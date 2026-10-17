@@ -7,10 +7,9 @@ import {
   CircleUser,
   KeyRound,
 } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
-import { useMutation } from "@tanstack/react-query"
-import { logout } from "@/services/auth.service"
+import { useLogout } from "@/hooks/auth/use-logout"
 import { UserAvatar } from "@/components/user-avatar"
 import {
   DropdownMenu,
@@ -38,8 +37,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const navigate = useNavigate()
-  const logoutMutation = useMutation({ mutationFn: logout, meta: { successMessage: "Signed out successfully." }, onSettled: () => navigate("/login", { replace: true }) })
+  const logoutMutation = useLogout()
 
   return (
     <SidebarMenu>

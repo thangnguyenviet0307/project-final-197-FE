@@ -19,8 +19,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { useThemeManager } from "@/hooks/use-theme-manager"
-import { useCircularTransition } from "@/hooks/use-circular-transition"
+import { useThemeManager } from "@/hooks/theme/use-theme-manager"
+import { useCircularTransition } from "@/hooks/theme/use-circular-transition"
 import {
   colorThemes,
   colorThemeLabels,

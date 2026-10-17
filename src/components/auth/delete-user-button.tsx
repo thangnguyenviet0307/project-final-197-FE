@@ -1,9 +1,8 @@
 import { useState } from "react"
-import { useMutation } from "@tanstack/react-query"
+import { useDeleteUser } from "@/hooks/users/use-delete-user"
 import { LoaderCircle, Trash2, TriangleAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverTrigger, PopoverContent, PopoverTitle, PopoverDescription } from "@/components/ui/popover"
-import { deleteUser } from "@/services/users.service"
 import { getApiError } from "@/services/api"
 
 export function DeleteUserButton({ id, email, disabled, onDeleted }: {
@@ -13,9 +12,7 @@ export function DeleteUserButton({ id, email, disabled, onDeleted }: {
   onDeleted: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const mutation = useMutation({
-    meta: { successMessage: "Account deleted." },
-    mutationFn: () => deleteUser(id),
+  const mutation = useDeleteUser(id, {
     onSuccess: () => { setOpen(false); onDeleted() },
   })
   return <Popover open={open} onOpenChange={(value) => {

@@ -54,7 +54,7 @@ import { toast } from "@/components/ui/toast"
 import { z } from "zod"
 
 import { schema } from "../schemas/task-schema"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/layout/use-mobile"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

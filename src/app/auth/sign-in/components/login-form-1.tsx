@@ -1,11 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useMutation } from "@tanstack/react-query"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useLogin } from "@/hooks/auth/use-login"
+import { Link, useLocation } from "react-router-dom"
 import { LoaderCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { loginSchema } from "@/lib/auth-schemas"
-import { login } from "@/services/auth.service"
 import { getApiError } from "@/services/api"
 import type { LoginCredentials } from "@/types/auth"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
@@ -14,27 +13,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 
 export function LoginForm1({ className, ...props }: React.ComponentProps<"div">) {
-  const navigate = useNavigate()
   const location = useLocation()
   const form = useForm<LoginCredentials>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } })
-  const mutation = useMutation({
-    meta: { successMessage: "Signed in successfully." },
-    mutationFn: login,
-    onSuccess: (user) => {
-      const from = location.state?.from
-      const path = typeof from?.pathname === "string" ? from.pathname : ""
-      const safePath = path.startsWith("/") && !path.startsWith("//") &&
-        !/^\/(login|auth|register|forgot-password|403)(\/|$)/.test(path)
-      const target = safePath ? `${path}${from.search || ""}${from.hash || ""}` : "/admin/dashboard"
-      navigate(user.mustChangePassword ? "/change-password" : user.role === "customer" ? "/403" : target, { replace: true })
-    },
-    onError: (error) => {
+  const mutation = useLogin((error) => {
       const failure = getApiError(error)
       form.setError("root", { message: failure.message })
       failure.errors?.forEach(({ field, message }) => {
         if (field === "email" || field === "password") form.setError(field, { message })
       })
-    },
   })
   return <div className={cn("flex flex-col gap-6", className)} {...props}>
     <Card><CardHeader className="text-center">

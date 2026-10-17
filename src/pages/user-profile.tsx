@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect } from "react"
+import { useAvatarUpload } from "@/hooks/profile/use-avatar-upload"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useProfile } from "@/hooks/profile/use-profile"
+import { useUpdateProfile } from "@/hooks/profile/use-update-profile"
 import { LoaderCircle, Upload } from "lucide-react"
 import { BaseLayout } from "@/components/layouts/base-layout"
 import { UserAvatar } from "@/components/user-avatar"
@@ -13,7 +15,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { profileSchema, type ProfileValues } from "@/lib/profile-schema"
 import { useAuthStore } from "@/stores/auth.store"
-import { getProfile, updateProfile } from "@/services/auth.service"
 import { getApiError } from "@/services/api"
 import type { User } from "@/types/auth"
 
@@ -27,30 +28,15 @@ function valuesFromUser(user: User | null): ProfileValues {
 
 export default function UserProfilePage() {
   const user = useAuthStore((state) => state.user)
-  const version = useAuthStore((state) => state.sessionVersion)
-  const profile = useQuery({ queryKey: ["auth", "me", version], queryFn: ({ signal }) => getProfile(signal), staleTime: 0 })
+  const profile = useProfile()
   const current = profile.data ?? user
-  const fileInput = useRef<HTMLInputElement>(null)
-  const readerRef = useRef<FileReader | null>(null)
-  const [avatar, setAvatar] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [removeAvatar, setRemoveAvatar] = useState(false)
-  const [avatarError, setAvatarError] = useState("")
-  const [isReading, setIsReading] = useState(false)
+  const { fileInput, avatar, preview, removeAvatar, avatarError, isReading,
+    clearPhotoChanges, selectPhoto, resetPhoto } = useAvatarUpload()
   const form = useForm<ProfileValues>({ resolver: zodResolver(profileSchema), defaultValues: valuesFromUser(user) })
   const { reset } = form
   const dirty = form.formState.isDirty
   useEffect(() => { if (profile.data && !dirty) reset(valuesFromUser(profile.data)) }, [profile.data, reset, dirty])
-  useEffect(() => () => readerRef.current?.abort(), [])
-
-  const clearPhotoChanges = () => {
-    readerRef.current?.abort()
-    setAvatar(null); setPreview(null); setRemoveAvatar(false); setAvatarError(""); setIsReading(false)
-    if (fileInput.current) fileInput.current.value = ""
-  }
-  const mutation = useMutation({
-    meta: { successMessage: "Profile updated." },
-    mutationFn: updateProfile,
+  const mutation = useUpdateProfile({
     onSuccess: (saved) => { reset(valuesFromUser(saved)); clearPhotoChanges() },
     onError: (error) => {
       const failure = getApiError(error)
@@ -60,23 +46,6 @@ export default function UserProfilePage() {
       })
     },
   })
-
-  const selectPhoto = (file: File | undefined) => {
-    readerRef.current?.abort()
-    setIsReading(false)
-    if (!file) return
-    if (!["image/jpeg", "image/png", "image/gif"].includes(file.type) || file.size > 800 * 1024) {
-      setAvatarError("Choose a JPG, PNG or GIF image up to 800 KB.")
-      if (fileInput.current) fileInput.current.value = ""
-      return
-    }
-    const reader = new FileReader()
-    readerRef.current = reader
-    setIsReading(true)
-    reader.onload = () => { setAvatar(file); setPreview(String(reader.result)); setRemoveAvatar(false); setAvatarError(""); setIsReading(false) }
-    reader.onerror = () => { setAvatarError("Unable to read the image. Please choose another file."); setIsReading(false) }
-    reader.readAsDataURL(file)
-  }
 
   return <BaseLayout title="User Profile" description="Update your profile and personal contact information.">
     <div className="px-4 lg:px-6">
@@ -93,7 +62,7 @@ export default function UserProfilePage() {
                 <UserAvatar name={current?.name || current?.email || "User"} avatar={removeAvatar ? "" : preview ?? current?.avatar} className="size-20" />
                 <div className="space-y-2"><div className="flex gap-2">
                   <Button type="button" size="sm" onClick={() => fileInput.current?.click()}><Upload />Upload new photo</Button>
-                  <Button type="button" size="sm" variant="outline" onClick={() => { clearPhotoChanges(); setRemoveAvatar(true) }}>Reset photo</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={resetPhoto}>Reset photo</Button>
                 </div><p className="text-xs text-muted-foreground">JPG, GIF or PNG, up to 800 KB. Click Save Changes to save your photo.</p></div>
                 <input ref={fileInput} type="file" aria-label="Profile photo" accept="image/jpeg,image/png,image/gif" className="hidden" onChange={(event) => selectPhoto(event.target.files?.[0])} />
               </div>

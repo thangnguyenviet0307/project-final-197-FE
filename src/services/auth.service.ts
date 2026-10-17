@@ -60,8 +60,6 @@ export async function updateProfile({ profile, avatar, removeAvatar }: {
   if (useAuthStore.getState().sessionVersion !== version) throw new Error("Session changed")
   const user = userSchema.parse(data.data)
   useAuthStore.setState({ user })
-  queryClient.setQueryData(["auth", "me", version], user)
-  await queryClient.invalidateQueries({ queryKey: ["users"] })
   return user
 }
 

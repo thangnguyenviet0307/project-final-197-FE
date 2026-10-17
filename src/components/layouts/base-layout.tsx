@@ -8,7 +8,7 @@ import {
   ThemeCustomizer,
   ThemeCustomizerTrigger,
 } from "@/components/theme-customizer"
-import { useSidebarConfig } from "@/hooks/use-sidebar-config"
+import { useSidebarConfig } from "@/hooks/layout/use-sidebar-config"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 interface BaseLayoutProps {

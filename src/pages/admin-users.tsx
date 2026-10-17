@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useUsers } from "@/hooks/users/use-users"
+import { useCreateUser } from "@/hooks/users/use-create-user"
+import { useResetUserPassword } from "@/hooks/users/use-reset-user-password"
 import { z } from "zod"
 import { KeyRound, LoaderCircle, UserPlus } from "lucide-react"
 import { BaseLayout } from "@/components/layouts/base-layout"
@@ -11,7 +13,7 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { createUser, createUserSchema, getTemporaryPassword, listUsers, resetUserPassword, type CreateUserInput, type ManagedUser } from "@/services/users.service"
+import { createUserSchema, getTemporaryPassword, type CreateUserInput, type ManagedUser } from "@/services/users.service"
 import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { passwordSchema } from "@/lib/auth-schemas"
@@ -21,12 +23,9 @@ import { DeleteUserButton } from "@/components/auth/delete-user-button"
 const resetSchema = z.object({ password: passwordSchema })
 
 function ResetPassword({ user, close }: { user: ManagedUser; close: () => void }) {
-  const queryClient = useQueryClient()
   const form = useForm<z.infer<typeof resetSchema>>({ resolver: zodResolver(resetSchema), defaultValues: { password: getTemporaryPassword(user.role) } })
-  const mutation = useMutation({
-    meta: { successMessage: "Password reset successfully." },
-    mutationFn: ({ password }: z.infer<typeof resetSchema>) => resetUserPassword({ id: user._id, password }),
-    onSuccess: () => { form.reset(); void queryClient.invalidateQueries({ queryKey: ["users"] }) },
+  const mutation = useResetUserPassword(user._id, {
+    onSuccess: () => form.reset(),
     onError: (error) => form.setError("root", { message: getApiError(error).message }),
   })
   return <Card><CardHeader><CardTitle>Reset password: {user.email}</CardTitle></CardHeader>
@@ -49,15 +48,12 @@ export default function UsersPage() {
   const [page, setPage] = useState(1)
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const currentUser = useAuthStore((state) => state.user)
-  const queryClient = useQueryClient()
-  const users = useQuery({ queryKey: ["users", page], queryFn: ({ signal }) => listUsers(page, signal) })
+  const users = useUsers(page)
   const form = useForm<CreateUserInput>({ resolver: zodResolver(createUserSchema), defaultValues: {
     firstName: "", lastName: "", email: "", password: getTemporaryPassword("staff"), role: "staff",
   } })
-  const mutation = useMutation({
-    mutationFn: createUser,
-    meta: { successMessage: "Account created successfully." },
-    onSuccess: () => { form.reset(); setPage(1); void queryClient.invalidateQueries({ queryKey: ["users"] }) },
+  const mutation = useCreateUser({
+    onSuccess: () => { form.reset(); setPage(1) },
     onError: (error) => {
       const failure = getApiError(error)
       form.setError("root", { message: failure.message })
@@ -102,7 +98,6 @@ export default function UsersPage() {
                 <DeleteUserButton id={user._id} email={user.email} disabled={user._id === currentUser?.id} onDeleted={() => {
                   if (resetTarget?._id === user._id) setResetTarget(null)
                   if (users.data.data.length === 1 && page > 1) setPage((value) => value - 1)
-                  void queryClient.invalidateQueries({ queryKey: ["users"] })
                 }} />
               </div></TableCell>
             </TableRow>)}{users.data.data.length === 0 && <TableRow><TableCell colSpan={6}>No accounts found.</TableCell></TableRow>}</TableBody></Table>

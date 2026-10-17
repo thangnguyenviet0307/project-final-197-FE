@@ -1,6 +1,6 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react"
 import { Toaster as SonnerToaster, toast, useSonner } from "sonner"
-import { useTheme } from "@/hooks/use-theme"
+import { useTheme } from "@/hooks/theme/use-theme"
 
 export { toast } from "sonner"
 

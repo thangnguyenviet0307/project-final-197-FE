@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useTheme } from "@/hooks/use-theme"
+import { useTheme } from "@/hooks/theme/use-theme"
 import { baseColors } from "@/config/theme-customizer-constants"
 import { colorThemes } from "@/config/theme-data"
 import type { ThemePreset, ImportedTheme } from "@/types/theme-customizer"

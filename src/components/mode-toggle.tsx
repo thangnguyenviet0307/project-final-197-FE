@@ -4,8 +4,8 @@ import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { useTheme } from "@/hooks/use-theme"
-import { useCircularTransition } from "@/hooks/use-circular-transition"
+import { useTheme } from "@/hooks/theme/use-theme"
+import { useCircularTransition } from "@/hooks/theme/use-circular-transition"
 import "./theme-customizer/circular-transition.css"
 
 interface ModeToggleProps {

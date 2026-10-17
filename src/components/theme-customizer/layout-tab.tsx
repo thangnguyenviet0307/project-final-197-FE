@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { useSidebarConfig } from "@/hooks/use-sidebar-config"
+import { useSidebarConfig } from "@/hooks/layout/use-sidebar-config"
 import { useSidebar } from "@/components/ui/sidebar"
 import {
   sidebarVariants,

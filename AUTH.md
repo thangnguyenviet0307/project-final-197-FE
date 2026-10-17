@@ -46,7 +46,18 @@ Sonner displays dismissible success/error notifications at the bottom-left, resp
 
 Notifications use a compact 280px responsive width, 10px horizontal padding, centered text, and no close button. They expire after five seconds and stack up to three at once. Older notifications are dismissed when a burst exceeds the limit, preventing an unbounded pending queue. Hovering or interacting with notifications temporarily pauses Sonner's expiry timer.
 
-## Verification
+## Frontend code organization
+
+- `src/services/`: HTTP requests and session persistence/lifecycle.
+- `src/hooks/auth/`: auth mutations, navigation, and session initialization.
+- `src/hooks/profile/`: profile queries, cache updates, and local avatar validation/preview.
+- `src/hooks/users/`: user queries/mutations and list cache invalidation.
+- `src/hooks/theme/`: theme state, customization, and theme transitions.
+- `src/hooks/layout/`: responsive layout, fullscreen, and sidebar configuration.
+- Pages/components render the interface, validate form input, and map API errors to fields. Hooks accept callbacks for form-specific success/error handling.
+- `src/types/mutation.ts`: shared TypeScript callback types for mutation hooks.
+
+## Verification commands
 
 - Frontend: `pnpm test`, `pnpm build`, `pnpm lint`.
 - Backend: `pnpm test` from its own directory.

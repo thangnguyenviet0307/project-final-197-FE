@@ -28,7 +28,7 @@ import { getAppUrl } from "@/lib/utils"
 import { Logo } from "@/components/logo"
 import { MegaMenu } from "@/components/landing/mega-menu"
 import { ModeToggle } from "@/components/mode-toggle"
-import { useTheme } from "@/hooks/use-theme"
+import { useTheme } from "@/hooks/theme/use-theme"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [

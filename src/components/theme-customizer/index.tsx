@@ -11,8 +11,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useThemeManager } from "@/hooks/use-theme-manager"
-import { useSidebarConfig } from "@/hooks/use-sidebar-config"
+import { useThemeManager } from "@/hooks/theme/use-theme-manager"
+import { useSidebarConfig } from "@/hooks/layout/use-sidebar-config"
 import { tweakcnThemes } from "@/config/theme-data"
 import { ThemeTab } from "./theme-tab"
 import { LayoutTab } from "./layout-tab"
