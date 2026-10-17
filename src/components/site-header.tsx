@@ -1,14 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CommandSearch, SearchTrigger } from "@/components/command-search"
 import { ModeToggle } from "@/components/mode-toggle"
-import { getAppUrl } from "@/lib/utils"
+import { useAuthStore } from "@/stores/auth.store"
+import { Badge } from "@/components/ui/badge"
 
 export function SiteHeader() {
+  const user = useAuthStore((state) => state.user)
   const [searchOpen, setSearchOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -36,51 +37,8 @@ export function SiteHeader() {
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-              nativeButton={false}
-              render={
-                <a
-                  href="https://shadcnstore.com/blocks"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                />
-              }
-            >
-              Blocks
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-              nativeButton={false}
-              render={
-                <a
-                  href={getAppUrl("/landing")}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                />
-              }
-            >
-              Landing Page
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex"
-              nativeButton={false}
-              render={
-                <a
-                  href="https://github.com/shadcnstore/shadcn-dashboard-landing-template"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                />
-              }
-            >
-              GitHub
-            </Button>
+            <span className="hidden text-sm sm:inline">{user?.name}</span>
+            <Badge variant="secondary">{user?.role}</Badge>
             <ModeToggle />
           </div>
         </div>

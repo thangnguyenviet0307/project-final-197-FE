@@ -12,13 +12,12 @@ import {
   AlertTriangle,
   Settings,
   HelpCircle,
-  CreditCard,
   LayoutTemplate,
   Users,
 } from "lucide-react"
+import { useAuthStore } from "@/stores/auth.store"
 import { Link } from "react-router-dom"
 import { Logo } from "@/components/logo"
-import { SidebarNotification } from "@/components/sidebar-notification"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -44,7 +43,7 @@ const data = {
       items: [
         {
           title: "Dashboard 1",
-          url: "/dashboard",
+          url: "/admin/dashboard",
           icon: LayoutDashboard,
         },
         {
@@ -169,16 +168,8 @@ const data = {
           icon: Settings,
           items: [
             {
-              title: "User Settings",
+              title: "User Profile",
               url: "/settings/user",
-            },
-            {
-              title: "Account Settings",
-              url: "/settings/account",
-            },
-            {
-              title: "Plans & Billing",
-              url: "/settings/billing",
             },
             {
               title: "Appearance",
@@ -199,17 +190,17 @@ const data = {
           url: "/faqs",
           icon: HelpCircle,
         },
-        {
-          title: "Pricing",
-          url: "/pricing",
-          icon: CreditCard,
-        },
       ],
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = useAuthStore((state) => state.user)
+  const groups = data.navGroups.map((group) => ({ ...group,
+    items: group.items.filter((item) => item.title !== "Auth Pages" && item.title !== "Errors" &&
+      (item.url !== "/users" || user?.role === "admin")),
+  }))
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -228,13 +219,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {data.navGroups.map((group) => (
+        {groups.map((group) => (
           <NavMain key={group.label} label={group.label} items={group.items} />
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <SidebarNotification />
-        <NavUser user={data.user} />
+        {user && <NavUser user={{ name: user.name, email: user.email, avatar: user.avatar || "" }} />}
       </SidebarFooter>
     </Sidebar>
   )

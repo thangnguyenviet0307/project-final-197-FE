@@ -4,6 +4,9 @@ import { SidebarConfigProvider } from "@/contexts/sidebar-context"
 import { Toaster } from "@/components/ui/toast"
 import { RootFallback, RootLayout } from "@/components/router/root-layout"
 import { routes } from "@/config/routes"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { queryClient } from "@/lib/query-client"
+import { AuthBootstrap } from "@/components/router/auth-bootstrap"
 import { useEffect } from "react"
 import { initGTM } from "@/utils/analytics"
 
@@ -35,7 +38,9 @@ function App() {
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <SidebarConfigProvider>
           <Toaster>
-            <RouterProvider router={router} />
+            <QueryClientProvider client={queryClient}>
+              <AuthBootstrap><RouterProvider router={router} /></AuthBootstrap>
+            </QueryClientProvider>
           </Toaster>
         </SidebarConfigProvider>
       </ThemeProvider>

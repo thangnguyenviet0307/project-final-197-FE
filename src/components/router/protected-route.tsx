@@ -1,0 +1,23 @@
+import { Navigate, Outlet, useLocation } from "react-router-dom"
+import { useAuthStore } from "@/stores/auth.store"
+import { RootFallback } from "./root-layout"
+import type { Role } from "@/types/auth"
+
+export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Role[] }) {
+  const { user, isLoading, isAuthenticated } = useAuthStore()
+  const location = useLocation()
+  if (isLoading) return <RootFallback />
+  if (!isAuthenticated || !user) return <Navigate to="/login" state={{ from: location }} replace />
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/403" replace />
+  if (user.mustChangePassword && location.pathname !== "/change-password") {
+    return <Navigate to="/change-password" replace />
+  }
+  return <Outlet />
+}
+
+export function PublicOnlyRoute() {
+  const { user, isLoading, isAuthenticated } = useAuthStore()
+  if (isLoading) return <RootFallback />
+  if (isAuthenticated) return <Navigate to={user?.mustChangePassword ? "/change-password" : user?.role === "customer" ? "/403" : "/admin/dashboard"} replace />
+  return <Outlet />
+}

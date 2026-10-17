@@ -1,0 +1,54 @@
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "@tanstack/react-query"
+import { LoaderCircle } from "lucide-react"
+import { useNavigate, Link } from "react-router-dom"
+import type { z } from "zod"
+import { changePasswordSchema } from "@/lib/auth-schemas"
+import { changePassword } from "@/services/auth.service"
+import { getApiError } from "@/services/api"
+import { useAuthStore } from "@/stores/auth.store"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { LogoutButton } from "@/components/auth/logout-button"
+
+type Values = z.infer<typeof changePasswordSchema>
+export default function ChangePasswordPage() {
+  const navigate = useNavigate()
+  const required = useAuthStore((state) => state.user?.mustChangePassword)
+  const form = useForm<Values>({ resolver: zodResolver(changePasswordSchema), defaultValues: {
+    currentPassword: "", newPassword: "", confirmPassword: "",
+  } })
+  const mutation = useMutation({
+    meta: { successMessage: "Password changed. Please sign in again." },
+    mutationFn: ({ currentPassword, newPassword }: Values) => changePassword({ currentPassword, newPassword }),
+    onSuccess: () => navigate("/login", { replace: true, state: { message: "Password changed. Please sign in again." } }),
+    onError: (error) => form.setError("root", { message: getApiError(error).message }),
+  })
+  return <div className="bg-muted flex min-h-svh items-center justify-center p-6">
+    <Card className="w-full max-w-md">
+      <CardHeader><CardTitle>Change password</CardTitle><CardDescription>
+        {required ? "Change the temporary password provided by your administrator to continue." : "Changing your password will revoke all existing sessions."}
+      </CardDescription></CardHeader>
+      <CardContent><form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+        {([
+          ["currentPassword", "Current password", "current-password"],
+          ["newPassword", "New password", "new-password"],
+          ["confirmPassword", "Confirm new password", "new-password"],
+        ] as const).map(([name, label, autocomplete]) => <Field key={name} data-invalid={!!form.formState.errors[name]}>
+          <FieldLabel htmlFor={name}>{label}</FieldLabel>
+          <Input id={name} type="password" autoComplete={autocomplete} aria-invalid={!!form.formState.errors[name]} {...form.register(name)} />
+          <FieldError errors={[form.formState.errors[name]]} />
+        </Field>)}
+        {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+        <Button type="submit" disabled={mutation.isPending}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Save new password</Button>
+      </form>
+      <div className="mt-5 flex items-center justify-between gap-3">
+        {!required && <Link className="text-sm underline" to="/admin/dashboard">Back to Dashboard</Link>}
+        <LogoutButton />
+      </div></CardContent>
+    </Card>
+  </div>
+}

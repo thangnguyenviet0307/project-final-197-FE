@@ -1,41 +1,20 @@
-"use client"
-
+import { ShieldX } from "lucide-react"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { LogoutButton } from "@/components/auth/logout-button"
+import { useAuthStore } from "@/stores/auth.store"
 
 export function ForbiddenError() {
-  const navigate = useNavigate()
-
-  return (
-    <div className="mx-auto flex min-h-dvh flex-col items-center justify-center gap-8 p-8 md:gap-12 md:p-16">
-      <img
-        src="https://ui.shadcn.com/placeholder.svg"
-        alt="placeholder image"
-        className="aspect-video w-240 rounded-xl object-cover dark:brightness-[0.95] dark:invert"
-      />
-      <div className="text-center">
-        <h1 className="mb-4 text-3xl font-bold">403</h1>
-        <h2 className="mb-3 text-2xl font-semibold">Forbidden</h2>
-        <p>
-          Access to this resource is forbidden. You don't have the necessary
-          permissions to view this page.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
-          <Button
-            className="cursor-pointer"
-            onClick={() => navigate("/dashboard")}
-          >
-            Go Back Home
-          </Button>
-          <Button
-            variant="outline"
-            className="flex cursor-pointer items-center gap-1"
-            onClick={() => navigate("#")}
-          >
-            Contact Us
-          </Button>
-        </div>
-      </div>
+  const user = useAuthStore((state) => state.user)
+  return <div className="mx-auto flex min-h-svh max-w-lg flex-col items-center justify-center gap-5 p-6 text-center">
+    <ShieldX className="size-16 text-destructive" />
+    <h1 className="text-4xl font-bold">403</h1>
+    <h2 className="text-xl font-semibold">Access denied</h2>
+    <p className="text-muted-foreground">Your account does not have permission to access this page. Contact your administrator for help.</p>
+    <div className="flex flex-wrap justify-center gap-3">
+      {user && user.role !== "customer" ? <Button nativeButton={false} render={<Link to="/admin/dashboard" />}>Back to Dashboard</Button>
+        : !user && <Button nativeButton={false} render={<Link to="/login" />}>Sign in</Button>}
+      {user && <LogoutButton />}
     </div>
-  )
+  </div>
 }

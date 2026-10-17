@@ -2,7 +2,6 @@ import { BaseLayout } from "@/components/layouts/base-layout"
 import { MetricsOverview } from "./components/metrics-overview"
 import { SalesChart } from "./components/sales-chart"
 import { RecentTransactions } from "./components/recent-transactions"
-import { TopProducts } from "./components/top-products"
 import { CustomerInsights } from "./components/customer-insights"
 import { QuickActions } from "./components/quick-actions"
 import { RevenueBreakdown } from "./components/revenue-breakdown"
@@ -37,11 +36,7 @@ export default function Dashboard2() {
             <RevenueBreakdown />
           </div>
 
-          {/* Third Row - Two Column Layout */}
-          <div className="grid gap-6 grid-cols-1 @5xl:grid-cols-2">
-            <RecentTransactions />
-            <TopProducts />
-          </div>
+          <RecentTransactions />
 
           {/* Fourth Row - Customer Insights and Team Performance */}
           <CustomerInsights />

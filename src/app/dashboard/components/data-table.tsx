@@ -202,9 +202,9 @@ const columns: ColumnDef<DataTableFeatures, z.infer<typeof schema>>[] = [
         onSubmit={(e) => {
           e.preventDefault()
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: { title: `Saving ${row.original.header}` },
-            success: { title: "Done" },
-            error: { title: "Error" },
+            loading: `Saving ${row.original.header}`,
+            success: "Done",
+            error: "Error",
           })
         }}
       >
@@ -227,9 +227,9 @@ const columns: ColumnDef<DataTableFeatures, z.infer<typeof schema>>[] = [
         onSubmit={(e) => {
           e.preventDefault()
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: { title: `Saving ${row.original.header}` },
-            success: { title: "Done" },
-            error: { title: "Error" },
+            loading: `Saving ${row.original.header}`,
+            success: "Done",
+            error: "Error",
           })
         }}
       >

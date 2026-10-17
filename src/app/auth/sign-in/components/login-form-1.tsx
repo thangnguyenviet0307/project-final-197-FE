@@ -1,143 +1,66 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { useMutation } from "@tanstack/react-query"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { LoaderCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { loginSchema } from "@/lib/auth-schemas"
+import { login } from "@/services/auth.service"
+import { getApiError } from "@/services/api"
+import type { LoginCredentials } from "@/types/auth"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
-const loginFormSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-})
-
-type LoginFormValues = z.infer<typeof loginFormSchema>
-
-export function LoginForm1({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginFormSchema),
-    defaultValues: {
-      email: "test@example.com",
-      password: "password",
+export function LoginForm1({ className, ...props }: React.ComponentProps<"div">) {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const form = useForm<LoginCredentials>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } })
+  const mutation = useMutation({
+    meta: { successMessage: "Signed in successfully." },
+    mutationFn: login,
+    onSuccess: (user) => {
+      const from = location.state?.from
+      const path = typeof from?.pathname === "string" ? from.pathname : ""
+      const safePath = path.startsWith("/") && !path.startsWith("//") &&
+        !/^\/(login|auth|register|forgot-password|403)(\/|$)/.test(path)
+      const target = safePath ? `${path}${from.search || ""}${from.hash || ""}` : "/admin/dashboard"
+      navigate(user.mustChangePassword ? "/change-password" : user.role === "customer" ? "/403" : target, { replace: true })
+    },
+    onError: (error) => {
+      const failure = getApiError(error)
+      form.setError("root", { message: failure.message })
+      failure.errors?.forEach(({ field, message }) => {
+        if (field === "email" || field === "password") form.setError(field, { message })
+      })
     },
   })
-
-  return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action="/">
-            <div className="grid gap-6">
-              <FieldGroup className="grid gap-4">
-                <Controller
-                  control={form.control}
-                  name="email"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="login-form-1-email">
-                        Email
-                      </FieldLabel>
-
-                      <Input
-                        id="login-form-1-email"
-                        aria-invalid={fieldState.invalid}
-                        type="email"
-                        placeholder="test@example.com"
-                        {...field}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  control={form.control}
-                  name="password"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <div className="flex items-center">
-                        <FieldLabel htmlFor="login-form-1-password">
-                          Password
-                        </FieldLabel>
-                        <a
-                          href="/templates/dashboard/shadcn-dashboard-landing-template/auth/forgot-password"
-                          className="ml-auto text-sm underline-offset-4 hover:underline"
-                        >
-                          Forgot your password?
-                        </a>
-                      </div>
-
-                      <Input
-                        id="login-form-1-password"
-                        aria-invalid={fieldState.invalid}
-                        type="password"
-                        {...field}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Button type="submit" className="w-full cursor-pointer">
-                  Login
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full cursor-pointer"
-                  type="button"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  Login with Google
-                </Button>
-              </FieldGroup>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <a
-                  href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-up"
-                  className="underline underline-offset-4"
-                >
-                  Sign up
-                </a>
-              </div>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+  return <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <Card><CardHeader className="text-center">
+      <CardTitle className="text-xl">Admin Sign In</CardTitle>
+      <CardDescription>Use the account provided by your administrator.</CardDescription>
+    </CardHeader><CardContent>
+      {typeof location.state?.message === "string" && <p role="status" className="mb-4 text-sm">{location.state.message}</p>}
+      <form className="space-y-4" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+        <Field data-invalid={!!form.formState.errors.email}>
+          <FieldLabel htmlFor="login-email">Email</FieldLabel>
+          <Input id="login-email" type="email" autoComplete="username" placeholder="you@example.com" aria-invalid={!!form.formState.errors.email} {...form.register("email")} />
+          <FieldError errors={[form.formState.errors.email]} />
+        </Field>
+        <Field data-invalid={!!form.formState.errors.password}>
+          <FieldLabel htmlFor="login-password">Password</FieldLabel>
+          <Input id="login-password" type="password" autoComplete="current-password" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
+          <FieldError errors={[form.formState.errors.password]} />
+        </Field>
+        {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
+        <Button type="submit" className="w-full" disabled={mutation.isPending}>
+          {mutation.isPending && <LoaderCircle className="animate-spin" />} {mutation.isPending ? "Signing in…" : "Sign in"}
+        </Button>
+      </form>
+      <div className="mt-4 text-right">
+        <Link to="/forgot-password" className="text-sm underline-offset-4 hover:underline">Forgot password?</Link>
       </div>
-    </div>
-  )
+    </CardContent></Card>
+  </div>
 }

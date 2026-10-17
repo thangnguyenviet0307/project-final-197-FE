@@ -1,15 +1,17 @@
 "use client"
 
 import {
-  CreditCard,
   EllipsisVertical,
   LogOut,
   BellDot,
   CircleUser,
+  KeyRound,
 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
-import { Logo } from "@/components/logo"
+import { useMutation } from "@tanstack/react-query"
+import { logout } from "@/services/auth.service"
+import { UserAvatar } from "@/components/user-avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +38,8 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+  const logoutMutation = useMutation({ mutationFn: logout, meta: { successMessage: "Signed out successfully." }, onSettled: () => navigate("/login", { replace: true }) })
 
   return (
     <SidebarMenu>
@@ -45,13 +49,12 @@ export function NavUser({
             render={
               <SidebarMenuButton
                 size="lg"
+                aria-label={`Account menu ${user.name}`}
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground cursor-pointer"
               />
             }
           >
-            <div className="flex size-8 items-center justify-center rounded-lg">
-              <Logo size={28} className="size-7!" />
-            </div>
+            <UserAvatar name={user.name} avatar={user.avatar} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
               <span className="text-muted-foreground truncate text-xs">
@@ -69,9 +72,7 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal text-foreground">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <div className="size-8 rounded-lg">
-                    <Logo size={28} />
-                  </div>
+                  <UserAvatar name={user.name} avatar={user.avatar} />
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
                     <span className="text-muted-foreground truncate text-xs">
@@ -83,19 +84,15 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                render={<Link to="/settings/account" />}
-              >
-                <CircleUser />
-                Account
+              <DropdownMenuItem className="cursor-pointer" render={<Link to="/settings/user" />}>
+                <CircleUser />User Profile
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                render={<Link to="/settings/billing" />}
+                render={<Link to="/change-password" />}
               >
-                <CreditCard />
-                Billing
+                <KeyRound />
+                Change password
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -109,10 +106,11 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                render={<Link to="/sign-in" />}
+                disabled={logoutMutation.isPending}
+                onClick={() => logoutMutation.mutate()}
               >
                 <LogOut />
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

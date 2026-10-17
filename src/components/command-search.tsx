@@ -11,9 +11,8 @@ import {
   Calendar,
   Shield,
   AlertTriangle,
-  Settings,
   HelpCircle,
-  CreditCard,
+  Users,
   User,
   Bell,
   Link2,
@@ -32,6 +31,7 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { Kbd } from "@/components/ui/kbd"
+import { useAuthStore } from "@/stores/auth.store"
 
 interface SearchItem {
   title: string
@@ -47,12 +47,13 @@ interface CommandSearchProps {
 
 export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const navigate = useNavigate()
+  const role = useAuthStore((state) => state.user?.role)
 
   const searchItems: SearchItem[] = [
     // Dashboards
     {
       title: "Dashboard 1",
-      url: "/dashboard",
+      url: "/admin/dashboard",
       group: "Dashboards",
       icon: LayoutDashboard,
     },
@@ -68,6 +69,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
     { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },
     { title: "Calendar", url: "/calendar", group: "Apps", icon: Calendar },
+    { title: "User Management", url: "/users", group: "Apps", icon: Users },
+    { title: "Change password", url: "/change-password", group: "Settings", icon: Shield },
 
     // Auth Pages
     {
@@ -141,22 +144,10 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
     // Settings
     {
-      title: "User Settings",
+      title: "User Profile",
       url: "/settings/user",
       group: "Settings",
       icon: User,
-    },
-    {
-      title: "Account Settings",
-      url: "/settings/account",
-      group: "Settings",
-      icon: Settings,
-    },
-    {
-      title: "Plans & Billing",
-      url: "/settings/billing",
-      group: "Settings",
-      icon: CreditCard,
     },
     {
       title: "Appearance",
@@ -179,10 +170,12 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
     // Pages
     { title: "FAQs", url: "/faqs", group: "Pages", icon: HelpCircle },
-    { title: "Pricing", url: "/pricing", group: "Pages", icon: CreditCard },
   ]
 
-  const groupedItems = searchItems.reduce(
+  const groupedItems = searchItems.filter((item) =>
+    item.group !== "Auth Pages" && item.group !== "Errors" &&
+    (item.url !== "/users" || role === "admin")
+  ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {
         acc[item.group] = []
