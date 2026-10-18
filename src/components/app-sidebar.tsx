@@ -14,6 +14,7 @@ import {
   HelpCircle,
   LayoutTemplate,
   Users,
+  FolderTree,
 } from "lucide-react"
 import { useAuthStore } from "@/stores/auth.store"
 import { Link } from "react-router-dom"
@@ -75,6 +76,11 @@ const data = {
           title: "Calendar",
           url: "/calendar",
           icon: Calendar,
+        },
+        {
+          title: "Categories",
+          url: "/categories",
+          icon: FolderTree,
         },
         {
           title: "Users",
