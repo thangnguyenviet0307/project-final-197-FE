@@ -42,7 +42,7 @@ Zustand persists only access/refresh tokens. User and role are checked through `
 
 ## Notifications and language
 
-Sonner displays dismissible success/error notifications at the bottom-left, respecting the app theme. Query and mutation failures use shared error formatting. Successful sign-in/out, profile saves, account creation/deletion, and password changes/resets show action-specific messages. Inline field errors remain available next to the relevant inputs. Frontend interface text is English; localized errors from older Backend builds receive English fallbacks.
+Sonner displays dismissible success/error notifications at the bottom-left, respecting the app theme. Query and mutation failures use shared error formatting. Successful sign-in/out, profile saves, account creation/deletion, and password changes/resets show action-specific messages. Inline field errors remain available next to the relevant inputs. Frontend interface text is English; known localized Backend errors are translated, while unrecognized Backend messages are preserved rather than replaced with a generic status message.
 
 Notifications use a compact 280px responsive width, 10px horizontal padding, centered text, and no close button. They expire after five seconds and stack up to three at once. Older notifications are dismissed when a burst exceeds the limit, preventing an unbounded pending queue. Hovering or interacting with notifications temporarily pauses Sonner's expiry timer.
 

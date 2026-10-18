@@ -7,7 +7,7 @@ export function useLogin(onError?: (error: Error) => void) {
   const location = useLocation()
   return useMutation({
     mutationFn: login,
-    meta: { successMessage: "Signed in successfully." },
+    meta: { successMessage: "Signed in successfully.", suppressGlobalErrorToast: true },
     onSuccess: (user) => {
       const from = location.state?.from
       const path = typeof from?.pathname === "string" ? from.pathname : ""

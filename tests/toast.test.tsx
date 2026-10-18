@@ -41,6 +41,16 @@ it("shows action success messages and API failures through the shared query clie
   expect(failure).toHaveBeenCalledWith("Action failed.")
 })
 
+it("does not duplicate a form-level sign-in error as a toast", async () => {
+  const failure = vi.spyOn(toast, "error")
+  const mutation = queryClient.getMutationCache().build(queryClient, {
+    mutationFn: async () => { throw new Error("The email or password is incorrect.") },
+    meta: { suppressGlobalErrorToast: true },
+  })
+  await expect(mutation.execute(undefined)).rejects.toThrow("The email or password is incorrect.")
+  expect(failure).not.toHaveBeenCalled()
+})
+
 it("automatically removes a toast after five seconds", async () => {
   vi.useFakeTimers()
   render(<ThemeProvider defaultTheme="light" storageKey="toast-test-theme"><Toaster /></ThemeProvider>)

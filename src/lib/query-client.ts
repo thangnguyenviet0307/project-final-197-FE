@@ -4,7 +4,10 @@ import { getApiError } from "@/lib/api-error"
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
-    onError: (error) => toast.error(getApiError(error).message),
+    onError: (error, _variables, _context, mutation) => {
+      if (mutation.meta?.suppressGlobalErrorToast) return
+      toast.error(getApiError(error).message)
+    },
     onSuccess: (_data, _variables, _context, mutation) => {
       if (typeof mutation.meta?.successMessage === "string") toast.success(mutation.meta.successMessage)
     },
