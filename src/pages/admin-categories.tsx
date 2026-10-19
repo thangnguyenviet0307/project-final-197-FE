@@ -28,41 +28,78 @@ import {
   CheckCircle2,
   Folder,
   Layers,
+  BatteryCharging,
+  Cable,
+  Camera,
+  HardDrive,
+  Headphones,
+  Laptop,
+  Package,
+  PlugZap,
+  ShieldCheck,
+  Smartphone,
+  Speaker,
+  Tablet,
+  Watch,
+  Wifi,
+  type LucideIcon,
 } from "lucide-react"
 
 
-// Map keyword -> emoji for category images
-function getCategoryEmoji(name: string): string {
-  const lower = name.toLowerCase()
-  if (/tai nghe|headphone|audio/.test(lower)) return "🎧"
-  if (/điện thoại|phone|smartphone|mobile/.test(lower)) return "📱"
-  if (/laptop|máy tính xách tay|notebook/.test(lower)) return "💻"
-  if (/máy tính|computer|pc|desktop/.test(lower)) return "🖥️"
-  if (/tivi|tv|màn hình|monitor|screen/.test(lower)) return "📺"
-  if (/camera|máy ảnh|máy chụp/.test(lower)) return "📷"
-  if (/chuột|mouse/.test(lower)) return "🖱️"
-  if (/bàn phím|keyboard/.test(lower)) return "⌨️"
-  if (/loa|speaker|âm thanh|sound/.test(lower)) return "🔊"
-  if (/pin|battery|sạc|charger/.test(lower)) return "🔋"
-  if (/đồng hồ|watch|smartwatch/.test(lower)) return "⌚"
-  if (/máy in|printer/.test(lower)) return "🖨️"
-  if (/ổ cứng|hard drive|ssd|storage|lưu trữ/.test(lower)) return "💾"
-  if (/wifi|router|mạng|network/.test(lower)) return "📡"
-  if (/thời trang|quần|áo|fashion|clothing|mặc/.test(lower)) return "👕"
-  if (/giày|dép|shoes|boots/.test(lower)) return "👟"
-  if (/túi|bag|balo|backpack/.test(lower)) return "🎒"
-  if (/son|mỹ phẩm|beauty|makeup|cosmetic/.test(lower)) return "💄"
-  if (/thể thao|sport|gym|yoga/.test(lower)) return "🏋️"
-  if (/sách|book|văn phòng|office/.test(lower)) return "📚"
-  if (/đồ chơi|toy|game|gaming/.test(lower)) return "🎮"
-  if (/nhà bếp|kitchen|nấu ăn|cook/.test(lower)) return "🍳"
-  if (/nội thất|furniture|ghế|bàn/.test(lower)) return "🪑"
-  if (/xe|vehicle|ôtô|car|motor|bike/.test(lower)) return "🚗"
-  if (/hoa quả|trái cây|fruit/.test(lower)) return "🍎"
-  if (/thực phẩm|food|đồ ăn/.test(lower)) return "🍜"
-  if (/sức khỏe|health|y tế|medical/.test(lower)) return "💊"
-  if (/sony/.test(lower)) return "🎧"
-  return "📦"
+function getCategoryIcon(name: string): { Icon: LucideIcon; color: string } {
+  const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  const colors = {
+    phone: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    audio: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    charging: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    protection: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    storage: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+    other: "bg-muted text-muted-foreground",
+  }
+
+  if (/tai nghe|headphones?|earbuds?|earphones?|airpods?/.test(normalized)) {
+    return { Icon: Headphones, color: colors.audio }
+  }
+  if (/op lung|bao da|phone case|case|cover/.test(normalized)) {
+    return { Icon: Smartphone, color: colors.phone }
+  }
+  if (/kinh cuong luc|cuong luc|mieng dan|screen protector|tempered glass/.test(normalized)) {
+    return { Icon: ShieldCheck, color: colors.protection }
+  }
+  if (/sac du phong|power bank|pin|battery/.test(normalized)) {
+    return { Icon: BatteryCharging, color: colors.charging }
+  }
+  if (/sac|charger|adapter/.test(normalized)) {
+    return { Icon: PlugZap, color: colors.charging }
+  }
+  if (/cap|cable|usb/.test(normalized)) {
+    return { Icon: Cable, color: colors.charging }
+  }
+  if (/dien thoai|phone|smartphone|mobile/.test(normalized)) {
+    return { Icon: Smartphone, color: colors.phone }
+  }
+  if (/tablet|ipad/.test(normalized)) {
+    return { Icon: Tablet, color: colors.phone }
+  }
+  if (/laptop|notebook/.test(normalized)) {
+    return { Icon: Laptop, color: colors.phone }
+  }
+  if (/dong ho|watch|smartwatch/.test(normalized)) {
+    return { Icon: Watch, color: colors.phone }
+  }
+  if (/camera|may anh/.test(normalized)) {
+    return { Icon: Camera, color: colors.audio }
+  }
+  if (/loa|speaker|am thanh/.test(normalized)) {
+    return { Icon: Speaker, color: colors.audio }
+  }
+  if (/the nho|o cung|hard drive|ssd|storage/.test(normalized)) {
+    return { Icon: HardDrive, color: colors.storage }
+  }
+  if (/wifi|router|mang|network/.test(normalized)) {
+    return { Icon: Wifi, color: colors.storage }
+  }
+  return { Icon: Package, color: colors.other }
 }
 
 export default function AdminCategoriesPage() {
@@ -325,8 +362,7 @@ export default function AdminCategoriesPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-12 text-center">Ảnh</TableHead>
-                      <TableHead className="w-[260px]">Tên danh mục</TableHead>
+                      <TableHead className="w-[300px]">Danh mục</TableHead>
                       <TableHead>Slug</TableHead>
                       <TableHead>Mô tả</TableHead>
                       <TableHead>Danh mục cha</TableHead>
@@ -341,24 +377,17 @@ export default function AdminCategoriesPage() {
                         typeof category.parent === "object" && category.parent !== null
                           ? category.parent.name
                           : categories.find((c) => c._id === category.parent)?.name
+                      const { Icon: CategoryIcon, color: iconColor } = getCategoryIcon(
+                        `${category.name} ${category.description ?? ""}`,
+                      )
 
                       return (
                         <TableRow key={category._id}>
-                          <TableCell className="text-center">
-                            <span
-                              className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-muted text-xl"
-                              title={category.name}
-                            >
-                              {getCategoryEmoji(category.name)}
-                            </span>
-                          </TableCell>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                              {category.parent ? (
-                                <FolderTree className="h-4 w-4 text-blue-500 shrink-0" />
-                              ) : (
-                                <Folder className="h-4 w-4 text-amber-500 shrink-0" />
-                              )}
+                              <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${iconColor}`}>
+                                <CategoryIcon className="size-4" aria-hidden="true" />
+                              </span>
                               <span>{category.name}</span>
                             </div>
                           </TableCell>
