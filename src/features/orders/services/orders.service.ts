@@ -23,3 +23,8 @@ export async function startOrder({ id, userId }: { id: string; userId?: string }
   const { data } = await api.patch<ApiResponse<Order>>(`/orders/${encodeURIComponent(id)}/start`, userId ? { userId } : {})
   return data.data
 }
+
+export async function reassignOrder({ id, userId }: { id: string; userId: string }): Promise<Order> {
+  const { data } = await api.patch<ApiResponse<Order>>(`/orders/${encodeURIComponent(id)}/assignee`, { userId })
+  return data.data
+}

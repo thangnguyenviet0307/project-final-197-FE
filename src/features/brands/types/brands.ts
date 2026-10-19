@@ -17,12 +17,14 @@ export interface IBrandOption {
 }
 
 export interface CreateBrandInput {
+  isActive?: boolean
   logoUrl?: string
   name: string
   description?: string
 }
 
 export interface UpdateBrandInput {
+  isActive?: boolean
   logoUrl?: string
   name?: string
   description?: string

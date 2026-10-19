@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware"
 import type { TokenPair, User } from "@/features/auth/types/auth"
 
 interface AuthState {
+  sessionId: string | null
+  hasSession: boolean
   user: User | null
   accessToken: string | null
   refreshToken: string | null
@@ -15,8 +17,10 @@ interface AuthState {
   clearSession: () => void
 }
 
-// Persist only credentials. Always obtain the current user/role from /auth/me on reload.
+// Persist only a non-secret session marker. Credentials stay in memory / HttpOnly cookie.
 export const useAuthStore = create<AuthState>()(persist((set) => ({
+  sessionId: null,
+  hasSession: false,
   user: null,
   accessToken: null,
   refreshToken: null,
@@ -25,16 +29,18 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
   sessionVersion: 0,
   initializationError: null,
   setSession: (user, tokens) => set((state) => ({
-    ...tokens, user, isAuthenticated: true, isLoading: false,
+    ...tokens, refreshToken: tokens.refreshToken ?? null, hasSession: true, sessionId: crypto.randomUUID(), user, isAuthenticated: true, isLoading: false,
     initializationError: null, sessionVersion: state.sessionVersion + 1,
   })),
-  setTokens: (tokens) => set(tokens),
+  setTokens: (tokens) => set({ ...tokens, refreshToken: tokens.refreshToken ?? null }),
   clearSession: () => set((state) => ({
-    user: null, accessToken: null, refreshToken: null,
+    sessionId: null, hasSession: false, user: null, accessToken: null, refreshToken: null,
     isAuthenticated: false, isLoading: false, initializationError: null,
     sessionVersion: state.sessionVersion + 1,
   })),
 }), {
   name: "admin-auth",
-  partialize: ({ accessToken, refreshToken }) => ({ accessToken, refreshToken }),
+  version: 1,
+  migrate: () => ({ hasSession: false, sessionId: null }),
+  partialize: ({ hasSession, sessionId }) => ({ hasSession, sessionId }),
 }))

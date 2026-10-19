@@ -8,6 +8,7 @@ import { orderStatuses, orderTransitions } from "@/features/orders/utils/order-s
 import { getApiError } from "@/services/api"
 import type { Order, OrderStatus } from "@/features/orders/types/orders"
 import { StartOrderAction } from "@/features/orders/components/start-order-action"
+import { ReassignOrderAction } from "@/features/orders/components/reassign-order-action"
 
 export function OrderActions({ order, onDeleted, disabled }: { order: Order; onDeleted: () => void; disabled?: boolean }) {
   const user = useAuthStore(state => state.user)
@@ -24,6 +25,7 @@ export function OrderActions({ order, onDeleted, disabled }: { order: Order; onD
   function open(value: "status" | "delete") { update.reset(); remove.reset(); setNext(""); setMode(value) }
   return <>
     <StartOrderAction order={order} disabled={disabled} />
+    <ReassignOrderAction order={order} disabled={disabled} />
     {allowed.length > 0 && <Button size="sm" variant="outline" disabled={disabled} aria-label={`Update status ${order.orderCode ?? order._id}`} onClick={() => open("status")}><Pencil className="size-4" />Update status</Button>}
     {order.orderStatus === 3 && <Button size="sm" variant="destructive" disabled={disabled} aria-label={`Delete order ${order.orderCode ?? order._id}`} onClick={() => open("delete")}><Trash2 className="size-4" />Delete</Button>}
     <Dialog open={mode !== null} onOpenChange={value => { if (!value && !pending) setMode(null) }}>

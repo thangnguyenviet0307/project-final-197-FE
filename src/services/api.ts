@@ -5,9 +5,9 @@ import { queryClient } from "@/services/query-client"
 import type { ApiResponse, TokenPair } from "@/features/auth/types/auth"
 
 const baseURL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1").replace(/\/$/, "")
-export const api = axios.create({ baseURL, timeout: 15_000 })
+export const api = axios.create({ baseURL, timeout: 15_000, withCredentials: true })
 // Auth endpoints use an isolated client so login/refresh errors never recursively refresh.
-export const authApi = axios.create({ baseURL, timeout: 15_000 })
+export const authApi = axios.create({ baseURL, timeout: 15_000, withCredentials: true })
 
 interface AuthRequest extends InternalAxiosRequestConfig {
   retried?: boolean
@@ -22,20 +22,24 @@ export function clearAuth() {
 let refreshing: { version: number; promise: Promise<string> } | null = null
 
 export function refreshAccessToken(): Promise<string> {
-  const { refreshToken, sessionVersion } = useAuthStore.getState()
+  const { refreshToken, hasSession, sessionVersion } = useAuthStore.getState()
   if (refreshing?.version === sessionVersion) return refreshing.promise
-  if (!refreshToken) {
+  if (!refreshToken && !hasSession) {
     clearAuth()
     return Promise.reject(new Error("Your session has expired."))
   }
-  const promise = authApi.post<ApiResponse<TokenPair>>("/auth/refresh", { refreshToken })
+  const request = () => authApi.post<ApiResponse<TokenPair>>("/auth/refresh", {}, { headers: { "X-Auth-Transport": "cookie" } })
+  const promise = (typeof navigator !== "undefined" && navigator.locks ? navigator.locks.request("admin-auth-refresh", request) : request())
     .then(({ data }) => {
       if (useAuthStore.getState().sessionVersion !== sessionVersion) throw new Error("Session changed")
-      if (!data.data.accessToken || !data.data.refreshToken) throw new Error("Invalid token response")
+      if (!data.data.accessToken) throw new Error("Invalid token response")
       useAuthStore.getState().setTokens(data.data)
       return data.data.accessToken
     }).catch((error: unknown) => {
-      if (useAuthStore.getState().sessionVersion === sessionVersion) clearAuth()
+      const status = axios.isAxiosError(error) ? error.response?.status : undefined
+      if (useAuthStore.getState().sessionVersion === sessionVersion && (
+        status === 400 || status === 401 || status === 403 || (error instanceof Error && error.message === "Invalid token response")
+      )) clearAuth()
       throw error
     }).finally(() => {
       if (refreshing?.promise === promise) refreshing = null

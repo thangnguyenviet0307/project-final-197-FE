@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import { AxiosError, AxiosHeaders } from "axios"
+import { AxiosError, AxiosHeaders, type AxiosAdapter } from "axios"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom"
@@ -39,7 +39,7 @@ function submit(email = " TEST@example.com ", password = "Password123") {
 }
 
 it("validates invalid email/password without sending an API request", async () => {
-  authApi.defaults.adapter = vi.fn()
+  authApi.defaults.adapter = vi.fn<AxiosAdapter>()
   setup(); submit("invalid", "123")
   expect(await screen.findByText("Invalid email address.")).toBeTruthy()
   expect(screen.getByText("Password must contain at least 6 characters.")).toBeTruthy()
@@ -51,7 +51,7 @@ it.each([
   ["invalid-email", "123"],
   ["random@example.com", "random-password"],
 ])("opens password recovery without submitting login for inputs %s", async (email, password) => {
-  authApi.defaults.adapter = vi.fn()
+  authApi.defaults.adapter = vi.fn<AxiosAdapter>()
   setup()
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: email } })
   fireEvent.change(screen.getByLabelText("Password"), { target: { value: password } })

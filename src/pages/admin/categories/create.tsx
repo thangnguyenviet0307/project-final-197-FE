@@ -7,6 +7,6 @@ export default function CategoryCreatePage() {
   const navigate = useNavigate()
   const create = useCreateCategory()
   return <CreatePageLayout title="Add category" backTo="/categories" backLabel="Back to categories">
-    <CategoryForm onCancel={() => navigate("/categories")} onSubmit={async values => { await create.mutateAsync(values); navigate("/categories") }} />
+    <CategoryForm onSaved={() => navigate("/categories")} onCancel={() => navigate("/categories")} onSubmit={async values => { await create.mutateAsync(values) }} />
   </CreatePageLayout>
 }

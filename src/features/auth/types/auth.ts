@@ -22,7 +22,7 @@ export interface LoginCredentials {
 
 export interface TokenPair {
   accessToken: string
-  refreshToken: string
+  refreshToken?: string
 }
 
 export interface AuthResponse extends TokenPair {

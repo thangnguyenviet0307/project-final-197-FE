@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { api, authApi, clearAuth, getApiError } from "@/services/api"
+import { api, authApi, clearAuth, getApiError, refreshAccessToken } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import type { ApiResponse, ChangePasswordInput, LoginCredentials, TokenPair } from "@/features/auth/types/auth"
@@ -25,7 +25,7 @@ const userSchema = z.object({
 
 export async function login(credentials: LoginCredentials) {
   const version = useAuthStore.getState().sessionVersion
-  const { data } = await authApi.post<ApiResponse<TokenPair & { user: unknown }>>("/auth/login", credentials)
+  const { data } = await authApi.post<ApiResponse<TokenPair & { user: unknown }>>("/auth/login", credentials, { headers: { "X-Auth-Transport": "cookie" } })
   if (useAuthStore.getState().sessionVersion !== version) throw new Error("Session changed")
   const user = userSchema.parse(data.data.user)
   queryClient.clear()
@@ -72,23 +72,23 @@ let initializing: Promise<void> | null = null
 export function initializeSession(): Promise<void> {
   if (initializing) return initializing
   const state = useAuthStore.getState()
-  if (!state.accessToken && !state.refreshToken) {
+  if (!state.accessToken && !state.refreshToken && !state.hasSession) {
     clearAuth()
     return Promise.resolve()
   }
   const version = state.sessionVersion
   useAuthStore.setState({ isLoading: true, initializationError: null })
-  initializing = queryClient.fetchQuery({
+  initializing = (state.accessToken ? Promise.resolve() : refreshAccessToken().then(() => undefined)).then(() => queryClient.fetchQuery({
     queryKey: ["auth", "me", version],
     queryFn: async ({ signal }) => {
       const { data } = await api.get<ApiResponse<unknown>>("/auth/me", { signal })
       return userSchema.parse(data.data)
     },
     staleTime: 0,
-  }).then((user) => {
+  })).then((user) => {
     const current = useAuthStore.getState()
-    if (current.sessionVersion === version && current.accessToken && current.refreshToken) {
-      current.setSession(user, { accessToken: current.accessToken, refreshToken: current.refreshToken })
+    if (current.sessionVersion === version && current.accessToken) {
+      useAuthStore.setState({ user, isAuthenticated: true, isLoading: false, initializationError: null })
     }
   }).catch((error: unknown) => {
     if (useAuthStore.getState().sessionVersion !== version) return

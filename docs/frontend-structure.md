@@ -91,3 +91,13 @@ import { useAuthStore } from "@/stores/auth.store"
 ## Kiểm tra
 
 Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.ps1`, dùng `pnpm.cmd` tương ứng. Lần tổ chức thư mục này giữ nguyên URL, phân quyền và logic nghiệp vụ.
+
+## Admin contract updates
+
+- Deploy the corresponding Backend changes together with the Frontend. Inventory/variant updates require `expectedVersion` from the product response `__v`; stale requests return 409 and preserve the editor input. Metadata-only partial updates still omit inventory.
+- New Order items snapshot product/variant names and selected options alongside price/discount/SKU. Legacy missing snapshots are displayed as Not recorded; no historical data is backfilled.
+- Catalog mutations invalidate both catalog keys and populated Products queries. Category deletion explains which direct children become roots.
+- Users role/status filters and username ordering run before server pagination; rows and totals share the same filter. Handler selection requests active staff server-side.
+- Product deletion queues managed gallery public IDs in the same transaction. The Backend worker retries Cloudinary cleanup from a durable outbox; it does not delete external thumbnail URLs.
+- Category, Brand and User create forms share dirty-navigation/Cancel protection. Brand status is editable; descriptions retain the API contract without silently truncating existing values.
+- Browser auth uses HttpOnly refresh cookies and in-memory access tokens; see [AUTH.md](../AUTH.md) for origin/HTTPS/same-site deployment requirements. Demo passwords remain unchanged by explicit user decision.

@@ -67,7 +67,8 @@ describe("auth API/session", () => {
     }
     await Promise.all([api.get("/one"), api.get("/two"), api.get("/three")])
     expect(refresh).toHaveBeenCalledTimes(1)
-    expect(JSON.parse(refresh.mock.calls[0][0].data)).toEqual({ refreshToken: "old-refresh" })
+    expect(JSON.parse(refresh.mock.calls[0][0].data)).toEqual({})
+    expect(refresh.mock.calls[0][0].headers.get("X-Auth-Transport")).toBe("cookie")
     expect(sent.filter((token) => token === "Bearer new-access")).toHaveLength(3)
     expect(useAuthStore.getState()).toMatchObject(newTokens)
   })
@@ -136,9 +137,9 @@ describe("auth API/session", () => {
     expect(useAuthStore.getState()).toMatchObject({ isLoading: false, isAuthenticated: true, user: { role: "admin", name: "Test User" } })
   })
 
-  it("persists only tokens, never trusts a cached role", () => {
+  it("persists only a session marker and never credentials or a cached role", () => {
     const persisted = JSON.parse(localStorage.getItem("admin-auth") || "{}")
-    expect(persisted.state).toEqual(oldTokens)
+    expect(persisted.state).toEqual({ hasSession: true, sessionId: expect.any(String) })
   })
 
   it("keeps an unavailable server distinct from an invalid session so retry remains possible", async () => {
@@ -164,3 +165,24 @@ describe("auth API/session", () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
   })
 })
+
+it("restores an access token from HttpOnly refresh transport after reload", async () => {
+  useAuthStore.setState({ accessToken: null, refreshToken: null, hasSession: true, isAuthenticated: false });
+  authApi.defaults.adapter = async config => {
+    expect(JSON.parse(config.data)).toEqual({});
+    expect(config.headers.get("X-Auth-Transport")).toBe("cookie");
+    return response(config, { data: { accessToken: "cookie-access" } });
+  };
+  api.defaults.adapter = async config => response(config, { data: user });
+  await initializeSession();
+  expect(useAuthStore.getState()).toMatchObject({ accessToken: "cookie-access", refreshToken: null, isAuthenticated: true });
+  expect(localStorage.getItem("admin-auth")).not.toContain("cookie-access");
+});
+
+it("keeps cookie-session initialization retryable during a network outage", async () => {
+  useAuthStore.setState({ accessToken: null, refreshToken: null, hasSession: true, isAuthenticated: false });
+  authApi.defaults.adapter = async () => { throw new AxiosError("Network Error", "ERR_NETWORK") };
+  await initializeSession();
+  expect(useAuthStore.getState()).toMatchObject({ hasSession: true, isLoading: false, isAuthenticated: false });
+  expect(useAuthStore.getState().initializationError).toBeTruthy();
+});

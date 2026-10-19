@@ -7,10 +7,10 @@ import { useStartOrder } from "@/features/orders/hooks/use-orders"
 import { getApiError } from "@/services/api"
 import type { Order } from "@/features/orders/types/orders"
 
-function HandlerPicker({ onSelect, selected, disabled }: { onSelect: (id: string) => void; selected: string; disabled: boolean }) {
+export function HandlerPicker({ onSelect, selected, disabled }: { onSelect: (id: string) => void; selected: string; disabled: boolean }) {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
-  const query = useUsers(page, search)
+  const query = useUsers(page, search, 10, { role: "staff", active: true })
   return <div className="space-y-2"><label className="grid gap-1 text-sm">Find handler<input className="rounded-md border bg-background p-2" value={search} disabled={disabled} onChange={event => { setSearch(event.target.value); setPage(1) }} /></label>
     {query.isPending ? <p role="status">Loading handlers…</p> : query.isError ? <div role="alert"><p>{getApiError(query.error).message}</p><Button variant="outline" onClick={() => void query.refetch()}>Retry handlers</Button></div> : <>
       <div className="max-h-48 space-y-2 overflow-y-auto" aria-busy={query.isFetching}>{query.data?.data.filter(person => person.active && person.role === "staff").map(person => <label key={person._id} className="flex items-center gap-2 text-sm"><input type="radio" name="order-handler" value={person._id} checked={selected === person._id} disabled={disabled || query.isFetching} onChange={() => onSelect(person._id)} />{person.firstName} {person.lastName} ({person.email})</label>)}</div>

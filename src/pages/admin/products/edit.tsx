@@ -31,7 +31,7 @@ export default function ProductEditPage() {
             throw new Error("Product inventory or variants changed while you were editing. Reload this page and review the latest data before saving.")
           }
         }
-        return mutation.mutateAsync({ id, input })
+        return mutation.mutateAsync({ id, input: { ...input, ...((input.variants !== undefined || input.stock !== undefined) ? { expectedVersion: original.__v ?? 0 } : {}) } })
       }} /></>}
   </div></BaseLayout>
 }

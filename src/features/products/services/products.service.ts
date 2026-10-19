@@ -1,6 +1,6 @@
 import { api } from "@/services/api"
 import type { ApiResponse } from "@/features/auth/types/auth"
-import type { Product, ProductInput, ProductsQuery, ProductsResult, ProductStatistics } from "@/features/products/types/products"
+import type { Product, ProductInput, UpdateProductInput, ProductsQuery, ProductsResult, ProductStatistics } from "@/features/products/types/products"
 
 export async function listProducts(params: ProductsQuery, signal?: AbortSignal): Promise<ProductsResult> {
   const { data } = await api.get<ApiResponse<Product[]> & Pick<ProductsResult, "pagination">>("/products", { params, signal })
@@ -14,7 +14,7 @@ export async function createProduct(input: ProductInput): Promise<Product> {
   const { data } = await api.post<ApiResponse<Product>>("/products", input)
   return data.data
 }
-export async function updateProduct({ id, input }: { id: string; input: Partial<ProductInput> }): Promise<Product> {
+export async function updateProduct({ id, input }: { id: string; input: UpdateProductInput }): Promise<Product> {
   const { data } = await api.put<ApiResponse<Product>>(`/products/${encodeURIComponent(id)}`, input)
   return data.data
 }

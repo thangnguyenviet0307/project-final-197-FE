@@ -1,4 +1,5 @@
 "use client"
+import { invalidateCatalog } from "@/features/products/utils/invalidate-catalog"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -85,9 +86,7 @@ const BrandsPage = () => {
     }) => brandsService.updateById(id, values),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["brands"],
-      })
+      await invalidateCatalog(queryClient, "brands")
     },
   })
 
@@ -97,9 +96,7 @@ const BrandsPage = () => {
       brandsService.deleteById(id),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["brands"],
-      })
+      await invalidateCatalog(queryClient, "brands")
     },
   })
 

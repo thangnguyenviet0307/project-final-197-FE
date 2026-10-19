@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { deleteOrder, getOrder, listOrders, updateOrderStatus, startOrder, updateOrderDates } from "@/features/orders/services/orders.service"
+import { deleteOrder, getOrder, listOrders, updateOrderStatus, startOrder, updateOrderDates, reassignOrder } from "@/features/orders/services/orders.service"
 import type { OrdersQuery } from "@/features/orders/types/orders"
 
 export const orderKeys = { all: ["orders"] as const, list: (params: OrdersQuery) => ["orders", "list", params] as const, detail: (id: string) => ["orders", "detail", id] as const }
@@ -38,4 +38,12 @@ export function useDeleteOrder() {
     client.removeQueries({ queryKey: orderKeys.detail(id), exact: true })
     await client.invalidateQueries({ queryKey: orderKeys.all })
   }, onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) } })
+}
+
+export function useReassignOrder() {
+  const client = useQueryClient()
+  return useMutation({ mutationFn: reassignOrder, meta: { successMessage: "Order handler reassigned." },
+    onSuccess: () => Promise.all([client.invalidateQueries({ queryKey: orderKeys.all }), client.invalidateQueries({ queryKey: ["users"] })]),
+    onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) },
+  })
 }

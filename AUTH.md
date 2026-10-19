@@ -28,17 +28,17 @@ All paths below follow `/api/v1`. Responses use `{ success, statusCode, message,
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| POST | `/auth/login` | Email/password sign-in; returns user and both tokens |
+| POST | `/auth/login` | Email/password sign-in; browser returns user/access token and sets refresh cookie |
 | GET | `/auth/me` | Current user/profile and password-change requirement |
 | PATCH | `/auth/me` | Update own profile using multipart FormData |
-| POST | `/auth/refresh` | Rotate both tokens using `{ refreshToken }` |
+| POST | `/auth/refresh` | Browser: rotate using HttpOnly cookie + custom transport header; non-browser: `{ refreshToken }` |
 | POST | `/auth/logout` | Revoke session |
 | POST | `/auth/change-password` | Verify current password, set new password, revoke sessions |
 | GET/POST | `/users` | Admin lists/provisions accounts |
 | PUT | `/users/:id` | Admin updates account or sets temporary password |
 | DELETE | `/users/:id` | Admin deletes account |
 
-Zustand persists only access/refresh tokens. User and role are checked through `/me` after a reload. Axios attaches Bearer tokens, coalesces refresh requests within a tab, and retries failed requests once. Failed refresh clears credentials and private query cache. Backend currently supports admin/staff; customer roles cannot access the Dashboard.
+Zustand persists only a non-secret session marker/ID. Access tokens stay in memory; the browser refresh token stays in an HttpOnly cookie. User and role are checked through `/me` after a reload. Axios attaches Bearer tokens, coalesces refresh requests within a tab, uses Web Locks across tabs where supported, and retries failed requests once. Rejected refresh clears credentials and private query cache; network/server failures remain retryable. Backend currently supports admin/staff; customer roles cannot access the Dashboard.
 
 ## Notifications and language
 
@@ -64,8 +64,16 @@ Notifications use a compact 280px responsive width, 10px horizontal padding, cen
 
 ## Verification commands
 
-- Frontend: `pnpm test`, `pnpm build`, `pnpm lint`.
+- Frontend: `pnpm typecheck` (app and tests), `pnpm test`, `pnpm build`, `pnpm lint`.
 - Backend: `pnpm test` from its own directory.
 - Auth/profile tests use Axios adapters or mock Mongoose with temporary HTTP servers; they do not modify a real database.
 
 Library reference: [Sonner](https://sonner.emilkowal.ski/getting-started).
+
+## Browser session transport
+
+The Admin frontend sends `X-Auth-Transport: cookie` for login/refresh and enables credentials. Backend sets an HttpOnly, SameSite=Strict refresh cookie scoped to `/api/v1/auth`; production adds Secure. Access tokens remain in memory. Local storage contains only a session marker, never tokens. Old persisted credentials are discarded on upgrade; sign in again.
+
+Backend `FRONTEND_ORIGINS` is a comma-separated exact origin allowlist (default local origins: http://localhost:5173 and http://127.0.0.1:5173). Production requires an explicit allowlist and HTTPS. Keep FE/API on the same site for SameSite=Strict, or deploy an API reverse proxy; cross-site deployments need a separate cookie/CSRF design. Browser refresh requires the custom header and trusted Origin. Non-browser REST clients can retain the JSON token contract without Origin. No .env files are changed automatically.
+
+Demo creation passwords remain Admin123/Staff123 by explicit decision; mandatory first-password change remains enabled. These shared defaults are an accepted demo limitation and must be reconsidered before production.

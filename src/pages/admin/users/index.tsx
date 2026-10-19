@@ -3,7 +3,7 @@ import { ListPagination } from "@/components/list-pagination"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ContentSkeleton } from "@/components/page-skeleton"
-import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import {
   ArrowDown, ArrowUp, BriefcaseBusiness, Users, CheckCircle2, CirclePause,
   KeyRound,
@@ -23,12 +23,12 @@ import {
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getTemporaryPassword, type ManagedUser } from "@/features/users/services/users.service"
-import { api, getApiError } from "@/services/api"
+import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { useUsers } from "@/features/users/hooks/use-users"
 import { useResetUserPassword } from "@/features/users/hooks/use-reset-user-password"
 import { DeleteUserConfirmation } from "@/features/users/components/delete-user-confirmation"
-import { queryClient } from "@/services/query-client"
+import { useUpdateUser } from "@/features/users/hooks/use-update-user"
 import "@/pages/admin/users/index.css"
 
 type Status = "all" | "active" | "suspended"
@@ -162,7 +162,8 @@ export default function UsersPage() {
   const [editRole, setEditRole] = useState<ManagedUser["role"]>("staff")
   const [editActive, setEditActive] = useState(true)
   const [editError, setEditError] = useState("")
-  const [isSavingRole, setIsSavingRole] = useState(false)
+  const updateUser = useUpdateUser()
+  const isSavingRole = updateUser.isPending
   const currentUser = useAuthStore(state => state.user)
 
   useEffect(() => {
@@ -173,14 +174,12 @@ export default function UsersPage() {
     return () => window.clearTimeout(timeout)
   }, [searchInput, search])
 
-  const users = useUsers(page, search, limit)
-
-  const visibleUsers = useMemo(() => (users.data?.data ?? [])
-    .filter(user => (roleFilter === "all" || user.role === roleFilter) && (statusFilter === "all" || getStatus(user) === statusFilter))
-    .sort((left, right) => {
-      const result = getUsername(left).localeCompare(getUsername(right), undefined, { sensitivity: "base" })
-      return sortDirection === "asc" ? result : -result
-    }), [users.data, roleFilter, statusFilter, sortDirection])
+  const users = useUsers(page, search, limit, {
+    ...(roleFilter !== "all" ? { role: roleFilter } : {}),
+    ...(statusFilter !== "all" ? { active: statusFilter === "active" } : {}),
+    sortBy: "username", sortOrder: sortDirection,
+  })
+  const visibleUsers = users.data?.data ?? []
   const totalPages = Math.max(1, users.data?.pagination.totalPages ?? 1)
   const isBusy = users.isFetching && users.isPlaceholderData
 
@@ -192,12 +191,10 @@ export default function UsersPage() {
     event.preventDefault()
     if (!editUser) return
     try {
-      setIsSavingRole(true); setEditError("")
-      await api.put(`/users/${encodeURIComponent(editUser._id)}`, { role: editRole, active: editActive })
+      setEditError("")
+      await updateUser.mutateAsync({ id: editUser._id, input: { role: editRole, active: editActive } })
       setEditUser(null)
-      await queryClient.invalidateQueries({ queryKey: ["users"] })
     } catch (error) { setEditError(getApiError(error).message) }
-    finally { setIsSavingRole(false) }
   }
 
   const statistics = [
@@ -228,11 +225,11 @@ export default function UsersPage() {
                 {searchInput && <Button variant="ghost" size="icon-sm" aria-label="Clear account search" className="absolute right-1 top-1/2 -translate-y-1/2" onClick={() => { setSearchInput(""); setSearch(""); changePage(1) }}><X className="size-3.5" /></Button>}
               </div>
             </Field>
-            <FilterMenu label="Account status" value={statusFilter} options={statusOptions} onChange={setStatusFilter} />
-            <FilterMenu label="Account role" value={roleFilter} options={roleOptions} onChange={setRoleFilter} />
+            <FilterMenu label="Account status" value={statusFilter} options={statusOptions} onChange={value => { setStatusFilter(value); setPage(1) }} />
+            <FilterMenu label="Account role" value={roleFilter} options={roleOptions} onChange={value => { setRoleFilter(value); setPage(1) }} />
             <Button type="button" variant="outline" className="sm:col-span-2 lg:col-span-4 lg:justify-self-end" onClick={() => { setSearchInput(""); setSearch(""); setStatusFilter("all"); setRoleFilter("all"); setPage(1) }}>Reset filters</Button>
           </div>
-          <p className="text-xs text-muted-foreground">Role, status and sorting apply to the current page.</p>
+          <p className="text-xs text-muted-foreground">Role, status and sorting apply across all result pages.</p>
         </div>
         <p role="status" className="text-sm text-muted-foreground">{users.isFetching && !users.isLoading ? search ? "Searching" : "Updating" : ""}</p>
 
@@ -248,7 +245,7 @@ export default function UsersPage() {
                 {columns.map(column => <TableHead key={column.key}
                   aria-sort={column.key === "username" ? sortDirection === "asc" ? "ascending" : "descending" : undefined}>
                   {column.key === "username" ? <button type="button" aria-label="Sort by username" title="Sort by username" className="inline-flex cursor-pointer items-center gap-3 rounded py-1 focus-visible:outline-2 focus-visible:outline-ring"
-                    onClick={() => setSortDirection(previous => previous === "asc" ? "desc" : "asc")}>{column.label}
+                    onClick={() => { setSortDirection(previous => previous === "asc" ? "desc" : "asc"); setPage(1) }}>{column.label}
                     {sortDirection === "asc" ? <ArrowUp className="size-4 cursor-pointer" /> : <ArrowDown className="size-4 cursor-pointer" />}
                   </button> : column.label}
                 </TableHead>)}
@@ -294,7 +291,7 @@ export default function UsersPage() {
               {!visibleUsers.length && <TableRow className="hover:bg-transparent"><TableCell colSpan={columns.length + 1} className="h-64 text-center text-muted-foreground">
                 {users.isLoading ? <ContentSkeleton label="Loading users..." />
                   : users.isError ? "Unable to load users. Please try again."
-                  : statusFilter !== "all" || roleFilter !== "all" ? "No users on this page match your filters."
+                  : statusFilter !== "all" || roleFilter !== "all" ? "No users match your filters."
                   : search ? `No accounts found for "${search}".` : "No accounts found."}
               </TableCell></TableRow>}
             </TableBody>

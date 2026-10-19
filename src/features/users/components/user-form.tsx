@@ -1,3 +1,4 @@
+import { useUnsavedForm } from "@/hooks/use-unsaved-form"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderCircle } from "lucide-react"
@@ -14,8 +15,10 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
     resolver: zodResolver(createUserSchema),
     defaultValues: { firstName: "", lastName: "", email: "", password: getDefaultUserPassword("staff"), role: "staff" },
   })
+  const navigation = useUnsavedForm(form.formState.isDirty)
   const mutation = useCreateUser({
     onSuccess: () => {
+      navigation.allowSavedNavigation()
       form.reset({ firstName: "", lastName: "", email: "", password: getDefaultUserPassword("staff"), role: "staff" })
       onSaved()
     },
@@ -30,7 +33,7 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
     },
   })
 
- return (          <form aria-label="Create account" className="max-w-3xl space-y-6" noValidate onSubmit={form.handleSubmit(async values => {
+ return (<> <form aria-label="Create account" className="max-w-3xl space-y-6" noValidate onSubmit={form.handleSubmit(async values => {
    try { await mutation.mutateAsync(values) } catch { /* Field errors are set by the mutation callback. */ }
  })}>
                 <fieldset disabled={mutation.isPending} className="space-y-4">
@@ -93,7 +96,7 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
                     {mutation.isPending && <LoaderCircle className="animate-spin" />}
                     Create account
                   </Button>
-                  <Button type="button" variant="outline" disabled={mutation.isPending} onClick={onCancel}>Cancel</Button>
+                  <Button type="button" variant="outline" disabled={mutation.isPending} onClick={() => navigation.confirmDiscard(onCancel)}>Cancel</Button>
                 </div>
-              </form>)
+              </form>{navigation.guard}</>)
 }

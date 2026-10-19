@@ -49,7 +49,7 @@ it("details use snapshots and the server total even when a product is deleted", 
   expect(screen.queryByRole("button", { name: /Update status/ })).toBeNull()
 })
 it("admin confirms a valid transition for an assigned order", async () => {
-  let current = { ...order, userId: "b".repeat(24) }
+  let current: Order = { ...order, userId: "b".repeat(24) }
   const writes: unknown[] = []
   api.defaults.adapter = async config => {
     if (config.method === "patch") { const input = JSON.parse(config.data); writes.push(input); current = { ...order, orderStatus: input.orderStatus, userId: input.userId } }
@@ -113,7 +113,7 @@ it("rounds snapshot subtotals half up per line and rejects invalid money", () =>
   expect(orderItemSubtotal({ price: NaN, discount: 0, quantity: 1 })).toBeNull()
 })
 it("refreshes after a conflicting transition and prevents another invalid submission", async () => {
-  let current = { ...order, userId: "b".repeat(24) }
+  let current: Order = { ...order, userId: "b".repeat(24) }
   let writes = 0
   api.defaults.adapter = async config => {
     if (config.method === "patch") {
@@ -138,7 +138,7 @@ it("renders loading while the order request is pending", () => {
   expect(screen.getByRole("status", { name: "Loading orders" })).toBeTruthy()
 })
 it("staff claims an unassigned pending order through the restricted start endpoint", async () => {
-  let current = { ...order, userId: "b".repeat(24) }
+  let current: Order = { ...order, userId: "b".repeat(24) }
   const writes: { url: string | undefined; body: unknown }[] = []
   api.defaults.adapter = async config => {
     if (config.method === "patch") { writes.push({ url: config.url, body: JSON.parse(config.data) }); current = { ...order, orderStatus: 2, userId: "b".repeat(24) } }
@@ -224,4 +224,32 @@ it("unassigned staff cannot edit order dates", async () => {
   setup("staff", `/orders/${id}`)
   await screen.findByText("OLD-SKU")
   expect(screen.queryByRole("button", { name: "Edit dates" })).toBeNull()
+})
+
+it("shows purchase names and options independently of current product names", async () => {
+  mockOrder({ ...order, orderItems: [{ ...order.orderItems[0], productName: "Purchased name", variantName: "Purchased variant", selectedOptions: { color: "Black" }, productId: { _id: id, product_name: "Renamed now" } }] })
+  setup("staff", `/orders/${id}`)
+  expect(await screen.findByText("Purchased name")).toBeTruthy()
+  expect(screen.getByText("Purchased variant")).toBeTruthy()
+  expect(screen.getByText("color: Black")).toBeTruthy()
+  expect(screen.getByText("Current name: Renamed now")).toBeTruthy()
+})
+
+it("reassigns a Processing order without changing its status", async () => {
+  const nextHandler = "c".repeat(24)
+  const writes = vi.fn()
+  let current: Order = { ...order, orderStatus: 2, userId: "d".repeat(24) }
+  api.defaults.adapter = async config => {
+    if (config.method === "patch") { writes(config.url, JSON.parse(config.data)); current = { ...current, userId: nextHandler } }
+    const data = config.url === "/users" ? [{ _id: nextHandler, firstName: "New", lastName: "Handler", email: "handler@example.com", active: true, role: "staff" }] : current
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
+  }
+  setup("admin", `/orders/${id}`)
+  fireEvent.click(await screen.findByRole("button", { name: "Reassign handler" }))
+  fireEvent.click(await screen.findByRole("radio", { name: "New Handler (handler@example.com)" }))
+  fireEvent.click(screen.getByRole("button", { name: "Confirm reassignment" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith(`/orders/${id}/assignee`, { userId: nextHandler }))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  expect(current.orderStatus).toBe(2)
+  expect(current.totalAmount).toBe(order.totalAmount)
 })

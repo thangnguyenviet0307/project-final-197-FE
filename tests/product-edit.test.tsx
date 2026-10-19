@@ -52,7 +52,7 @@ it("saves a variant edit with IDs and the explicit product price when inventory 
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
   expect(await screen.findByText("Saved product detail")).toBeTruthy()
   expect(writes).toHaveBeenCalledOnce()
-  expect(writes.mock.calls[0][0]).toEqual({ price: 150, variants: [{ ...original.variants![0], stock: 9, variant_name: null, images: [], attributes: {}, color: "", size: "", image: "" }] })
+  expect(writes.mock.calls[0][0]).toEqual({ expectedVersion: 0, price: 150, variants: [{ ...original.variants![0], stock: 9, variant_name: null, images: [], attributes: {}, color: "", size: "", image: "" }] })
 })
 
 it("saves a description without overwriting inventory changed by another editor", async () => {

@@ -1,3 +1,4 @@
+import { getApiError } from "@/services/api"
 import { Link } from "react-router-dom"
 import { CatalogImage } from "@/components/catalog-image"
 
@@ -70,10 +71,8 @@ function DeleteBrandDialog({
     try {
       await onDelete(brand._id)
       setOpen(false)
-    } catch {
-      setError(
-        "Không thể xóa thương hiệu. Vui lòng thử lại."
-      )
+    } catch (error) {
+      setError(getApiError(error).message)
     } finally {
       setDeleting(false)
     }

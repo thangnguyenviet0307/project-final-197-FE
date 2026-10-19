@@ -29,12 +29,14 @@ export interface ProductInput {
 }
 export interface Product extends Omit<ProductInput, "category" | "brand"> {
   _id: string
+  __v?: number
   category: CatalogReference | string | null
   brand: CatalogReference | string | null
   images?: { public_id: string; secure_url: string; width?: number; height?: number; format?: string }[]
   createdAt?: string
   updatedAt?: string
 }
+export type UpdateProductInput = Partial<ProductInput> & { expectedVersion?: number }
 export interface ProductsQuery {
   page: number; limit: number; sku?: string; color?: string; size?: string
   search?: string; category?: string; brand?: string; minPrice?: number; maxPrice?: number

@@ -38,18 +38,21 @@ export interface ManagedUser {
   bio?: string;
 }
 
+export interface UsersFilters { role?: ManagedUser["role"]; active?: boolean; sortBy?: "username"; sortOrder?: "asc" | "desc" }
+
 export async function listUsers(
   page: number,
   signal: AbortSignal,
   search = "",
   limit = 10,
+  filters: UsersFilters = {},
 ) {
   const { data } = await api.get<
     ApiResponse<ManagedUser[]> & {
       pagination: { totalPages: number; total: number };
     }
   >("/users", {
-    params: { page, limit, ...(search ? { search } : {}) },
+    params: { page, limit, ...(search ? { search } : {}), ...filters },
     signal,
   });
   return data;
@@ -71,4 +74,8 @@ export async function resetUserPassword({
 
 export async function deleteUser(id: string) {
   await api.delete(`/users/${encodeURIComponent(id)}`);
+}
+
+export async function updateUser({ id, input }: { id: string; input: Pick<ManagedUser, "role" | "active"> }) {
+  await api.put(`/users/${encodeURIComponent(id)}`, input)
 }

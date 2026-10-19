@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && tsc -p tsconfig.test.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:contracts": "node scripts/check-backend-contract.mjs"
+    "test:contracts": "node scripts/check-backend-contract.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -5,6 +5,9 @@ export interface OrderItem {
   productId: string | { _id: string; product_name?: string } | null
   variantId?: string
   sku?: string
+  productName?: string
+  variantName?: string | null
+  selectedOptions?: Record<string, string | number | boolean | null>
   quantity: number
   price: number
   discount: number

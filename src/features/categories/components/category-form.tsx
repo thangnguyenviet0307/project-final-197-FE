@@ -1,3 +1,4 @@
+import { useUnsavedForm } from "@/hooks/use-unsaved-form"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -9,14 +10,15 @@ import { categorySchema, type Category, type CategoryFormInput } from "@/feature
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import { getApiError } from "@/services/api"
 
-export function CategoryForm({ category, onSubmit, onCancel }: { category?: Category; onSubmit: (values: CategoryFormInput) => Promise<unknown>; onCancel: () => void }) {
+export function CategoryForm({ category, onSubmit, onSaved, onCancel }: { category?: Category; onSubmit: (values: CategoryFormInput) => Promise<unknown>; onSaved?: () => void; onCancel: () => void }) {
   const categories = useCategories()
   const form = useForm<CategoryFormInput>({ resolver: zodResolver(categorySchema), defaultValues: { name: category?.name ?? "", description: category?.description ?? "", icon: category?.icon ?? "", parent: typeof category?.parent === "object" ? category.parent?._id ?? null : category?.parent ?? null, isActive: category?.isActive ?? true } })
   const icon = useWatch({ control: form.control, name: "icon" })
+  const navigation = useUnsavedForm(form.formState.isDirty)
   const busy = form.formState.isSubmitting
-  return <form aria-label={category ? "Edit category" : "Create category"} noValidate className="max-w-3xl space-y-6" onSubmit={form.handleSubmit(async values => {
+  return <><form aria-label={category ? "Edit category" : "Create category"} noValidate className="max-w-3xl space-y-6" onSubmit={form.handleSubmit(async values => {
     form.clearErrors()
-    try { await onSubmit(values) } catch (error) { form.setError("root", { message: getApiError(error).message }) }
+    try { await onSubmit(values); navigation.allowSavedNavigation(); onSaved?.() } catch (error) { form.setError("root", { message: getApiError(error).message }) }
   })}>
     <fieldset disabled={busy} className="space-y-4">
       <Field><FieldLabel htmlFor="category-name">Category name</FieldLabel><Input id="category-name" {...form.register("name")} aria-invalid={!!form.formState.errors.name} /><FieldError errors={[form.formState.errors.name]} /></Field>
@@ -36,6 +38,6 @@ export function CategoryForm({ category, onSubmit, onCancel }: { category?: Cate
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("isActive")} />Active category</label>
     </fieldset>
     {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
-    <div className="flex gap-2"><Button type="submit" disabled={busy || categories.isPending || categories.isError}>{busy ? "Saving..." : category ? "Save changes" : "Create category"}</Button><Button type="button" variant="outline" disabled={busy} onClick={onCancel}>Cancel</Button></div>
-  </form>
+    <div className="flex gap-2"><Button type="submit" disabled={busy || categories.isPending || categories.isError}>{busy ? "Saving..." : category ? "Save changes" : "Create category"}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => navigation.confirmDiscard(onCancel)}>Cancel</Button></div>
+  </form>{navigation.guard}</>
 }

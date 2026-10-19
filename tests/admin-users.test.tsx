@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, within, waitFor } from "@testing-library/react"
 import { MemoryRouter, Routes, Route } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { AxiosHeaders } from "axios"
+import { AxiosHeaders, type AxiosResponse } from "axios"
 import UsersPage from "@/pages/admin/users/index"
 import { api, clearAuth } from "@/services/api"
 import { queryClient } from "@/services/query-client"
@@ -117,7 +117,7 @@ it("searches accounts by name or account email and shows an empty search result"
     if (config.method === "get") requests.push(config.params)
     const params = config.params as { search?: string }
     if (params.search === "Jane Smith") {
-      return await new Promise((resolve) => {
+      return await new Promise<AxiosResponse>((resolve) => {
         releaseSearch = () => resolve({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
           data: [],
           pagination: { total: 0, totalPages: 1 },
@@ -231,7 +231,7 @@ it("sorts by username only and provides a pointer cursor on its control", async 
     data: [
       { _id: "zeta", firstName: "Alpha", lastName: "Name", email: "zeta@example.com", role: "staff", active: true },
       { _id: "alpha", firstName: "Zeta", lastName: "Name", email: "alpha@example.com", role: "admin", active: true },
-    ], pagination: { total: 2, totalPages: 1 },
+    ].sort((a, b) => config.params.sortOrder === "desc" ? b.email.localeCompare(a.email) : a.email.localeCompare(b.email)), pagination: { total: 2, totalPages: 1 },
   } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   await screen.findByText("alpha@example.com")
@@ -243,7 +243,7 @@ it("sorts by username only and provides a pointer cursor on its control", async 
   expect(within(screen.getByRole("columnheader", { name: "Name" })).queryByRole("button")).toBeNull()
   expect(within(screen.getByRole("columnheader", { name: "Email" })).queryByRole("button")).toBeNull()
   fireEvent.click(sort)
-  expect(usernames()).toEqual(["zeta", "alpha"])
+  await waitFor(() => expect(usernames()).toEqual(["zeta", "alpha"]))
   expect(sort.closest("th")?.getAttribute("aria-sort")).toBe("descending")
 })
 
@@ -327,20 +327,21 @@ it("keeps fixed page size and resets search and filters", async () => {
   api.defaults.adapter = async config => {
     requests.push(config.params)
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
-      data: [{ _id: "target", firstName: "Jane", lastName: "Smith", email: "jane@example.com", role: "staff", active: true }],
-      pagination: { total: 30, totalPages: Math.ceil(30 / Number(config.params.limit)) },
+      data: config.params.active === false ? [] : [{ _id: "target", firstName: "Jane", lastName: "Smith", email: "jane@example.com", role: "staff", active: true }],
+      pagination: { total: config.params.active === false ? 0 : 30, totalPages: Math.ceil(30 / Number(config.params.limit)) },
     } }
   }
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   await screen.findByText("jane@example.com")
   fireEvent.click(screen.getByRole("button", { name: "Next" }))
-  await waitFor(() => expect(requests).toContainEqual({ page: 2, limit: 10 }))
+  await waitFor(() => expect(requests).toContainEqual({ page: 2, limit: 10, sortBy: "username", sortOrder: "asc" }))
   await waitFor(() => expect(screen.getByRole("button", { name: "Next" }).hasAttribute("disabled")).toBe(false))
   expect(screen.queryByLabelText("Users per page")).toBeNull()
   fireEvent.change(screen.getByLabelText("Search accounts by name or account email"), { target: { value: "Jane" } })
-  await waitFor(() => expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane" }))
+  await waitFor(() => expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", sortBy: "username", sortOrder: "asc" }))
   fireEvent.change(screen.getByLabelText("Account status"), { target: { value: "suspended" } })
-  expect(await screen.findByText("No users on this page match your filters.")).toBeTruthy()
+  expect(await screen.findByText("No users match your filters.")).toBeTruthy()
+  expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", active: false, sortBy: "username", sortOrder: "asc" })
   fireEvent.click(screen.getByRole("button", { name: "Reset filters" }))
   expect(await screen.findByText("jane@example.com")).toBeTruthy()
   expect((screen.getByLabelText("Search accounts by name or account email") as HTMLInputElement).value).toBe("")

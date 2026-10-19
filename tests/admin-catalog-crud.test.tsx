@@ -95,21 +95,23 @@ it("creates, edits and deletes customer contacts through the rendered forms", as
 it("creates and updates brands and invalidates the product selector cache", async () => {
   const { writes } = mockApi("brands")
   queryClient.setQueryData(["brands"], [brand])
+  queryClient.setQueryData(["products", "detail", "cached-product"], { brand })
   setup(<BrandsPage />)
   await screen.findByText("Acme")
   fireEvent.click(screen.getByRole("link", { name: "Add Brand" }))
   let dialog = await screen.findByRole("form", { name: "Create brand" })
   fireEvent.change(within(dialog).getByLabelText("Brand Name"), { target: { value: "New Brand" } })
   fireEvent.click(within(dialog).getByRole("button", { name: "Create Brand" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/brands", { name: "New Brand", description: "", logoUrl: "" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/brands", { name: "New Brand", description: "", logoUrl: "", isActive: true }))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
   expect(queryClient.getQueryState(["brands"])?.isInvalidated).toBe(true)
+  expect(queryClient.getQueryState(["products", "detail", "cached-product"])?.isInvalidated).toBe(true)
   await screen.findByText("Acme")
   fireEvent.click(screen.getByRole("button", { name: "Edit Acme" }))
   dialog = await screen.findByRole("dialog", { name: "Edit Brand" })
   fireEvent.change(within(dialog).getByLabelText("Brand Name"), { target: { value: "Renamed" } })
   fireEvent.click(within(dialog).getByRole("button", { name: "Save Changes" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/brands/${brand._id}`, { name: "Renamed", description: "Devices", logoUrl: "" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/brands/${brand._id}`, { name: "Renamed", description: "Devices", logoUrl: "", isActive: true }))
 })
 
 it.each([false, true])("brand deletion keeps the confirmation open only on failure (%s)", async failed => {
@@ -327,4 +329,14 @@ it("retries a failed product preview while keeping the category dialog open", as
   fireEvent.click(screen.getByRole("button", { name: "Close preview" }))
   await waitFor(() => expect(screen.queryByRole("dialog", { name: "Product preview" })).toBeNull())
   expect(screen.getByRole("dialog", { name: "Delete category?" })).toBeTruthy()
+})
+
+it("explains which direct child categories become roots before deleting a parent", async () => {
+  const child = { ...category, _id: "d".repeat(24), name: "Child category", parent: category._id }
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: config.url === "/products" ? { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } : { data: [category, child] } })
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Phones" }))
+  const dialog = await screen.findByRole("dialog", { name: "Delete category?" })
+  expect(await within(dialog).findByText(/Deleting this category will move 1 direct child categories to the root level/)).toBeTruthy()
+  expect(within(dialog).getByText("Child category")).toBeTruthy()
 })
