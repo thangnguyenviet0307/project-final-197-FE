@@ -36,9 +36,11 @@ export const routes: RouteObject[] = [
     { path: "/settings/notifications", lazy: page(() => import("@/app/settings/notifications/page")) },
     { path: "/settings/connections", lazy: page(() => import("@/app/settings/connections/page")) },
     { element: <ProtectedRoute allowedRoles={["admin"]} />, children: [
-      { path: "/users", lazy: page(() => import("@/app/users/page")) },
-      { path: "/admin/users", element: <Navigate to="/users" replace /> },
+    { path: "/users", lazy: page(() => import("@/app/users/page")) },
+    { path: "/admin/users", element: <Navigate to="/users" replace /> },
+    { path: "/brands", lazy: page(() => import("@/app/brands/page")) },
     ] },
+
   ] },
   { path: "/403", lazy: page(() => import("@/app/errors/forbidden/page")) },
   { path: "/errors/forbidden", element: <Navigate to="/403" replace /> },

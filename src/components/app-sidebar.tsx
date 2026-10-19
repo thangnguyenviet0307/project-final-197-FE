@@ -13,6 +13,7 @@ import {
   Settings,
   HelpCircle,
   LayoutTemplate,
+  Tags,
   Users,
   FolderTree,
 } from "lucide-react"
@@ -86,6 +87,11 @@ const data = {
           title: "Users",
           url: "/users",
           icon: Users,
+        },
+        {
+          title: "Brands",
+          url: "/brands",
+          icon: Tags,
         },
       ],
     },
@@ -203,10 +209,18 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user)
-  const groups = data.navGroups.map((group) => ({ ...group,
-    items: group.items.filter((item) => item.title !== "Auth Pages" && item.title !== "Errors" &&
-      (item.url !== "/users" || user?.role === "admin")),
+  
+  const groups = data.navGroups.map((group) => ({
+  ...group,
+   items: group.items.filter(
+    (item) =>
+      item.title !== "Auth Pages" &&
+      item.title !== "Errors" &&
+      (!["/users", "/brands"].includes(item.url) ||
+        user?.role === "admin")
+    ),
   }))
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
