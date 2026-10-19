@@ -1,10 +1,10 @@
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from "axios"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { api, authApi, clearAuth, refreshAccessToken } from "@/services/api"
-import { initializeSession, login, logout, changePassword } from "@/services/auth.service"
+import { initializeSession, login, logout, changePassword } from "@/features/auth/services/auth.service"
 import { useAuthStore } from "@/stores/auth.store"
-import { queryClient } from "@/lib/query-client"
-import type { User } from "@/types/auth"
+import { queryClient } from "@/services/query-client"
+import type { User } from "@/features/auth/types/auth"
 
 const user: User = { id: "a", name: "Test User", firstName: "Test", lastName: "User", email: "test@example.com", role: "staff", mustChangePassword: false }
 const oldTokens = { accessToken: "old-access", refreshToken: "old-refresh" }

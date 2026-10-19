@@ -1,6 +1,6 @@
 "use client"
 
-import { cn, assetUrl } from "@/lib/utils"
+import { cn, assetUrl } from "@/utils/utils"
 
 interface Image3DProps {
   lightSrc: string

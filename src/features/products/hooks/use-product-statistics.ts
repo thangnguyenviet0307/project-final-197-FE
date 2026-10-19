@@ -1,0 +1,5 @@
+import { useQuery } from "@tanstack/react-query"
+import { getProductStatistics } from "@/features/products/services/products.service"
+export function useProductStatistics() {
+  return useQuery({ queryKey: ["products", "statistics"], queryFn: ({ signal }) => getProductStatistics(signal) })
+}

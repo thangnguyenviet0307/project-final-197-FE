@@ -4,13 +4,13 @@ import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders } from "axios"
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { NavUser } from "@/components/nav-user"
-import { SiteHeader } from "@/components/site-header"
-import { queryClient } from "@/lib/query-client"
+import { NavUser } from "@/layout/admin/nav-user"
+import { SiteHeader } from "@/layout/admin/site-header"
+import { queryClient } from "@/services/query-client"
 import { useAuthStore } from "@/stores/auth.store"
 import { api, clearAuth } from "@/services/api"
 
-vi.mock("@/components/command-search", () => ({
+vi.mock("@/layout/admin/command-search", () => ({
   CommandSearch: () => null,
   SearchTrigger: () => <button>Search</button>,
 }))

@@ -1,9 +1,10 @@
 import { beforeEach, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom"
-import { ProtectedRoute, PublicOnlyRoute } from "@/components/router/protected-route"
+import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes, useLocation, type RouteObject } from "react-router-dom"
+import { routes } from "@/router/routes"
+import { ProtectedRoute, PublicOnlyRoute } from "@/router/protected-route"
 import { useAuthStore } from "@/stores/auth.store"
-import type { Role } from "@/types/auth"
+import type { Role } from "@/features/auth/types/auth"
 
 function LoginLocation() {
   const location = useLocation()
@@ -53,4 +54,26 @@ it("waits for session initialization before redirecting", () => {
   useAuthStore.setState({ isLoading: true }); setup()
   expect(screen.queryByText(/Login from/)).toBeNull()
   expect(screen.queryByText("Users")).toBeNull()
+})
+
+// Keep the real route hierarchy and guards; replace page imports with small render targets.
+function replacePages(items: RouteObject[]): RouteObject[] {
+  return items.map(route => ({ ...route, lazy: route.lazy ? async () => ({ Component: () => <p>Page {route.path}</p> }) : undefined,
+    children: route.children ? replacePages(route.children) : undefined,
+  }) as RouteObject)
+}
+it.each(["/products/new", `/products/${"a".repeat(24)}/edit`])("denies staff access to product write route %s", async path => {
+  session("staff")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  expect(await screen.findByText("Page /403")).toBeTruthy()
+})
+it.each(["/products", `/products/${"a".repeat(24)}`])("allows staff to read product route %s", async path => {
+  session("staff")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  expect(await screen.findByText(path === "/products" ? "Page /products" : "Page /products/:id")).toBeTruthy()
+})
+it("allows an admin to open the product creation route", async () => {
+  session("admin")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/products/new"] })} />)
+  expect(await screen.findByText("Page /products/new")).toBeTruthy()
 })
