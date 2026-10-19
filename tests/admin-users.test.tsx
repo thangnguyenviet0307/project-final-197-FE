@@ -36,8 +36,8 @@ it("keeps Full name empty when the account has no name instead of copying the ac
   setup()
   const emailCell = await screen.findByText("target@example.com")
   const row = emailCell.closest("tr")!
-  const nameCell = within(row).getAllByRole("cell")[0]
-  expect(nameCell.firstElementChild?.lastElementChild?.textContent).toBe("")
+  const nameCell = within(row).getAllByRole("cell")[1]
+  expect(nameCell.firstElementChild?.textContent).toBe("")
   expect(within(row).getAllByText("target@example.com")).toHaveLength(1)
 })
 
@@ -50,9 +50,9 @@ it("constrains long full names to the name column and keeps the complete name av
   })
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
   const row = (await screen.findByText("long@example.com")).closest("tr")!
-  const nameCell = within(row).getAllByRole("cell")[0]
+  const nameCell = within(row).getAllByRole("cell")[1]
   const name = nameCell.querySelector("span.truncate")
-  expect(screen.getByRole("table").querySelector("col")?.getAttribute("style")).toBe("width: 24%;")
+  expect(screen.getByRole("table").querySelector("col")?.getAttribute("style")).toBe("width: 20%;")
   expect(screen.getByRole("table").classList.contains("w-full")).toBe(true)
   expect(screen.getByRole("table").classList.contains("min-w-[1250px]")).toBe(false)
   expect(name?.classList.contains("truncate")).toBe(true)
@@ -60,7 +60,9 @@ it("constrains long full names to the name column and keeps the complete name av
 })
 
 it("keeps the Accounts table columns aligned across pages with different content", async () => {
+  const requests: { page: number; limit: number }[] = []
   api.defaults.adapter = async (config) => {
+    requests.push(config.params as { page: number; limit: number })
     const page = Number((config.params as { page: number }).page)
     const accounts = page === 1
       ? Array.from({ length: 10 }, (_, index) => ({
@@ -92,13 +94,15 @@ it("keeps the Accounts table columns aligned across pages with different content
   const table = screen.getByRole("table")
   const widthsOnPageOne = Array.from(table.querySelectorAll("col"), (column) => column.getAttribute("style"))
   expect(table.classList.contains("table-fixed")).toBe(true)
-  expect(widthsOnPageOne[0]).toBe("width: 24%;")
+  expect(widthsOnPageOne[0]).toBe("width: 20%;")
   expect(table.classList.contains("min-w-[1250px]")).toBe(false)
   expect(table.parentElement?.classList.contains("overflow-x-auto")).toBe(true)
   expect(table.parentElement?.parentElement?.classList.contains("overflow-x-auto")).toBe(false)
 
   fireEvent.click(screen.getByRole("button", { name: "Next" }))
   await screen.findByText("page2@example.com")
+  expect(requests).toContainEqual(expect.objectContaining({ page: 1, limit: 10 }))
+  expect(requests).toContainEqual(expect.objectContaining({ page: 2, limit: 10 }))
   const pageTwoTable = screen.getByRole("table")
   expect(Array.from(pageTwoTable.querySelectorAll("col"), (column) => column.getAttribute("style"))).toEqual(widthsOnPageOne)
   expect(pageTwoTable.classList.contains("table-fixed")).toBe(true)
@@ -131,10 +135,9 @@ it("searches accounts by name or account email and shows an empty search result"
 
   const search = await screen.findByRole("textbox", { name: "Search accounts by name or account email" })
   expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByText("Accounts").compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(screen.getByRole("table").parentElement?.parentElement?.parentElement?.classList.contains("min-h-[610px]")).toBe(true)
+  expect(screen.getByRole("heading", { name: "User List" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   expect(screen.getByRole("table").classList.contains("[&_td]:py-3")).toBe(true)
-  expect(screen.getByText(/Page 1/).parentElement?.classList.contains("mt-3")).toBe(true)
+  expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
   const requestCount = requests.length
   fireEvent.change(search, { target: { value: "Jane Smith" } })
   expect(requests).toHaveLength(requestCount)
@@ -158,7 +161,13 @@ it("searches accounts by name or account email and shows an empty search result"
 it.each([ ["staff", "Staff123"], ["admin", "Admin123"] ] as const)("creates %s accounts using the matching temporary password", async (role, password) => {
   const writes = setup()
   await screen.findByText("target@example.com")
-  fireEvent.change(screen.getByLabelText("Role"), { target: { value: role } })
+  fireEvent.click(screen.getByRole("button", { name: "Add User" }))
+  fireEvent.click(await screen.findByRole("combobox", { name: "Role" }))
+  const option = await screen.findByRole("option", { name: role === "admin" ? "Admin" : "Staff" })
+  fireEvent.mouseMove(option)
+  fireEvent.mouseDown(option)
+  fireEvent.mouseUp(option)
+  fireEvent.click(option)
   expect(screen.getByLabelText("Temporary password")).toHaveProperty("value", password)
   fireEvent.change(screen.getByLabelText("First name"), { target: { value: "New" } })
   fireEvent.change(screen.getByLabelText("Last name"), { target: { value: "User" } })
@@ -186,4 +195,125 @@ it("confirms account deletion from the Edit actions menu", async () => {
   expect(await screen.findByText(/You are about to delete the account/)).toBeTruthy()
   fireEvent.click(screen.getByRole("button", { name: "Confirm deletion" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", "/users/target", undefined))
+})
+
+
+
+
+it("edits account access without silently resetting its password", async () => {
+  const writes = setup()
+  await screen.findByText("target@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Edit" }))
+  fireEvent.change(screen.getByLabelText("Status"), { target: { value: "suspended" } })
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { role: "staff", active: false }))
+})
+
+
+it("removes invitations, View, row selection and the page-size selector", async () => {
+  setup()
+  await screen.findByText("target@example.com")
+  expect(screen.queryByRole("button", { name: "Invite User" })).toBeNull()
+  expect(screen.queryByRole("button", { name: "View" })).toBeNull()
+  expect(screen.queryByRole("checkbox")).toBeNull()
+  expect(screen.queryByRole("combobox", { name: "Rows per page" })).toBeNull()
+  expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
+  expect(screen.getByRole("heading", { name: "User List" }).closest("section")?.classList.contains("dark")).toBe(false)
+})
+
+it("sorts by username only and provides a pointer cursor on its control", async () => {
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
+    data: [
+      { _id: "zeta", firstName: "Alpha", lastName: "Name", email: "zeta@example.com", role: "staff", active: true },
+      { _id: "alpha", firstName: "Zeta", lastName: "Name", email: "alpha@example.com", role: "admin", active: true },
+    ], pagination: { total: 2, totalPages: 1 },
+  } })
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  await screen.findByText("alpha@example.com")
+  const usernames = () => within(screen.getByRole("table")).getAllByRole("row").slice(1)
+    .map(row => within(row).getAllByRole("cell")[0].querySelector("span.truncate")?.textContent)
+  expect(usernames()).toEqual(["alpha", "zeta"])
+  const sort = screen.getByRole("button", { name: "Sort by username" })
+  expect(sort.classList.contains("cursor-pointer")).toBe(true)
+  expect(within(screen.getByRole("columnheader", { name: "Name" })).queryByRole("button")).toBeNull()
+  expect(within(screen.getByRole("columnheader", { name: "Email" })).queryByRole("button")).toBeNull()
+  fireEvent.click(sort)
+  expect(usernames()).toEqual(["zeta", "alpha"])
+  expect(sort.closest("th")?.getAttribute("aria-sort")).toBe("descending")
+})
+
+it("uses only active/suspended statuses and admin/staff roles, including temporary accounts", async () => {
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
+    data: [{ _id: "temporary", firstName: "Temporary", lastName: "User", email: "temporary@example.com", role: "staff", active: true, mustChangePassword: true }],
+    pagination: { total: 1, totalPages: 1 },
+  } })
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  const row = (await screen.findByText("temporary@example.com")).closest("tr")!
+  expect(within(row).getByText("Active")).toBeTruthy()
+  expect(screen.queryByText("Invited")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Status" }))
+  expect(await screen.findByRole("button", { name: "Suspended" })).toBeTruthy()
+  expect(screen.queryByRole("button", { name: "Invited" })).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "All statuses" }))
+  fireEvent.click(screen.getByRole("button", { name: "Add User" }))
+  const role = await screen.findByRole("combobox", { name: "Role" })
+  fireEvent.click(role)
+  expect((await screen.findAllByRole("option")).map(option => option.textContent)).toEqual(["Staff", "Admin"])
+  expect(screen.queryByText("Manager")).toBeNull()
+  expect(screen.queryByText("Cashier")).toBeNull()
+})
+
+it("opens the selected user's profile and closes it without writing account data", async () => {
+  const writes = setup()
+  const row = (await screen.findByText("target@example.com")).closest("tr")!
+  fireEvent.click(within(row).getAllByRole("cell")[1])
+  const dialog = await screen.findByRole("dialog", { name: "User profile" })
+  expect(within(dialog).getByText("Username")).toBeTruthy()
+  expect(within(dialog).getAllByText("target@example.com")).toHaveLength(2)
+  expect(within(dialog).getByText("Staff")).toBeTruthy()
+  expect(within(dialog).getByText("Active")).toBeTruthy()
+  expect(within(dialog).queryByText(/password/i)).toBeNull()
+  fireEvent.click(within(dialog).getByRole("button", { name: "Close" }))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  expect(writes).not.toHaveBeenCalled()
+})
+
+it.each(["Enter", " "])("opens a focused user row with the %s key", async key => {
+  setup()
+  const row = (await screen.findByText("target@example.com")).closest("tr")!
+  row.focus()
+  fireEvent.keyDown(row, { key })
+  expect(await screen.findByRole("dialog", { name: "User profile" })).toBeTruthy()
+})
+
+it("keeps the account action menu separate from the profile dialog", async () => {
+  setup()
+  await screen.findByText("target@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
+  expect(await screen.findByRole("menuitem", { name: "Edit" })).toBeTruthy()
+  expect(screen.queryByRole("dialog", { name: "User profile" })).toBeNull()
+  fireEvent.click(screen.getByRole("menuitem", { name: "Edit" }))
+  expect(await screen.findByRole("dialog", { name: "Edit account" })).toBeTruthy()
+  expect(screen.queryByRole("dialog", { name: "User profile" })).toBeNull()
+})
+
+it("shows the clicked account rather than the signed-in admin or a previous selection", async () => {
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
+    data: [
+      { _id: "one", firstName: "First", lastName: "User", email: "one@example.com", role: "staff", active: true },
+      { _id: "two", firstName: "Second", lastName: "User", email: "two@example.com", personalEmail: "personal@example.com", phone: "0901234567", location: "Ho Chi Minh City", bio: "Second user's biography", role: "admin", active: false },
+    ], pagination: { total: 2, totalPages: 1 },
+  } })
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  fireEvent.click((await screen.findByText("one@example.com")).closest("tr")!)
+  fireEvent.click(within(await screen.findByRole("dialog", { name: "User profile" })).getByRole("button", { name: "Close" }))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  fireEvent.click(screen.getByText("two@example.com").closest("tr")!)
+  const dialog = await screen.findByRole("dialog", { name: "User profile" })
+  for (const text of ["personal@example.com", "0901234567", "Ho Chi Minh City", "Second user's biography", "Admin", "Suspended"]) {
+    expect(within(dialog).getByText(text)).toBeTruthy()
+  }
+  expect(within(dialog).queryByText("one@example.com")).toBeNull()
+  expect(within(dialog).queryByText("self@example.com")).toBeNull()
 })
