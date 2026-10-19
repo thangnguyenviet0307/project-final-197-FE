@@ -29,10 +29,10 @@ export interface ManagedUser {
   avatar?: string
 }
 
-export async function listUsers(page: number, signal: AbortSignal) {
+export async function listUsers(page: number, signal: AbortSignal, search = "") {
   const { data } = await api.get<ApiResponse<ManagedUser[]> & {
     pagination: { totalPages: number; total: number }
-  }>("/users", { params: { page, limit: 10 }, signal })
+  }>("/users", { params: { page, limit: 10, ...(search ? { search } : {}) }, signal })
   return data
 }
 

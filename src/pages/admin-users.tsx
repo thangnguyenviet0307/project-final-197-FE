@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUsers } from "@/hooks/users/use-users"
 import { useCreateUser } from "@/hooks/users/use-create-user"
 import { useResetUserPassword } from "@/hooks/users/use-reset-user-password"
 import { z } from "zod"
-import { KeyRound, LoaderCircle, UserPlus } from "lucide-react"
+import { KeyRound, LoaderCircle, MoreVertical, Search, Trash2, UserPlus, X } from "lucide-react"
 import { BaseLayout } from "@/components/layouts/base-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,14 @@ import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { passwordSchema } from "@/lib/auth-schemas"
 import { UserAvatar } from "@/components/user-avatar"
-import { DeleteUserButton } from "@/components/auth/delete-user-button"
+import { DeleteUserConfirmation } from "@/components/auth/delete-user-confirmation"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const resetSchema = z.object({ password: passwordSchema })
 
@@ -46,9 +53,19 @@ function ResetPassword({ user, close }: { user: ManagedUser; close: () => void }
 
 export default function UsersPage() {
   const [page, setPage] = useState(1)
+  const [searchInput, setSearchInput] = useState("")
+  const [search, setSearch] = useState("")
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const currentUser = useAuthStore((state) => state.user)
-  const users = useUsers(page)
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim())
+      setPage(1)
+    }, 300)
+    return () => window.clearTimeout(timeout)
+  }, [searchInput])
+  const users = useUsers(page, search)
   const form = useForm<CreateUserInput>({ resolver: zodResolver(createUserSchema), defaultValues: {
     firstName: "", lastName: "", email: "", password: getTemporaryPassword("staff"), role: "staff",
   } })
@@ -84,28 +101,99 @@ export default function UsersPage() {
         </form></CardContent>
       </Card>
       {resetTarget && <ResetPassword key={resetTarget._id} user={resetTarget} close={() => setResetTarget(null)} />}
+      {deleteTarget && <DeleteUserConfirmation
+        key={deleteTarget._id}
+        id={deleteTarget._id}
+        email={deleteTarget.email}
+        open
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        onDeleted={() => {
+          setDeleteTarget(null)
+          if (users.data?.data.length === 1 && page > 1) setPage((value) => value - 1)
+        }}
+      />}
       <Card><CardHeader><CardTitle>Accounts</CardTitle></CardHeader><CardContent>
-        {users.isPending ? <p role="status" className="flex gap-2"><LoaderCircle className="size-4 animate-spin" />Loading…</p>
-          : users.isError ? <div role="alert"><p>{getApiError(users.error).message}</p><Button variant="outline" onClick={() => void users.refetch()}>Try again</Button></div>
-          : <><Table><TableHeader><TableRow><TableHead>Full name</TableHead><TableHead>Account email</TableHead><TableHead>Personal email</TableHead><TableHead>Role</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+        <form
+          role="search"
+          className="mb-4 flex w-full gap-2 sm:max-w-md"
+          onSubmit={(event) => {
+            event.preventDefault()
+            setSearch(searchInput.trim())
+            setPage(1)
+          }}
+        >
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              aria-label="Search accounts by name or account email"
+              placeholder="Search by name or account email"
+              maxLength={200}
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchInput && <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Clear account search"
+              className="absolute right-1 top-1/2 size-7 -translate-y-1/2"
+              onClick={() => {
+                setSearchInput("")
+                setSearch("")
+                setPage(1)
+              }}
+            ><X /></Button>}
+          </div>
+          <Button type="submit" className="w-24 shrink-0" aria-label="Search accounts">
+            {users.isFetching
+              ? <><LoaderCircle className="animate-spin" />Searching</>
+              : <><Search />Search</>}
+          </Button>
+        </form>
+        {users.isPending ? <div className="flex min-h-[610px] items-start"><p role="status" className="flex gap-2"><LoaderCircle className="size-4 animate-spin" />Loading…</p></div>
+          : users.isError && !users.data ? <div role="alert" className="min-h-[610px]"><p>{getApiError(users.error).message}</p><Button variant="outline" onClick={() => void users.refetch()}>Try again</Button></div>
+          : <div className="min-h-[610px]">
+            <div className="transition-opacity duration-200" aria-busy={users.isFetching}>
+            {users.isError && <div role="alert" className="mb-3 flex items-center gap-3 text-sm text-destructive">
+              <p>{getApiError(users.error).message}</p><Button size="sm" variant="outline" onClick={() => void users.refetch()}>Try again</Button>
+            </div>}
+            <Table className="w-full table-fixed [&_td]:py-3">
+              <colgroup>
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "17%" }} />
+                <col style={{ width: "17%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "22%" }} />
+                <col style={{ width: "12%" }} />
+              </colgroup>
+              <TableHeader><TableRow><TableHead>Full name</TableHead><TableHead>Account email</TableHead><TableHead>Personal email</TableHead><TableHead>Role</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
             <TableBody>{users.data.data.map((user) => <TableRow key={user._id}>
-              <TableCell><div className="flex items-center gap-3"><UserAvatar name={`${user.firstName || ""} ${user.lastName || ""}`.trim()} avatar={user.avatar} /><span>{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</span></div></TableCell><TableCell>{user.email}</TableCell>
-              <TableCell>{user.personalEmail || "—"}</TableCell>
+              <TableCell><div className="flex min-w-0 items-center gap-3"><UserAvatar className="shrink-0" name={`${user.firstName || ""} ${user.lastName || ""}`.trim()} avatar={user.avatar} /><span className="min-w-0 flex-1 truncate" title={`${user.firstName || ""} ${user.lastName || ""}`.trim()}>{`${user.firstName || ""} ${user.lastName || ""}`.trim()}</span></div></TableCell>
+              <TableCell><span className="block truncate" title={user.email}>{user.email}</span></TableCell>
+              <TableCell><span className="block truncate" title={user.personalEmail || "—"}>{user.personalEmail || "—"}</span></TableCell>
               <TableCell><Badge variant="secondary">{user.role}</Badge></TableCell>
-              <TableCell>{user.active ? "Active" : "Disabled"}{user.mustChangePassword && " · Password change required"}</TableCell>
-              <TableCell><div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled={user._id === currentUser?.id} onClick={() => setResetTarget(user)}><KeyRound />Reset password</Button>
-                <DeleteUserButton id={user._id} email={user.email} disabled={user._id === currentUser?.id} onDeleted={() => {
-                  if (resetTarget?._id === user._id) setResetTarget(null)
-                  if (users.data.data.length === 1 && page > 1) setPage((value) => value - 1)
-                }} />
-              </div></TableCell>
-            </TableRow>)}{users.data.data.length === 0 && <TableRow><TableCell colSpan={6}>No accounts found.</TableCell></TableRow>}</TableBody></Table>
-            <div className="mt-4 flex items-center justify-end gap-3">
+              <TableCell><span className="block truncate" title={`${user.active ? "Active" : "Disabled"}${user.mustChangePassword ? " · Password change required" : ""}`}>{user.active ? "Active" : "Disabled"}{user.mustChangePassword && " · Password change required"}</span></TableCell>
+              <TableCell><DropdownMenu>
+                <DropdownMenuTrigger render={<Button variant="outline" size="sm" disabled={user._id === currentUser?.id} aria-label={`Edit account ${user.email}`} />}>
+                  Edit<MoreVertical className="size-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setResetTarget(user)}><KeyRound />Reset password</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setDeleteTarget(user)}
+                  ><Trash2 />Delete account</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu></TableCell>
+            </TableRow>)}{users.data.data.length === 0 && <TableRow>            <TableCell colSpan={6}>{search ? `No accounts found for "${search}".` : "No accounts found."}</TableCell></TableRow>}</TableBody></Table>
+            </div>
+            <div className="mt-3 flex items-center justify-end gap-3">
               <Button variant="outline" disabled={page <= 1 || users.isFetching} onClick={() => setPage((value) => value - 1)}>Previous</Button>
               <span className="text-sm">Page {page} / {Math.max(1, users.data.pagination.totalPages)}</span>
               <Button variant="outline" disabled={page >= users.data.pagination.totalPages || users.isFetching} onClick={() => setPage((value) => value + 1)}>Next</Button>
-            </div></>}
+            </div></div>}
       </CardContent></Card>
     </div>
   </BaseLayout>

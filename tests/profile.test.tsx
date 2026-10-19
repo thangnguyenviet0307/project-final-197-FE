@@ -31,10 +31,19 @@ function renderPage(node: ReactNode) {
 it("loads the profile and keeps account email/role readonly while removing template fields", async () => {
   api.defaults.adapter = async (config) => ({ config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" })
   renderPage(<UserProfilePage />)
+  expect(await screen.findByText("Test User")).toBeTruthy()
+  expect(screen.getByText("Thông tin cá nhân")).toBeTruthy()
+  expect(screen.queryByText("Profile photo")).toBeNull()
+  expect(screen.queryByText("Contact your administrator to change your account email.")).toBeNull()
+  expect(screen.queryByLabelText("First Name")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Cập nhật thông tin cá nhân" }))
   expect(await screen.findByLabelText("First Name")).toHaveProperty("value", "Test")
   expect(screen.getByLabelText("Personal email")).toHaveProperty("value", "personal@example.com")
   expect(screen.getByLabelText("Account email")).toHaveProperty("readOnly", true)
   expect(screen.getByLabelText("Role")).toHaveProperty("readOnly", true)
+  expect(screen.getByText("Profile photo")).toBeTruthy()
+  expect(screen.getByLabelText("Profile photo")).toBeTruthy()
+  expect(screen.queryByText("Contact your administrator to change this address.")).toBeNull()
   for (const label of ["Company", "Website", "Language", "Timezone"]) expect(screen.queryByLabelText(label)).toBeNull()
 })
 
@@ -53,22 +62,62 @@ it("saves profile via API, updates the sidebar's user state, and invalidates the
     return { config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" }
   })
   renderPage(<UserProfilePage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Cập nhật thông tin cá nhân" }))
   fireEvent.change(await screen.findByLabelText("First Name"), { target: { value: "Updated" } })
   fireEvent.change(screen.getByLabelText("Personal email"), { target: { value: "new@example.com" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save Changes" }))
-  expect(await screen.findByText("Profile updated.")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thông tin" }))
+  expect(await screen.findByText("Updated User")).toBeTruthy()
+  expect(screen.queryByLabelText("First Name")).toBeNull()
   expect(useAuthStore.getState().user).toMatchObject({ name: "Updated User", personalEmail: "new@example.com" })
   expect(invalidation).toHaveBeenCalledWith({ queryKey: ["users"] })
 })
 
-it("avatar controls do not submit the profile and reject oversized uploads", async () => {
-  api.defaults.adapter = vi.fn(async (config) => ({ config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" }))
+it("opens the edit form on request and returns to the saved profile when canceled", async () => {
+  api.defaults.adapter = async (config) => ({ config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" })
   renderPage(<UserProfilePage />)
-  await screen.findByLabelText("First Name")
+  fireEvent.click(await screen.findByRole("button", { name: "Cập nhật thông tin cá nhân" }))
+  fireEvent.change(await screen.findByLabelText("First Name"), { target: { value: "Preview" } })
+  fireEvent.click(screen.getByRole("button", { name: "Hủy" }))
+  expect(await screen.findByText("Test User")).toBeTruthy()
+  expect(screen.queryByLabelText("First Name")).toBeNull()
+})
+
+it("uploads a selected avatar with the profile and returns to the updated profile", async () => {
+  let submittedAvatar: FormDataEntryValue | null = null
+  api.defaults.adapter = vi.fn(async (config) => {
+    if (config.method === "patch") {
+      submittedAvatar = (config.data as FormData).get("avatar")
+      return { config, data: { data: { ...user, avatar: "https://example.com/avatar.png" } }, headers: new AxiosHeaders(), status: 200, statusText: "" }
+    }
+    return { config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" }
+  })
+  renderPage(<UserProfilePage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Cập nhật thông tin cá nhân" }))
+  const photo = new File([new Uint8Array([1, 2, 3])], "avatar.png", { type: "image/png" })
+  fireEvent.change(screen.getByLabelText("Profile photo"), { target: { files: [photo] } })
+  await waitFor(() => expect(screen.getByRole("button", { name: "Lưu thông tin" })).toHaveProperty("disabled", false))
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thông tin" }))
+  await waitFor(() => expect(submittedAvatar).toBeInstanceOf(File))
+  expect(useAuthStore.getState().user?.avatar).toBe("https://example.com/avatar.png")
+  expect(screen.queryByLabelText("Profile photo")).toBeNull()
+})
+
+it("resets the avatar to its default when saving profile changes", async () => {
+  let submittedAvatar: FormDataEntryValue | null = null
+  api.defaults.adapter = vi.fn(async (config) => {
+    if (config.method === "patch") {
+      submittedAvatar = (config.data as FormData).get("avatar")
+      return { config, data: { data: { ...user, avatar: "" } }, headers: new AxiosHeaders(), status: 200, statusText: "" }
+    }
+    return { config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" }
+  })
+  renderPage(<UserProfilePage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Cập nhật thông tin cá nhân" }))
   fireEvent.click(screen.getByRole("button", { name: "Reset photo" }))
-  fireEvent.change(screen.getByLabelText("Profile photo"), { target: { files: [new File([new Uint8Array(800 * 1024 + 1)], "large.png", { type: "image/png" })] } })
-  expect(await screen.findByText("Choose a JPG, PNG or GIF image up to 800 KB.")).toBeTruthy()
-  expect(api.defaults.adapter).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thông tin" }))
+  await waitFor(() => expect(submittedAvatar).toBe(""))
+  expect(useAuthStore.getState().user?.avatar).toBe("")
+  expect(screen.queryByLabelText("Profile photo")).toBeNull()
 })
 
 it("requires an explicit popover confirmation before deleting an account", async () => {
