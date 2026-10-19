@@ -41,7 +41,6 @@ export default function AdminOrdersPage() {
     })} />
     {!validRange && <p role="alert">The date range in the URL is invalid and has not been applied.</p>}
     <div className="flex flex-wrap items-end gap-4"><label className="grid gap-2 text-sm">Status<select className="rounded-md border bg-background p-2" value={isOrderStatus(status) ? status : ""} onChange={event => change("orderStatus", event.target.value)}><option value="">All statuses</option>{Object.entries(orderStatuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-      <label className="grid gap-2 text-sm">Orders per page<select className="rounded-md border bg-background p-2" value={limit} onChange={event => change("limit", event.target.value)}>{[...new Set([10, 20, 50, 100, limit])].sort((a, b) => a - b).map(value => <option key={value}>{value}</option>)}</select></label>
       {pagination && <p className="py-2 text-sm" role="status">{pagination.total} orders{query.isFetching ? " · Updating…" : ""}</p>}
     </div>
     {query.isPending || query.isError ? <OrderQueryState error={query.error} retry={query.refetch} /> : <>

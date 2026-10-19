@@ -1,20 +1,20 @@
-import { pageNumbers } from "@/utils/pagination"
+import { Link } from "react-router-dom"
+import { ListPagination } from "@/components/list-pagination"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ContentSkeleton } from "@/components/page-skeleton"
 import { useEffect, useMemo, useState, type FormEvent } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
-  ArrowDown, ArrowUp, BriefcaseBusiness, Check,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, KeyRound,
-  LoaderCircle, MoreHorizontal, PlusCircle, ShieldCheck,
+  ArrowDown, ArrowUp, BriefcaseBusiness, Users, CheckCircle2, CirclePause,
+  KeyRound,
+  LoaderCircle, MoreHorizontal, ShieldCheck,
   Trash2, UserRound, UserRoundPlus, X,
 } from "lucide-react"
 import { BaseLayout } from "@/layout/admin/base-layout"
 import { UserAvatar } from "@/components/user-avatar"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -22,12 +22,10 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { createUserSchema, getTemporaryPassword, type CreateUserInput, type ManagedUser } from "@/features/users/services/users.service"
+import { getTemporaryPassword, type ManagedUser } from "@/features/users/services/users.service"
 import { api, getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { useUsers } from "@/features/users/hooks/use-users"
-import { useCreateUser } from "@/features/users/hooks/use-create-user"
 import { useResetUserPassword } from "@/features/users/hooks/use-reset-user-password"
 import { DeleteUserConfirmation } from "@/features/users/components/delete-user-confirmation"
 import { queryClient } from "@/services/query-client"
@@ -70,31 +68,18 @@ function getStatus(user: ManagedUser): Exclude<Status, "all"> {
 function FilterMenu<T extends string>({ label, value, options, onChange }: {
   label: string; value: T; options: readonly { value: T; label: string }[]; onChange: (value: T) => void
 }) {
-  const active = value !== "all"
-  return (
-    <Popover>
-      <PopoverTrigger render={<Button variant="outline" className="h-10 border-dashed px-3.5" />}>
-        <PlusCircle className="size-4" />{label}
-        {active && <span className="rounded bg-muted px-1.5 text-xs">{options.find(option => option.value === value)?.label}</span>}
-      </PopoverTrigger>
-      <PopoverContent align="start" className="users-surface w-56 p-1.5">
-        <p className="px-2.5 py-2 text-xs font-medium text-muted-foreground">Filter by {label.toLowerCase()}</p>
-        {options.map(option => (
-          <button key={option.value} type="button" aria-pressed={value === option.value}
-            onClick={() => onChange(option.value)}
-            className="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring">
-            {option.label}{value === option.value && <Check className="size-4" />}
-          </button>
-        ))}
-        <p className="border-t px-2.5 py-2 text-xs text-muted-foreground">Filters apply to the current page.</p>
-      </PopoverContent>
-    </Popover>
-  )
+  const id = label === "Account status" ? "users-status" : "users-role"
+  return <Field><FieldLabel htmlFor={id}>{label}</FieldLabel>
+    <select id={id} className="h-8 rounded-md border bg-background px-2 text-sm" value={value} onChange={event => {
+      const selected = options.find(option => option.value === event.target.value)
+      if (selected) onChange(selected.value)
+    }}>{options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+  </Field>
 }
 
 function ResetPasswordDialog({ user, onClose }: { user: ManagedUser; onClose: () => void }) {
   const mutation = useResetUserPassword(user._id, { onSuccess: onClose })
-  const password = getTemporaryPassword(user.role)
+  const [password] = useState(() => getTemporaryPassword(user.role))
   return (
     <Dialog open onOpenChange={open => { if (!open && !mutation.isPending) onClose() }}>
       <DialogContent className="users-surface sm:max-w-md">
@@ -164,13 +149,13 @@ function UserProfileDialog({ user, onClose }: { user: ManagedUser; onClose: () =
 
 export default function UsersPage() {
   const [page, setPage] = useState(1)
+  const limit = 10
   const [searchInput, setSearchInput] = useState("")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<Status>("all")
   const [roleFilter, setRoleFilter] = useState<"all" | ManagedUser["role"]>("all")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
   const [profileUser, setProfileUser] = useState<ManagedUser | null>(null)
-  const [createUserOpen, setCreateUserOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
   const [editUser, setEditUser] = useState<ManagedUser | null>(null)
@@ -188,27 +173,7 @@ export default function UsersPage() {
     return () => window.clearTimeout(timeout)
   }, [searchInput, search])
 
-  const users = useUsers(page, search)
-  const form = useForm<CreateUserInput>({
-    resolver: zodResolver(createUserSchema),
-    defaultValues: { firstName: "", lastName: "", email: "", password: getTemporaryPassword("staff"), role: "staff" },
-  })
-  const mutation = useCreateUser({
-    onSuccess: () => {
-      form.reset({ firstName: "", lastName: "", email: "", password: getTemporaryPassword("staff"), role: "staff" })
-      setCreateUserOpen(false); setPage(1)
-      void queryClient.invalidateQueries({ queryKey: ["users"] })
-    },
-    onError: error => {
-      const failure = getApiError(error)
-      form.setError("root", { message: failure.message })
-      failure.errors?.forEach(({ field, message }) => {
-        if (field === "firstName" || field === "lastName" || field === "email" || field === "password" || field === "role") {
-          form.setError(field, { message })
-        }
-      })
-    },
-  })
+  const users = useUsers(page, search, limit)
 
   const visibleUsers = useMemo(() => (users.data?.data ?? [])
     .filter(user => (roleFilter === "all" || user.role === roleFilter) && (statusFilter === "all" || getStatus(user) === statusFilter))
@@ -235,43 +200,52 @@ export default function UsersPage() {
     finally { setIsSavingRole(false) }
   }
 
+  const statistics = [
+    { label: "Matching accounts", value: users.data?.pagination.total, caption: "Across all result pages", Icon: Users, color: "text-muted-foreground" },
+    { label: "Active accounts", value: users.data?.data.filter(user => user.active).length, caption: "On this page", Icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400" },
+    { label: "Suspended accounts", value: users.data?.data.filter(user => !user.active).length, caption: "On this page", Icon: CirclePause, color: "text-amber-600 dark:text-amber-400" },
+  ]
   return (
-    <BaseLayout>
-      <section className="users-page mx-4 min-w-0 rounded-xl lg:mx-6" aria-labelledby="users-heading">
-        <header className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <h1 id="users-heading" className="text-[28px] font-bold tracking-tight">User List</h1>
-            <p className="mt-1 text-base text-muted-foreground">Manage your users and their roles here.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Button className="h-11 rounded-lg px-4" onClick={() => setCreateUserOpen(true)}>Add User<UserRoundPlus className="ml-1 size-4.5" /></Button>
-          </div>
-        </header>
-
-        <div role="search" aria-label="Filter users" className="mb-5 flex flex-wrap items-center gap-2.5">
-          <div className="relative w-full sm:w-72 lg:w-80">
-            <Input aria-label="Search accounts by name or account email" placeholder="Filter users..." maxLength={200}
-              value={searchInput} onChange={event => setSearchInput(event.target.value)} className="h-10 rounded-lg px-3.5 pr-9" />
-            {searchInput && <Button variant="ghost" size="icon-sm" aria-label="Clear account search" className="absolute right-1 top-1/2 -translate-y-1/2"
-              onClick={() => { setSearchInput(""); setSearch(""); changePage(1) }}><X className="size-3.5" /></Button>}
-          </div>
-          <FilterMenu label="Status" value={statusFilter} options={statusOptions} onChange={value => { setStatusFilter(value) }} />
-          <FilterMenu label="Role" value={roleFilter} options={roleOptions} onChange={value => { setRoleFilter(value) }} />
-          {(statusFilter !== "all" || roleFilter !== "all") && <Button variant="ghost" onClick={() => { setRoleFilter("all"); setStatusFilter("all") }}>Reset<X className="size-3.5" /></Button>}
-          <span role="status" className="text-xs text-muted-foreground">{users.isFetching && !users.isLoading ? search ? "Searching" : "Updating" : ""}</span>
-
+    <BaseLayout title="Users" description="Manage your team accounts, roles and access.">
+      <section className="space-y-4 px-4 lg:px-6" aria-label="User management">
+        <section aria-label="User statistics" className="grid grid-cols-2 gap-4 md:grid-cols-3" aria-busy={users.isFetching}>
+          {statistics.map(({ label, value, caption, Icon, color }) => <Card key={label}>
+            <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+              <CardTitle className="text-xs font-medium uppercase text-muted-foreground">{label}</CardTitle>
+              <Icon className={`size-4 shrink-0 ${color}`} />
+            </CardHeader>
+            <CardContent><div className={`text-2xl font-bold ${color}`}>{users.isPending ? <Skeleton className="h-8 w-20" /> : users.isError ? "-" : value ?? "-"}</div><p className="mt-1 text-xs text-muted-foreground">{caption}</p></CardContent>
+          </Card>)}
+        </section>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{users.data ? `${users.data.pagination.total} accounts` : "User accounts"}</p>
+          <Button nativeButton={false} role="link" render={<Link to="/users/new" />}><UserRoundPlus />Add User</Button>
         </div>
+        <div role="search" aria-label="Filter users" className="space-y-3 rounded-lg border p-4">
+          <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Field className="lg:col-span-2"><FieldLabel htmlFor="users-search">Name or account email</FieldLabel>
+              <div className="relative"><Input id="users-search" aria-label="Search accounts by name or account email" maxLength={200} value={searchInput} onChange={event => setSearchInput(event.target.value)} className="pr-9" />
+                {searchInput && <Button variant="ghost" size="icon-sm" aria-label="Clear account search" className="absolute right-1 top-1/2 -translate-y-1/2" onClick={() => { setSearchInput(""); setSearch(""); changePage(1) }}><X className="size-3.5" /></Button>}
+              </div>
+            </Field>
+            <FilterMenu label="Account status" value={statusFilter} options={statusOptions} onChange={setStatusFilter} />
+            <FilterMenu label="Account role" value={roleFilter} options={roleOptions} onChange={setRoleFilter} />
+            <Button type="button" variant="outline" className="sm:col-span-2 lg:col-span-4 lg:justify-self-end" onClick={() => { setSearchInput(""); setSearch(""); setStatusFilter("all"); setRoleFilter("all"); setPage(1) }}>Reset filters</Button>
+          </div>
+          <p className="text-xs text-muted-foreground">Role, status and sorting apply to the current page.</p>
+        </div>
+        <p role="status" className="text-sm text-muted-foreground">{users.isFetching && !users.isLoading ? search ? "Searching" : "Updating" : ""}</p>
 
         {users.isError && <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">
           <span>{getApiError(users.error).message}</span><Button variant="outline" size="sm" onClick={() => void users.refetch()}>Retry</Button>
         </div>}
 
         <div className="overflow-hidden rounded-lg border border-border">
-          <Table className="w-full min-w-250 table-fixed [&_td]:py-3" aria-label="User list table" aria-busy={users.isFetching}>
+          <Table className="w-full min-w-250 table-fixed" aria-label="User list table" aria-busy={users.isFetching}>
             <colgroup>{columns.map(column => <col key={column.key} style={{ width: column.width }} />)}<col style={{ width: "4%" }} /></colgroup>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                {columns.map(column => <TableHead key={column.key} className={column.key === "username" ? "users-username" : ""}
+                {columns.map(column => <TableHead key={column.key}
                   aria-sort={column.key === "username" ? sortDirection === "asc" ? "ascending" : "descending" : undefined}>
                   {column.key === "username" ? <button type="button" aria-label="Sort by username" title="Sort by username" className="inline-flex cursor-pointer items-center gap-3 rounded py-1 focus-visible:outline-2 focus-visible:outline-ring"
                     onClick={() => setSortDirection(previous => previous === "asc" ? "desc" : "asc")}>{column.label}
@@ -293,8 +267,8 @@ export default function UsersPage() {
                       event.preventDefault(); setProfileUser(user)
                     }
                   }}>
-                  {columns.map(column => <TableCell key={column.key} className={column.key === "username" ? "users-username font-medium" : ""}>
-                    {column.key === "status" ? <Badge className={`users-status users-status-${status}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>
+                  {columns.map(column => <TableCell key={column.key} className={column.key === "username" ? "font-medium" : ""}>
+                    {column.key === "status" ? <Badge variant={user.active ? "default" : "secondary"}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>
                       : column.key === "role" ? <div className="flex items-center gap-2.5">{getRoleIcon(user.role)}<span className="truncate">{getRoleLabel(user.role)}</span></div>
                       : column.key === "username" ? <div className="flex min-w-0 items-center gap-2.5">
                         <span aria-hidden="true" className="shrink-0"><UserAvatar name={getDisplayName(user) || getUsername(user)} avatar={user.avatar} /></span>
@@ -306,7 +280,7 @@ export default function UsersPage() {
                   </TableCell>)}
                   <TableCell className="px-1 text-center" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                     <DropdownMenu>
-                      <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" disabled={user._id === currentUser?.id} aria-label={`Edit account ${user.email}`} className="cursor-pointer rounded-md" />}><MoreHorizontal className="size-4.5" /></DropdownMenuTrigger>
+                      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" disabled={user._id === currentUser?.id || isBusy} aria-label={`Edit account ${user.email}`} className="cursor-pointer rounded-md" />}><MoreHorizontal className="size-4.5" /></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="users-surface w-48">
                         <DropdownMenuItem onClick={() => openEditUser(user)}><UserRound className="size-4" />Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setResetTarget(user)}><KeyRound className="size-4" />Reset password</DropdownMenuItem>
@@ -327,89 +301,8 @@ export default function UsersPage() {
           </Table>
         </div>
 
-        <footer className="mt-5 flex justify-end text-sm">
-          <nav aria-label="Users pagination" className="flex flex-wrap items-center gap-2">
-            <span className="mr-3 font-medium">Page {page} of {totalPages}</span>
-            <Button variant="outline" size="icon" aria-label="First page" disabled={page === 1 || isBusy} onClick={() => changePage(1)}><ChevronsLeft className="size-4" /></Button>
-            <Button variant="outline" size="icon" aria-label="Previous" disabled={page === 1 || isBusy} onClick={() => changePage(page - 1)}><ChevronLeft className="size-4" /></Button>
-            {pageNumbers(page, totalPages).map(number => typeof number === "string" ? <span key={number} className="px-1 text-muted-foreground">...</span>
-              : <Button key={number} variant={number === page ? "default" : "outline"} size="icon" aria-label={`Page ${number}`} aria-current={number === page ? "page" : undefined}
-                disabled={isBusy} onClick={() => changePage(number)}>{number}</Button>)}
-            <Button variant="outline" size="icon" aria-label="Next" disabled={page >= totalPages || isBusy} onClick={() => changePage(page + 1)}><ChevronRight className="size-4" /></Button>
-            <Button variant="outline" size="icon" aria-label="Last page" disabled={page >= totalPages || isBusy} onClick={() => changePage(totalPages)}><ChevronsRight className="size-4" /></Button>
-          </nav>
-        </footer>
+        <ListPagination label="Users pagination" page={page} totalPages={totalPages} disabled={users.isFetching} onPageChange={changePage} />
       </section>
-
-      <Dialog open={createUserOpen} onOpenChange={open => { if (!mutation.isPending) setCreateUserOpen(open) }}>
-        <DialogContent className="users-surface w-[min(42rem,calc(100%-2rem))] rounded-xl sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create account</DialogTitle>
-            <DialogDescription>Add a team member and share their temporary sign-in details privately.</DialogDescription>
-          </DialogHeader>
-          <form className="space-y-4" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field data-invalid={!!form.formState.errors.firstName}>
-                    <FieldLabel htmlFor="create-first-name">First name</FieldLabel>
-                    <Input id="create-first-name" className="h-11 px-3" autoComplete="off" aria-invalid={!!form.formState.errors.firstName} {...form.register("firstName")} />
-                    <FieldError errors={[form.formState.errors.firstName]} />
-                  </Field>
-                  <Field data-invalid={!!form.formState.errors.lastName}>
-                    <FieldLabel htmlFor="create-last-name">Last name</FieldLabel>
-                    <Input id="create-last-name" className="h-11 px-3" autoComplete="off" aria-invalid={!!form.formState.errors.lastName} {...form.register("lastName")} />
-                    <FieldError errors={[form.formState.errors.lastName]} />
-                  </Field>
-                </div>
-
-                <Field data-invalid={!!form.formState.errors.email}>
-                  <FieldLabel htmlFor="create-email">Email</FieldLabel>
-                  <Input id="create-email" className="h-11 px-3" type="email" autoComplete="off" aria-invalid={!!form.formState.errors.email} {...form.register("email")} />
-                  <FieldError errors={[form.formState.errors.email]} />
-                </Field>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Field data-invalid={!!form.formState.errors.role}>
-                    <FieldLabel htmlFor="create-role">Role</FieldLabel>
-                    <Controller name="role" control={form.control} render={({ field }) => (
-                      <Select value={field.value} onValueChange={value => {
-                        if (value !== "staff" && value !== "admin") return
-                        field.onChange(value)
-                        form.setValue("password", getTemporaryPassword(value), { shouldValidate: true })
-                      }}>
-                        <SelectTrigger id="create-role" ref={field.ref} onBlur={field.onBlur}
-                          aria-invalid={!!form.formState.errors.role}
-                          className="w-full cursor-pointer rounded-xl px-3 data-[size=default]:h-11">
-                          <SelectValue>{getRoleLabel(field.value)}</SelectValue>
-                        </SelectTrigger>
-                        <SelectContent alignItemWithTrigger={false} align="start" className="rounded-xl p-1.5">
-                          <SelectItem value="staff" className="cursor-pointer rounded-lg px-3 py-2">Staff</SelectItem>
-                          <SelectItem value="admin" className="cursor-pointer rounded-lg px-3 py-2">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )} />
-                    <FieldError errors={[form.formState.errors.role]} />
-                  </Field>
-                  <Field data-invalid={!!form.formState.errors.password}>
-                    <FieldLabel htmlFor="create-password">Temporary password</FieldLabel>
-                    <Input id="create-password" className="h-11 px-3" type="text" readOnly autoComplete="off" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
-                    <FieldError errors={[form.formState.errors.password]} />
-                  </Field>
-                </div>
-
-                {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
-
-                <div className="flex items-center justify-end gap-3 pt-2">
-                  <Button type="button" variant="outline" className="h-11 min-w-24 px-4 text-sm" disabled={mutation.isPending} onClick={() => form.reset()}>
-                    Reset
-                  </Button>
-                  <Button type="submit" disabled={mutation.isPending} className="h-11 px-5 text-sm">
-                    {mutation.isPending && <LoaderCircle className="animate-spin" />}
-                    Create account
-                  </Button>
-                </div>
-              </form>
-        </DialogContent>
-      </Dialog>
 
       {profileUser && <UserProfileDialog user={profileUser} onClose={() => setProfileUser(null)} />}
 

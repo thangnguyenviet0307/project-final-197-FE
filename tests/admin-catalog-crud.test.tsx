@@ -1,0 +1,330 @@
+import BrandCreatePage from "@/pages/admin/brands/create"
+import CategoryCreatePage from "@/pages/admin/categories/create"
+import type { ReactNode } from "react"
+import { beforeEach, afterEach, expect, it, vi } from "vitest"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { MemoryRouter, useLocation, Routes, Route } from "react-router-dom"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { AxiosError, AxiosHeaders } from "axios"
+import CustomersPage from "@/pages/admin/customers/index"
+import BrandsPage from "@/pages/admin/brands/index"
+import CategoriesPage from "@/pages/admin/categories/index"
+import { customersService } from "@/features/customers/services/customers.service"
+import { getTemporaryPassword } from "@/features/users/services/users.service"
+import { api, clearAuth } from "@/services/api"
+import { queryClient } from "@/services/query-client"
+import { useAuthStore } from "@/stores/auth.store"
+
+vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
+const originalAdapter = api.defaults.adapter
+const customer = { _id: "a".repeat(24), firstName: "An", lastName: "Nguyen", email: "an@example.com", phone: "0901234567", address: { street: "One", city: "City", state: "State" }, isActive: true }
+const brand = { _id: "b".repeat(24), name: "Acme", slug: "acme", description: "Devices", isActive: true }
+const category = { _id: "c".repeat(24), name: "Phones", slug: "phones", description: "Devices", isActive: true, parent: null }
+
+beforeEach(() => {
+  clearAuth()
+  useAuthStore.getState().setSession({ id: "self", name: "Admin", firstName: "Admin", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
+})
+afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
+function LocationDebug() { return <output data-testid="location">{useLocation().search}</output> }
+function setup(page: ReactNode, path = "/") {
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/brands/new" element={<BrandCreatePage />} /><Route path="/categories/new" element={<CategoryCreatePage />} /><Route path="*" element={page} /></Routes><LocationDebug /></MemoryRouter></QueryClientProvider>)
+}
+function mockApi(resource: "customers" | "brands" | "categories", rejectDelete = false) {
+  const writes = vi.fn()
+  const gets = vi.fn()
+  api.defaults.adapter = async config => {
+    if (config.url === "/products") return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: 0, totalPages: 0 } } }
+    const record = resource === "customers" ? customer : resource === "brands" ? brand : category
+    const response = { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: config.method === "get" ? [record] : record, pagination: { page: Number(config.params?.page ?? 1), limit: 10, total: 101, totalPages: 11 } } }
+    if (config.method === "get") gets(config.params)
+    else writes(config.method, config.url, config.data ? JSON.parse(config.data) : undefined)
+    if (rejectDelete && config.method === "delete") throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, { ...response, status: 409, data: { message: "Referenced by products" } })
+    return response
+  }
+  return { writes, gets }
+}
+
+it("maps customer names in both directions and sends only supported contact fields", async () => {
+  const { writes } = mockApi("customers")
+  const input = { first_name: "An", last_name: "Nguyen", email: "an@example.com", phone: "0901234567", street: "One", city: "City", state: "State" }
+  const result = await customersService.createCustomer(input)
+  expect(result.data).toMatchObject(input)
+  expect(writes).toHaveBeenCalledWith("post", "/customers", { firstName: "An", lastName: "Nguyen", email: input.email, phone: input.phone, address: customer.address })
+  await customersService.updateCustomer(customer._id, { first_name: "Binh" })
+  expect(writes).toHaveBeenLastCalledWith("put", `/customers/${customer._id}`, { firstName: "Binh" })
+})
+
+it("loads later customer pages on the server, retains totals and resets page on search", async () => {
+  const { gets } = mockApi("customers")
+  setup(<CustomersPage />, "/customers?page=10")
+  await screen.findByText("an@example.com")
+  expect(gets).toHaveBeenCalledWith({ page: 10, limit: 10 })
+  expect(screen.getByText("Total: 101 customers")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  await waitFor(() => expect(gets).toHaveBeenCalledWith({ page: 11, limit: 10 }))
+  await screen.findByText("an@example.com")
+  fireEvent.change(screen.getByLabelText("Search customers"), { target: { value: "An" } })
+  fireEvent.click(screen.getByRole("button", { name: "Search" }))
+  await waitFor(() => expect(gets).toHaveBeenCalledWith({ page: 1, limit: 10, search: "An" }))
+  expect(screen.getByTestId("location").textContent).toContain("page=1")
+})
+
+it("creates, edits and deletes customer contacts through the rendered forms", async () => {
+  const { writes } = mockApi("customers")
+  setup(<CustomersPage />)
+  await screen.findByText("an@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Add Customer" }))
+  let dialog = await screen.findByRole("dialog", { name: "Add New Customer" })
+  expect(within(dialog).queryByLabelText(/Birthday|Password/)).toBeNull()
+  for (const [label, value] of [["First Name", "An"], ["Last Name", "Nguyen"], ["Email", "an@example.com"], ["Phone", "0901234567"], ["Street", "One"], ["City", "City"], ["State", "State"]]) fireEvent.change(within(dialog).getByLabelText(label), { target: { value } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Create Customer" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/customers", expect.objectContaining({ firstName: "An", lastName: "Nguyen" })))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Edit An Nguyen" }))
+  dialog = await screen.findByRole("dialog", { name: "Edit Customer" })
+  fireEvent.change(within(dialog).getByLabelText("First Name"), { target: { value: "Binh" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Save Changes" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/customers/${customer._id}`, expect.objectContaining({ firstName: "Binh", lastName: "Nguyen" })))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Delete An Nguyen" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Customer" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/customers/${customer._id}`, undefined))
+})
+
+it("creates and updates brands and invalidates the product selector cache", async () => {
+  const { writes } = mockApi("brands")
+  queryClient.setQueryData(["brands"], [brand])
+  setup(<BrandsPage />)
+  await screen.findByText("Acme")
+  fireEvent.click(screen.getByRole("link", { name: "Add Brand" }))
+  let dialog = await screen.findByRole("form", { name: "Create brand" })
+  fireEvent.change(within(dialog).getByLabelText("Brand Name"), { target: { value: "New Brand" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Create Brand" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/brands", { name: "New Brand", description: "", logoUrl: "" }))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  expect(queryClient.getQueryState(["brands"])?.isInvalidated).toBe(true)
+  await screen.findByText("Acme")
+  fireEvent.click(screen.getByRole("button", { name: "Edit Acme" }))
+  dialog = await screen.findByRole("dialog", { name: "Edit Brand" })
+  fireEvent.change(within(dialog).getByLabelText("Brand Name"), { target: { value: "Renamed" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Save Changes" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/brands/${brand._id}`, { name: "Renamed", description: "Devices", logoUrl: "" }))
+})
+
+it.each([false, true])("brand deletion keeps the confirmation open only on failure (%s)", async failed => {
+  const { writes } = mockApi("brands", failed)
+  setup(<BrandsPage />)
+  await screen.findByText("Acme")
+  fireEvent.click(screen.getByRole("button", { name: "Delete Acme" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Brand" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/brands/${brand._id}`, undefined))
+  if (failed) expect(await within(screen.getByRole("alertdialog")).findByRole("alert")).toBeTruthy()
+  else await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+})
+
+it("generates different temporary passwords without role-based defaults", () => {
+  const passwords = Array.from({ length: 20 }, () => getTemporaryPassword("staff"))
+  expect(new Set(passwords).size).toBe(20)
+  expect(passwords.every(password => password.length >= 20)).toBe(true)
+})
+
+it("staff can read categories without seeing write actions", async () => {
+  mockApi("categories")
+  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role: "staff" } : null }))
+  setup(<CategoriesPage />)
+  await screen.findByText("Phones")
+  expect(screen.queryByRole("button", { name: "Edit Phones" })).toBeNull()
+  expect(screen.queryByRole("button", { name: "Delete Phones" })).toBeNull()
+  expect(screen.queryByRole("link", { name: "Add category" })).toBeNull()
+})
+
+it("creates, edits and deletes categories using accessible dialogs", async () => {
+  const { writes } = mockApi("categories")
+  setup(<CategoriesPage />)
+  await screen.findByText("Phones")
+  fireEvent.click(screen.getByRole("link", { name: "Add category" }))
+  let dialog = await screen.findByRole("form", { name: "Create category" })
+  fireEvent.change(within(dialog).getByLabelText("Category name"), { target: { value: "Cases" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Create category" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/categories", expect.objectContaining({ name: "Cases", parent: null, isActive: true })))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  fireEvent.click(await screen.findByRole("button", { name: "Edit Phones" }))
+  dialog = await screen.findByRole("dialog", { name: "Edit category" })
+  fireEvent.change(within(dialog).getByLabelText("Category name"), { target: { value: "New Phones" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/categories/${category._id}`, expect.objectContaining({ name: "New Phones" })))
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Delete Phones" }))
+  dialog = await screen.findByRole("dialog", { name: "Delete category?" })
+  await within(dialog).findByText("No related products found.")
+  fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận xóa" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/categories/${category._id}`, undefined))
+})
+
+it("keeps the customer delete dialog open when an order reference prevents deletion", async () => {
+  mockApi("customers", true)
+  setup(<CustomersPage />)
+  await screen.findByText("an@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Delete An Nguyen" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Customer" }))
+  expect(await within(screen.getByRole("alertdialog")).findByRole("alert")).toBeTruthy()
+})
+
+it("allows retrying a failed customer list request without losing the URL", async () => {
+  let fail = true
+  api.defaults.adapter = async config => {
+    if (fail) throw new AxiosError("Network unavailable", "ERR_NETWORK", config)
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [customer], pagination: { page: 2, limit: 10, total: 101, totalPages: 11 } } }
+  }
+  setup(<CustomersPage />, "/customers?page=2&search=An")
+  fireEvent.click(await screen.findByRole("button", { name: "Retry customers" }).then(button => { fail = false; return button }))
+  expect(await screen.findByText("an@example.com")).toBeTruthy()
+  expect(screen.getByTestId("location").textContent).toBe("?page=2&search=An")
+})
+
+it("keeps a category conflict in its dialog and allows dismissal with Escape", async () => {
+  mockApi("categories", true)
+  setup(<CategoriesPage />)
+  await screen.findByText("Phones")
+  fireEvent.click(screen.getByRole("button", { name: "Delete Phones" }))
+  const dialog = await screen.findByRole("dialog", { name: "Delete category?" })
+  await within(dialog).findByText("No related products found.")
+  fireEvent.click(within(dialog).getByRole("button", { name: "Xác nhận xóa" }))
+  expect(await within(dialog).findByText("Referenced by products")).toBeTruthy()
+  fireEvent.keyDown(dialog, { key: "Escape", code: "Escape" })
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+})
+
+it.each(["categories", "brands"] as const)("paginates %s with fixed page size and resets filters", async resource => {
+  const records = Array.from({ length: 25 }, (_, index) => ({
+    ...(resource === "categories" ? category : brand),
+    _id: String(index).padStart(24, "0"),
+    name: `Item ${index + 1}`,
+    slug: `item-${index + 1}`,
+    isActive: index % 2 === 0,
+  }))
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: records } })
+  const categories = resource === "categories"
+  setup(categories ? <CategoriesPage /> : <BrandsPage />)
+  await screen.findByText("Item 1")
+  expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(11)
+  fireEvent.click(within(screen.getByRole("navigation", { name: categories ? "Categories pagination" : "Brands pagination" })).getByRole("button", { name: "Next" }))
+  expect(await screen.findByText("Item 11")).toBeTruthy()
+  expect(screen.queryByLabelText(categories ? "Categories per page" : "Brands per page")).toBeNull()
+  fireEvent.change(screen.getByLabelText(categories ? "Category name" : "Brand name"), { target: { value: "Item 25" } })
+  await waitFor(() => expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(2))
+  expect(screen.getByText("Item 25")).toBeTruthy()
+  fireEvent.change(screen.getByLabelText("Status"), { target: { value: "inactive" } })
+  expect(screen.getByText(categories ? "No categories found." : "No brands found.")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Reset filters" }))
+  expect(await screen.findByText("Item 1")).toBeTruthy()
+  expect(screen.getByText("Page 1 of 3")).toBeTruthy()
+})
+
+it.each(["categories", "brands"] as const)("creates %s on the new route and renders its saved thumbnail", async resource => {
+  const categories = resource === "categories"
+  const imageField = categories ? "icon" : "logoUrl"
+  let record: Record<string, unknown> = categories ? { ...category } : { ...brand }
+  const writes = vi.fn()
+  api.defaults.adapter = async config => {
+    if (config.method === "post") {
+      const input = JSON.parse(config.data)
+      writes(input)
+      record = { ...record, ...input }
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: config.method === "get" ? [record] : record } }
+  }
+  setup(categories ? <CategoriesPage /> : <BrandsPage />)
+  fireEvent.click(await screen.findByRole("link", { name: categories ? "Add category" : "Add Brand" }))
+  const form = await screen.findByRole("form", { name: categories ? "Create category" : "Create brand" })
+  fireEvent.change(within(form).getByLabelText(categories ? "Category name" : "Brand Name"), { target: { value: "New Thumbnail" } })
+  fireEvent.change(within(form).getByLabelText("Thumbnail URL"), { target: { value: "javascript:alert(1)" } })
+  fireEvent.click(within(form).getByRole("button", { name: categories ? "Create category" : "Create Brand" }))
+  expect(await within(form).findByText("Enter a valid HTTP or HTTPS image URL.")).toBeTruthy()
+  expect(writes).not.toHaveBeenCalled()
+  fireEvent.change(within(form).getByLabelText("Thumbnail URL"), { target: { value: "https://example.com/thumbnail.png" } })
+  fireEvent.click(within(form).getByRole("button", { name: categories ? "Create category" : "Create Brand" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith(expect.objectContaining({ [imageField]: "https://example.com/thumbnail.png" })))
+  const image = await screen.findByRole("img", { name: "New Thumbnail" })
+  expect(image.getAttribute("src")).toBe("https://example.com/thumbnail.png")
+  fireEvent.error(image)
+  expect(screen.getByRole("img", { name: "New Thumbnail: image unavailable" })).toBeTruthy()
+})
+
+it("previews related products in place without navigating away from category deletion", async () => {
+  const requests: unknown[] = []
+  const writes = vi.fn()
+  const productId = "d".repeat(24)
+  api.defaults.adapter = async config => {
+    if (config.method === "delete") writes()
+    if (config.url === `/products/${productId}`) return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: { _id: productId, product_name: "Phone example", category: { name: "Phones" }, brand: { name: "Acme" }, stock: 7, price: 250, is_active: true } } }
+    if (config.url === "/products") {
+      requests.push(config.params)
+      return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: productId, product_name: "Phone example" }], pagination: { total: 11, totalPages: 2 } } }
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [category] } }
+  }
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Phones" }))
+  const dialog = await screen.findByRole("dialog", { name: "Delete category?" })
+  const product = await within(dialog).findByRole("button", { name: "Phone example" })
+  fireEvent.click(product)
+  const preview = await screen.findByRole("dialog", { name: "Product preview" })
+  expect(await within(preview).findByText("Acme")).toBeTruthy()
+  expect(within(preview).getByText("7")).toBeTruthy()
+  fireEvent.keyDown(preview, { key: "Escape", code: "Escape" })
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Product preview" })).toBeNull())
+  expect(screen.getByRole("dialog", { name: "Delete category?" })).toBeTruthy()
+  expect(requests).toContainEqual({ category: category._id, page: 1, limit: 10 })
+  expect(within(dialog).queryByRole("link")).toBeNull()
+  expect(within(dialog).getByRole("button", { name: "Xác nhận xóa" }).hasAttribute("disabled")).toBe(true)
+  fireEvent.click(within(dialog).getByRole("button", { name: "Next products" }))
+  await waitFor(() => expect(requests).toContainEqual({ category: category._id, page: 2, limit: 10 }))
+  expect(writes).not.toHaveBeenCalled()
+})
+
+it("does not treat a related-products network failure as an empty category", async () => {
+  let fail = true
+  api.defaults.adapter = async config => {
+    if (config.url === "/products") {
+      if (fail) throw new AxiosError("Network unavailable", "ERR_NETWORK", config)
+      return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: 0, totalPages: 0 } } }
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [category] } }
+  }
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Phones" }))
+  const dialog = await screen.findByRole("dialog", { name: "Delete category?" })
+  const retry = await within(dialog).findByRole("button", { name: "Retry products" })
+  expect(within(dialog).queryByText("No related products found.")).toBeNull()
+  expect(within(dialog).getByRole("button", { name: "Xác nhận xóa" }).hasAttribute("disabled")).toBe(true)
+  fail = false
+  fireEvent.click(retry)
+  await within(dialog).findByText("No related products found.")
+  expect(within(dialog).getByRole("button", { name: "Xác nhận xóa" }).hasAttribute("disabled")).toBe(false)
+})
+
+it("retries a failed product preview while keeping the category dialog open", async () => {
+  let fail = true
+  const id = "e".repeat(24)
+  api.defaults.adapter = async config => {
+    let data: unknown = [category]
+    if (config.url === "/products") return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, product_name: "Related phone" }], pagination: { total: 1, totalPages: 1 } } }
+    if (config.url === `/products/${id}`) {
+      if (fail) throw new AxiosError("Network unavailable", "ERR_NETWORK", config)
+      data = { _id: id, product_name: "Related phone", category: { name: "Phones" }, brand: { name: "Preview brand" }, stock: 2, price: 100, is_active: true }
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data } }
+  }
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole("button", { name: "Delete Phones" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Related phone" }))
+  const retry = await screen.findByRole("button", { name: "Retry preview" })
+  fail = false
+  fireEvent.click(retry)
+  expect(await screen.findByText("Preview brand")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Close preview" }))
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "Product preview" })).toBeNull())
+  expect(screen.getByRole("dialog", { name: "Delete category?" })).toBeTruthy()
+})

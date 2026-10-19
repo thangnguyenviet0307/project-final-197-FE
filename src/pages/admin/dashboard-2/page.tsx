@@ -9,6 +9,7 @@ import { RevenueBreakdown } from "@/pages/admin/dashboard-2/components/revenue-b
 export default function Dashboard2() {
   return (
     <BaseLayout>
+      <p role="status" className="mx-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm lg:mx-6">Demo dashboard: figures and charts are sample data, not live business results.</p>
       <div className="flex flex-col flex-1 gap-6 px-6 pt-0">
         {/* Enhanced Header */}
 

@@ -1,6 +1,6 @@
 import { useCallback, useState, type ReactElement } from "react"
 import { Link, useLocation, useSearchParams } from "react-router-dom"
-import { Eye, Pencil, Plus, Trash2, Package, CheckCircle2, PackageX, Boxes, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { Eye, Pencil, Plus, Trash2, Package, CheckCircle2, PackageX, Boxes } from "lucide-react"
 import { BaseLayout } from "@/layout/admin/base-layout"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,7 @@ import { ProductImage } from "@/features/products/components/product-image"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useProductStatistics } from "@/features/products/hooks/use-product-statistics"
-import { pageNumbers } from "@/utils/pagination"
+import { ListPagination } from "@/components/list-pagination"
 import { ContentSkeleton } from "@/components/page-skeleton"
 import { discountedPrice } from "@/features/products/utils/product-price"
 
@@ -76,11 +76,7 @@ export default function AdminProductsPage() {
       updated.set("page", "1")
       return updated
     })} />
-    <label className="flex items-center gap-2 text-sm">Products per page
-      <select aria-label="Products per page" className="rounded-md border bg-background p-2" value={limit} onChange={event => setParams(previous => {
-        const updated = new URLSearchParams(previous); updated.set("limit", event.target.value); updated.set("page", "1"); return updated
-      })}>{[...new Set([10, 20, 50, 100, limit])].sort((a, b) => a - b).map(value => <option key={value} value={value}>{value}</option>)}</select>
-    </label>
+
     {query.isPending ? <ContentSkeleton label="Loading products" /> : query.isError ? <div role="alert" className="space-y-3"><p>{getApiError(query.error).message}</p><Button variant="outline" onClick={() => void query.refetch()}>Retry</Button></div> : <>
       {query.isFetching && <p role="status" className="text-sm text-muted-foreground">Updating products…</p>}
       {!products.length ? <div className="grid justify-items-center gap-3 rounded-lg border py-12"><Package className="size-8 text-muted-foreground" /><p>No products found.</p>{page > 1 && <Button variant="outline" onClick={() => changePage(Math.max(1, pagination?.totalPages ?? 1))}>Return to available products</Button>}</div> :
@@ -107,18 +103,7 @@ export default function AdminProductsPage() {
             {admin && <><ActionTooltip label="Edit product"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`Edit ${product.product_name}`} render={<Link to={`/products/${product._id}/edit`} state={linkState} />}><Pencil /></Button></ActionTooltip>
               <ActionTooltip label="Delete product"><Button size="icon" variant="ghost" disabled={query.isPlaceholderData} aria-label={`Delete ${product.product_name}`} onClick={() => setDeleting(product)}><Trash2 className="text-destructive" /></Button></ActionTooltip></>}</div></TableCell>
         </TableRow>})}</TableBody></Table></div>}
-      <footer className="mt-5 flex justify-end text-sm">
-        <nav aria-label="Products pagination" className="flex flex-wrap items-center gap-2">
-          <span className="mr-3 font-medium">Page {page} of {totalPages}</span>
-          <Button variant="outline" size="icon" aria-label="First page" disabled={page <= 1 || query.isFetching} onClick={() => changePage(1)}><ChevronsLeft className="size-4" /></Button>
-          <Button variant="outline" size="icon" aria-label="Previous" disabled={page <= 1 || query.isFetching} onClick={() => changePage(page - 1)}><ChevronLeft className="size-4" /></Button>
-          {pageNumbers(page, totalPages).map(number => typeof number === "string" ? <span key={number} className="px-1 text-muted-foreground">...</span>
-            : <Button key={number} variant={number === page ? "default" : "outline"} size="icon" aria-label={`Page ${number}`} aria-current={number === page ? "page" : undefined}
-              disabled={query.isFetching} onClick={() => changePage(number)}>{number}</Button>)}
-          <Button variant="outline" size="icon" aria-label="Next" disabled={page >= totalPages || query.isFetching} onClick={() => changePage(page + 1)}><ChevronRight className="size-4" /></Button>
-          <Button variant="outline" size="icon" aria-label="Last page" disabled={page >= totalPages || query.isFetching} onClick={() => changePage(totalPages)}><ChevronsRight className="size-4" /></Button>
-        </nav>
-      </footer>
+      <ListPagination label="Products pagination" page={page} totalPages={totalPages} disabled={query.isFetching} onPageChange={changePage} />
     </>}
     {deleting && <DeleteProductConfirmation key={deleting._id} product={deleting} onClose={() => setDeleting(null)} onDeleted={() => {
       setDeleting(null)

@@ -36,10 +36,9 @@ it("debounces server filters, resets the page, and persists page size and reset 
   await waitFor(() => expect(requests).toHaveLength(2))
   expect(requests[1]).toMatchObject({ page: 1, limit: 20, search: "Case", category: "a".repeat(24) })
   expect(screen.getByTestId("product-location").textContent).toContain("search=Case")
-  fireEvent.change(screen.getByLabelText("Products per page"), { target: { value: "50" } })
-  await waitFor(() => expect(requests.at(-1)).toMatchObject({ page: 1, limit: 50, search: "Case" }))
+  expect(screen.queryByLabelText("Products per page")).toBeNull()
   fireEvent.click(screen.getByRole("button", { name: "Reset filters" }))
-  await waitFor(() => expect(requests.at(-1)).toMatchObject({ page: 1, limit: 50, search: undefined, category: undefined, brand: undefined }))
+  await waitFor(() => expect(requests.at(-1)).toMatchObject({ page: 1, limit: 20, search: undefined, category: undefined, brand: undefined }))
   expect((screen.getByLabelText("Product name") as HTMLInputElement).value).toBe("")
 })
 it("keeps only name and catalog filters visible and ignores old advanced URL filters", async () => {

@@ -12,7 +12,7 @@
 
 Admin provisions staff/admin accounts at `/users`. There is no public registration. Share temporary credentials privately. New accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
 
-Creation and reset forms use `Admin123` for admin accounts and `Staff123` for staff accounts. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
+Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password reset forms generate a unique temporary password using the browser cryptographic random generator. Reset passwords remain stable while their dialog is open; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
 
 Use the three-dot account menu at the bottom of the sidebar for User Profile, Change password, and Sign out. The avatar uses the saved image or initials. Upgrade to Pro, the Welcome promotion, Pricing, and Plans & Billing have been removed from dashboard navigation and the account menu. Old billing/pricing URLs redirect to Profile/Dashboard.
 

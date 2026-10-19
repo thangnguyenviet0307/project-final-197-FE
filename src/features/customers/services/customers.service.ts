@@ -5,7 +5,7 @@ import type {
   ICustomer,
   CreateCustomerInput,
   UpdateCustomerInput,
-} from "./type"
+} from "@/features/customers/types/customers"
 
 interface BackendCustomer {
   _id: string
@@ -29,27 +29,28 @@ interface CustomerResponse<T> {
   data: T
 }
 
+export interface CustomerPagination {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
 interface CustomersListResponse {
   success: boolean
   message?: string
   data: BackendCustomer[]
-  pagination?: {
-    page?: number
-    limit?: number
-    total?: number
-    totalPages?: number
-  }
+  pagination: CustomerPagination
 }
 
 // Chuyển dữ liệu Backend sang định dạng đang dùng trên FE
 function mapCustomer(customer: BackendCustomer): ICustomer {
   return {
     _id: customer._id,
-    first_name: customer.lastName,
-    last_name: customer.firstName,
+    first_name: customer.firstName,
+    last_name: customer.lastName,
     email: customer.email,
     phone: customer.phone,
-    birthday: null,
     street: customer.address?.street ?? "",
     city: customer.address?.city ?? "",
     state: customer.address?.state ?? "",
@@ -63,11 +64,11 @@ function toBackendCustomer(
   input: CreateCustomerInput | UpdateCustomerInput
 ) {
   return {
-    ...(input.last_name !== undefined && {
-      firstName: input.last_name,
-    }),
     ...(input.first_name !== undefined && {
-      lastName: input.first_name,
+      firstName: input.first_name,
+    }),
+    ...(input.last_name !== undefined && {
+      lastName: input.last_name,
     }),
     ...(input.email !== undefined && {
       email: input.email,
@@ -91,18 +92,17 @@ function toBackendCustomer(
 
 export const customersService = {
   // GET danh sách Customers
-  getCustomers: async (): Promise<CustomerResponse<ICustomer[]>> => {
+  getCustomers: async (params: { page: number; limit: number; search?: string }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
     const response = await api.get<CustomersListResponse>(
       "/customers",
       {
-        params: {
-          page: 1,
-          limit: 100,
-        },
+        params,
+        signal,
       }
     )
 
     return {
+      pagination: response.data.pagination,
       success: response.data.success,
       message: response.data.message,
       data: (response.data.data ?? []).map(mapCustomer),

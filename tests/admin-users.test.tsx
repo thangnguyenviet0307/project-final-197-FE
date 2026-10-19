@@ -1,7 +1,8 @@
+import UserCreatePage from "@/pages/admin/users/create"
 import type { ReactNode } from "react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, within, waitFor } from "@testing-library/react"
-import { MemoryRouter } from "react-router-dom"
+import { MemoryRouter, Routes, Route } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders } from "axios"
 import UsersPage from "@/pages/admin/users/index"
@@ -10,7 +11,7 @@ import { queryClient } from "@/services/query-client"
 import { useAuthStore } from "@/stores/auth.store"
 
 vi.mock("@/layout/admin/base-layout", () => ({
-  BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main>,
+  BaseLayout: ({ children, title }: { children: ReactNode; title?: string }) => <main>{title && <h1>{title}</h1>}{children}</main>,
 }))
 const originalAdapter = api.defaults.adapter
 beforeEach(() => {
@@ -19,6 +20,7 @@ beforeEach(() => {
   useAuthStore.getState().setSession({ id: "self", name: "Admin", firstName: "Admin", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
 })
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
+function UserTestRoutes() { return <Routes><Route path="/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
 function setup(role: "admin" | "staff" = "staff") {
   const writes = vi.fn()
   api.defaults.adapter = async (config) => {
@@ -28,7 +30,7 @@ function setup(role: "admin" | "staff" = "staff") {
       pagination: { total: 1, totalPages: 1 },
     } }
   }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   return writes
 }
 
@@ -48,7 +50,7 @@ it("constrains long full names to the name column and keeps the complete name av
       pagination: { total: 1, totalPages: 1 },
     },
   })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   const row = (await screen.findByText("long@example.com")).closest("tr")!
   const nameCell = within(row).getAllByRole("cell")[1]
   const name = nameCell.querySelector("span.truncate")
@@ -88,7 +90,7 @@ it("keeps the Accounts table columns aligned across pages with different content
       pagination: { total: 11, totalPages: 2 },
     } }
   }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
 
   await screen.findByText("page1-0@example.com")
   const table = screen.getByRole("table")
@@ -131,12 +133,11 @@ it("searches accounts by name or account email and shows an empty search result"
     } }
   })
   let releaseSearch!: () => void
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
 
   const search = await screen.findByRole("textbox", { name: "Search accounts by name or account email" })
   expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "User List" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(screen.getByRole("table").classList.contains("[&_td]:py-3")).toBe(true)
+  expect(screen.getByRole("heading", { name: "Users" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
   const requestCount = requests.length
   fireEvent.change(search, { target: { value: "Jane Smith" } })
@@ -158,17 +159,18 @@ it("searches accounts by name or account email and shows an empty search result"
   expect(await screen.findByText('No accounts found for "jane@example.com".')).toBeTruthy()
 })
 
-it.each([ ["staff", "Staff123"], ["admin", "Admin123"] ] as const)("creates %s accounts using the matching temporary password", async (role, password) => {
+it.each(["staff", "admin"] as const)("creates %s accounts using the requested default password", async role => {
   const writes = setup()
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Add User" }))
+  fireEvent.click(screen.getByRole("link", { name: "Add User" }))
   fireEvent.click(await screen.findByRole("combobox", { name: "Role" }))
   const option = await screen.findByRole("option", { name: role === "admin" ? "Admin" : "Staff" })
   fireEvent.mouseMove(option)
   fireEvent.mouseDown(option)
   fireEvent.mouseUp(option)
   fireEvent.click(option)
-  expect(screen.getByLabelText("Temporary password")).toHaveProperty("value", password)
+  const password = (screen.getByLabelText("Temporary password") as HTMLInputElement).value
+  expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
   fireEvent.change(screen.getByLabelText("First name"), { target: { value: "New" } })
   fireEvent.change(screen.getByLabelText("Last name"), { target: { value: "User" } })
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } })
@@ -176,13 +178,15 @@ it.each([ ["staff", "Staff123"], ["admin", "Admin123"] ] as const)("creates %s a
   await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users", expect.objectContaining({ role, password })))
 })
 
-it.each([ ["staff", "Staff123"], ["admin", "Admin123"] ] as const)("resets %s accounts using the matching temporary password", async (role, password) => {
+it.each(["staff", "admin"] as const)("resets %s accounts using a stable random temporary password", async role => {
   const writes = setup(role)
   await screen.findByText("target@example.com")
   fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
   fireEvent.click(await screen.findByRole("menuitem", { name: "Reset password" }))
   const field = screen.getByLabelText("New temporary password")
-  expect(field).toHaveProperty("value", password)
+  const password = (field as HTMLInputElement).value
+  expect(password.length).toBeGreaterThanOrEqual(20)
+  expect(["Admin123", "Staff123"]).not.toContain(password)
   fireEvent.submit(field.closest("form")!)
   await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { password }))
 })
@@ -211,15 +215,15 @@ it("edits account access without silently resetting its password", async () => {
 })
 
 
-it("removes invitations, View, row selection and the page-size selector", async () => {
+it("keeps account actions while using the shared catalog controls", async () => {
   setup()
   await screen.findByText("target@example.com")
   expect(screen.queryByRole("button", { name: "Invite User" })).toBeNull()
   expect(screen.queryByRole("button", { name: "View" })).toBeNull()
   expect(screen.queryByRole("checkbox")).toBeNull()
-  expect(screen.queryByRole("combobox", { name: "Rows per page" })).toBeNull()
+  expect(screen.queryByRole("combobox", { name: "Users per page" })).toBeNull()
   expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "User List" }).closest("section")?.classList.contains("dark")).toBe(false)
+  expect(screen.getByRole("region", { name: "User management" }).classList.contains("dark")).toBe(false)
 })
 
 it("sorts by username only and provides a pointer cursor on its control", async () => {
@@ -229,7 +233,7 @@ it("sorts by username only and provides a pointer cursor on its control", async 
       { _id: "alpha", firstName: "Zeta", lastName: "Name", email: "alpha@example.com", role: "admin", active: true },
     ], pagination: { total: 2, totalPages: 1 },
   } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   await screen.findByText("alpha@example.com")
   const usernames = () => within(screen.getByRole("table")).getAllByRole("row").slice(1)
     .map(row => within(row).getAllByRole("cell")[0].querySelector("span.truncate")?.textContent)
@@ -248,15 +252,15 @@ it("uses only active/suspended statuses and admin/staff roles, including tempora
     data: [{ _id: "temporary", firstName: "Temporary", lastName: "User", email: "temporary@example.com", role: "staff", active: true, mustChangePassword: true }],
     pagination: { total: 1, totalPages: 1 },
   } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   const row = (await screen.findByText("temporary@example.com")).closest("tr")!
   expect(within(row).getByText("Active")).toBeTruthy()
   expect(screen.queryByText("Invited")).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "Status" }))
-  expect(await screen.findByRole("button", { name: "Suspended" })).toBeTruthy()
-  expect(screen.queryByRole("button", { name: "Invited" })).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "All statuses" }))
-  fireEvent.click(screen.getByRole("button", { name: "Add User" }))
+  const status = screen.getByRole("combobox", { name: "Account status" })
+  expect(within(status).getByRole("option", { name: "Suspended" })).toBeTruthy()
+  expect(within(status).queryByRole("option", { name: "Invited" })).toBeNull()
+  fireEvent.change(status, { target: { value: "all" } })
+  fireEvent.click(screen.getByRole("link", { name: "Add User" }))
   const role = await screen.findByRole("combobox", { name: "Role" })
   fireEvent.click(role)
   expect((await screen.findAllByRole("option")).map(option => option.textContent)).toEqual(["Staff", "Admin"])
@@ -305,7 +309,7 @@ it("shows the clicked account rather than the signed-in admin or a previous sele
       { _id: "two", firstName: "Second", lastName: "User", email: "two@example.com", personalEmail: "personal@example.com", phone: "0901234567", location: "Ho Chi Minh City", bio: "Second user's biography", role: "admin", active: false },
     ], pagination: { total: 2, totalPages: 1 },
   } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UsersPage /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   fireEvent.click((await screen.findByText("one@example.com")).closest("tr")!)
   fireEvent.click(within(await screen.findByRole("dialog", { name: "User profile" })).getByRole("button", { name: "Close" }))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
@@ -316,4 +320,30 @@ it("shows the clicked account rather than the signed-in admin or a previous sele
   }
   expect(within(dialog).queryByText("one@example.com")).toBeNull()
   expect(within(dialog).queryByText("self@example.com")).toBeNull()
+})
+
+it("keeps fixed page size and resets search and filters", async () => {
+  const requests: unknown[] = []
+  api.defaults.adapter = async config => {
+    requests.push(config.params)
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
+      data: [{ _id: "target", firstName: "Jane", lastName: "Smith", email: "jane@example.com", role: "staff", active: true }],
+      pagination: { total: 30, totalPages: Math.ceil(30 / Number(config.params.limit)) },
+    } }
+  }
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
+  await screen.findByText("jane@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  await waitFor(() => expect(requests).toContainEqual({ page: 2, limit: 10 }))
+  await waitFor(() => expect(screen.getByRole("button", { name: "Next" }).hasAttribute("disabled")).toBe(false))
+  expect(screen.queryByLabelText("Users per page")).toBeNull()
+  fireEvent.change(screen.getByLabelText("Search accounts by name or account email"), { target: { value: "Jane" } })
+  await waitFor(() => expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane" }))
+  fireEvent.change(screen.getByLabelText("Account status"), { target: { value: "suspended" } })
+  expect(await screen.findByText("No users on this page match your filters.")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Reset filters" }))
+  expect(await screen.findByText("jane@example.com")).toBeTruthy()
+  expect((screen.getByLabelText("Search accounts by name or account email") as HTMLInputElement).value).toBe("")
+  expect((screen.getByLabelText("Account status") as HTMLSelectElement).value).toBe("all")
+  expect(screen.getByText("Page 1 of 3")).toBeTruthy()
 })

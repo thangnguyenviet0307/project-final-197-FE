@@ -11,7 +11,7 @@ src/
 │   ├── root-layout.tsx         # Khung gốc và trạng thái chuyển trang
 │   └── admin/                  # BaseLayout, sidebar, header, footer, navigation
 ├── pages/
-│   ├── admin/                  # products/, orders/, users/, categories/,
+│   ├── admin/                  # products/, orders/, users/, categories/, brands/, customers/,
 │   │                           # account/, dashboard/, dashboard-2/, settings/
 │   ├── auth/                   # Đăng nhập, quên mật khẩu, đổi mật khẩu
 │   ├── public/landing/         # Landing page công khai hiện tại
@@ -26,7 +26,8 @@ src/
 │   ├── products/               # components/, hooks/, services/, types/, schemas/, utils/
 │   ├── orders/                 # components/, hooks/, services/, types/, utils/
 │   ├── categories/             # hooks/, services/
-│   └── brands/                 # hooks/, services/, types/
+│   ├── brands/                 # components/, hooks/, services/, types/
+│   └── customers/              # components/, services/, types/
 ├── hooks/                      # Hook dùng chung: layout/, theme/
 ├── context/                    # Context theme/sidebar và ThemeProvider
 ├── stores/                     # Zustand state dùng toàn ứng dụng: auth.store.ts
@@ -74,6 +75,8 @@ Không tạo `redux/` vì ứng dụng đang dùng Zustand. State cục bộ gi�
 5. Đăng ký URL và quyền trong `router/routes.tsx`. Thư mục không tự tạo route. Dashboard hiện dành cho admin/staff; storefront cần cơ chế tài khoản khách phù hợp khi phát triển.
 
 Component riêng một trang có thể nằm trong `components/` con cạnh trang đó. CSS riêng nằm cạnh trang/component; global styles giữ ở `src/index.css`. Trang mẫu được giữ để tham khảo. `pages/storefront/` hiện chỉ có hướng dẫn, chưa có trang hoạt động.
+
+Sau khi merge code, đưa trang Brands/Customers vào `pages/admin/<nghiệp-vụ>/index.tsx`, component vào `features/<nghiệp-vụ>/components/`, API vào `services/` và kiểu dữ liệu vào `types/` của feature tương ứng. Không tạo lại `src/app/` hoặc import từ đường dẫn layout cũ. Brands và Customers dùng route `/brands`, `/customers`, được bảo vệ bằng quyền admin như menu quản trị. Cache danh sách thương hiệu cho trang quản trị dùng `["brands", "management"]`; danh sách dùng trong form sản phẩm giữ `["brands"]` vì hai bên có định dạng dữ liệu khác nhau. Sau mutation, invalidate prefix `["brands"]` cập nhật cả hai.
 
 Import dùng alias `@/`. Ví dụ:
 

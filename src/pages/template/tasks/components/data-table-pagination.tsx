@@ -10,14 +10,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: ReactTable<DataTableFeatures, TData>
@@ -33,32 +26,7 @@ export function DataTablePagination<TData extends RowData>({
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className="flex items-center gap-x-6 lg:gap-x-8">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">Rows per page</p>
-          <Select
-            value={`${table.state.pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value))
-            }}
-          >
-            <SelectTrigger className="h-8 w-[70px] cursor-pointer">
-              <SelectValue placeholder={table.state.pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              <SelectGroup>
-                {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem
-                    key={pageSize}
-                    value={`${pageSize}`}
-                    className="cursor-pointer"
-                  >
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+
         <div className="flex items-center gap-2">
           <Button
             variant="outline"

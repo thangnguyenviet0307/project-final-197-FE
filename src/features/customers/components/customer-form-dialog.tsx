@@ -30,7 +30,7 @@ import { Input } from "@/components/ui/input"
 import type {
   ICustomer,
   CreateCustomerInput,
-} from "@/app/customers/type"
+} from "@/features/customers/types/customers"
 
 const customerFormSchema = z.object({
   first_name: z
@@ -59,7 +59,6 @@ const customerFormSchema = z.object({
     .email("Email không đúng định dạng")
     .max(150, "Email không được vượt quá 150 ký tự"),
 
-  birthday: z.string(),
 
   street: z
     .string()
@@ -79,14 +78,7 @@ const customerFormSchema = z.object({
     .min(1, "Vui lòng nhập tỉnh/thành")
     .max(50, "Tỉnh/thành không được vượt quá 50 ký tự"),
 
-  password: z
-    .string()
-    .refine(
-      (value) =>
-        value.length === 0 ||
-        (value.length >= 8 && value.length <= 72),
-      "Mật khẩu phải từ 8 đến 72 ký tự"
-    ),
+
 })
 
 type CustomerFormValues = z.infer<
@@ -118,11 +110,9 @@ export function CustomerFormDialog({
       last_name: "",
       phone: "",
       email: "",
-      birthday: "",
       street: "",
       city: "",
       state: "",
-      password: "",
     },
   })
 
@@ -134,13 +124,9 @@ export function CustomerFormDialog({
       last_name: customer?.last_name ?? "",
       phone: customer?.phone ?? "",
       email: customer?.email ?? "",
-      birthday: customer?.birthday
-        ? customer.birthday.slice(0, 10)
-        : "",
       street: customer?.street ?? "",
       city: customer?.city ?? "",
       state: customer?.state ?? "",
-      password: "",
     })
   }, [customer, open, form])
 
@@ -162,14 +148,9 @@ export function CustomerFormDialog({
         last_name: values.last_name.trim(),
         phone: values.phone.trim(),
         email: values.email.trim(),
-        birthday: values.birthday || null,
         street: values.street.trim(),
         city: values.city.trim(),
         state: values.state.trim(),
-      }
-
-      if (!customer && values.password) {
-        data.password = values.password
       }
 
       await onSubmit(data)
@@ -276,7 +257,7 @@ export function CustomerFormDialog({
             <DialogDescription>
               {customer
                 ? "Update customer information below."
-                : "Create a new customer."}
+                : "Create a customer contact record. This does not create a sign-in account."}
             </DialogDescription>
           </DialogHeader>
 
@@ -361,22 +342,6 @@ export function CustomerFormDialog({
               <FieldError errors={[errors.phone]} />
             </Field>
 
-            <Field data-invalid={!!errors.birthday}>
-              <FieldLabel htmlFor={`${formId}-birthday`}>
-                Birthday (Optional)
-              </FieldLabel>
-
-              <Input
-                id={`${formId}-birthday`}
-                type="date"
-                disabled={saving}
-                aria-invalid={!!errors.birthday}
-                {...form.register("birthday")}
-              />
-
-              <FieldError errors={[errors.birthday]} />
-            </Field>
-
             <Field data-invalid={!!errors.street}>
               <FieldLabel htmlFor={`${formId}-street`}>
                 Street
@@ -426,31 +391,6 @@ export function CustomerFormDialog({
                 <FieldError errors={[errors.state]} />
               </Field>
             </div>
-
-            {!customer && (
-              <Field data-invalid={!!errors.password}>
-                <FieldLabel
-                  htmlFor={`${formId}-password`}
-                >
-                  Password (Optional)
-                </FieldLabel>
-
-                <Input
-                  id={`${formId}-password`}
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Enter password"
-                  maxLength={72}
-                  disabled={saving}
-                  aria-invalid={!!errors.password}
-                  {...form.register("password")}
-                />
-
-                <FieldError
-                  errors={[errors.password]}
-                />
-              </Field>
-            )}
 
             {errors.root && (
               <FieldError errors={[errors.root]} />

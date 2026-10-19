@@ -77,3 +77,15 @@ it("allows an admin to open the product creation route", async () => {
   render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/products/new"] })} />)
   expect(await screen.findByText("Page /products/new")).toBeTruthy()
 })
+
+it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {
+  session("staff")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  expect(await screen.findByText("Page /403")).toBeTruthy()
+})
+
+it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"])("allows admin access to merged route %s", async path => {
+  session("admin")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  expect(await screen.findByText(`Page ${path}`)).toBeTruthy()
+})

@@ -413,36 +413,6 @@ function TableContent({
           {currentTable.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="flex w-full items-center gap-8 lg:w-fit">
-          <Field orientation="horizontal" className="hidden w-fit lg:flex">
-            <FieldLabel htmlFor="rows-per-page" className="text-sm font-medium">
-              Rows per page
-            </FieldLabel>
-            <Select
-              value={`${currentTable.state.pagination.pageSize}`}
-              onValueChange={(value) => {
-                currentTable.setPageSize(Number(value))
-              }}
-            >
-              <SelectTrigger
-                size="sm"
-                className="w-20 cursor-pointer"
-                id="rows-per-page"
-              >
-                <SelectValue
-                  placeholder={currentTable.state.pagination.pageSize}
-                />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectGroup>
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
           <div className="flex w-fit items-center justify-center text-sm font-medium">
             Page {currentTable.state.pagination.pageIndex + 1} of{" "}
             {currentTable.getPageCount()}
@@ -837,37 +807,6 @@ export function DataTable({
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
-            <Field orientation="horizontal" className="hidden w-fit lg:flex">
-              <FieldLabel
-                htmlFor="rows-per-page"
-                className="text-sm font-medium"
-              >
-                Rows per page
-              </FieldLabel>
-              <Select
-                value={`${table.state.pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="w-20 cursor-pointer"
-                  id="rows-per-page"
-                >
-                  <SelectValue placeholder={table.state.pagination.pageSize} />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  <SelectGroup>
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
-                      <SelectItem key={pageSize} value={`${pageSize}`}>
-                        {pageSize}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
               Page {table.state.pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}

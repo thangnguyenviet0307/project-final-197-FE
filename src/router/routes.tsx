@@ -108,6 +108,9 @@ export const routes: RouteObject[] = [
       {
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
+          { path: "/categories/new", lazy: page(() => import("@/pages/admin/categories/create")) },
+          { path: "/brands/new", lazy: page(() => import("@/pages/admin/brands/create")) },
+          { path: "/users/new", lazy: page(() => import("@/pages/admin/users/create")) },
           {
             path: "/products/new",
             lazy: page(() => import("@/pages/admin/products/create")),
@@ -117,6 +120,8 @@ export const routes: RouteObject[] = [
             lazy: page(() => import("@/pages/admin/products/edit")),
           },
           { path: "/users", lazy: page(() => import("@/pages/admin/users/page")) },
+          { path: "/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
+          { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
           { path: "/admin/users", element: <Navigate to="/users" replace /> },
         ],
       },

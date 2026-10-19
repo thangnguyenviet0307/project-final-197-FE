@@ -67,6 +67,10 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
     // Apps
     { title: "Products", url: "/products", group: "Apps", icon: Package },
+    { title: "Orders", url: "/orders", group: "Apps", icon: Package },
+    { title: "Categories", url: "/categories", group: "Apps", icon: Package },
+    { title: "Brands", url: "/brands", group: "Apps", icon: Package },
+    { title: "Customers", url: "/customers", group: "Apps", icon: Users },
     { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
     { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
     { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },
@@ -176,7 +180,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Auth Pages" && item.group !== "Errors" &&
-    (item.url !== "/users" || role === "admin")
+    (!["/users", "/brands", "/customers"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

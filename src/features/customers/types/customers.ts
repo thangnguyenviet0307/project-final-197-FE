@@ -5,7 +5,6 @@ export interface ICustomer {
   last_name: string
   phone: string
   email: string
-  birthday?: string | null
   street: string
   city: string
   state: string
@@ -18,11 +17,9 @@ export interface CreateCustomerInput {
   last_name: string
   phone: string
   email: string
-  birthday?: string | null
   street: string
   city: string
   state: string
-  password?: string | null
 }
 
 export type UpdateCustomerInput =

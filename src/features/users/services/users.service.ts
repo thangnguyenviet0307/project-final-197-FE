@@ -12,11 +12,15 @@ export const createUserSchema = z.object({
 });
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
-export function getTemporaryPassword(
-  role: "admin" | "staff",
-) {
-  if (role === "admin") return "Admin123";
-  return "Staff123";
+export function getDefaultUserPassword(role: "admin" | "staff") {
+  return role === "admin" ? "Admin123" : "Staff123"
+}
+
+// Password resets generate a separate cryptographically random password.
+export function getTemporaryPassword(role: "admin" | "staff") {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789-_"
+  const bytes = crypto.getRandomValues(new Uint8Array(20))
+  return `${role === "admin" ? "A" : "S"}a7!${Array.from(bytes, byte => alphabet[byte % alphabet.length]).join("")}`
 }
 
 export interface ManagedUser {
@@ -38,13 +42,14 @@ export async function listUsers(
   page: number,
   signal: AbortSignal,
   search = "",
+  limit = 10,
 ) {
   const { data } = await api.get<
     ApiResponse<ManagedUser[]> & {
       pagination: { totalPages: number; total: number };
     }
   >("/users", {
-    params: { page, limit: 10, ...(search ? { search } : {}) },
+    params: { page, limit, ...(search ? { search } : {}) },
     signal,
   });
   return data;

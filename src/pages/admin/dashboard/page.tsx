@@ -11,6 +11,7 @@ import focusDocumentsData from "@/pages/admin/dashboard/data/focus-documents-dat
 export default function Page() {
   return (
     <BaseLayout title="Dashboard" description="Welcome to your admin dashboard">
+      <p role="status" className="mx-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm lg:mx-6">Demo dashboard: figures and charts are sample data, not live business results.</p>
       <div className="flex flex-col @container/main px-4 lg:px-6 gap-6">
         <SectionCards />
         <ChartAreaInteractive />

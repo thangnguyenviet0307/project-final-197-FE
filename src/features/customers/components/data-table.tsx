@@ -1,10 +1,9 @@
 
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useState } from "react"
 import { Search, Trash2, X } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -29,33 +28,38 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-import { BrandFormDialog } from "./brand-form-dialog"
+import { CustomerFormDialog } from "@/features/customers/components/customer-form-dialog"
 
 import type {
-  IBrand,
-  CreateBrandInput,
-  UpdateBrandInput,
-} from "@/app/brands/type"
+  ICustomer,
+  CreateCustomerInput,
+  UpdateCustomerInput,
+} from "@/features/customers/types/customers"
 
-interface BrandTableProps {
-  brands: IBrand[]
+interface CustomerTableProps {
+  customers: ICustomer[]
+  page: number
+  total: number
+  totalPages: number
+  onPageChange: (page: number) => void
   searchQuery: string
   onSearch: (value: string) => void
   onDelete: (id: string) => Promise<void> | void
   onEdit: (
     id: string,
-    values: UpdateBrandInput
+    values: UpdateCustomerInput
   ) => Promise<void> | void
   onAdd: (
-    values: CreateBrandInput
+    values: CreateCustomerInput
   ) => Promise<void> | void
 }
 
-function DeleteBrandDialog({
-  brand,
+// Dialog xác nhận xóa Customer
+function DeleteCustomerDialog({
+  customer,
   onDelete,
 }: {
-  brand: IBrand
+  customer: ICustomer
   onDelete: (id: string) => Promise<void> | void
 }) {
   const [open, setOpen] = useState(false)
@@ -69,11 +73,11 @@ function DeleteBrandDialog({
     setError("")
 
     try {
-      await onDelete(brand._id)
+      await onDelete(customer._id)
       setOpen(false)
     } catch {
       setError(
-        "Không thể xóa thương hiệu. Vui lòng thử lại."
+        "Không thể xóa khách hàng. Vui lòng thử lại."
       )
     } finally {
       setDeleting(false)
@@ -94,8 +98,8 @@ function DeleteBrandDialog({
         type="button"
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-destructive"
-        aria-label={`Delete ${brand.name}`}
+        className="h-8 w-8 cursor-pointer text-destructive"
+        aria-label={`Delete ${customer.first_name} ${customer.last_name}`}
         onClick={() => setOpen(true)}
       >
         <Trash2 className="size-4" />
@@ -104,17 +108,23 @@ function DeleteBrandDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Xác nhận xóa thương hiệu
+            Xác nhận xóa khách hàng
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            Bạn có chắc chắn muốn xóa thương hiệu{" "}
-            <strong>{brand.name}</strong> không?
+            Bạn có chắc chắn muốn xóa khách hàng{" "}
+            <strong>
+              {customer.first_name} {customer.last_name}
+            </strong>{" "}
+            không?
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p
+            role="alert"
+            className="text-sm text-destructive"
+          >
             {error}
           </p>
         )}
@@ -132,7 +142,9 @@ function DeleteBrandDialog({
             }}
             className="bg-destructive text-white hover:bg-destructive/90"
           >
-            {deleting ? "Deleting..." : "Delete Brand"}
+            {deleting
+              ? "Deleting..."
+              : "Delete Customer"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -140,54 +152,49 @@ function DeleteBrandDialog({
   )
 }
 
-const PAGE_SIZE = 10
 
-export function BrandTable({
-  brands,
+export function CustomerTable({
+  customers,
+  page, total, totalPages, onPageChange,
   searchQuery,
   onSearch,
   onDelete,
   onEdit,
   onAdd,
-}: BrandTableProps) {
-  const [searchValue, setSearchValue] = useState(searchQuery)
-  const [pageIndex, setPageIndex] = useState(0)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set()
-  )
+}: CustomerTableProps) {
+  const [searchValue, setSearchValue] =
+    useState(searchQuery)
 
-  useEffect(() => {
+
+  const [selectedIds, setSelectedIds] = useState<
+    Set<string>
+  >(() => new Set())
+
+  const [previousSearchQuery, setPreviousSearchQuery] = useState(searchQuery)
+  if (previousSearchQuery !== searchQuery) {
+    setPreviousSearchQuery(searchQuery)
     setSearchValue(searchQuery)
-    setPageIndex(0)
-  }, [searchQuery])
 
-  const pageCount = Math.max(
-    1,
-    Math.ceil(brands.length / PAGE_SIZE)
-  )
+  }
 
-  const currentPage = Math.min(
-    pageIndex,
-    pageCount - 1
-  )
-
-  const visibleBrands = useMemo(() => {
-    const start = currentPage * PAGE_SIZE
-    return brands.slice(start, start + PAGE_SIZE)
-  }, [brands, currentPage])
+  // Phân trang 10 khách hàng
+  const visibleCustomers = customers
 
   const allPageSelected =
-    visibleBrands.length > 0 &&
-    visibleBrands.every((brand) =>
-      selectedIds.has(brand._id)
+    visibleCustomers.length > 0 &&
+    visibleCustomers.every((customer) =>
+      selectedIds.has(customer._id)
     )
 
   const somePageSelected =
-    visibleBrands.some((brand) =>
-      selectedIds.has(brand._id)
+    visibleCustomers.some((customer) =>
+      selectedIds.has(customer._id)
     )
 
-  function toggleRow(id: string, checked: boolean) {
+  function toggleRow(
+    id: string,
+    checked: boolean
+  ) {
     setSelectedIds((previous) => {
       const next = new Set(previous)
 
@@ -205,11 +212,11 @@ export function BrandTable({
     setSelectedIds((previous) => {
       const next = new Set(previous)
 
-      for (const brand of visibleBrands) {
+      for (const customer of visibleCustomers) {
         if (checked) {
-          next.add(brand._id)
+          next.add(customer._id)
         } else {
-          next.delete(brand._id)
+          next.delete(customer._id)
         }
       }
 
@@ -219,29 +226,31 @@ export function BrandTable({
 
   return (
     <div className="w-full space-y-4">
-      {/* Search và Add Brand */}
+      {/* Tìm kiếm và thêm Customer */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form
           className="flex max-w-sm flex-1 items-center gap-2"
           onSubmit={(event) => {
             event.preventDefault()
             onSearch(searchValue)
-            setPageIndex(0)
+
           }}
         >
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
             <Input
-              placeholder="Search brands..."
+              aria-label="Search customers"
+              placeholder="Search customers..."
               value={searchValue}
               onChange={(event) => {
                 const value = event.target.value
+
                 setSearchValue(value)
 
                 if (!value.trim() && searchQuery) {
                   onSearch("")
-                  setPageIndex(0)
+
                 }
               }}
               className="pl-9 pr-9"
@@ -256,7 +265,7 @@ export function BrandTable({
                 onClick={() => {
                   setSearchValue("")
                   onSearch("")
-                  setPageIndex(0)
+
                 }}
               >
                 <X className="size-4" />
@@ -267,102 +276,121 @@ export function BrandTable({
             )}
           </div>
 
-          <Button type="submit" variant="outline">
+          <Button
+            type="submit"
+            variant="outline"
+          >
             Search
           </Button>
         </form>
 
-        <BrandFormDialog
+        <CustomerFormDialog
           onSubmit={onAdd}
-          submitLabel="Create Brand"
+          submitLabel="Create Customer"
         />
       </div>
 
-      {/* Brands Table */}
+      {/* Bảng Customers */}
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-12">
-                
-              <Checkbox
-                aria-label="Select all brands on page"
-                checked={allPageSelected}
-                indeterminate={!allPageSelected && somePageSelected}
-                onCheckedChange={(checked) =>
-                togglePage(checked === true)
-             }
-            />
-
+                <Checkbox
+                  aria-label="Select all customers on page"
+                  checked={allPageSelected}
+                  indeterminate={
+                    !allPageSelected &&
+                    somePageSelected
+                  }
+                  onCheckedChange={(checked) =>
+                    togglePage(checked === true)
+                  }
+                />
               </TableHead>
 
-              <TableHead>Brand</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Address</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {visibleBrands.length > 0 ? (
-              visibleBrands.map((brand) => (
-                <TableRow key={brand._id}>
+            {visibleCustomers.length > 0 ? (
+              visibleCustomers.map((customer) => (
+                <TableRow key={customer._id}>
                   <TableCell>
                     <Checkbox
-                      aria-label={`Select ${brand.name}`}
-                      checked={selectedIds.has(brand._id)}
+                      aria-label={`Select ${customer.first_name} ${customer.last_name}`}
+                      checked={selectedIds.has(
+                        customer._id
+                      )}
                       onCheckedChange={(checked) =>
                         toggleRow(
-                          brand._id,
+                          customer._id,
                           checked === true
                         )
                       }
                     />
                   </TableCell>
 
+                  {/* Họ tên và Email */}
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium">
-                        {brand.name}
+                        {customer.first_name}{" "}
+                        {customer.last_name}
                       </span>
+
                       <span className="text-sm text-muted-foreground">
-                        {brand.description || "No description"}
+                        {customer.email}
                       </span>
                     </div>
                   </TableCell>
 
+                  {/* Số điện thoại */}
                   <TableCell>
-                    <Badge variant="secondary">
-                      {brand.slug}
-                    </Badge>
+                    {customer.phone}
                   </TableCell>
 
+                  {/* Địa chỉ */}
                   <TableCell>
-                    <Badge
-                      variant={
-                        brand.isActive
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {brand.isActive
-                        ? "Active"
-                        : "Inactive"}
-                    </Badge>
+                    <div className="flex flex-col">
+                      <span>
+                        {customer.street}
+                      </span>
+
+                      <span className="text-sm text-muted-foreground">
+                        {[
+                          customer.city,
+                          customer.state,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </span>
+                    </div>
                   </TableCell>
 
+                  {/* Ngày sinh */}
+
+
+                  {/* Chỉnh sửa và xóa */}
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <BrandFormDialog
-                        brand={brand}
+                      <CustomerFormDialog
+                        customer={customer}
                         onSubmit={(values) =>
-                          onEdit(brand._id, values)
+                          onEdit(
+                            customer._id,
+                            values
+                          )
                         }
                         submitLabel="Save Changes"
                       />
 
-                      <DeleteBrandDialog
-                        brand={brand}
+                      <DeleteCustomerDialog
+                        customer={customer}
                         onDelete={onDelete}
                       />
                     </div>
@@ -375,7 +403,8 @@ export function BrandTable({
                   colSpan={5}
                   className="h-24 text-center"
                 >
-                  No brands found.
+                  No customers found.
+                  {page > 1 && <Button variant="outline" onClick={() => onPageChange(totalPages)}>Return to available customers</Button>}
                 </TableCell>
               </TableRow>
             )}
@@ -383,25 +412,23 @@ export function BrandTable({
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between gap-4 py-4">
+      {/* Phân trang */}
+      <nav aria-label="Customers pagination" className="flex flex-wrap items-center justify-between gap-4 py-4">
         <span className="text-sm text-muted-foreground">
-          Total: {brands.length} brands
+          Total: {total} customers
         </span>
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground">
-            Page {currentPage + 1} of {pageCount}
+            Page {page} of {totalPages}
           </span>
 
           <Button
             type="button"
             variant="outline"
             size="sm"
-            disabled={currentPage === 0}
-            onClick={() =>
-              setPageIndex(Math.max(0, currentPage - 1))
-            }
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
           >
             Previous
           </Button>
@@ -410,17 +437,15 @@ export function BrandTable({
             type="button"
             variant="outline"
             size="sm"
-            disabled={currentPage >= pageCount - 1}
-            onClick={() =>
-              setPageIndex(
-                Math.min(pageCount - 1, currentPage + 1)
-              )
+            disabled={
+              page >= totalPages
             }
+            onClick={() => onPageChange(page + 1)}
           >
             Next
           </Button>
         </div>
-      </div>
+      </nav>
     </div>
   )
 }
