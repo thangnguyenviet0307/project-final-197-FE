@@ -48,14 +48,19 @@ Notifications use a compact 280px responsive width, 10px horizontal padding, cen
 
 ## Frontend code organization
 
-- `src/services/`: HTTP requests and session persistence/lifecycle.
-- `src/hooks/auth/`: auth mutations, navigation, and session initialization.
-- `src/hooks/profile/`: profile queries, cache updates, and local avatar validation/preview.
-- `src/hooks/users/`: user queries/mutations and list cache invalidation.
+- `src/services/api.ts`: shared HTTP client and refresh handling.
+- `src/features/auth/`: auth services, schemas, mutations, and session initialization.
+- `src/stores/auth.store.ts`: shared Zustand session store.
+- `src/context/`: theme/sidebar contexts and theme provider.
+- `src/layout/`: root layout and admin shell.
+- `src/features/profile/`: profile queries, cache updates, and local avatar validation/preview.
+- `src/features/users/`: user services, queries/mutations, confirmation UI, and list cache invalidation.
 - `src/hooks/theme/`: theme state, customization, and theme transitions.
 - `src/hooks/layout/`: responsive layout, fullscreen, and sidebar configuration.
 - Pages/components render the interface, validate form input, and map API errors to fields. Hooks accept callbacks for form-specific success/error handling.
 - `src/types/mutation.ts`: shared TypeScript callback types for mutation hooks.
+- `src/router/`: route definitions, access guards, and auth bootstrap.
+- See [Frontend structure](docs/frontend-structure.md) for page locations and rules for new commerce features.
 
 ## Verification commands
 

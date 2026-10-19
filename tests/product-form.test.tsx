@@ -4,12 +4,12 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosError, AxiosHeaders } from "axios"
-import { ProductForm } from "@/components/products/product-form"
+import { ProductForm } from "@/features/products/components/product-form"
 import { api } from "@/services/api"
-import { queryClient } from "@/lib/query-client"
-import type { Product } from "@/types/products"
+import { queryClient } from "@/services/query-client"
+import type { Product } from "@/features/products/types/products"
 const original = api.defaults.adapter
-vi.mock("@/components/products/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
+vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 const id = "a".repeat(24)
 const product: Product = { _id: id, product_name: "Phone case", category: { _id: id, name: "Cases" }, brand: { _id: id, name: "Brand" }, model_year: 2026, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 2, attributes: { warranty: 12, wireless: false } }] }
 beforeEach(() => {

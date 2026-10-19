@@ -4,14 +4,14 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders } from "axios"
-import ProductEditPage from "@/pages/product-edit"
+import ProductEditPage from "@/pages/admin/products/edit"
 import { api } from "@/services/api"
-import { queryClient } from "@/lib/query-client"
-import type { Product } from "@/types/products"
+import { queryClient } from "@/services/query-client"
+import type { Product } from "@/features/products/types/products"
 
-vi.mock("@/components/layouts/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
+vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
 const adapter = api.defaults.adapter
-vi.mock("@/components/products/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
+vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 const id = "a".repeat(24)
 const original: Product = { _id: id, product_name: "Phone case", slug: "custom-case", category: { _id: id, name: "Cases" }, brand: { _id: id, name: "Brand" }, model_year: 2026, price: 150, stock: 10,
   variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 10 }] }

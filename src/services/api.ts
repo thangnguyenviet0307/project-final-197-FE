@@ -1,8 +1,8 @@
 import axios from "axios"
 import type { InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "@/stores/auth.store"
-import { queryClient } from "@/lib/query-client"
-import type { ApiResponse, TokenPair } from "@/types/auth"
+import { queryClient } from "@/services/query-client"
+import type { ApiResponse, TokenPair } from "@/features/auth/types/auth"
 
 const baseURL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1").replace(/\/$/, "")
 export const api = axios.create({ baseURL, timeout: 15_000 })
@@ -72,4 +72,4 @@ api.interceptors.response.use((response) => response, async (error: unknown) => 
   return api(config)
 })
 
-export { getApiError } from "@/lib/api-error"
+export { getApiError } from "@/utils/api-error"

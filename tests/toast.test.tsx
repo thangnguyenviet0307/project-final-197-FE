@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { toast, Toaster } from "@/components/ui/toast"
-import { ThemeProvider } from "@/components/theme-provider"
-import { queryClient } from "@/lib/query-client"
+import { ThemeProvider } from "@/context/theme-provider"
+import { queryClient } from "@/services/query-client"
 
 beforeEach(() => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })))

@@ -1,7 +1,7 @@
 import { expect, it } from "vitest"
 import { act, render, screen } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
-import { RootFallback } from "@/components/router/root-layout"
+import { RootFallback } from "@/layout/root-layout"
 import { ContentSkeleton } from "@/components/page-skeleton"
 
 it("shows a skeleton during initial route loading and removes it when the page is ready", async () => {

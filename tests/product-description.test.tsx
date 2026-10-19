@@ -1,7 +1,7 @@
 import { expect, it, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { ProductDescriptionEditor } from "@/components/products/product-description-editor"
-import { descriptionToHtml, sanitizeDescription } from "@/lib/product-description"
+import { ProductDescriptionEditor } from "@/features/products/components/product-description-editor"
+import { descriptionToHtml, sanitizeDescription } from "@/features/products/utils/product-description"
 
 it("escapes legacy plain text and preserves its line breaks", () => {
   expect(descriptionToHtml("Case < 5 & cable\nSecond line")).toBe("<p>Case &lt; 5 &amp; cable<br>Second line</p>")

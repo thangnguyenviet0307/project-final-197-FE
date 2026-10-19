@@ -4,12 +4,12 @@ import { fireEvent, render, screen, within, waitFor } from "@testing-library/rea
 import { MemoryRouter } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders } from "axios"
-import UsersPage from "@/pages/admin-users"
+import UsersPage from "@/pages/admin/users/index"
 import { api, clearAuth } from "@/services/api"
-import { queryClient } from "@/lib/query-client"
+import { queryClient } from "@/services/query-client"
 import { useAuthStore } from "@/stores/auth.store"
 
-vi.mock("@/components/layouts/base-layout", () => ({
+vi.mock("@/layout/admin/base-layout", () => ({
   BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main>,
 }))
 const originalAdapter = api.defaults.adapter

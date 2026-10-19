@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosHeaders } from "axios"
 import { expect, it } from "vitest"
-import { getApiError } from "@/lib/api-error"
+import { getApiError } from "@/utils/api-error"
 
 function apiError({
   status,

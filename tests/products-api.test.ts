@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from "vitest"
 import { AxiosHeaders } from "axios"
 import { api } from "@/services/api"
-import { createProduct, deleteProduct, getProduct, listProducts, updateProduct, getProductStatistics } from "@/services/products.service"
+import { createProduct, deleteProduct, getProduct, listProducts, updateProduct, getProductStatistics } from "@/features/products/services/products.service"
 const original = api.defaults.adapter
 afterEach(() => { api.defaults.adapter = original })
 it("uses the existing products contract for pagination and CRUD", async () => {

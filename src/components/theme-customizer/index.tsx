@@ -17,7 +17,7 @@ import { tweakcnThemes } from "@/config/theme-data"
 import { ThemeTab } from "./theme-tab"
 import { LayoutTab } from "./layout-tab"
 import { ImportModal } from "./import-modal"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import type { ImportedTheme } from "@/types/theme-customizer"
 
 interface ThemeCustomizerProps {

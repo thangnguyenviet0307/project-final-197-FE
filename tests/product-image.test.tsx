@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
-import { ProductImage } from "@/components/products/product-image"
+import { ProductImage } from "@/features/products/components/product-image"
 
 it("shows a fallback for missing and broken images and recovers when the URL changes", () => {
   const { rerender } = render(<ProductImage alt="Case" />)

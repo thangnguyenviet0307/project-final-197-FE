@@ -1,18 +1,18 @@
 import { expect, it, vi } from "vitest"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
-import { ProductForm } from "@/components/products/product-form"
-import type { Product } from "@/types/products"
-import ProductDetailPage from "@/pages/product-detail"
-import ProductCreatePage from "@/pages/product-create"
+import { ProductForm } from "@/features/products/components/product-form"
+import type { Product } from "@/features/products/types/products"
+import ProductDetailPage from "@/pages/admin/products/detail"
+import ProductCreatePage from "@/pages/admin/products/create"
 
 const id = "a".repeat(24)
-vi.mock("@/hooks/products/use-create-product", () => ({ useCreateProduct: () => ({ mutateAsync: vi.fn(), isPending: false }) }))
-vi.mock("@/components/products/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
-vi.mock("@/hooks/categories/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Cases", isActive: true }], isPending: false }) }))
-vi.mock("@/hooks/brands/use-brands", () => ({ useBrands: () => ({ data: [{ _id: "a".repeat(24), name: "Brand", isActive: true }], isPending: false }) }))
-vi.mock("@/hooks/products/use-product", () => ({ useProduct: () => ({ data: { _id: "a".repeat(24), product_name: "Phone case", category: null, brand: null, model_year: 2026 } }) }))
-vi.mock("@/components/layouts/base-layout", () => ({ BaseLayout: ({ children }: { children: import("react").ReactNode }) => <main>{children}</main> }))
+vi.mock("@/features/products/hooks/use-create-product", () => ({ useCreateProduct: () => ({ mutateAsync: vi.fn(), isPending: false }) }))
+vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
+vi.mock("@/features/categories/hooks/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Cases", isActive: true }], isPending: false }) }))
+vi.mock("@/features/brands/hooks/use-brands", () => ({ useBrands: () => ({ data: [{ _id: "a".repeat(24), name: "Brand", isActive: true }], isPending: false }) }))
+vi.mock("@/features/products/hooks/use-product", () => ({ useProduct: () => ({ data: { _id: "a".repeat(24), product_name: "Phone case", category: null, brand: null, model_year: 2026 } }) }))
+vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: import("react").ReactNode }) => <main>{children}</main> }))
 const product: Product = { _id: id, product_name: "Phone case", model_year: 2026, category: id, brand: id, stock: 1 }
 function setup(save = vi.fn().mockResolvedValue(undefined)) {
   const router = createMemoryRouter([

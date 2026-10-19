@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 /**
  * Brand icons. lucide-react 1.x dropped every brand mark, so these keep the

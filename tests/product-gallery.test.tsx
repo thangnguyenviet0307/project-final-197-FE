@@ -2,10 +2,10 @@ import { beforeEach, afterEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosError, AxiosHeaders } from "axios"
-import { ProductGallery } from "@/components/products/product-gallery"
-import { queryClient } from "@/lib/query-client"
+import { ProductGallery } from "@/features/products/components/product-gallery"
+import { queryClient } from "@/services/query-client"
 import { api } from "@/services/api"
-import type { Product } from "@/types/products"
+import type { Product } from "@/features/products/types/products"
 const originalAdapter = api.defaults.adapter
 const product: Product = { _id: "a".repeat(24), product_name: "Case", category: null, brand: null, model_year: 2026, images: [{ public_id: "folder/image", secure_url: "https://images.test/image.png" }] }
 beforeEach(() => {

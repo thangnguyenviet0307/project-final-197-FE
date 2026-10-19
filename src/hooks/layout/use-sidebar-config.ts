@@ -2,7 +2,7 @@ import * as React from "react"
 import {
   SidebarContext,
   type SidebarContextValue,
-} from "@/contexts/sidebar-config"
+} from "@/context/sidebar-config"
 
 export function useSidebarConfig(): SidebarContextValue {
   const context = React.useContext(SidebarContext)

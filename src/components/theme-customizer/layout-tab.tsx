@@ -15,7 +15,7 @@ import {
   sidebarCollapsibleOptions,
   sidebarSideOptions,
 } from "@/config/theme-customizer-constants"
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 
 export function LayoutTab() {
   const { config: sidebarConfig, updateConfig: updateSidebarConfig } =

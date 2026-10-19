@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { discountedPrice } from "@/lib/product-price"
+import { discountedPrice } from "@/features/products/utils/product-price"
 
 it.each([
   [0.05, 30, 0.04], [0.1, 65, 0.04], [0.25, 34, 0.17],

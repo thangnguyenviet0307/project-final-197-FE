@@ -1,16 +1,16 @@
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { beforeEach, afterEach, expect, it, vi } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders, AxiosError } from "axios"
 import { MemoryRouter } from "react-router-dom"
-import UserProfilePage from "@/pages/user-profile"
-import { DeleteUserButton } from "@/components/auth/delete-user-button"
+import UserProfilePage from "@/pages/admin/account/profile"
+import { DeleteUserConfirmation } from "@/features/users/components/delete-user-confirmation"
 import { api, clearAuth } from "@/services/api"
-import { queryClient } from "@/lib/query-client"
+import { queryClient } from "@/services/query-client"
 import { useAuthStore } from "@/stores/auth.store"
 
-vi.mock("@/components/layouts/base-layout", () => ({
+vi.mock("@/layout/admin/base-layout", () => ({
   BaseLayout: ({ children, title }: { children: ReactNode; title: string }) => <main><h1>{title}</h1>{children}</main>,
 }))
 
@@ -26,6 +26,14 @@ beforeEach(() => {
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth(); vi.restoreAllMocks() })
 function renderPage(node: ReactNode) {
   return render(<QueryClientProvider client={queryClient}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>)
+}
+
+function DeleteAccountControl({ onDeleted }: { onDeleted: () => void }) {
+  const [open, setOpen] = useState(false)
+  return <>
+    <button onClick={() => setOpen(true)}>Delete account target@example.com</button>
+    <DeleteUserConfirmation id="target" email="target@example.com" open={open} onOpenChange={setOpen} onDeleted={onDeleted} />
+  </>
 }
 
 it("loads the profile and keeps account email/role readonly while removing template fields", async () => {
@@ -120,10 +128,10 @@ it("resets the avatar to its default when saving profile changes", async () => {
   expect(screen.queryByLabelText("Profile photo")).toBeNull()
 })
 
-it("requires an explicit popover confirmation before deleting an account", async () => {
+it("requires an explicit dialog confirmation before deleting an account", async () => {
   const deleted = vi.fn()
   api.defaults.adapter = vi.fn(async (config) => ({ config, data: {}, headers: new AxiosHeaders(), status: 200, statusText: "" }))
-  renderPage(<DeleteUserButton id="target" email="target@example.com" onDeleted={deleted} />)
+  renderPage(<DeleteAccountControl onDeleted={deleted} />)
   fireEvent.click(screen.getByRole("button", { name: "Delete account target@example.com" }))
   await screen.findByText("Delete account?")
   expect(api.defaults.adapter).not.toHaveBeenCalled()
@@ -139,7 +147,7 @@ it("keeps the warning open and shows Backend protection errors when deletion is 
   api.defaults.adapter = async (config) => { throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, {
     config, data: { message: "Cannot remove the last active administrator" }, status: 409, statusText: "", headers: new AxiosHeaders(),
   }) }
-  renderPage(<DeleteUserButton id="target" email="target@example.com" onDeleted={vi.fn()} />)
+  renderPage(<DeleteAccountControl onDeleted={vi.fn()} />)
   fireEvent.click(screen.getByRole("button", { name: "Delete account target@example.com" }))
   fireEvent.click(await screen.findByRole("button", { name: "Confirm deletion" }))
   expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Cannot remove the last active administrator")

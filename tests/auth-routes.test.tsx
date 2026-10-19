@@ -1,10 +1,10 @@
 import { beforeEach, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes, useLocation, type RouteObject } from "react-router-dom"
-import { routes } from "@/config/routes"
-import { ProtectedRoute, PublicOnlyRoute } from "@/components/router/protected-route"
+import { routes } from "@/router/routes"
+import { ProtectedRoute, PublicOnlyRoute } from "@/router/protected-route"
 import { useAuthStore } from "@/stores/auth.store"
-import type { Role } from "@/types/auth"
+import type { Role } from "@/features/auth/types/auth"
 
 function LoginLocation() {
   const location = useLocation()

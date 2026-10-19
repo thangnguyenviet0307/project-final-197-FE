@@ -1,6 +1,6 @@
 import { expect, it } from "vitest"
-import { productDefaults, productPayload, productUpdatePayload, productSchema } from "@/lib/product-schema"
-import type { Product } from "@/types/products"
+import { productDefaults, productPayload, productUpdatePayload, productSchema } from "@/features/products/schemas/product-schema"
+import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
 const values = () => ({ ...productDefaults(), product_name: "Phone case", category: id, brand: id })

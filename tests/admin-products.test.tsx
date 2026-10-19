@@ -4,14 +4,14 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { MemoryRouter, useLocation } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosError, AxiosHeaders } from "axios"
-import ProductsPage from "@/pages/admin-products"
+import ProductsPage from "@/pages/admin/products/index"
 import { api, clearAuth } from "@/services/api"
-import { queryClient } from "@/lib/query-client"
+import { queryClient } from "@/services/query-client"
 import { useAuthStore } from "@/stores/auth.store"
-vi.mock("@/components/layouts/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
-vi.mock("@/hooks/products/use-product-statistics", () => ({ useProductStatistics: () => ({ data: { total: 25, active: 18, outOfStock: 4, stockUnits: 120 }, isFetching: false }) }))
-vi.mock("@/hooks/categories/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Cases" }] }) }))
-vi.mock("@/hooks/brands/use-brands", () => ({ useBrands: () => ({ data: [{ _id: "b".repeat(24), name: "Brand" }] }) }))
+vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
+vi.mock("@/features/products/hooks/use-product-statistics", () => ({ useProductStatistics: () => ({ data: { total: 25, active: 18, outOfStock: 4, stockUnits: 120 }, isFetching: false }) }))
+vi.mock("@/features/categories/hooks/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Cases" }] }) }))
+vi.mock("@/features/brands/hooks/use-brands", () => ({ useBrands: () => ({ data: [{ _id: "b".repeat(24), name: "Brand" }] }) }))
 const original = api.defaults.adapter
 const product = { _id: "a".repeat(24), product_name: "Phone case", price: 100, stock: 4, category: { name: "Cases" }, brand: { name: "Brand" }, is_active: true }
 beforeEach(() => { queryClient.clear(); clearAuth() })

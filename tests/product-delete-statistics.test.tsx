@@ -2,9 +2,9 @@ import { afterEach, expect, it } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { AxiosHeaders } from "axios"
-import { useDeleteProduct } from "@/hooks/products/use-delete-product"
-import { useProductStatistics } from "@/hooks/products/use-product-statistics"
-import { queryClient } from "@/lib/query-client"
+import { useDeleteProduct } from "@/features/products/hooks/use-delete-product"
+import { useProductStatistics } from "@/features/products/hooks/use-product-statistics"
+import { queryClient } from "@/services/query-client"
 import { api } from "@/services/api"
 
 const adapter = api.defaults.adapter
