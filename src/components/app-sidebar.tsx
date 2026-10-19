@@ -15,6 +15,7 @@ import {
   LayoutTemplate,
   Tags,
   Users,
+  UserRound,
   FolderTree,
 } from "lucide-react"
 import { useAuthStore } from "@/stores/auth.store"
@@ -92,6 +93,11 @@ const data = {
           title: "Brands",
           url: "/brands",
           icon: Tags,
+        },
+        {
+          title: "Customers",
+          url: "/customers",
+          icon: UserRound,
         },
       ],
     },
@@ -216,8 +222,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Auth Pages" &&
       item.title !== "Errors" &&
-      (!["/users", "/brands"].includes(item.url) ||
-        user?.role === "admin")
+      (!["/users", "/brands", "/customers"].includes(item.url) ||
+       user?.role === "admin")
     ),
   }))
 

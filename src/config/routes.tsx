@@ -39,6 +39,7 @@ export const routes: RouteObject[] = [
     { path: "/users", lazy: page(() => import("@/app/users/page")) },
     { path: "/admin/users", element: <Navigate to="/users" replace /> },
     { path: "/brands", lazy: page(() => import("@/app/brands/page")) },
+    { path: "/customers", lazy: page(() => import("@/app/customers/page")) },
     ] },
 
   ] },
