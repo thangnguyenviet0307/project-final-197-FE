@@ -3,6 +3,7 @@
 import { useNavigate } from "react-router-dom"
 import {
   Search,
+  Package,
   LayoutPanelLeft,
   LayoutDashboard,
   Mail,
@@ -65,6 +66,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     },
 
     // Apps
+    { title: "Products", url: "/products", group: "Apps", icon: Package },
     { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
     { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
     { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },

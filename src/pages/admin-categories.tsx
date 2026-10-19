@@ -1,3 +1,5 @@
+import { ContentSkeleton } from "@/components/page-skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useState, useMemo } from "react"
 import { useCategories } from "@/hooks/categories/use-categories"
 import { useCreateCategory } from "@/hooks/categories/use-create-category"
@@ -272,7 +274,7 @@ export default function AdminCategoriesPage() {
               <Folder className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold">{isLoading ? <Skeleton className="h-8 w-16" /> : stats.total}</div>
             </CardContent>
           </Card>
           <Card>
@@ -284,7 +286,7 @@ export default function AdminCategoriesPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                {stats.active}
+                {isLoading ? <Skeleton className="h-8 w-16" /> : stats.active}
               </div>
             </CardContent>
           </Card>
@@ -296,7 +298,7 @@ export default function AdminCategoriesPage() {
               <Layers className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.root}</div>
+              <div className="text-2xl font-bold">{isLoading ? <Skeleton className="h-8 w-16" /> : stats.root}</div>
             </CardContent>
           </Card>
           <Card>
@@ -307,7 +309,7 @@ export default function AdminCategoriesPage() {
               <FolderTree className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.sub}</div>
+              <div className="text-2xl font-bold">{isLoading ? <Skeleton className="h-8 w-16" /> : stats.sub}</div>
             </CardContent>
           </Card>
         </div>
@@ -329,7 +331,10 @@ export default function AdminCategoriesPage() {
                 <span className="text-xs text-muted-foreground whitespace-nowrap">Trạng thái:</span>
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === "all" || value === "active" || value === "inactive") setStatusFilter(value)
+                  }}
                   className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="all">Tất cả ({categories.length})</option>
@@ -345,10 +350,7 @@ export default function AdminCategoriesPage() {
         <Card>
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="flex items-center justify-center p-12 text-muted-foreground gap-2">
-                <LoaderCircle className="h-5 w-5 animate-spin" />
-                Đang tải dữ liệu danh mục...
-              </div>
+              <ContentSkeleton label="Loading categories" />
             ) : error ? (
               <div className="p-8 text-center text-destructive">
                 Không thể tải danh sách danh mục: {getApiError(error).message}

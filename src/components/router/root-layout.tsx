@@ -1,6 +1,6 @@
 import { Outlet, useNavigation } from "react-router-dom"
 
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { PageSkeleton } from "@/components/page-skeleton"
 
 /** Thin top bar shown while the next route's code is loading. */
 function RouteProgress() {
@@ -27,9 +27,5 @@ export function RootLayout() {
 
 /** Shown on the very first load, before any route has rendered. */
 export function RootFallback() {
-  return (
-    <div className="flex min-h-svh items-center justify-center">
-      <LoadingSpinner />
-    </div>
-  )
+  return <PageSkeleton />
 }

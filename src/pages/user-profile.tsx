@@ -18,6 +18,7 @@ import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { profileSchema, type ProfileValues } from "@/lib/profile-schema"
 import type { User } from "@/types/auth"
+import { ContentSkeleton } from "@/components/page-skeleton"
 
 function valuesFromUser(user: User | null): ProfileValues {
   return {
@@ -88,9 +89,7 @@ export default function UserProfilePage() {
 
   return <BaseLayout title="User Profile" description="View and manage your personal account information.">
     <div className="space-y-6 px-4 lg:px-6">
-      {profile.isPending ? <Card><CardContent className="flex items-center gap-3 py-8 text-sm text-muted-foreground">
-        <LoaderCircle className="size-4 animate-spin" /> Loading your profile…
-      </CardContent></Card> : profile.isError ? <Card>
+      {profile.isPending ? <Card><CardContent><ContentSkeleton label="Loading your profile…" variant="profile" /></CardContent></Card> : profile.isError ? <Card>
         <CardContent className="flex flex-col items-start gap-3 py-6">
           <p role="alert" className="text-sm text-destructive">{getApiError(profile.error).message}</p>
           <Button variant="outline" onClick={() => void profile.refetch()}>Try again</Button>

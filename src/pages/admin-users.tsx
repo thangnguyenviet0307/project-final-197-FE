@@ -1,3 +1,5 @@
+import { pageNumbers } from "@/lib/pagination"
+import { ContentSkeleton } from "@/components/page-skeleton"
 import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -63,14 +65,6 @@ function getRoleIcon(role: ManagedUser["role"]) {
 }
 function getStatus(user: ManagedUser): Exclude<Status, "all"> {
   return user.active ? "active" : "suspended"
-}
-function pageNumbers(page: number, total: number): (number | "start-gap" | "end-gap")[] {
-  if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1)
-  const start = Math.max(2, Math.min(page - 1, total - 4))
-  const end = Math.min(total - 1, Math.max(page + 1, 5))
-  return [1, ...(start > 2 ? ["start-gap" as const] : []),
-    ...Array.from({ length: end - start + 1 }, (_, index) => start + index),
-    ...(end < total - 1 ? ["end-gap" as const] : []), total]
 }
 
 function FilterMenu<T extends string>({ label, value, options, onChange }: {
@@ -323,7 +317,7 @@ export default function UsersPage() {
                 </TableRow>
               })}
               {!visibleUsers.length && <TableRow className="hover:bg-transparent"><TableCell colSpan={columns.length + 1} className="h-64 text-center text-muted-foreground">
-                {users.isLoading ? <span className="inline-flex items-center gap-2"><LoaderCircle className="size-4 animate-spin" />Loading users...</span>
+                {users.isLoading ? <ContentSkeleton label="Loading users..." />
                   : users.isError ? "Unable to load users. Please try again."
                   : statusFilter !== "all" || roleFilter !== "all" ? "No users on this page match your filters."
                   : search ? `No accounts found for "${search}".` : "No accounts found."}

@@ -15,6 +15,7 @@ import {
   LayoutTemplate,
   Users,
   FolderTree,
+  Package,
 } from "lucide-react"
 import { useAuthStore } from "@/stores/auth.store"
 import { Link } from "react-router-dom"
@@ -82,6 +83,7 @@ const data = {
           url: "/categories",
           icon: FolderTree,
         },
+        { title: "Products", url: "/products", icon: Package },
         {
           title: "Users",
           url: "/users",
