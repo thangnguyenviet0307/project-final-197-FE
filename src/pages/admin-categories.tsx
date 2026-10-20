@@ -102,6 +102,37 @@ function getCategoryIcon(name: string): { Icon: LucideIcon; color: string } {
   return { Icon: Package, color: colors.other }
 }
 
+function CategoryVisual({
+  src,
+  Icon,
+  color,
+}: {
+  src?: string
+  Icon: LucideIcon
+  color: string
+}) {
+  const [imageFailed, setImageFailed] = useState(false)
+
+  if (src && !imageFailed) {
+    return (
+      <span className="inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-background">
+        <img
+          src={src}
+          alt=""
+          className="size-full object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      </span>
+    )
+  }
+
+  return (
+    <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${color}`}>
+      <Icon className="size-4" aria-hidden="true" />
+    </span>
+  )
+}
+
 export default function AdminCategoriesPage() {
   const { data: categories = [], isLoading, error } = useCategories()
 
@@ -117,6 +148,7 @@ export default function AdminCategoriesPage() {
     description: "",
     parent: null,
     isActive: true,
+    icon: "",
   })
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -161,6 +193,7 @@ export default function AdminCategoriesPage() {
       description: "",
       parent: null,
       isActive: true,
+      icon: "",
     })
     setFormError(null)
     setIsFormOpen(true)
@@ -179,6 +212,7 @@ export default function AdminCategoriesPage() {
     setFormData({
       name: category.name,
       description: category.description || "",
+      icon: category.icon || "",
       parent: parentId,
       isActive: category.isActive,
     })
@@ -241,6 +275,7 @@ export default function AdminCategoriesPage() {
   }, [categories])
 
   const isSaving = createMutation.isPending || updateMutation.isPending
+  const previewIcon = getCategoryIcon(`${formData.name} ${formData.description ?? ""}`)
 
   return (
     <BaseLayout>
@@ -385,9 +420,12 @@ export default function AdminCategoriesPage() {
                         <TableRow key={category._id}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                              <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${iconColor}`}>
-                                <CategoryIcon className="size-4" aria-hidden="true" />
-                              </span>
+                              <CategoryVisual
+                                key={category.icon || "fallback"}
+                                src={category.icon}
+                                Icon={CategoryIcon}
+                                color={iconColor}
+                              />
                               <span>{category.name}</span>
                             </div>
                           </TableCell>
@@ -502,6 +540,34 @@ export default function AdminCategoriesPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   />
+                </div>
+
+                {/* Category image URL */}
+                <div className="space-y-1.5">
+                  <label htmlFor="category-icon-url" className="text-sm font-medium">
+                    URL ảnh danh mục
+                  </label>
+                  <Input
+                    id="category-icon-url"
+                    type="url"
+                    placeholder="https://example.com/tai-nghe.jpg"
+                    value={formData.icon || ""}
+                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Dán URL trực tiếp đến ảnh (HTTP/HTTPS), không phải URL trang kết quả tìm kiếm.
+                  </p>
+                  {formData.icon?.trim() && (
+                    <div className="flex items-center gap-3 rounded-md border p-3">
+                      <CategoryVisual
+                        key={formData.icon.trim()}
+                        src={formData.icon.trim()}
+                        Icon={previewIcon.Icon}
+                        color={previewIcon.color}
+                      />
+                      <span className="text-sm text-muted-foreground">Xem trước ảnh danh mục</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Danh mục cha */}
