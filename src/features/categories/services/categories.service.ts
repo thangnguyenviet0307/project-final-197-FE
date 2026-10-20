@@ -6,6 +6,10 @@ export const categorySchema = z.object({
   icon: imageUrlSchema.optional(),
   name: z.string().trim().min(1, "Category name is required."),
   description: z.string().trim().optional(),
+  icon: z.union([
+    z.string().trim().url().refine((url) => /^https?:\/\//i.test(url), "URL ảnh phải dùng HTTP hoặc HTTPS"),
+    z.literal(""),
+  ]).optional(),
   parent: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
 });
@@ -24,6 +28,7 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
+  icon?: string;
   parent?: CategoryParent | string | null;
   isActive: boolean;
   isDeleted: boolean;
@@ -35,6 +40,7 @@ export interface CreateCategoryInput {
   icon?: string;
   name: string;
   description?: string;
+  icon?: string;
   parent?: string | null;
   isActive?: boolean;
 }
@@ -43,6 +49,7 @@ export interface UpdateCategoryInput {
   icon?: string;
   name?: string;
   description?: string;
+  icon?: string;
   parent?: string | null;
   isActive?: boolean;
 }
@@ -65,6 +72,7 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
     name: input.name,
     ...(input.icon !== undefined ? { icon: input.icon } : {}),
     description: input.description || "",
+    icon: input.icon?.trim() || "",
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
@@ -83,6 +91,7 @@ export async function updateCategory({
   if (input.icon !== undefined) payload.icon = input.icon;
   if (input.name !== undefined) payload.name = input.name;
   if (input.description !== undefined) payload.description = input.description;
+  if (input.icon !== undefined) payload.icon = input.icon.trim();
   if (input.parent !== undefined) payload.parent = input.parent ? input.parent : null;
   if (input.isActive !== undefined) payload.isActive = input.isActive;
 
