@@ -47,11 +47,13 @@ it("blocks an inventory edit if stock changed after the form was opened", async 
 
 it("saves a variant edit with IDs and the explicit product price when inventory is unchanged", async () => {
   const writes = setup(original)
+  queryClient.setQueryData(["orders", "detail", "cached-order"], { currentProductName: "Old name" })
   fireEvent.change(await screen.findByLabelText("Variant stock"), { target: { value: "9" } })
   await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
   expect(await screen.findByText("Saved product detail")).toBeTruthy()
   expect(writes).toHaveBeenCalledOnce()
+  expect(queryClient.getQueryState(["orders", "detail", "cached-order"])?.isInvalidated).toBe(true)
   expect(writes.mock.calls[0][0]).toEqual({ expectedVersion: 0, price: 150, variants: [{ ...original.variants![0], stock: 9, variant_name: null, images: [], attributes: {}, color: "", size: "", image: "" }] })
 })
 

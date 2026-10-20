@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { LoaderCircle } from "lucide-react"
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import { useBrands } from "@/features/brands/hooks/use-brands"
-import { productDefaults, productPayload, productUpdatePayload, productSchema, type ProductFormValues } from "@/features/products/schemas/product-schema"
+import { productDefaults, productPayload, productUpdatePayload, productSchema, productErrorPath, type ProductFormValues } from "@/features/products/schemas/product-schema"
 import type { CatalogReference, Product, ProductInput } from "@/features/products/types/products"
 import { getApiError } from "@/services/api"
 import { Button } from "@/components/ui/button"
@@ -72,8 +72,8 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
       const failure = getApiError(error)
       form.setError("root", { message: failure.message })
       failure.errors?.forEach(({ field, message }) => {
-        const path = field.replace(/^body\./, "").replace(/\[(\d+)\]/g, ".$1")
-        if (path in values || /^variants\.\d+\.(sku|price|stock|variant_name|color|size|image|compare_at_price)$/.test(path)) {
+        const path = productErrorPath(field, values)
+        if (path) {
           form.setError(path as FieldPath<ProductFormValues>, { message })
         }
       })

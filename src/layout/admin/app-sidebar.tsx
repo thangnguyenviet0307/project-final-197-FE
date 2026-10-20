@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  LayoutPanelLeft,
   LayoutDashboard,
   Mail,
   CheckSquare,
@@ -44,17 +43,12 @@ const data = {
   },
   navGroups: [
     {
-      label: "Dashboards",
+      label: "Overview",
       items: [
         {
-          title: "Dashboard 1",
+          title: "Dashboard",
           url: "/admin/dashboard",
           icon: LayoutDashboard,
-        },
-        {
-          title: "Dashboard 2",
-          url: "/dashboard-2",
-          icon: LayoutPanelLeft,
         },
       ],
     },

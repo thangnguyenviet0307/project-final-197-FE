@@ -18,6 +18,26 @@ beforeEach(() => {
 })
 afterEach(() => { api.defaults.adapter = original; queryClient.clear() })
 function wrap(children: ReactNode) { return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: "*", element: children }])} /></QueryClientProvider>) }
+it.each([
+  ["Variant stock", "-5", "Variant stock cannot be negative."],
+  ["Variant stock", "1.5", "Variant stock must be a whole number."],
+  ["Variant price", "-1", "Variant price cannot be negative."],
+  ["Compare at price", "-1", "Compare at price cannot be negative."],
+  ["Discount (%)", "71", "Discount cannot exceed 70%."],
+  ["Model year", "1899", "Model year must be 1900 or later."],
+])("shows a useful error next to %s when its value is %s", async (label, value, message) => {
+  const save = vi.fn()
+  wrap(<ProductForm product={product} save={save} pending={false} />)
+  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
+  const input = screen.getByLabelText(label)
+  fireEvent.change(input, { target: { value } })
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  const error = await screen.findByText(message)
+  expect(input.getAttribute("aria-invalid")).toBe("true")
+  expect(input.getAttribute("aria-describedby")).toBe(error.id)
+  expect(save).not.toHaveBeenCalled()
+  expect(screen.queryByText(/Too small:|Too big:|Invalid input:/)).toBeNull()
+})
 it("loads catalog data and submits retained variants with typed options", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   wrap(<ProductForm product={product} save={save} pending={false} />)

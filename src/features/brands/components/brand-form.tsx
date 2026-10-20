@@ -11,7 +11,7 @@ import { imageUrlSchema } from "@/utils/image-url"
 import { getApiError } from "@/services/api"
 import type { IBrand, CreateBrandInput } from "@/features/brands/types/brands"
 
-const schema = z.object({ name: z.string().trim().min(1, "Brand name is required.").max(100), description: z.string().trim(), logoUrl: imageUrlSchema, isActive: z.boolean() })
+const schema = z.object({ name: z.string().trim().min(1, "Brand name is required.").max(100, "Brand name cannot exceed 100 characters."), description: z.string().trim(), logoUrl: imageUrlSchema, isActive: z.boolean() })
 type Values = z.infer<typeof schema>
 export function BrandForm({ brand, onSubmit, onSaved, onCancel, submitLabel = "Create Brand" }: { brand?: IBrand; onSubmit: (values: CreateBrandInput) => Promise<unknown> | void; onSaved?: () => void; onCancel: () => void; submitLabel?: string }) {
   const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { name: brand?.name ?? "", description: brand?.description ?? "", logoUrl: brand?.logoUrl ?? "", isActive: brand?.isActive ?? true } })

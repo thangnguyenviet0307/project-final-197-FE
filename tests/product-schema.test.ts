@@ -1,9 +1,16 @@
 import { expect, it } from "vitest"
-import { productDefaults, productPayload, productUpdatePayload, productSchema } from "@/features/products/schemas/product-schema"
+import { productDefaults, productPayload, productUpdatePayload, productSchema, productErrorPath } from "@/features/products/schemas/product-schema"
 import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
 const values = () => ({ ...productDefaults(), product_name: "Phone case", category: id, brand: id })
+it("maps backend image and attribute errors to the matching form inputs", () => {
+  const input = { ...values(), variants: [{ sku: "CASE-1", price: 1, images: [{ url: "image.png" }], options: [{ name: "material", value: "Silicone" }] }] }
+  expect(productErrorPath("body.variants[0].images[0]", input)).toBe("variants.0.images.0.url")
+  expect(productErrorPath("body.variants.0.attributes.material", input)).toBe("variants.0.options.0.value")
+  expect(productErrorPath("body.variants.0.attributes.unknown", input)).toBeNull()
+  expect(productErrorPath("body.expectedVersion", input)).toBeNull()
+})
 it("allows products without a price or variants and enforces backend limits", () => {
   expect(productSchema.safeParse(values()).success).toBe(true)
   for (const input of [{ discount: 71 }, { model_year: 1899 }, { stock: 1.5 }, { category: "invalid" }, { product_name: "ab" }]) {

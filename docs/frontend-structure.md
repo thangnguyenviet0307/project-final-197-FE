@@ -12,7 +12,7 @@ src/
 │   └── admin/                  # BaseLayout, sidebar, header, footer, navigation
 ├── pages/
 │   ├── admin/                  # products/, orders/, users/, categories/, brands/, customers/,
-│   │                           # account/, dashboard/, dashboard-2/, settings/
+│   │                           # account/, dashboard/, settings/
 │   ├── auth/                   # Đăng nhập, quên mật khẩu, đổi mật khẩu
 │   ├── public/landing/         # Landing page công khai hiện tại
 │   ├── storefront/             # Khu vực dành cho các trang bán hàng sắp phát triển

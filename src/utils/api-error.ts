@@ -82,6 +82,49 @@ function translateIssueMessage(message: string): string {
   return isLocalized(message) ? translateMessage(message) : message
 }
 
+function validationLabel(field: string, url = ""): string {
+  const path = field.replace(/^(body|query|params)\./, "").replace(/\[(\d+)\]/g, ".$1")
+  const variant = /^variants\.(\d+)\.(.+)$/.exec(path)
+  const key = (variant?.[2] ?? path).split(".").at(-1) ?? ""
+  const labels: Record<string, string> = {
+    product_name: "Product name", model_year: "Model year", sku: "SKU", variant_name: "Variant name",
+    stock: "Stock", price: "Price", compare_at_price: "Compare at price", discount: "Discount",
+    category: "Category", brand: "Brand", thumbnail: "Thumbnail path", description: "Description",
+    firstName: "First name", lastName: "Last name", email: "Email address", password: "Password",
+    currentPassword: "Current password", newPassword: "New password", confirmPassword: "Password confirmation",
+    personalEmail: "Personal email address", phone: "Phone number", location: "Location", bio: "Bio",
+    parent: "Parent category", icon: "Category thumbnail", logoUrl: "Brand thumbnail", role: "Role",
+    expectedVersion: "Product version", isActive: "Status", is_active: "Status", active: "Status",
+  }
+  let label = labels[key] ?? (key ? key.replace(/_/g, " ").replace(/^./, value => value.toUpperCase()) : "This field")
+  if (key === "name") label = /brands/.test(url) ? "Brand name" : /categories/.test(url) ? "Category name" : "Name"
+  if (variant) {
+    if (/\.images\./.test(path)) label = "Image path"
+    if (/\.options\./.test(path)) label = key === "name" ? "Option name" : "Option value"
+    label = label.replace(/^Variant /, "")
+    return `Variant ${Number(variant[1]) + 1} ${label === "SKU" ? label : label.toLowerCase()}`
+  }
+  return label
+}
+
+function validationMessage(message: string, label: string): string {
+  const limit = /^Too (small|big): expected (number|string|array) to (?:be|have) (?:>=|<=)([\d.e+-]+)/i.exec(message)
+  if (limit) {
+    const minimum = limit[1].toLowerCase() === "small"
+    const kind = limit[2].toLowerCase()
+    const bound = limit[3]
+    if (kind === "number" && minimum && Number(bound) === 0) return `${label} cannot be negative.`
+    if (kind === "string") return minimum ? `${label} must contain at least ${bound} characters.` : `${label} cannot exceed ${bound} characters.`
+    if (kind === "array") return `${label} must contain ${minimum ? "at least" : "no more than"} ${bound} items.`
+    return `${label} must be ${minimum ? "at least" : "no more than"} ${bound}.`
+  }
+  if (/^Invalid input: expected int\b/i.test(message)) return `${label} must be a whole number.`
+  if (/^Invalid input: expected number\b/i.test(message)) return `Enter a valid number for ${label.toLowerCase()}.`
+  if (/^Invalid option:/i.test(message)) return `Select a valid ${label.toLowerCase()}.`
+  if (/^Invalid (input|type|string)(:|$)/i.test(message)) return `Enter a valid value for ${label.toLowerCase()}.`
+  return translateIssueMessage(message)
+}
+
 export function getApiError(error: unknown): ApiError {
   if (error instanceof ZodError) {
     return {
@@ -95,14 +138,17 @@ export function getApiError(error: unknown): ApiError {
     const responseMessage = error.response?.data?.message
     const errors = error.response?.data?.errors?.map((issue) => ({
       ...issue,
-      message: translateIssueMessage(issue.message),
+      message: validationMessage(issue.message, validationLabel(issue.field, error.config?.url)),
     }))
     const genericResponseMessage = responseMessage !== undefined &&
       /^(validation failed|database validation failed|unauthorized|forbidden|not found|conflict|internal server error|bad request)$/i.test(responseMessage)
     const message = responseMessage
       ? genericResponseMessage
         ? errors?.length
-          ? errors.map(({ field, message: issueMessage }) => `${field}: ${issueMessage}`).join("; ")
+          ? errors.map(({ field, message: issueMessage }) => {
+            const label = validationLabel(field, error.config?.url)
+            return issueMessage.toLowerCase().startsWith(label.toLowerCase()) ? issueMessage : `${label}: ${issueMessage}`
+          }).join("; ")
           : statusMessage(statusCode, isLoginRequest(error.config?.url))
         : translateIssueMessage(responseMessage)
       : statusCode

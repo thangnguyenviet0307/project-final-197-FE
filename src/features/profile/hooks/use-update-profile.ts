@@ -12,7 +12,10 @@ export function useUpdateProfile(options: MutationCallbacks<Awaited<ReturnType<t
     onSuccess: async (...args) => {
       const version = useAuthStore.getState().sessionVersion
       queryClient.setQueryData(["auth", "me", version], args[0])
-      await queryClient.invalidateQueries({ queryKey: ["users"] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["users"] }),
+        queryClient.invalidateQueries({ queryKey: ["orders"] }),
+      ])
       await options.onSuccess?.(...args)
     },
   })

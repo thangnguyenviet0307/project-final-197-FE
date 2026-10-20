@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 import {
   Search,
   Package,
-  LayoutPanelLeft,
   LayoutDashboard,
   Mail,
   CheckSquare,
@@ -51,18 +50,12 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const role = useAuthStore((state) => state.user?.role)
 
   const searchItems: SearchItem[] = [
-    // Dashboards
+    // Overview
     {
-      title: "Dashboard 1",
+      title: "Dashboard",
       url: "/admin/dashboard",
-      group: "Dashboards",
+      group: "Overview",
       icon: LayoutDashboard,
-    },
-    {
-      title: "Dashboard 2",
-      url: "/dashboard-2",
-      group: "Dashboards",
-      icon: LayoutPanelLeft,
     },
 
     // Apps

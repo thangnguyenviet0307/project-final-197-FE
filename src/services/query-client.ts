@@ -1,6 +1,7 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { getApiError } from "@/utils/api-error"
+import { publishBusinessChange, subscribeToBusinessChanges } from "@/services/data-sync"
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -9,6 +10,7 @@ export const queryClient = new QueryClient({
       toast.error(getApiError(error).message)
     },
     onSuccess: (_data, _variables, _context, mutation) => {
+      publishBusinessChange()
       if (typeof mutation.meta?.successMessage === "string") toast.success(mutation.meta.successMessage)
     },
   }),
@@ -16,7 +18,16 @@ export const queryClient = new QueryClient({
     onError: (error) => toast.error(getApiError(error).message),
   }),
   defaultOptions: {
-    queries: { retry: false, staleTime: 30_000 },
+    queries: {
+      retry: false,
+      staleTime: 30_000,
+      refetchOnMount: "always",
+      refetchOnWindowFocus: "always",
+      refetchOnReconnect: "always",
+    },
     mutations: { retry: false },
   },
 })
+
+const stopDataSync = subscribeToBusinessChanges(queryClient, import.meta.hot)
+if (import.meta.hot) import.meta.hot.dispose(stopDataSync)

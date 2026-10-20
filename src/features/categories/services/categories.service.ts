@@ -4,7 +4,7 @@ import { api } from "@/services/api";
 
 export const categorySchema = z.object({
   icon: imageUrlSchema.optional(),
-  name: z.string().trim().min(1, "Tên danh mục không được để trống"),
+  name: z.string().trim().min(1, "Category name is required."),
   description: z.string().trim().optional(),
   parent: z.string().nullable().optional(),
   isActive: z.boolean().optional(),

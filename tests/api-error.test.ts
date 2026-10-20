@@ -50,7 +50,7 @@ it("shows localized validation details instead of the generic validation title",
     message: "Validation failed",
     errors: [{ field: "phone", message: "Số điện thoại không hợp lệ" }],
   }))).toMatchObject({
-    message: "phone: Enter a valid phone number.",
+    message: "Phone number: Enter a valid phone number.",
     errors: [{ field: "phone", message: "Enter a valid phone number." }],
   })
 })
@@ -75,4 +75,16 @@ it("explains network, timeout, and canceled requests separately", () => {
     .toBe("The API took too long to respond. Check your connection and try again.")
   expect(getApiError(new axios.CanceledError("canceled")).message)
     .toBe("The request was canceled because the page or sign-in session changed. Retry the action if it did not complete.")
+})
+
+it.each([
+  ["body.variants.0.stock", "Too small: expected number to be >=0", "Variant 1 stock cannot be negative."],
+  ["body.variants[1].price", "Too small: expected number to be >=0", "Variant 2 price cannot be negative."],
+  ["body.variants.0.stock", "Invalid input: expected int, received number", "Variant 1 stock must be a whole number."],
+  ["body.discount", "Too big: expected number to be <=70", "Discount must be no more than 70."],
+  ["body.firstName", "Too big: expected string to have <=50 characters", "First name cannot exceed 50 characters."],
+])("formats a backend validation error for %s without exposing schema wording", (field, raw, message) => {
+  const failure = getApiError(apiError({ status: 400, message: "Validation failed", errors: [{ field, message: raw }] }))
+  expect(failure.errors).toEqual([{ field, message }])
+  expect(failure.message).toBe(message)
 })
