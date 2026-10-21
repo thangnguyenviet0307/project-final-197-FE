@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useChangePassword } from "@/features/auth/hooks/use-change-password"
-import { LoaderCircle } from "lucide-react"
+import { Check, LoaderCircle } from "lucide-react"
 import { Link } from "react-router-dom"
 import type { z } from "zod"
 import { changePasswordSchema } from "@/features/auth/schemas/auth-schemas"
@@ -35,6 +35,16 @@ export default function ChangePasswordPage() {
           <Input id={name} type="password" autoComplete={autocomplete} aria-invalid={!!form.formState.errors[name]} {...form.register(name)} />
           <FieldError errors={[form.formState.errors[name]]} />
         </Field>)}
+        <ul className="space-y-2 text-sm text-muted-foreground" aria-label="Password requirements">
+          {[
+            "Password must contain at least 6 characters.",
+            "Include at least one uppercase letter and one number.",
+            "Include at least one special character, for example: !@#$%^&*()_",
+          ].map(requirement => <li key={requirement} className="flex items-start gap-2">
+            <Check className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            <span>{requirement}</span>
+          </li>)}
+        </ul>
         {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
         <Button type="submit" disabled={mutation.isPending}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Save new password</Button>
       </form>

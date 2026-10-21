@@ -1,3 +1,4 @@
+import { OrderNoteEditor } from "@/features/orders/components/order-note-editor"
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import { BaseLayout } from "@/layout/admin/base-layout"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,8 @@ export default function OrderDetailPage() {
     <Button nativeButton={false} variant="outline" render={<Link to={returnTo} />}>Back to orders</Button>
     {!order || query.isError ? <OrderQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
       <div className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="break-all text-xl font-semibold">Order {order.orderCode ?? order._id}</h1><p className="text-sm text-muted-foreground">{orderDate(order.orderDate)}</p></div><div className="flex flex-wrap items-center gap-2"><OrderStatusBadge status={order.orderStatus} /><OrderActions order={order} disabled={query.isFetching} onDeleted={() => navigate(returnTo, { replace: true })} /></div></div>
+      <OrderNoteEditor key={`${order._id}-${order.orderNote}`} order={order} />
+      {order.cancellationReason && <p className="text-sm">Cancellation reason: {order.cancellationReason}</p>}
       {query.isFetching && <p role="status">Updating order…</p>}
       <div className="grid gap-4 md:grid-cols-2"><Card><CardHeader><CardTitle>Customer & delivery</CardTitle></CardHeader><CardContent className="space-y-2 break-words text-sm"><p className="font-medium">{personName(customer)}</p><p>{customer?.email ?? "Email unavailable"}</p><p>{customer?.phone ?? "Phone unavailable"}</p><p>{[order.street, order.city, order.state].filter(Boolean).join(", ")}</p>{order.orderNote && <p className="whitespace-pre-wrap">Note: {order.orderNote}</p>}</CardContent></Card>
         <Card><CardHeader className="flex flex-wrap items-center justify-between gap-2"><CardTitle>Order information</CardTitle><OrderDatesDialog order={order} disabled={query.isFetching} /></CardHeader><CardContent><dl className="grid grid-cols-2 gap-3 text-sm">{[

@@ -1,9 +1,6 @@
 import type { ComponentType } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
-import {
-  ProtectedRoute,
-  PublicOnlyRoute,
-} from "@/router/protected-route";
+import { ProtectedRoute, PublicOnlyRoute } from "@/router/protected-route";
 
 function page(load: () => Promise<{ default: ComponentType }>) {
   return async () => ({ Component: (await load()).default });
@@ -52,23 +49,41 @@ export const routes: RouteObject[] = [
         path: "/dashboard",
         element: <Navigate to="/admin/dashboard" replace />,
       },
-      {
-        path: "/dashboard-2",
-        element: <Navigate to="/admin/dashboard" replace />,
-      },
-      { path: "/mail", lazy: page(() => import("@/pages/template/mail/page")) },
-      { path: "/tasks", lazy: page(() => import("@/pages/template/tasks/page")) },
-      { path: "/chat", lazy: page(() => import("@/pages/template/chat/page")) },
-      { path: "/calendar", lazy: page(() => import("@/pages/template/calendar/page")) },
-      { path: "/faqs", lazy: page(() => import("@/pages/template/faqs/page")) },
-      { path: "/pricing", element: <Navigate to="/admin/dashboard" replace /> },
+      // {
+      //   path: "/dashboard-2",
+      //   element: <Navigate to="/admin/dashboard" replace />,
+      // },
+      // { path: "/mail", lazy: page(() => import("@/pages/template/mail/page")) },
+      // {
+      //   path: "/tasks",
+      //   lazy: page(() => import("@/pages/template/tasks/page")),
+      // },
+      // { path: "/chat", lazy: page(() => import("@/pages/template/chat/page")) },
+      // {
+      //   path: "/calendar",
+      //   lazy: page(() => import("@/pages/template/calendar/page")),
+      // },
+      // { path: "/faqs", lazy: page(() => import("@/pages/template/faqs/page")) },
+      // { path: "/pricing", element: <Navigate to="/admin/dashboard" replace /> },
       {
         path: "/categories",
         lazy: page(() => import("@/pages/admin/categories/index")),
       },
-      { path: "/products", lazy: page(() => import("@/pages/admin/products/index")) },
-      { path: "/orders", lazy: page(() => import("@/pages/admin/orders/index")) },
-      { path: "/orders/:id", lazy: page(() => import("@/pages/admin/orders/detail")) },
+      {
+        path: "/products",
+        lazy: page(() => import("@/pages/admin/products/index")),
+      },
+      { path: "/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
+      { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
+      { path: "/orders/new", lazy: page(() => import("@/pages/admin/orders/create")) },
+      {
+        path: "/orders",
+        lazy: page(() => import("@/pages/admin/orders/index")),
+      },
+      {
+        path: "/orders/:id",
+        lazy: page(() => import("@/pages/admin/orders/detail")),
+      },
       {
         path: "/products/:id",
         lazy: page(() => import("@/pages/admin/products/detail")),
@@ -89,28 +104,37 @@ export const routes: RouteObject[] = [
         path: "/settings/account",
         element: <Navigate to="/settings/user" replace />,
       },
-      {
-        path: "/settings/billing",
-        element: <Navigate to="/settings/user" replace />,
-      },
-      {
-        path: "/settings/appearance",
-        lazy: page(() => import("@/pages/admin/settings/appearance/page")),
-      },
-      {
-        path: "/settings/notifications",
-        lazy: page(() => import("@/pages/admin/settings/notifications/page")),
-      },
-      {
-        path: "/settings/connections",
-        lazy: page(() => import("@/pages/admin/settings/connections/page")),
-      },
+      // {
+      //   path: "/settings/billing",
+      //   element: <Navigate to="/settings/user" replace />,
+      // },
+      // {
+      //   path: "/settings/appearance",
+      //   lazy: page(() => import("@/pages/admin/settings/appearance/page")),
+      // },
+      // {
+      //   path: "/settings/notifications",
+      //   lazy: page(() => import("@/pages/admin/settings/notifications/page")),
+      // },
+      // {
+      //   path: "/settings/connections",
+      //   lazy: page(() => import("@/pages/admin/settings/connections/page")),
+      // },
       {
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
-          { path: "/categories/new", lazy: page(() => import("@/pages/admin/categories/create")) },
-          { path: "/brands/new", lazy: page(() => import("@/pages/admin/brands/create")) },
-          { path: "/users/new", lazy: page(() => import("@/pages/admin/users/create")) },
+          {
+            path: "/categories/new",
+            lazy: page(() => import("@/pages/admin/categories/create")),
+          },
+          {
+            path: "/brands/new",
+            lazy: page(() => import("@/pages/admin/brands/create")),
+          },
+          {
+            path: "/users/new",
+            lazy: page(() => import("@/pages/admin/users/create")),
+          },
           {
             path: "/products/new",
             lazy: page(() => import("@/pages/admin/products/create")),
@@ -119,9 +143,12 @@ export const routes: RouteObject[] = [
             path: "/products/:id/edit",
             lazy: page(() => import("@/pages/admin/products/edit")),
           },
-          { path: "/users", lazy: page(() => import("@/pages/admin/users/page")) },
-          { path: "/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
-          { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
+          {
+            path: "/users",
+            lazy: page(() => import("@/pages/admin/users/page")),
+          },
+
+
           { path: "/admin/users", element: <Navigate to="/users" replace /> },
         ],
       },

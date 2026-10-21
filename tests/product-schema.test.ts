@@ -23,6 +23,15 @@ it("rejects invalid SKUs, duplicate SKUs, negative prices and duplicate option n
     expect(productSchema.safeParse({ ...values(), variants }).success).toBe(false)
   }
 })
+it("reports duplicate options and SKUs together at their original field paths", () => {
+  const variant = { sku: "CASE-1", price: 0, images: [], options: [{ name: "Color", value: "red" }, { name: "Color", value: "blue" }] }
+  const result = productSchema.safeParse({ ...values(), variants: [variant, { ...variant, options: [] }] })
+  expect(result.success).toBe(false)
+  if (!result.success) expect(result.error.issues.map(({ path, message }) => ({ path, message }))).toEqual([
+    { path: ["variants", 0, "options", 1, "name"], message: "Option names must be unique." },
+    { path: ["variants", 1, "sku"], message: "SKU must be unique." },
+  ])
+})
 it("preserves variant IDs, typed attributes and image paths when editing", () => {
   const product: Product = { ...values(), _id: id, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 10, images: ["/case.png"], attributes: { warranty: 12, wireless: false, empty: null, color: "red" } }] }
   const result = productPayload(productSchema.parse(productDefaults(product)))

@@ -173,7 +173,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Auth Pages" && item.group !== "Errors" &&
-    (!["/users", "/brands", "/customers"].includes(item.url) || role === "admin")
+    (!["/users"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

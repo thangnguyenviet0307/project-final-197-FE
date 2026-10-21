@@ -24,7 +24,7 @@ import { Separator } from "@/components/ui/separator"
 const accountFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),

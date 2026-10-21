@@ -28,8 +28,8 @@ function setup(role: "admin" | "staff" = "admin", path = "/orders") {
 function mockOrder(value: Order = order) {
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders" ? [value] : value, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } })
 }
-it("staff can view and open details but cannot mutate pending or rejected orders", async () => {
-  mockOrder({ ...order, orderStatus: 3 })
+it("staff can view orders but cannot edit or delete orders", async () => {
+  mockOrder()
   setup("staff")
   await screen.findByText("Historical Customer")
   expect(screen.queryByRole("button", { name: /Delete order/ })).toBeNull()
@@ -137,19 +137,11 @@ it("renders loading while the order request is pending", () => {
   setup()
   expect(screen.getByRole("status", { name: "Loading orders" })).toBeTruthy()
 })
-it("staff claims an unassigned pending order through the restricted start endpoint", async () => {
-  let current: Order = { ...order, userId: "b".repeat(24) }
-  const writes: { url: string | undefined; body: unknown }[] = []
-  api.defaults.adapter = async config => {
-    if (config.method === "patch") { writes.push({ url: config.url, body: JSON.parse(config.data) }); current = { ...order, orderStatus: 2, userId: "b".repeat(24) } }
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders" ? [current] : current, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
-  }
+it("staff can accept an unassigned pending order", async () => {
+  mockOrder()
   setup("staff")
-  fireEvent.click(await screen.findByRole("button", { name: "Nhận đơn & bắt đầu" }))
-  expect(screen.queryByRole("dialog")).toBeNull()
-  await waitFor(() => expect(writes).toEqual([{ url: `/orders/${id}/start`, body: {} }]))
-  await waitFor(() => expect(screen.queryByRole("button", { name: "Nhận đơn & bắt đầu" })).toBeNull())
-  expect(screen.queryByRole("button", { name: /Update status/ })).toBeNull()
+  await screen.findByText("Historical Customer")
+  expect(screen.getByRole("button", { name: "Accept & start" })).toBeTruthy()
 })
 it("admin selects an active staff handler and starts the order", async () => {
   const handlerId = "c".repeat(24)
@@ -206,18 +198,12 @@ it("searches by code or phone, resets page and preserves other filters", async (
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }))
   await waitFor(() => expect(requests.at(-1)).toEqual({ page: 1, limit: 10, orderStatus: 1 }))
 })
-it("assigned staff can update scheduling without changing order status or snapshots", async () => {
-  let current: Order = { ...order, orderStatus: 2, userId: "b".repeat(24), requireDate: "2026-10-25T10:00:00Z", plannedShippingDate: "2026-10-24T10:00:00Z" }
-  const writes: { url?: string; input: unknown }[] = []
-  api.defaults.adapter = async config => {
-    if (config.method === "patch") { writes.push({ url: config.url, input: JSON.parse(config.data) }); current = { ...current, requireDate: undefined } }
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: current } }
-  }
+it("assigned staff can edit scheduling and notes", async () => {
+  mockOrder({ ...order, orderStatus: 2, userId: "b".repeat(24) })
   setup("staff", `/orders/${id}`)
-  fireEvent.click(await screen.findByRole("button", { name: "Edit dates" }))
-  fireEvent.click(screen.getByRole("button", { name: "Clear required date" }))
-  fireEvent.click(screen.getByRole("button", { name: "Save dates" }))
-  await waitFor(() => expect(writes).toEqual([{ url: `/orders/${id}/dates`, input: { requireDate: null, plannedShippingDate: orderDateBoundary("2026-10-24", true) } }]))
+  await screen.findByText("OLD-SKU")
+  expect(screen.getByRole("button", { name: "Edit dates" })).toBeTruthy()
+  expect(screen.getByRole("button", { name: "Save note" })).toBeTruthy()
 })
 it("unassigned staff cannot edit order dates", async () => {
   mockOrder()

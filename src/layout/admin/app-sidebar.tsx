@@ -3,11 +3,10 @@
 import * as React from "react"
 import {
   LayoutDashboard,
-  Mail,
-  CheckSquare,
-  MessageCircle,
-  Calendar,
-  Shield,
+  // Mail,
+  // CheckSquare,
+  // MessageCircle,
+  // Calendar,
   AlertTriangle,
   Settings,
   HelpCircle,
@@ -55,26 +54,26 @@ const data = {
     {
       label: "Apps",
       items: [
-        {
-          title: "Mail",
-          url: "/mail",
-          icon: Mail,
-        },
-        {
-          title: "Tasks",
-          url: "/tasks",
-          icon: CheckSquare,
-        },
-        {
-          title: "Chat",
-          url: "/chat",
-          icon: MessageCircle,
-        },
-        {
-          title: "Calendar",
-          url: "/calendar",
-          icon: Calendar,
-        },
+        // {
+        //   title: "Mail",
+        //   url: "/mail",
+        //   icon: Mail,
+        // },
+        // {
+        //   title: "Tasks",
+        //   url: "/tasks",
+        //   icon: CheckSquare,
+        // },
+        // {
+        //   title: "Chat",
+        //   url: "/chat",
+        //   icon: MessageCircle,
+        // },
+        // {
+        //   title: "Calendar",
+        //   url: "/calendar",
+        //   icon: Calendar,
+        // },
         {
           title: "Categories",
           url: "/categories",
@@ -107,49 +106,6 @@ const data = {
           url: "/landing",
           target: "_blank",
           icon: LayoutTemplate,
-        },
-        {
-          title: "Auth Pages",
-          url: "#",
-          icon: Shield,
-          items: [
-            {
-              title: "Sign In 1",
-              url: "/auth/sign-in",
-            },
-            {
-              title: "Sign In 2",
-              url: "/auth/sign-in-2",
-            },
-            {
-              title: "Sign In 3",
-              url: "/auth/sign-in-3",
-            },
-            {
-              title: "Sign Up 1",
-              url: "/auth/sign-up",
-            },
-            {
-              title: "Sign Up 2",
-              url: "/auth/sign-up-2",
-            },
-            {
-              title: "Sign Up 3",
-              url: "/auth/sign-up-3",
-            },
-            {
-              title: "Forgot Password 1",
-              url: "/auth/forgot-password",
-            },
-            {
-              title: "Forgot Password 2",
-              url: "/auth/forgot-password-2",
-            },
-            {
-              title: "Forgot Password 3",
-              url: "/auth/forgot-password-3",
-            },
-          ],
         },
         {
           title: "Errors",
@@ -220,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Auth Pages" &&
       item.title !== "Errors" &&
-      (!["/users", "/brands", "/customers"].includes(item.url) ||
+      (!["/users"].includes(item.url) ||
        user?.role === "admin")
     ),
   }))

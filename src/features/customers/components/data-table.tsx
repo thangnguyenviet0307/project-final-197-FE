@@ -1,5 +1,8 @@
-
 "use client"
+
+import { useAuthStore } from "@/stores/auth.store"
+import { Link } from "react-router-dom"
+
 
 import { useState } from "react"
 import { Search, Trash2, X } from "lucide-react"
@@ -162,6 +165,7 @@ export function CustomerTable({
   onEdit,
   onAdd,
 }: CustomerTableProps) {
+  const admin = useAuthStore(state => state.user?.role === "admin")
   const [searchValue, setSearchValue] =
     useState(searchQuery)
 
@@ -378,7 +382,8 @@ export function CustomerTable({
                   {/* Chỉnh sửa và xóa */}
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <CustomerFormDialog
+                      <Link className="text-sm underline" to={`/orders?customerId=${customer._id}`}>Order history</Link>
+                      {admin && <CustomerFormDialog
                         customer={customer}
                         onSubmit={(values) =>
                           onEdit(
@@ -387,12 +392,12 @@ export function CustomerTable({
                           )
                         }
                         submitLabel="Save Changes"
-                      />
+                      />}
 
-                      <DeleteCustomerDialog
+                      {admin && <DeleteCustomerDialog
                         customer={customer}
                         onDelete={onDelete}
-                      />
+                      />}
                     </div>
                   </TableCell>
                 </TableRow>

@@ -6,7 +6,7 @@ import { passwordSchema } from "@/features/auth/schemas/auth-schemas";
 export const createUserSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required.").max(50, "First name cannot exceed 50 characters."),
   lastName: z.string().trim().min(1, "Last name is required.").max(50, "Last name cannot exceed 50 characters."),
-  email: z.string().trim().email("Invalid email address.").toLowerCase(),
+  email: z.string().trim().check(z.email("Invalid email address.")).toLowerCase(),
   password: passwordSchema,
   role: z.enum(["admin", "staff"], { error: "Select Admin or Staff." }),
 });
@@ -16,11 +16,9 @@ export function getDefaultUserPassword(role: "admin" | "staff") {
   return role === "admin" ? "Admin123" : "Staff123"
 }
 
-// Password resets generate a separate cryptographically random password.
+// Demo password resets use the same role-based defaults as account creation.
 export function getTemporaryPassword(role: "admin" | "staff") {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789-_"
-  const bytes = crypto.getRandomValues(new Uint8Array(20))
-  return `${role === "admin" ? "A" : "S"}a7!${Array.from(bytes, byte => alphabet[byte % alphabet.length]).join("")}`
+  return getDefaultUserPassword(role)
 }
 
 export interface ManagedUser {

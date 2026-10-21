@@ -29,7 +29,7 @@ export function StartOrderAction({ order, disabled }: { order: Order; disabled?:
   const admin = user?.role === "admin"
   const eligible = order.orderStatus === 1 && (admin || (user?.role === "staff" && (!assignee || assignee === user.id)))
   if (!eligible || !user) return null
-  if (!admin) return <div className="space-y-2"><Button size="sm" disabled={disabled || mutation.isPending} onClick={() => mutation.mutate({ id: order._id })}>{mutation.isPending ? "Starting…" : "Nhận đơn & bắt đầu"}</Button>{mutation.error && <p role="alert" className="text-sm text-destructive">{getApiError(mutation.error).message}</p>}</div>
+  if (!admin) return <div className="space-y-2"><Button size="sm" disabled={disabled || mutation.isPending} onClick={() => mutation.mutate({ id: order._id })}>{mutation.isPending ? "Starting…" : "Accept & start"}</Button>{mutation.error && <p role="alert" className="text-sm text-destructive">{getApiError(mutation.error).message}</p>}</div>
   return <><Button size="sm" disabled={disabled || mutation.isPending} onClick={() => { setHandler(""); mutation.reset(); setOpen(true) }}>Assign & start</Button>
     <Dialog open={open} onOpenChange={value => { if (!mutation.isPending) setOpen(value) }}><DialogContent showCloseButton={!mutation.isPending}><DialogHeader><DialogTitle>Start processing order?</DialogTitle><DialogDescription className="break-all">Order {order.orderCode ?? order._id} will be assigned and changed from Pending to Processing.</DialogDescription></DialogHeader>
       {open && <HandlerPicker selected={handler} onSelect={setHandler} disabled={mutation.isPending} />}

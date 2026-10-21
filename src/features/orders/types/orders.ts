@@ -27,12 +27,13 @@ export interface Order {
   street: string
   city: string
   state: string
+  cancellationReason?: string
   orderNote?: string
   paymentType: number
   totalAmount: number
   orderItems: OrderItem[]
 }
-export interface OrdersQuery { page: number; limit: number; orderStatus?: OrderStatus; dateFrom?: string; dateTo?: string; search?: string }
+export interface OrdersQuery { page: number; limit: number; customerId?: string; orderStatus?: OrderStatus; dateFrom?: string; dateTo?: string; search?: string }
 export interface OrdersResult { data: Order[]; pagination: { page: number; limit: number; total: number; totalPages: number } }
-export interface UpdateOrderStatusInput { orderStatus: OrderStatus; userId?: string }
+export interface UpdateOrderStatusInput { cancellationReason?: string; orderStatus: OrderStatus; userId?: string }
 export interface UpdateOrderDatesInput { requireDate?: string | null; plannedShippingDate?: string | null; shippingDate?: string }

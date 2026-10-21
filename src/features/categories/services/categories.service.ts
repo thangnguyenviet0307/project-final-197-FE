@@ -6,10 +6,6 @@ export const categorySchema = z.object({
   icon: imageUrlSchema.optional(),
   name: z.string().trim().min(1, "Category name is required."),
   description: z.string().trim().optional(),
-  icon: z.union([
-    z.string().trim().url().refine((url) => /^https?:\/\//i.test(url), "URL ảnh phải dùng HTTP hoặc HTTPS"),
-    z.literal(""),
-  ]).optional(),
   parent: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
 });
@@ -28,7 +24,6 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
-  icon?: string;
   parent?: CategoryParent | string | null;
   isActive: boolean;
   isDeleted: boolean;
@@ -40,7 +35,6 @@ export interface CreateCategoryInput {
   icon?: string;
   name: string;
   description?: string;
-  icon?: string;
   parent?: string | null;
   isActive?: boolean;
 }
@@ -49,7 +43,6 @@ export interface UpdateCategoryInput {
   icon?: string;
   name?: string;
   description?: string;
-  icon?: string;
   parent?: string | null;
   isActive?: boolean;
 }
@@ -70,9 +63,8 @@ export async function getCategoryById(id: string, signal?: AbortSignal): Promise
 export async function createCategory(input: CreateCategoryInput): Promise<Category> {
   const payload = {
     name: input.name,
-    ...(input.icon !== undefined ? { icon: input.icon } : {}),
+    ...(input.icon !== undefined ? { icon: input.icon.trim() } : {}),
     description: input.description || "",
-    icon: input.icon?.trim() || "",
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
@@ -88,7 +80,6 @@ export async function updateCategory({
   input: UpdateCategoryInput;
 }): Promise<Category> {
   const payload: Record<string, unknown> = {};
-  if (input.icon !== undefined) payload.icon = input.icon;
   if (input.name !== undefined) payload.name = input.name;
   if (input.description !== undefined) payload.description = input.description;
   if (input.icon !== undefined) payload.icon = input.icon.trim();

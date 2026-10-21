@@ -19,19 +19,19 @@ import { Github } from "@/components/icons/brand-icons"
 
 const contactFormSchema = z.object({
   firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
+    error: "First name must be at least 2 characters.",
   }),
   lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
+    error: "Last name must be at least 2 characters.",
   }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
+  email: z.email({
+    error: "Please enter a valid email address.",
   }),
   subject: z.string().min(5, {
-    message: "Subject must be at least 5 characters.",
+    error: "Subject must be at least 5 characters.",
   }),
   message: z.string().min(10, {
-    message: "Message must be at least 10 characters.",
+    error: "Message must be at least 10 characters.",
   }),
 })
 

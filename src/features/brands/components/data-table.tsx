@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth.store"
 import { getApiError } from "@/services/api"
 import { Link } from "react-router-dom"
 import { CatalogImage } from "@/components/catalog-image"
@@ -139,6 +140,7 @@ function DeleteBrandDialog({
 }
 
 export function BrandTable({ brands, searchQuery, onSearch, onDelete, onEdit }: BrandTableProps) {
+  const admin = useAuthStore(state => state.user?.role === "admin")
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [page, setPage] = useState(1)
   const limit = 10
@@ -161,7 +163,7 @@ export function BrandTable({ brands, searchQuery, onSearch, onDelete, onEdit }: 
   return <div className="space-y-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-muted-foreground">{filtered.length} brands</p>
-      <Button nativeButton={false} role="link" render={<Link to="/brands/new" />}><Plus />Add Brand</Button>
+      {admin && <Button nativeButton={false} role="link" render={<Link to="/brands/new" />}><Plus />Add Brand</Button>}
     </div>
     <section aria-label="Brand filters" className="space-y-3 rounded-lg border p-4">
       <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -177,7 +179,7 @@ export function BrandTable({ brands, searchQuery, onSearch, onDelete, onEdit }: 
         <TableCell className="text-muted-foreground">{brand.slug}</TableCell>
         <TableCell className="max-w-80 truncate text-muted-foreground" title={brand.description}>{brand.description || "-"}</TableCell>
         <TableCell><Badge variant={brand.isActive ? "default" : "secondary"}>{brand.isActive ? "Active" : "Inactive"}</Badge></TableCell>
-        <TableCell><div className="flex gap-1"><BrandFormDialog brand={brand} onSubmit={values => onEdit(brand._id, values)} submitLabel="Save Changes" /><DeleteBrandDialog brand={brand} onDelete={onDelete} /></div></TableCell>
+        <TableCell>{admin && <div className="flex gap-1"><BrandFormDialog brand={brand} onSubmit={values => onEdit(brand._id, values)} submitLabel="Save Changes" /><DeleteBrandDialog brand={brand} onDelete={onDelete} /></div>}</TableCell>
       </TableRow>)}</TableBody>
     </Table></div>}
     <ListPagination label="Brands pagination" page={currentPage} totalPages={totalPages} onPageChange={setPage} />

@@ -20,7 +20,7 @@ function setup({ role = "admin", empty = false }: { role?: "admin" | "staff"; em
   api.defaults.adapter = async config => {
     requests.push({ url: config.url, params: config.params })
     if (config.url === "/products/statistics" && state.failStatistics) throw new AxiosError("Network Error", "ERR_NETWORK", config)
-    const data = config.url === "/products/statistics" ? { data: { total: empty ? 0 : state.total, active: 30, outOfStock: 2, stockUnits: 120 } }
+    const data = config.url === "/orders/personal-sales" ? { data: { completedOrders: 0, revenue: 0 } } : config.url === "/products/statistics" ? { data: { total: empty ? 0 : state.total, active: 30, outOfStock: 2, stockUnits: 120 } }
       : config.url === "/products" ? { data: empty ? [] : [{ _id: "b".repeat(24), product_name: "Phone case", stock: 3 }], pagination: { total: empty ? 0 : 8, totalPages: 2 } }
       : { data: empty || config.params.orderStatus ? [] : [{ _id: "c".repeat(24), orderCode: "ORD-ABC234", customerSnapshot: { firstName: "Jane", lastName: "Smith" }, orderStatus: 1, orderDate: "2026-10-20T08:00:00Z", totalAmount: 250000 }], pagination: { total: empty ? 0 : config.params.orderStatus ? ({ 1: 7, 2: 3, 3: 2, 4: 10 } as Record<number, number>)[config.params.orderStatus] : 22 } }
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data }
@@ -50,7 +50,7 @@ it("explains the staff order scope and shows real empty states", async () => {
   view()
   expect(await screen.findByText("No orders yet.")).toBeTruthy()
   expect(await screen.findByText("No low-stock products.")).toBeTruthy()
-  expect(screen.getByText(/orders assigned to you and unassigned orders/)).toBeTruthy()
+  expect(screen.getByText(/You can view all order history/)).toBeTruthy()
   expect(within(screen.getByRole("region", { name: "Order statistics" })).getAllByText("0")).toHaveLength(5)
 })
 

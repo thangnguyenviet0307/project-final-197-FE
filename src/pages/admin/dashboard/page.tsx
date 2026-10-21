@@ -1,3 +1,4 @@
+import { PersonalSales } from "@/features/orders/components/personal-sales"
 import { Link } from "react-router-dom"
 import { useIsFetching, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, Boxes, CheckCircle2, Package, PackageX, RefreshCw } from "lucide-react"
@@ -78,9 +79,10 @@ export default function DashboardPage() {
   return <BaseLayout title="Dashboard" description="A quick overview of orders, products and inventory.">
     <div className="space-y-6 px-4 lg:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">{admin ? "Order statistics cover all orders." : "Order statistics cover orders assigned to you and unassigned orders."} Product statistics cover the full catalog.</p>
+        <p className="text-sm text-muted-foreground">{admin ? "Order statistics cover all orders." : "You can view all order history. You can manage orders assigned to you, with up to 5 active orders at a time."} Product statistics cover the full catalog.</p>
         <Button variant="outline" disabled={refreshing} onClick={() => void Promise.all([client.invalidateQueries({ queryKey: ["orders"] }), client.invalidateQueries({ queryKey: ["products"] })])}><RefreshCw className={refreshing ? "animate-spin" : undefined} />Refresh</Button>
       </div>
+      {!admin && <PersonalSales />}
       <section aria-labelledby="dashboard-orders"><h2 id="dashboard-orders" className="mb-3 text-lg font-semibold">Orders overview</h2><OrderStatistics /></section>
       <section aria-labelledby="dashboard-products"><h2 id="dashboard-products" className="mb-3 text-lg font-semibold">Products & inventory</h2><ProductOverview /></section>
       <div className="grid gap-6 lg:grid-cols-3"><RecentOrders /><LowStockProducts /></div>

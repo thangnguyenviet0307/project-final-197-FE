@@ -56,7 +56,7 @@ const customerFormSchema = z.object({
   email: z
     .string()
     .trim()
-    .email("Email không đúng định dạng")
+    .check(z.email("Email không đúng định dạng"))
     .max(150, "Email không được vượt quá 150 ký tự"),
 
 
