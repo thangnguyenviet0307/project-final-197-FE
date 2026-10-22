@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react"
-import { useCategories } from "@/hooks/categories/use-categories"
-import { useCreateCategory } from "@/hooks/categories/use-create-category"
-import { useUpdateCategory } from "@/hooks/categories/use-update-category"
-import { useDeleteCategory } from "@/hooks/categories/use-delete-category"
-import { type Category, type CreateCategoryInput } from "@/services/categories.service"
+import { useCategories } from "@/features/categories/hooks/use-categories"
+import { useCreateCategory } from "@/features/categories/hooks/use-create-category"
+import { useUpdateCategory } from "@/features/categories/hooks/use-update-category"
+import { useDeleteCategory } from "@/features/categories/hooks/use-delete-category"
+import { type Category, type CreateCategoryInput } from "@/features/categories/services/categories.service"
 import { getApiError } from "@/services/api"
-import { BaseLayout } from "@/components/layouts/base-layout"
+import { BaseLayout } from "@/layout/admin/base-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -364,7 +364,12 @@ export default function AdminCategoriesPage() {
                 <span className="text-xs text-muted-foreground whitespace-nowrap">Trạng thái:</span>
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === "all" || value === "active" || value === "inactive") {
+                      setStatusFilter(value)
+                    }
+                  }}
                   className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="all">Tất cả ({categories.length})</option>
