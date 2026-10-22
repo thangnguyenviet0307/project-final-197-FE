@@ -1,4 +1,10 @@
-# Chuẩn bị storefront — chưa triển khai
+# Storefront — phạm vi giao diện hiện tại
+
+Homepage, danh sách sản phẩm và trang chi tiết đã có giao diện demo trong
+`src/pages/storefront/`, dùng dữ liệu trình bày tại
+`src/features/storefront/data/products.ts`. Các bộ lọc, chọn biến thể, gallery,
+tab mô tả và đồng hồ Flash Sale hoạt động trên dữ liệu demo này; chúng chưa tạo
+đơn hàng hoặc đọc catalog từ Backend.
 
 Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Frontend bán hàng. Các API bên dưới mô tả khả năng hiện có, không phải endpoint công khai dành cho người mua.
 
@@ -22,7 +28,7 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 6. Endpoint lịch sử/chi tiết đơn phải kiểm tra quyền sở hữu. Không dùng guard Frontend để thay thế kiểm tra này.
 7. Chốt phương thức thanh toán ban đầu, địa chỉ giao hàng, phí vận chuyển và trạng thái đơn mà khách được xem/hủy.
 
-## Thứ tự triển khai khi bắt đầu
+## Việc cần hoàn thiện trước khi mở bán
 
 Catalog khách và chi tiết sản phẩm → giỏ hàng → checkout/tạo đơn → xác thực/tài khoản khách và lịch sử đơn theo chính sách đã chốt. Nếu checkout yêu cầu đăng nhập, triển khai xác thực trước checkout.
 

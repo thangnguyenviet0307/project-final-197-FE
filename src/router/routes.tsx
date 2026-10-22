@@ -8,16 +8,24 @@ function page(load: () => Promise<{ default: ComponentType }>) {
 }
 
 export const routes: RouteObject[] = [
-  { path: "/", element: <Navigate to="/admin/dashboard" replace /> },
+  { path: "/", element: <Navigate to="/landing" replace /> },
   {
-  element: <StoreLayout />,
-  children: [
-    {
-      path: "/landing",
-      lazy: page(() => import("@/pages/public/landing/page")),
-    },
-  ],
-},
+    element: <StoreLayout />,
+    children: [
+      {
+        path: "/landing",
+        lazy: page(() => import("@/pages/storefront/home")),
+      },
+      {
+        path: "/shop",
+        lazy: page(() => import("@/pages/storefront/products")),
+      },
+      {
+        path: "/shop/:slug",
+        lazy: page(() => import("@/pages/storefront/products/detail")),
+      },
+    ],
+  },
   {
     element: <PublicOnlyRoute />,
     children: [

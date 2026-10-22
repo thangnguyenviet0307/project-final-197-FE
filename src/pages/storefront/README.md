@@ -1,9 +1,15 @@
 # Trang bán hàng
 
-Đặt các trang cho khách hàng tại đây, ví dụ `home/index.tsx`, `products/index.tsx`, `products/detail.tsx`, `cart/index.tsx`, `checkout/index.tsx`.
+Các trang storefront hiện có:
 
-Dùng nghiệp vụ từ `src/features/`, UI dùng chung từ `src/components/`, và layout bán hàng tại `src/layout/storefront/` khi triển khai. Đăng ký URL trong `src/router/routes.tsx`.
+- `home/index.tsx`: homepage theo thứ tự hero, danh mục nhanh, tiện ích, bộ sưu tập,
+  tab ưu đãi/bán chạy/đánh giá, ba nhóm sản phẩm và testimonial.
+- `products/index.tsx`: danh sách sản phẩm và bộ lọc.
+- `products/detail.tsx`: chi tiết, gallery, chọn biến thể, tab nội dung và sản phẩm liên quan.
 
-Thư mục này chưa có trang hoạt động. Xem [quy tắc tổ chức Frontend](../../../docs/frontend-structure.md).
+Các trang dùng `src/features/storefront/` cho dữ liệu demo và component nghiệp vụ,
+được bọc bởi `src/layout/storefront/`. Xem [quy tắc tổ chức Frontend](../../../docs/frontend-structure.md).
 
-Customers hiện là hồ sơ liên hệ để kiểm thử API, chưa phải tài khoản khách hàng đăng nhập. Chưa triển khai giỏ hàng/checkout hoặc mở quyền truy cập catalog công khai. Xem [hợp đồng cần chốt trước khi phát triển](../../../docs/storefront-contract.md).
+Catalog hiện dùng dữ liệu demo vì Backend chưa có API catalog công khai.
+Giỏ hàng/checkout và luồng đặt hàng chưa được bật. Xem
+[giới hạn storefront hiện tại](../../../docs/storefront-contract.md).
