@@ -12,7 +12,7 @@ vi.mock("@/features/products/hooks/use-create-product", () => ({ useCreateProduc
 vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 vi.mock("@/features/categories/hooks/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Cases", isActive: true }], isPending: false }) }))
 vi.mock("@/features/brands/hooks/use-brands", () => ({ useBrands: () => ({ data: [{ _id: "a".repeat(24), name: "Brand", isActive: true }], isPending: false }) }))
-vi.mock("@/features/products/hooks/use-product", () => ({ useProduct: () => ({ data: { _id: "a".repeat(24), product_name: "Phone case", category: null, brand: null, model_year: 2026 } }) }))
+vi.mock("@/features/products/hooks/use-product", () => ({ useProduct: () => ({ data: { _id: "a".repeat(24), product_name: "Phone case", slug: "phone-case", category: { _id: "b".repeat(24), name: "Cases", slug: "phone-cases" }, brand: null, model_year: 2026 } }) }))
 vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: import("react").ReactNode }) => <main>{children}</main> }))
 const product: Product = { _id: id, product_name: "Phone case", model_year: 2026, category: id, brand: id, stock: 1 }
 function setup(save = vi.fn().mockResolvedValue(undefined)) {
@@ -85,6 +85,15 @@ it("returns from detail to the exact list URL", async () => {
   fireEvent.click(screen.getByRole("link", { name: "Back" }))
   expect(await screen.findByText("Restored list")).toBeTruthy()
   expect(router.state.location.pathname + router.state.location.search).toBe(returnTo)
+})
+
+it("links the admin product view to the populated category slug on the storefront", () => {
+  const router = createMemoryRouter([{ path: "/products/:id", element: <ProductDetailPage /> }], { initialEntries: [`/products/${id}`] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  const link = screen.getByRole("link", { name: "View on storefront" })
+  expect(link.getAttribute("href")).toBe("/phone-cases/phone-case")
+  expect(link.getAttribute("target")).toBe("_blank")
+  expect(screen.getByRole("link", { name: "/phone-cases/phone-case" })).toBeTruthy()
 })
 it("guards a new product draft and preserves its list URL on cancellation", async () => {
   const returnTo = "/products?page=2&size=XL"

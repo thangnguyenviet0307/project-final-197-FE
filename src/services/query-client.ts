@@ -15,7 +15,10 @@ export const queryClient = new QueryClient({
     },
   }),
   queryCache: new QueryCache({
-    onError: (error) => toast.error(getApiError(error).message),
+    onError: (error, query) => {
+      if (query.meta?.suppressGlobalErrorToast) return
+      toast.error(getApiError(error).message)
+    },
   }),
   defaultOptions: {
     queries: {

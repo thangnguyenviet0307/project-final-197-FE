@@ -6,7 +6,7 @@ Các trang khách hàng dùng chung `src/layout/storefront/storefront-layout.tsx
 | --- | --- |
 | `/` | Trang chủ, banner chuyển slide, danh mục, sản phẩm nổi bật |
 | `/shop` | Danh sách, tìm kiếm, lọc danh mục/thương hiệu, sắp xếp |
-| `/shop/:slug` | Chi tiết, chọn số lượng, thêm vào giỏ |
+| `/:categorySlug/:slug` | Chi tiết, chọn số lượng, thêm vào giỏ |
 | `/wishlist` | Sản phẩm yêu thích |
 | `/cart` | Giỏ hàng, cập nhật số lượng, xóa, tổng tiền ước tính |
 | `/contact` | Liên hệ và chính sách mẫu |

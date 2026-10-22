@@ -1,6 +1,6 @@
 import { InventoryEditor } from "@/features/products/components/inventory-editor"
 import { Link, useParams } from "react-router-dom"
-import { Pencil, ArrowLeft } from "lucide-react"
+import { Pencil, ArrowLeft, ExternalLink } from "lucide-react"
 import { BaseLayout } from "@/layout/admin/base-layout"
 import { ProductQueryState } from "@/features/products/components/product-query-state"
 import { Button } from "@/components/ui/button"
@@ -13,15 +13,19 @@ import { useProductListLocation } from "@/features/products/hooks/use-product-li
 import { descriptionToHtml } from "@/features/products/utils/product-description"
 import "@/features/products/components/product-description.css"
 import { ProductGallery } from "@/features/products/components/product-gallery"
+import { storefrontProductUrl } from "@/utils/storefront-url"
 
 export default function ProductDetailPage() {
   const { id = "" } = useParams()
   const query = useProduct(id)
   const admin = useAuthStore(state => state.user?.role === "admin")
   const product = query.data
+  const categorySlug = product?.category && typeof product.category !== "string" ? product.category.slug : undefined
+  const storefrontPath = product?.slug?.trim() && categorySlug?.trim() ? storefrontProductUrl(categorySlug, product.slug) : null
   const returnTo = useProductListLocation()
   return <BaseLayout title={product?.product_name ?? "Product detail"}><div className="space-y-6 px-4 lg:px-6">
-    <div className="flex gap-2"><Button nativeButton={false} role="link" variant="outline" render={<Link to={returnTo} />}><ArrowLeft />Back</Button>
+    <div className="flex flex-wrap gap-2"><Button nativeButton={false} role="link" variant="outline" render={<Link to={returnTo} />}><ArrowLeft />Back</Button>
+      {storefrontPath && <Button nativeButton={false} role="link" variant="outline" render={<Link to={storefrontPath} target="_blank" rel="noopener noreferrer" />}><ExternalLink />View on storefront</Button>}
       {admin && product && <Button nativeButton={false} role="link" render={<Link to={`/products/${id}/edit`} state={{ returnTo }} />}><Pencil />Edit</Button>}</div>
     {query.isError || !product ? <ProductQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
       <div className="grid gap-6 md:grid-cols-2"><div className="space-y-3"><ProductImage src={product.thumbnail} alt={product.product_name} className="h-80 w-full rounded-lg border" />
@@ -31,7 +35,8 @@ export default function ProductDetailPage() {
           ["Price", product.price === undefined ? "—" : formatPrice(product.price)], ["Discount", product.discount === undefined ? "—" : `${product.discount}%`],
           ["Stock", product.stock], ["Model year", product.model_year], ["Slug", product.slug], ["Created", product.createdAt], ["Updated", product.updatedAt],
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value ?? "—"}</dd></div>)}
-          <div><dt className="text-muted-foreground">Status</dt><dd><Badge variant="secondary">{product.is_active ? "Active" : "Inactive"}</Badge></dd></div></dl>
+          <div><dt className="text-muted-foreground">Status</dt><dd><Badge variant="secondary">{product.is_active ? "Active" : "Inactive"}</Badge></dd></div>
+          <div className="col-span-2 min-w-0"><dt className="text-muted-foreground">Storefront link</dt><dd>{storefrontPath ? <Link className="break-all font-medium text-primary underline underline-offset-4" to={storefrontPath} target="_blank" rel="noopener noreferrer">{storefrontPath}</Link> : <span className="text-muted-foreground">Unavailable — product or category slug is missing.</span>}</dd></div></dl>
       </div>
       <InventoryEditor key={`${product._id}-${product.__v}`} product={product} />
       {admin && <ProductGallery product={product} />}

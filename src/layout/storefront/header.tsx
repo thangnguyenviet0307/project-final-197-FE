@@ -1,7 +1,8 @@
 import { Heart, ShoppingBag, Search, MapPin, Headphones, ChevronDown, Menu, ChevronRight, User, Truck, LogIn, Grid2X2, Laptop, Camera, Smartphone, Printer, Monitor, Speaker, Sparkles, Trophy } from "lucide-react"
 import { useState } from "react"
 import { Link, NavLink, useNavigate, useSearchParams, useLocation } from "react-router-dom"
-import { categories, categoryUrl, money, products } from "@/features/storefront/catalog"
+import { categories, categoryUrl, money } from "@/features/storefront/catalog"
+import { getCartLines } from "@/features/storefront/product-options"
 import { useStorefront } from "@/features/storefront/store"
 
 const departments = [
@@ -22,9 +23,10 @@ export function StorefrontHeader() {
   const [query, setQuery] = useState(params.get("q") ?? "")
   const [category, setCategory] = useState("")
   const navigate = useNavigate()
-  const { cart, wishlist } = useStorefront()
-  const count = products.reduce((sum, product) => sum + (cart[product.slug] ?? 0), 0)
-  const total = products.reduce((sum, product) => sum + product.price * (cart[product.slug] ?? 0), 0)
+  const { cart, wishlist, apiProducts } = useStorefront()
+  const lines = getCartLines(cart, apiProducts)
+  const count = lines.reduce((sum, line) => sum + line.quantity, 0)
+  const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0)
   return <>
     <div className="sf-topbar"><div className="sf-container">
       <div><span>English <ChevronDown size={10} /></span><span>USD <ChevronDown size={10} /></span></div>
@@ -57,6 +59,7 @@ export function StorefrontNavbar() {
       <NavLink to="/shop" aria-label="Sản phẩm">Shop <ChevronDown size={11} /></NavLink>
       <div className="am-megamenu"><button>Megamenu <ChevronDown size={11} /><b>NEW</b></button><div className="am-megamenu-panel">{categories.map(item => <Link to={categoryUrl(item)} key={item}>{item}</Link>)}</div></div>
       <div className="am-megamenu"><button>Pages <ChevronDown size={11} /></button><div className="am-megamenu-panel"><Link to="/wishlist">My Wishlist</Link><Link to="/cart">Shopping Cart</Link><Link to="/contact">About Us</Link></div></div>
+      <div className="am-megamenu"><button type="button">Blog <ChevronDown size={11} /></button><div className="am-megamenu-panel"><p className="px-2 py-3 text-xs text-neutral-500">Articles are coming soon.</p></div></div>
       <NavLink to="/contact">Contact Us</NavLink>
     </div>
     <a className="sf-hotline" href="tel:0800657972"><Headphones size={28} strokeWidth={1.4} /><strong>0 (800) 657 - 972</strong></a>

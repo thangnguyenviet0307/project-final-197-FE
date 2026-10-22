@@ -1,5 +1,5 @@
 export type AttributeValue = string | number | boolean | null
-export interface CatalogReference { _id: string; name: string; isActive?: boolean; isDeleted?: boolean }
+export interface CatalogReference { _id: string; name: string; slug?: string; isActive?: boolean; isDeleted?: boolean }
 export interface ProductVariant {
   _id?: string
   sku: string
