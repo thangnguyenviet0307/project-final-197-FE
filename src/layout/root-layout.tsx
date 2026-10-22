@@ -1,6 +1,6 @@
-import { Outlet, useNavigation } from "react-router-dom"
+import { Outlet, useMatches, useNavigation } from "react-router-dom"
 
-import { PageSkeleton } from "@/components/page-skeleton"
+import { AuthBootstrap } from "@/router/auth-bootstrap"
 
 /** Thin top bar shown while the next route's code is loading. */
 function RouteProgress() {
@@ -17,15 +17,18 @@ function RouteProgress() {
 
 export function RootLayout() {
   const navigation = useNavigation()
+  const isStorefront = useMatches().some(match =>
+    (match.handle as { storefront?: boolean } | undefined)?.storefront === true
+  )
   return (
     <>
       {navigation.state === "loading" && <RouteProgress />}
-      <Outlet />
+      {isStorefront ? <Outlet /> : <AuthBootstrap><Outlet /></AuthBootstrap>}
     </>
   )
 }
 
-/** Shown on the very first load, before any route has rendered. */
+/** Route modules may still be loading; the destination layout is not known yet. */
 export function RootFallback() {
-  return <PageSkeleton />
+  return <RouteProgress />
 }

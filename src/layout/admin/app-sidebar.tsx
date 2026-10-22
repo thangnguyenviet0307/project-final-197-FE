@@ -102,8 +102,8 @@ const data = {
       label: "Pages",
       items: [
         {
-          title: "Landing",
-          url: "/landing",
+          title: "Shop Page",
+          url: "/",
           target: "_blank",
           icon: LayoutTemplate,
         },

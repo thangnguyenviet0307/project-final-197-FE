@@ -1,0 +1,242 @@
+[
+  {
+    "slug": "motorola-moto-360-sport-45mm-black",
+    "name": "Watch Sport - 45mm, Black",
+    "image": "/storefront/amanto/seiko.jpg",
+    "price": 327.5,
+    "originalPrice": 399.6,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "watch-gold-pink-cord-coteetci",
+    "name": "Watch Gold cord Stone",
+    "image": "/storefront/amanto/product11.jpg",
+    "price": 600.0,
+    "originalPrice": 600.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "blue-silence",
+    "name": "BLUE SILENCE",
+    "image": "/storefront/amanto/product1.jpg",
+    "price": 125.0,
+    "originalPrice": 125.0,
+    "category": "Headphones",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "copy-of-ipad-pro-mlmx2cl-a-mlmx2ll-a-9-7-inch",
+    "name": "Tablets (MLMX2LL/A) 9.7-inch",
+    "image": "/storefront/amanto/ipad_e35cc469-feef-4ba9-a9e4-e387a3f1eed8.jpg",
+    "price": 210.25,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "headphones-klm",
+    "name": "HEADPHONES KLM",
+    "image": "/storefront/amanto/product2.jpg",
+    "price": 150.0,
+    "originalPrice": 150.0,
+    "category": "Headphones",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "powerlead-pwah-pl-n20-bluetooth-4-0-smart-watch",
+    "name": "Smart Watch",
+    "image": "/storefront/amanto/watch.jpg",
+    "price": 505.0,
+    "originalPrice": 505.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "canon-pixma-pro-100-wireless-color-professional-inkjet",
+    "name": "Pro-100 Wireless Color Professional Inkjet",
+    "image": "/storefront/amanto/canonpixma.jpg",
+    "price": 109.69,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "watch-silver-white",
+    "name": "Watch Silver White",
+    "image": "/storefront/amanto/product15.jpg",
+    "price": 500.0,
+    "originalPrice": 500.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "apple-imac-mk462ll-a-27-inch-retina-5k",
+    "name": "27-Inch Retina 5K",
+    "image": "/storefront/amanto/imac.jpg",
+    "price": 109.69,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "watch-space-gray-black",
+    "name": "Watch Space Gray Black",
+    "image": "/storefront/amanto/product13.jpg",
+    "price": 500.0,
+    "originalPrice": 500.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "apple-ipad-4-16gb-9-7-retina-display-wifi-bluetooth",
+    "name": "Display WiFi Bluetooth",
+    "image": "/storefront/amanto/macbook.jpg",
+    "price": 109.69,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "canon-0111c001-powershot-sx610-hs-wi-fi",
+    "name": "PowerShot SX610 HS, Wi-Fi",
+    "image": "/storefront/amanto/canon2_3afb6f26-873a-48eb-bec5-9e91481948bd.jpg",
+    "price": 90.0,
+    "originalPrice": 90.0,
+    "category": "Camera & Video",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "real-beat-silence",
+    "name": "Real beat silence",
+    "image": "/storefront/amanto/product3_fae37f2f-2c92-4124-825d-5f833edd82a7.jpg",
+    "price": 250.0,
+    "originalPrice": 250.0,
+    "category": "Headphones",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "apple-watch-series-1-38mm-smartwatch",
+    "name": "Watch Series 1 38mm Smartwatch",
+    "image": "/storefront/amanto/iwatch.jpg",
+    "price": 199.69,
+    "originalPrice": 199.69,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "watch-gold-pink",
+    "name": "Watch Gold Pink",
+    "image": "/storefront/amanto/product14.jpg",
+    "price": 400.0,
+    "originalPrice": 400.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "apple-mac-mini-mc936ll-a-with-lion-server",
+    "name": "MC936LL/A with Lion Server",
+    "image": "/storefront/amanto/macmini2.jpg",
+    "price": 109.69,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "black-silence",
+    "name": "Black silence",
+    "image": "/storefront/amanto/product4_6df63ff8-c52a-4313-bdbf-22399082aa05.jpg",
+    "price": 250.0,
+    "originalPrice": 250.0,
+    "category": "Headphones",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "sony-sel1670z-vario-tessar-t-e-16-70mm-f4-za-oss",
+    "name": "Vario-Tessar T E 16-70mm F4 ZA OSS",
+    "image": "/storefront/amanto/lens.jpg",
+    "price": 199.69,
+    "originalPrice": 199.69,
+    "category": "Camera & Video",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "jbl-pulse-2-portable-splashproof-bluetooth-speaker-black",
+    "name": "Splashproof Bluetooth Speaker, Back",
+    "image": "/storefront/amanto/sound_a6dc0e4a-7fb9-49a7-8d70-ab3577e907c2.jpg",
+    "price": 156.0,
+    "originalPrice": 299.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "copy-of-watch-gold-cord-stone",
+    "name": "Watch Silver Nylon Sport",
+    "image": "/storefront/amanto/product16.jpg",
+    "price": 550.0,
+    "originalPrice": 550.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "bose-virtually-inv-v2isible-791-in-ceiling-speakers",
+    "name": "Full Body Skin (3rd Gen)",
+    "image": "/storefront/amanto/macmini.jpg",
+    "price": 399.6,
+    "originalPrice": 399.6,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "watch-space-gray-black-1",
+    "name": "Watch Gold Pink cord Coteetci",
+    "image": "/storefront/amanto/product12.jpg",
+    "price": 450.0,
+    "originalPrice": 450.0,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "sony-smartwatch-3-2016",
+    "name": "Smartwatch 3 - 2016",
+    "image": "/storefront/amanto/iwatch2.jpg",
+    "price": 125.0,
+    "originalPrice": 200.5,
+    "category": "Watch",
+    "brand": "AMANTO",
+    "rating": 4.8
+  },
+  {
+    "slug": "sony-xperia-x-compact-unlocked-smartphone",
+    "name": "Compact - Unlocked Smartphone",
+    "image": "/storefront/amanto/smarphone.jpg",
+    "price": 212.2,
+    "originalPrice": 212.2,
+    "category": "Electronics",
+    "brand": "AMANTO",
+    "rating": 4.8
+  }
+]

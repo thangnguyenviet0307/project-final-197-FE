@@ -6,7 +6,6 @@ import { RootFallback, RootLayout } from "@/layout/root-layout"
 import { routes } from "@/router/routes"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClient } from "@/services/query-client"
-import { AuthBootstrap } from "@/router/auth-bootstrap"
 import { useEffect } from "react"
 import { initGTM } from "@/utils/analytics"
 
@@ -39,7 +38,7 @@ function App() {
         <SidebarConfigProvider>
           <Toaster>
             <QueryClientProvider client={queryClient}>
-              <AuthBootstrap><RouterProvider router={router} /></AuthBootstrap>
+              <RouterProvider router={router} />
             </QueryClientProvider>
           </Toaster>
         </SidebarConfigProvider>

@@ -7,7 +7,18 @@ function page(load: () => Promise<{ default: ComponentType }>) {
 }
 
 export const routes: RouteObject[] = [
-  { path: "/", element: <Navigate to="/admin/dashboard" replace /> },
+  {
+    handle: { storefront: true },
+    lazy: page(() => import("@/layout/storefront/storefront-layout")),
+    children: [
+      { path: "/", lazy: page(() => import("@/pages/storefront/homepage")) },
+      { path: "/shop", lazy: page(() => import("@/pages/storefront/shop")) },
+      { path: "/shop/:slug", lazy: page(() => import("@/pages/storefront/product-detail")) },
+      { path: "/wishlist", lazy: page(() => import("@/pages/storefront/wishlist")) },
+      { path: "/cart", lazy: page(() => import("@/pages/storefront/cart")) },
+      { path: "/contact", lazy: page(() => import("@/pages/storefront/contact")) },
+    ],
+  },
   { path: "/landing", lazy: page(() => import("@/pages/public/landing/page")) },
   {
     element: <PublicOnlyRoute />,

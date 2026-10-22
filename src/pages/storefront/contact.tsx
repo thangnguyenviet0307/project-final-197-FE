@@ -1,0 +1,6 @@
+import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { Link } from "react-router-dom"
+
+export default function Contact() {
+  return <div className="sf-container sf-page"><div className="sf-breadcrumb"><Link to="/">Trang chủ</Link><span>/</span>Liên hệ</div><div className="sf-page-intro"><span className="sf-kicker">LUÔN Ở ĐÂY, VÌ BẠN</span><h1>Kết nối cùng Amanto</h1><p>Chúng tôi sẵn sàng giúp bạn tìm được thiết bị phù hợp.</p></div><div className="sf-contact-grid"><section className="sf-contact-card"><h2>Ghé thăm cửa hàng</h2><p><MapPin size={20} />123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</p><p><Clock size={20} />9:00 – 21:00, Thứ 2 – Chủ nhật</p><a href="tel:18001976"><Phone size={20} />1800 1976</a><a href="mailto:hello@amanto.example"><Mail size={20} />hello@amanto.example</a><small>Địa chỉ và thông tin liên hệ minh họa cho giao diện.</small></section><section className="sf-contact-card"><h2>Mua sắm an tâm</h2><div id="shipping"><h3>Giao hàng & đổi trả</h3><p>Giao hàng miễn phí cho đơn từ 2 triệu. Hỗ trợ đổi trả trong vòng 30 ngày theo điều kiện sản phẩm.</p></div><div id="warranty"><h3>Chính sách bảo hành</h3><p>Bảo hành theo chính sách của từng thương hiệu. Liên hệ cửa hàng để được tư vấn thông tin cụ thể.</p></div><small>Các chính sách trên là nội dung minh họa, chưa áp dụng cho giao dịch thực tế.</small></section></div></div>
+}
