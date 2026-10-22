@@ -1,3 +1,4 @@
+import { StoreLayout } from "@/layout/store/store-layout";
 import type { ComponentType } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 import {
@@ -11,7 +12,15 @@ function page(load: () => Promise<{ default: ComponentType }>) {
 
 export const routes: RouteObject[] = [
   { path: "/", element: <Navigate to="/admin/dashboard" replace /> },
-  { path: "/landing", lazy: page(() => import("@/pages/public/landing/page")) },
+  {
+  element: <StoreLayout />,
+  children: [
+    {
+      path: "/landing",
+      lazy: page(() => import("@/pages/public/landing/page")),
+    },
+  ],
+},
   {
     element: <PublicOnlyRoute />,
     children: [

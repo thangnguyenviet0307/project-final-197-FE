@@ -14,7 +14,7 @@ export function StoreHeader() {
             to="/landing"
             className="text-3xl font-black tracking-tight text-gray-950"
           >
-            197<span className="text-green-600">STORE</span>
+            DEMO<span className="text-green-600">STORE</span>
           </Link>
 
           <Link

@@ -12,7 +12,7 @@ export function StoreTopBar() {
 
         <div className="flex items-center gap-4">
           <span className="hidden sm:inline">
-            Chào mừng đến với 197 Store
+            Chào mừng đến với Demo Store
           </span>
           <Link to="/login" className="hover:text-green-600">
             Đăng nhập
