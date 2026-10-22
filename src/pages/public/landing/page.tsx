@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { LandingNavbar } from "@/pages/public/landing/components/navbar"
+import { StoreHeader } from "@/pages/public/landing/components/store-header"
+import { StoreNavbar } from "@/pages/public/landing/components/store-navbar"
 import { HeroSection } from "@/pages/public/landing/components/hero-section"
 import { LogoCarousel } from "@/pages/public/landing/components/logo-carousel"
 import { StatsSection } from "@/pages/public/landing/components/stats-section"
@@ -25,8 +26,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <LandingNavbar />
+      {/* Store Header */}
+        <StoreHeader />
+
+      {/* Store Navigation */}
+        <StoreNavbar />
 
       {/* Main Content */}
       <main>
