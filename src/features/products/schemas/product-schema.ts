@@ -14,10 +14,11 @@ export const variantSchema = z.object({
   price: numeric("Variant price").nonnegative("Variant price cannot be negative."), compare_at_price: numeric("Compare at price").nonnegative("Compare at price cannot be negative.").nullable().optional(),
   stock: stock("Variant stock").optional(), image: optionalText("Primary image path", 255),
   images: z.array(z.object({ url: z.string().trim().min(1, "Enter an image path.").max(255, "Image path cannot exceed 255 characters.") })),
-  options: z.array(z.object({ name: z.string().trim().min(1, "Enter an option name."), value: z.union([z.string(), z.number(), z.boolean(), z.null()]) })).superRefine((options, ctx) => {
+  options: z.array(z.object({ name: z.string().trim().min(1, "Enter an option name."), value: z.union([z.string(), z.number(), z.boolean(), z.null()]) })).check((ctx) => {
+    const options = ctx.value
     const names = new Set<string>()
     options.forEach((option, index) => {
-      if (names.has(option.name)) ctx.addIssue({ code: "custom", path: [index, "name"], message: "Option names must be unique." })
+      if (names.has(option.name)) ctx.issues.push({ code: "custom", continue: true, input: option.name, path: [index, "name"], message: "Option names must be unique." })
       names.add(option.name)
     })
   }),
@@ -29,10 +30,11 @@ export const productSchema = z.object({
   price: numeric("Price").nonnegative("Price cannot be negative.").optional(), discount: numeric("Discount").min(0, "Discount cannot be negative.").max(70, "Discount cannot exceed 70%."),
   description: optionalText("Description", 2000), thumbnail: optionalText("Thumbnail path", 255),
   stock: stock("Stock").optional(), is_active: z.boolean(), variants: z.array(variantSchema),
-}).superRefine(({ variants }, ctx) => {
+}).check((ctx) => {
+  const { variants } = ctx.value
   const skus = new Set<string>()
   variants.forEach((variant, index) => {
-    if (skus.has(variant.sku)) ctx.addIssue({ code: "custom", path: ["variants", index, "sku"], message: "SKU must be unique." })
+    if (skus.has(variant.sku)) ctx.issues.push({ code: "custom", continue: true, input: variant.sku, path: ["variants", index, "sku"], message: "SKU must be unique." })
     skus.add(variant.sku)
   })
 })

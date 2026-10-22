@@ -12,7 +12,7 @@
 
 Admin provisions staff/admin accounts at `/users`. There is no public registration. Share temporary credentials privately. New accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
 
-Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password reset forms generate a unique temporary password using the browser cryptographic random generator. Reset passwords remain stable while their dialog is open; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
+Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password resets use the same role-based demo defaults; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
 
 Use the three-dot account menu at the bottom of the sidebar for User Profile, Change password, and Sign out. The avatar uses the saved image or initials. Upgrade to Pro, the Welcome promotion, Pricing, and Plans & Billing have been removed from dashboard navigation and the account menu. Old billing/pricing URLs redirect to Profile/Dashboard.
 
@@ -77,3 +77,13 @@ The Admin frontend sends `X-Auth-Transport: cookie` for login/refresh and enable
 Backend `FRONTEND_ORIGINS` is a comma-separated exact origin allowlist (default local origins: http://localhost:5173 and http://127.0.0.1:5173). Production requires an explicit allowlist and HTTPS. Keep FE/API on the same site for SameSite=Strict, or deploy an API reverse proxy; cross-site deployments need a separate cookie/CSRF design. Browser refresh requires the custom header and trusted Origin. Non-browser REST clients can retain the JSON token contract without Origin. No .env files are changed automatically.
 
 Demo creation passwords remain Admin123/Staff123 by explicit decision; mandatory first-password change remains enabled. These shared defaults are an accepted demo limitation and must be reconsidered before production.
+
+## Admin and Staff permissions
+
+Admin retains all existing management permissions. Staff may view all order history and details at every status, including other handlers' orders, and create manual orders assigned to themselves. Staff may accept eligible unassigned Pending orders, update status and cancellation reasons, and edit notes/delivery schedules on their own open orders. Orders assigned to another handler remain read-only; reassignment and permanent deletion remain Admin-only. Each Staff may hold up to five active (Pending or Processing) orders, enforced transactionally on create, acceptance, status assignment and Admin reassignment. Completed and Rejected orders free capacity. Cancellation uses the existing Rejected status, preserves the order, and restores inventory transactionally. Only Admin may permanently delete rejected orders or reassign handlers.
+
+Staff may view products and update inventory through `PATCH /products/:id/inventory`. This strict endpoint accepts only an expected product version and product stock or variant IDs/stocks; prices, discounts, product creation/deletion and image management remain Admin-only. Existing product SKU lookup remains available.
+
+Staff may view/create customers and inspect their accessible order history using the customer filter. Customer editing/deletion and account management remain Admin-only. No customer export endpoint or Staff export control is provided. This restricts built-in export, not the ability to copy information a user can already view.
+
+The Staff Dashboard shows personal all-time completed sales through `GET /orders/personal-sales`, scoped on the server to the authenticated account, plus operational order and inventory counts. Personal sales exclude unassigned orders and other handlers' orders. The system has no shift tracking, cost/profit or cash-flow module; shift revenue is not inferred. Order statuses remain Pending, Processing, Rejected and Completed.

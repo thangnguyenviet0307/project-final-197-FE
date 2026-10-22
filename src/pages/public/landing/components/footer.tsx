@@ -17,8 +17,8 @@ import {
 } from "@/components/icons/brand-icons"
 
 const newsletterSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
+  email: z.email({
+    error: "Please enter a valid email address.",
   }),
 })
 

@@ -63,8 +63,8 @@ export async function getCategoryById(id: string, signal?: AbortSignal): Promise
 export async function createCategory(input: CreateCategoryInput): Promise<Category> {
   const payload = {
     name: input.name,
+    ...(input.icon !== undefined ? { icon: input.icon.trim() } : {}),
     description: input.description || "",
-    icon: input.icon?.trim() || "",
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };

@@ -178,15 +178,14 @@ it.each(["staff", "admin"] as const)("creates %s accounts using the requested de
   await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users", expect.objectContaining({ role, password })))
 })
 
-it.each(["staff", "admin"] as const)("resets %s accounts using a stable random temporary password", async role => {
+it.each(["staff", "admin"] as const)("resets %s accounts using the role-based default password", async role => {
   const writes = setup(role)
   await screen.findByText("target@example.com")
   fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
   fireEvent.click(await screen.findByRole("menuitem", { name: "Reset password" }))
   const field = screen.getByLabelText("New temporary password")
   const password = (field as HTMLInputElement).value
-  expect(password.length).toBeGreaterThanOrEqual(20)
-  expect(["Admin123", "Staff123"]).not.toContain(password)
+  expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
   fireEvent.submit(field.closest("form")!)
   await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { password }))
 })
