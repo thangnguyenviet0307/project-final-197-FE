@@ -1,4 +1,4 @@
-import { StoreLayout } from "@/layout/store/store-layout";
+import { StoreLayout } from "@/layout/storefront/store-layout"
 import type { ComponentType } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 import {

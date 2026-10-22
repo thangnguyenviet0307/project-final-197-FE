@@ -1,9 +1,8 @@
-
 import { Outlet } from "react-router-dom"
 
-import { StoreHeader } from "@/components/store/store-header"
-import { StoreNavbar } from "@/components/store/store-navbar"
-import { StoreFooter } from "@/components/store/store-footer"
+import { StoreHeader } from "./store-header"
+import { StoreNavbar } from "./store-navbar"
+import { StoreFooter } from "./store-footer"
 
 export function StoreLayout() {
   return (
