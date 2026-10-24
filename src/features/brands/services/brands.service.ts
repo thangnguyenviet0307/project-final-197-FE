@@ -1,3 +1,4 @@
+import type { ApiEnvelope } from "@/types/api"
 import { api } from "@/services/api"
 import type { Brand } from "@/features/brands/types/brands"
 
@@ -7,11 +8,7 @@ import type {
   UpdateBrandInput,
 } from "@/features/brands/types/brands"
 
-export interface BrandApiResponse<T> {
-  success?: boolean
-  message?: string
-  data: T
-}
+export type BrandApiResponse<T> = ApiEnvelope<T>
 
 export const brandsService = {
   // GET - Lấy danh sách Brands

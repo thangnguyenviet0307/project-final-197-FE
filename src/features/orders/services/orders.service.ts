@@ -1,5 +1,5 @@
 import { api } from "@/services/api"
-import type { ApiResponse } from "@/features/auth/types/auth"
+import type { ApiResponse } from "@/types/api"
 import type { Order, OrdersQuery, OrdersResult, UpdateOrderStatusInput, UpdateOrderDatesInput } from "@/features/orders/types/orders"
 
 export async function listOrders(params: OrdersQuery, signal?: AbortSignal): Promise<OrdersResult> {

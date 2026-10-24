@@ -10,6 +10,10 @@
 
 ## Accounts and navigation
 
+Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. Customer sessions return to `/`; admin/staff sessions return to the dashboard. `/login` remains the administration sign-in page. The storefront header links to customer sign-in and `/register`, and shows sign-out for authenticated sessions.
+
+`/register` contains the customer registration form and validation, but submission is disabled because the current Backend has no public registration endpoint. No account is created and no registration request is sent. Backend must supply a customer registration contract before this form can be activated. Customer account pages remain previews.
+
 Admin provisions staff/admin accounts at `/users`. There is no public registration. Share temporary credentials privately. New accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
 
 Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password reset forms generate a unique temporary password using the browser cryptographic random generator. Reset passwords remain stable while their dialog is open; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.

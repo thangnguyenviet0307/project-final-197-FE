@@ -1,6 +1,6 @@
 import axios from "axios"
 import { ZodError } from "zod"
-import type { ApiError } from "@/features/auth/types/auth"
+import type { ApiError } from "@/types/api"
 
 const localizedMessages: Array<[RegExp, string]> = [
   [/^email hoặc mật khẩu không chính xác$/i, "The email or password is incorrect, or this account is disabled."],

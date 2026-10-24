@@ -53,7 +53,7 @@ export function StoreFooter() {
           {/* Store information */}
           <section>
             <Link
-              to="/landing"
+              to="/"
               className="text-3xl font-black tracking-tight text-white"
             >
               Demo<span className="text-[#65b719]">STORE</span>

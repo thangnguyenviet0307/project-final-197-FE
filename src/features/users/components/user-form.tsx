@@ -7,7 +7,9 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getApiError } from "@/services/api"
-import { createUserSchema, getDefaultUserPassword, type CreateUserInput } from "@/features/users/services/users.service"
+import { getDefaultUserPassword } from "@/features/users/services/users.service"
+import { createUserSchema } from "@/features/users/schemas/user-schema"
+import type { CreateUserInput } from "@/features/users/types/users"
 import { useCreateUser } from "@/features/users/hooks/use-create-user"
 
 export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: () => void }) {

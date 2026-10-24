@@ -18,19 +18,17 @@ function page(load: () => Promise<{ default: ComponentType }>) {
 
 export const routes: RouteObject[] = [
   // ==========================================
-  // DEFAULT - OPEN STOREFRONT FIRST
-  // ==========================================
-  {
-    path: "/",
-    element: <Navigate to="/landing" replace />,
-  },
-
-  // ==========================================
   // STOREFRONT
   // ==========================================
   {
     element: <StoreLayout />,
     children: [
+      {
+        path: "/",
+        lazy: page(() =>
+          import("@/pages/storefront/home/index")
+        ),
+      },
       {
         path: "/landing",
         lazy: page(() =>
@@ -45,6 +43,13 @@ export const routes: RouteObject[] = [
         ),
       },
 
+      {
+        element: <PublicOnlyRoute />,
+        children: [
+          { path: "/account/login", lazy: page(() => import("@/pages/storefront/auth/login")) },
+          { path: "/register", lazy: page(() => import("@/pages/storefront/auth/register")) },
+        ],
+      },
       // CUSTOMER ACCOUNT - UI PREVIEW
       {
         path: "/account",
@@ -113,7 +118,6 @@ export const routes: RouteObject[] = [
     "/auth/sign-up",
     "/auth/sign-up-2",
     "/auth/sign-up-3",
-    "/register",
   ].map((path) => ({
     path,
     element: <Navigate to="/login" replace />,

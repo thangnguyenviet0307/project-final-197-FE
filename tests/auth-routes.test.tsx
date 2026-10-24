@@ -1,4 +1,5 @@
 import { beforeEach, expect, it } from "vitest"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes, useLocation, type RouteObject } from "react-router-dom"
 import { routes } from "@/router/routes"
@@ -76,6 +77,17 @@ it("allows an admin to open the product creation route", async () => {
   session("admin")
   render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/products/new"] })} />)
   expect(await screen.findByText("Page /products/new")).toBeTruthy()
+})
+
+it.each(["/account/login", "/register"])("opens customer auth route %s for guests", async path => {
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  expect(await screen.findByText(`Page ${path}`)).toBeTruthy()
+})
+
+it.each(["/account/login", "/register", "/login"])("returns signed-in customers home from %s", async path => {
+  session("customer")
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
+  expect(await screen.findByText("Page /")).toBeTruthy()
 })
 
 it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {

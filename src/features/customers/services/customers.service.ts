@@ -1,3 +1,4 @@
+import type { ApiResult, Pagination } from "@/types/api"
 
 import { api } from "@/services/api"
 
@@ -23,25 +24,11 @@ interface BackendCustomer {
   updatedAt?: string
 }
 
-interface CustomerResponse<T> {
-  success: boolean
-  message?: string
-  data: T
-}
+type CustomerResponse<T> = ApiResult<T>
 
-export interface CustomerPagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-}
+export type CustomerPagination = Pagination
 
-interface CustomersListResponse {
-  success: boolean
-  message?: string
-  data: BackendCustomer[]
-  pagination: CustomerPagination
-}
+type CustomersListResponse = ApiResult<BackendCustomer[]> & { pagination: Pagination }
 
 // Chuyển dữ liệu Backend sang định dạng đang dùng trên FE
 function mapCustomer(customer: BackendCustomer): ICustomer {

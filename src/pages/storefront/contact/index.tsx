@@ -75,7 +75,7 @@ export default function ContactPage() {
           className="flex items-center gap-2 py-7 text-xs text-gray-500"
         >
           <Link
-            to="/landing"
+            to="/"
             className="transition-colors hover:text-[#55b000]"
           >
             Home

@@ -1,28 +1,22 @@
 import { useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSearchParams } from "react-router-dom"
 import { BaseLayout } from "@/layout/admin/base-layout"
-import { customersService } from "@/features/customers/services/customers.service"
+import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from "@/features/customers/hooks/use-customers"
 import { CustomerTable } from "@/features/customers/components/data-table"
 import { Button } from "@/components/ui/button"
 import { getApiError } from "@/services/api"
-import type { CreateCustomerInput, UpdateCustomerInput } from "@/features/customers/types/customers"
+import type { CreateCustomerInput } from "@/features/customers/types/customers"
 
 export default function CustomersPage() {
-  const client = useQueryClient()
   const [params, setParams] = useSearchParams()
   const requestedPage = Number(params.get("page"))
   const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
   const search = params.get("search")?.trim() ?? ""
   const [success, setSuccess] = useState("")
-  const query = useQuery({
-    queryKey: ["customers", { page, search }],
-    queryFn: ({ signal }) => customersService.getCustomers({ page, limit: 10, ...(search ? { search } : {}) }, signal),
-  })
-  const refresh = () => client.invalidateQueries({ queryKey: ["customers"] })
-  const create = useMutation({ mutationFn: customersService.createCustomer, onSuccess: refresh })
-  const update = useMutation({ mutationFn: ({ id, values }: { id: string; values: UpdateCustomerInput }) => customersService.updateCustomer(id, values), onSuccess: refresh })
-  const remove = useMutation({ mutationFn: customersService.deleteCustomer, onSuccess: refresh })
+  const query = useCustomers({ page, search })
+  const create = useCreateCustomer()
+  const update = useUpdateCustomer()
+  const remove = useDeleteCustomer()
   function changePage(next: number) {
     setParams(previous => { const nextParams = new URLSearchParams(previous); nextParams.set("page", String(next)); return nextParams })
   }

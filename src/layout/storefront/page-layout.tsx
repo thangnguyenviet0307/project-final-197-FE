@@ -32,7 +32,7 @@ export function PageLayout({
             <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <li>
                 <Link
-                  to="/landing"
+                  to="/"
                   className="transition hover:text-[#55b000]"
                 >
                   Trang chủ

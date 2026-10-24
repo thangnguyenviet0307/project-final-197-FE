@@ -22,7 +22,8 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getTemporaryPassword, type ManagedUser } from "@/features/users/services/users.service"
+import { getTemporaryPassword } from "@/features/users/services/users.service"
+import type { ManagedUser } from "@/features/users/types/users"
 import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { useUsers } from "@/features/users/hooks/use-users"

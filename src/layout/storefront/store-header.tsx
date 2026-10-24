@@ -13,7 +13,7 @@ export function StoreHeader() {
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-5 px-5 py-5 md:min-h-[120px] md:grid-cols-[260px_minmax(0,1fr)_170px] md:gap-8 md:py-0 lg:grid-cols-[300px_minmax(0,1fr)_200px]">
         <div className="flex items-center justify-between">
           <Link
-            to="/landing"
+            to="/"
             aria-label="DEMO STORE - Trang chủ"
             className="inline-flex items-center text-[30px] font-black tracking-[-1.5px] text-gray-950 transition-opacity hover:opacity-80 sm:text-[34px]"
           >
@@ -22,7 +22,7 @@ export function StoreHeader() {
           </Link>
 
           <Link
-            to="/login"
+            to="/account/login"
             aria-label="Tài khoản"
             className="flex items-center justify-center rounded-full border border-gray-200 p-2 text-gray-800 transition-colors hover:border-[#55b000] hover:text-[#55b000] md:hidden"
           >

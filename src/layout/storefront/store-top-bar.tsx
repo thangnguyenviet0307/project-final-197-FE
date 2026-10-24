@@ -1,8 +1,12 @@
 
 import { useState } from "react"
+import { Link } from "react-router-dom"
+import { useAuthStore } from "@/stores/auth.store"
+import { LogoutButton } from "@/features/auth/components/logout-button"
 import { ChevronDown, LogIn, UserRound } from "lucide-react"
 
 export function StoreTopBar() {
+  const user = useAuthStore((state) => state.user)
   const [language, setLanguage] = useState("English")
   const [currency, setCurrency] = useState("USD")
 
@@ -66,20 +70,20 @@ export function StoreTopBar() {
             aria-hidden="true"
           />
 
-          <span className="inline-flex items-center gap-1 px-3">
+          <Link to={user ? user.role === "customer" ? "/" : "/dashboard" : "/register"} className="inline-flex items-center gap-1 px-3 hover:text-[#55b000]">
             <UserRound size={13} />
-            Create Account
-          </span>
+            {user ? user.name : "Đăng ký"}
+          </Link>
 
           <span
             className="hidden h-4 w-px bg-gray-200 sm:block"
             aria-hidden="true"
           />
 
-          <span className="inline-flex items-center gap-1 px-3">
+          {user ? <LogoutButton /> : <Link to="/account/login" className="inline-flex items-center gap-1 px-3 hover:text-[#55b000]">
             <LogIn size={13} />
-            Login
-          </span>
+            Đăng nhập
+          </Link>}
         </div>
       </div>
     </div>

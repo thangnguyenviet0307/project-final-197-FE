@@ -2,7 +2,8 @@ import { z } from "zod"
 import { api, authApi, clearAuth, getApiError, refreshAccessToken } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
-import type { ApiResponse, ChangePasswordInput, LoginCredentials, TokenPair } from "@/features/auth/types/auth"
+import type { ApiResponse } from "@/types/api"
+import type { ChangePasswordInput, LoginCredentials, TokenPair } from "@/features/auth/types/auth"
 import type { ProfileValues } from "@/features/profile/schemas/profile-schema"
 
 const userSchema = z.object({

@@ -2,7 +2,8 @@ import axios from "axios"
 import type { InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
-import type { ApiResponse, TokenPair } from "@/features/auth/types/auth"
+import type { ApiResponse } from "@/types/api"
+import type { TokenPair } from "@/features/auth/types/auth"
 
 const baseURL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1").replace(/\/$/, "")
 export const api = axios.create({ baseURL, timeout: 15_000, withCredentials: true })

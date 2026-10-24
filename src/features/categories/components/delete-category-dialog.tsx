@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { listProducts } from "@/features/products/services/products.service"
 import { useDeleteCategory } from "@/features/categories/hooks/use-delete-category"
-import type { Category } from "@/features/categories/services/categories.service"
+import type { Category } from "@/features/categories/types/categories"
 import { getApiError } from "@/services/api"
 import { ProductQuickView } from "@/features/products/components/product-quick-view"
 

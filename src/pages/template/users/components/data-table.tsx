@@ -52,7 +52,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { UserFormDialog } from "@/pages/admin/users/components/user-form-dialog"
+import { UserFormDialog } from "@/pages/template/users/components/user-form-dialog"
 import {
   InputGroup,
   InputGroupAddon,

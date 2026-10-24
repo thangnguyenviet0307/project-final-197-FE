@@ -29,19 +29,6 @@ export interface AuthResponse extends TokenPair {
   user: User
 }
 
-export interface ApiResponse<T> {
-  success: boolean
-  statusCode: number
-  message: string
-  data: T
-}
-
-export interface ApiError {
-  statusCode: number
-  message: string
-  errors?: { field: string; message: string; code?: string }[]
-}
-
 export interface ChangePasswordInput {
   currentPassword: string
   newPassword: string

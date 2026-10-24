@@ -1,5 +1,4 @@
 "use client"
-import { invalidateCatalog } from "@/features/products/utils/invalidate-catalog"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -10,15 +9,10 @@ import { getApiError } from "@/services/api"
 
 
 import { useMemo, useState } from "react"
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query"
 import { useSearchParams } from "react-router-dom"
 
 import { BaseLayout } from "@/layout/admin/base-layout"
-import { brandsService } from "@/features/brands/services/brands.service"
+import { useBrandManagement, useUpdateBrand, useDeleteBrand } from "@/features/brands/hooks/use-brand-management"
 import { BrandTable } from "@/features/brands/components/data-table"
 
 import type {
@@ -27,7 +21,6 @@ import type {
 } from "@/features/brands/types/brands"
 
 const BrandsPage = () => {
-  const queryClient = useQueryClient()
 
   const [params, setParams] = useSearchParams()
   const [success, setSuccess] = useState("")
@@ -49,10 +42,7 @@ const BrandsPage = () => {
   }
 
   // GET - Lấy danh sách Brands
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["brands", "management"],
-    queryFn: ({ signal }) => brandsService.getBrands(signal),
-  })
+  const { data, isLoading, isError, error, refetch } = useBrandManagement()
 
   // Chuẩn hóa danh sách nhận từ Backend
   const brands = useMemo<IBrand[]>(() => {
@@ -74,33 +64,9 @@ const BrandsPage = () => {
     )
   }, [brands, searchQuery])
 
-  // POST - Thêm thương hiệu
-  // PUT - Sửa thương hiệu
-  const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      values,
-    }: {
-      id: string
-      values: UpdateBrandInput
-    }) => brandsService.updateById(id, values),
+  const updateMutation = useUpdateBrand()
+  const deleteMutation = useDeleteBrand()
 
-    onSuccess: async () => {
-      await invalidateCatalog(queryClient, "brands")
-    },
-  })
-
-  // DELETE - Xóa mềm thương hiệu
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      brandsService.deleteById(id),
-
-    onSuccess: async () => {
-      await invalidateCatalog(queryClient, "brands")
-    },
-  })
-
-  
   const handleEditBrand = async (
     id: string,
     values: UpdateBrandInput

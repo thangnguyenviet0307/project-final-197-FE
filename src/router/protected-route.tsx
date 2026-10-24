@@ -18,6 +18,6 @@ export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Role[] }) {
 export function PublicOnlyRoute() {
   const { user, isLoading, isAuthenticated } = useAuthStore()
   if (isLoading) return <RootFallback />
-  if (isAuthenticated) return <Navigate to={user?.mustChangePassword ? "/change-password" : user?.role === "customer" ? "/403" : "/admin/dashboard"} replace />
+  if (isAuthenticated) return <Navigate to={user?.role === "customer" ? "/" : user?.mustChangePassword ? "/change-password" : "/admin/dashboard"} replace />
   return <Outlet />
 }
