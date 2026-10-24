@@ -2,30 +2,30 @@
 import { NavLink, Outlet } from "react-router-dom"
 import {
   UserRound,
-  MapPin,
   Package,
+  MapPin,
   LockKeyhole,
   ChevronRight,
 } from "lucide-react"
 
 const accountMenus = [
   {
-    label: "Thông tin tài khoản",
+    label: "My Profile",
     path: "/account/profile",
     icon: UserRound,
   },
   {
-    label: "Địa chỉ giao hàng",
-    path: "/account/addresses",
-    icon: MapPin,
-  },
-  {
-    label: "Đơn hàng của tôi",
+    label: "My Orders",
     path: "/account/orders",
     icon: Package,
   },
   {
-    label: "Đổi mật khẩu",
+    label: "My Addresses",
+    path: "/account/addresses",
+    icon: MapPin,
+  },
+  {
+    label: "Change Password",
     path: "/account/change-password",
     icon: LockKeyhole,
   },
@@ -33,57 +33,61 @@ const accountMenus = [
 
 export function AccountLayout() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:py-12">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="min-h-[65vh] bg-[#fafafa]">
+      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:py-12">
+        <div className="mb-8">
+          <p className="text-xs text-gray-500">
+            Home / My Account
+          </p>
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">
+            MY ACCOUNT
+          </h1>
+          <div className="mt-4 h-1 w-14 bg-[#55b000]" />
+        </div>
 
-        {/* Account Sidebar */}
-        <aside className="h-fit overflow-hidden rounded-lg border border-gray-200 bg-white">
-          <div className="border-b border-gray-200 p-5">
-            <h2 className="text-lg font-bold text-gray-900">
-              Tài khoản của tôi
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Quản lý tài khoản
-            </p>
-          </div>
+        <div className="grid gap-8 lg:grid-cols-[290px_minmax(0,1fr)]">
+          <aside className="self-start overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <div className="bg-[#253529] px-6 py-7 text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#55b000]">
+                <UserRound size={28} />
+              </div>
+              <h2 className="mt-4 text-lg font-bold">
+                My Account
+              </h2>
+              <p className="mt-1 text-xs text-gray-300">
+                Customer area preview
+              </p>
+            </div>
 
-          <nav
-            aria-label="Điều hướng tài khoản"
-            className="flex flex-col p-2"
-          >
-            {accountMenus.map((item) => {
-              const Icon = item.icon
+            <nav aria-label="Account navigation" className="p-3">
+              {accountMenus.map((item) => {
+                const Icon = item.icon
 
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    [
-                      "flex items-center gap-3 rounded-md px-4 py-3 text-sm transition-colors",
-                      isActive
-                        ? "bg-[#55b000]/10 font-semibold text-[#438d00]"
-                        : "text-gray-700 hover:bg-gray-100",
-                    ].join(" ")
-                  }
-                >
-                  <Icon size={19} />
-                  <span className="flex-1">{item.label}</span>
-                  <ChevronRight size={15} />
-                </NavLink>
-              )
-            })}
-          </nav>
-        </aside>
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `mb-1 flex items-center gap-3 rounded-md px-4 py-3.5 text-sm transition-colors ${
+                        isActive
+                          ? "bg-[#55b000]/10 font-bold text-[#459000]"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-[#55b000]"
+                      }`
+                    }
+                  >
+                    <Icon size={19} />
+                    <span className="flex-1">{item.label}</span>
+                    <ChevronRight size={16} />
+                  </NavLink>
+                )
+              })}
+            </nav>
+          </aside>
 
-        {/* Account Page Content */}
-        <section
-          aria-label="Nội dung tài khoản"
-          className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 sm:p-7"
-        >
-          <Outlet />
-        </section>
-
+          <main className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </div>
   )

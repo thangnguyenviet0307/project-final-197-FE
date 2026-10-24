@@ -1,25 +1,85 @@
-import { Link } from "react-router-dom"
+
+import { useState } from "react"
+import { ChevronDown, LogIn, UserRound } from "lucide-react"
 
 export function StoreTopBar() {
+  const [language, setLanguage] = useState("English")
+  const [currency, setCurrency] = useState("USD")
+
   return (
-    <div className="border-b border-gray-200 bg-white text-xs text-gray-500">
-      <div className="mx-auto flex min-h-10 max-w-7xl items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-4">
-          <span>🇻🇳 Tiếng Việt</span>
-          <span className="text-gray-300">|</span>
-          <span>VND</span>
+    <div className="w-full border-b border-gray-100 bg-white text-gray-500">
+      <div className="mx-auto flex min-h-10 w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-2 text-xs lg:py-0">
+        <div className="flex shrink-0 items-center gap-4">
+          <div className="relative flex items-center gap-2">
+            <span aria-hidden="true" className="text-sm">
+              {language === "English" ? "🇬🇧" : "🇻🇳"}
+            </span>
+
+            <select
+              aria-label="Select language"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              className="cursor-pointer appearance-none bg-transparent pr-4 text-xs text-gray-500 outline-none hover:text-[#55b000]"
+            >
+              <option value="English">English</option>
+              <option value="Tiếng Việt">Tiếng Việt</option>
+            </select>
+
+            <ChevronDown
+              size={12}
+              className="pointer-events-none absolute right-0 text-gray-400"
+            />
+          </div>
+
+          <span className="h-4 w-px bg-gray-200" aria-hidden="true" />
+
+          <div className="relative flex items-center">
+            <select
+              aria-label="Select currency"
+              value={currency}
+              onChange={(event) => setCurrency(event.target.value)}
+              className="cursor-pointer appearance-none bg-transparent pr-4 text-xs text-gray-500 outline-none hover:text-[#55b000]"
+            >
+              <option value="USD">USD</option>
+              <option value="VND">VND</option>
+            </select>
+
+            <ChevronDown
+              size={12}
+              className="pointer-events-none absolute right-0 text-gray-400"
+            />
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:inline">
-            Chào mừng đến với Demo Store
+        <div className="flex flex-wrap items-center gap-y-2 text-xs text-gray-500">
+          <span className="px-3">Store Direction</span>
+
+          <span
+            className="hidden h-4 w-px bg-gray-200 sm:block"
+            aria-hidden="true"
+          />
+
+          <span className="px-3">Track Your Order</span>
+
+          <span
+            className="hidden h-4 w-px bg-gray-200 sm:block"
+            aria-hidden="true"
+          />
+
+          <span className="inline-flex items-center gap-1 px-3">
+            <UserRound size={13} />
+            Create Account
           </span>
-          <Link to="/login" className="hover:text-green-600">
-            Đăng nhập
-          </Link>
-          <Link to="/register" className="hover:text-green-600">
-            Đăng ký
-          </Link>
+
+          <span
+            className="hidden h-4 w-px bg-gray-200 sm:block"
+            aria-hidden="true"
+          />
+
+          <span className="inline-flex items-center gap-1 px-3">
+            <LogIn size={13} />
+            Login
+          </span>
         </div>
       </div>
     </div>
