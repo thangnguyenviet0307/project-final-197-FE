@@ -10,7 +10,7 @@
 
 ## Accounts and navigation
 
-Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. Customer sessions return to `/`; admin/staff sessions return to the dashboard. `/login` remains the administration sign-in page. The storefront header links to customer sign-in and `/register`, and shows sign-out for authenticated sessions.
+Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. All sign-ins from this form return to `/`. Authenticated sessions opening customer sign-in/registration also return to `/`, regardless of role. Storefront account links stay on the storefront and sign-out returns to `/account/login`. `/login` remains the separate administration sign-in page.
 
 `/register` contains the customer registration form and validation, but submission is disabled because the current Backend has no public registration endpoint. No account is created and no registration request is sent. Backend must supply a customer registration contract before this form can be activated. Customer account pages remain previews.
 

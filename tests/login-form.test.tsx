@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom"
 import { LoginForm1 } from "@/pages/auth/sign-in/components/login-form-1"
+import { CustomerAuthForm } from "@/features/auth/components/customer-auth-form"
 import { ForgotPasswordForm1 } from "@/pages/auth/forgot-password/components/forgot-password-form-1"
 import { ProtectedRoute, PublicOnlyRoute } from "@/router/protected-route"
 import { queryClient } from "@/services/query-client"
@@ -96,4 +97,20 @@ it("requires a password change before visiting the saved destination", async () 
   } } })
   setup(); submit()
   expect(await screen.findByText("Destination /change-password")).toBeTruthy()
+})
+
+it.each(["customer", "admin", "staff"])("keeps %s login through the customer form on the storefront", async role => {
+  authApi.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
+    user: { id: "a", email: "test@example.com", role, mustChangePassword: true }, accessToken: "access",
+  } } })
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[{
+    pathname: "/account/login", state: { from: { pathname: "/users" } },
+  }]}><Routes>
+    <Route path="/account/login" element={<CustomerAuthForm />} />
+    <Route path="/" element={<Destination />} />
+  </Routes></MemoryRouter></QueryClientProvider>)
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "test@example.com" } })
+  fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "Password123" } })
+  fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
+  expect(await screen.findByText("Destination /")).toBeTruthy()
 })

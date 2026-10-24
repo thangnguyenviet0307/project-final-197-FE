@@ -44,7 +44,7 @@ export const routes: RouteObject[] = [
       },
 
       {
-        element: <PublicOnlyRoute />,
+        element: <PublicOnlyRoute storefront />,
         children: [
           { path: "/account/login", lazy: page(() => import("@/pages/storefront/auth/login")) },
           { path: "/register", lazy: page(() => import("@/pages/storefront/auth/register")) },

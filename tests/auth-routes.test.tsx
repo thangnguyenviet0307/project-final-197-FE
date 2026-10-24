@@ -90,6 +90,16 @@ it.each(["/account/login", "/register", "/login"])("returns signed-in customers 
   expect(await screen.findByText("Page /")).toBeTruthy()
 })
 
+it.each([
+  ["admin", "/account/login"], ["admin", "/register"],
+  ["staff", "/account/login"], ["staff", "/register"],
+] as const)("keeps %s sessions on the storefront when opening %s", async (role, path) => {
+  session(role, true)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
+  expect(await screen.findByText("Page /")).toBeTruthy()
+  expect(screen.queryByRole("link", { name: /Test/ })?.getAttribute("href")).toBe("/")
+})
+
 it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {
   session("staff")
   render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)

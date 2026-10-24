@@ -37,7 +37,7 @@ export function StoreHeader() {
         <div className="flex items-center justify-end">
           <div className="flex items-center gap-3 text-gray-800">
             <div
-              className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200"
+              className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200"
               aria-label="Giỏ hàng"
             >
               <ShoppingCart size={23} strokeWidth={1.8} />

@@ -175,7 +175,7 @@ export function StoreFooter() {
                 <span
                   key={name}
                   title={`${name} - đang cập nhật`}
-                  className="flex size-9 items-center justify-center rounded-full border border-gray-600 text-gray-300"
+                  className="flex size-9 cursor-pointer items-center justify-center rounded-full border border-gray-600 text-gray-300"
                 >
                   <Icon className="h-[17px] w-[17px]" />
                 </span>
