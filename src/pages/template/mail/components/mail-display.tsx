@@ -199,7 +199,7 @@ export function MailDisplay({ mail }: MailDisplayProps) {
             }
           >
             <MoreVertical data-icon="inline-start" />
-            <span className="sr-only">More</span>
+            <span className="sr-only">Thêm</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>

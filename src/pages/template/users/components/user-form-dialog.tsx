@@ -36,7 +36,7 @@ const userFormSchema = z.object({
     message: "Name must be at least 2 characters.",
   }),
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Vui lòng nhập địa chỉ email hợp lệ.",
   }),
   role: z.string().min(1, {
     message: "Please select a role.",
@@ -102,7 +102,7 @@ export function UserFormDialog({ onAddUser }: UserFormDialogProps) {
               name="name"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="user-form-dialog-name">Name</FieldLabel>
+                  <FieldLabel htmlFor="user-form-dialog-name">Tên</FieldLabel>
 
                   <Input
                     id="user-form-dialog-name"
@@ -144,7 +144,7 @@ export function UserFormDialog({ onAddUser }: UserFormDialogProps) {
               name="role"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="user-form-dialog-role">Role</FieldLabel>
+                  <FieldLabel htmlFor="user-form-dialog-role">Vai trò</FieldLabel>
                   <Select
                     name={field.name}
                     onValueChange={field.onChange}
@@ -159,7 +159,7 @@ export function UserFormDialog({ onAddUser }: UserFormDialogProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="Admin">Admin</SelectItem>
+                        <SelectItem value="Quản trị viên">Quản trị viên</SelectItem>
                         <SelectItem value="Author">Author</SelectItem>
                         <SelectItem value="Editor">Editor</SelectItem>
                         <SelectItem value="Maintainer">Maintainer</SelectItem>
@@ -249,7 +249,7 @@ export function UserFormDialog({ onAddUser }: UserFormDialogProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="user-form-dialog-status">
-                    Status
+                    Trạng thái
                   </FieldLabel>
                   <Select
                     name={field.name}
@@ -261,14 +261,14 @@ export function UserFormDialog({ onAddUser }: UserFormDialogProps) {
                       aria-invalid={fieldState.invalid}
                       className="cursor-pointer w-full"
                     >
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                        <SelectItem value="Chờ xử lý">Chờ xử lý</SelectItem>
                         <SelectItem value="Error">Error</SelectItem>
-                        <SelectItem value="Inactive">Inactive</SelectItem>
+                        <SelectItem value="Ngừng hoạt động">Ngừng hoạt động</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>

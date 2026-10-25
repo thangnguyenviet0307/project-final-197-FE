@@ -22,24 +22,24 @@ export default function ChangePasswordPage() {
   const mutation = useChangePassword((error) => form.setError("root", { message: getApiError(error).message }))
   return <div className="bg-muted flex min-h-svh items-center justify-center p-6">
     <Card className="w-full max-w-md">
-      <CardHeader><CardTitle>Change password</CardTitle><CardDescription>
-        {required ? "Change the temporary password provided by your administrator to continue." : "Changing your password will revoke all existing sessions."}
+      <CardHeader><CardTitle>Đổi mật khẩu</CardTitle><CardDescription>
+        {required ? "Đổi mật khẩu tạm thời do quản trị viên cung cấp để tiếp tục." : "Đổi mật khẩu sẽ kết thúc tất cả các phiên đăng nhập hiện có."}
       </CardDescription></CardHeader>
       <CardContent><form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
         {([
-          ["currentPassword", "Current password", "current-password"],
-          ["newPassword", "New password", "new-password"],
-          ["confirmPassword", "Confirm new password", "new-password"],
+          ["currentPassword", "Mật khẩu hiện tại", "current-password"],
+          ["newPassword", "Mật khẩu mới", "new-password"],
+          ["confirmPassword", "Nhập lại mật khẩu mới", "new-password"],
         ] as const).map(([name, label, autocomplete]) => <Field key={name} data-invalid={!!form.formState.errors[name]}>
           <FieldLabel htmlFor={name}>{label}</FieldLabel>
           <Input id={name} type="password" autoComplete={autocomplete} aria-invalid={!!form.formState.errors[name]} {...form.register(name)} />
           <FieldError errors={[form.formState.errors[name]]} />
         </Field>)}
         {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
-        <Button type="submit" disabled={mutation.isPending}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Save new password</Button>
+        <Button type="submit" disabled={mutation.isPending}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Lưu mật khẩu mới</Button>
       </form>
       <div className="mt-5 flex items-center justify-between gap-3">
-        {!required && <Link className="text-sm underline" to="/admin/dashboard">Back to Dashboard</Link>}
+        {!required && <Link className="text-sm underline" to="/admin/dashboard">Về bảng điều khiển</Link>}
         <LogoutButton />
       </div></CardContent>
     </Card>

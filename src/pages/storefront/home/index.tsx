@@ -16,26 +16,25 @@ export default function StoreHomePage() {
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
           <div>
             <span className="inline-flex rounded-full bg-[#55b000]/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#459000]">
-              Welcome to Demo Store
+              Chào mừng đến với Demo Store
             </span>
 
             <h1 className="mt-7 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl lg:text-6xl">
-              Discover Your
+              Khám phá những
               <span className="block text-[#55b000]">
-                Favorite Products
+                sản phẩm yêu thích
               </span>
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-8 text-gray-600">
-              Explore the latest collections, popular
-              products and everyday essentials at Demo Store.
+              Khám phá bộ sưu tập mới nhất, sản phẩm được yêu thích và đồ dùng thiết yếu tại Demo Store.
             </p>
 
             <Link
               to="/contact"
               className="mt-8 inline-flex items-center gap-3 rounded-md bg-[#55b000] px-7 py-4 text-sm font-bold text-white transition-colors hover:bg-[#459000]"
             >
-              CONTACT US
+              LIÊN HỆ
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -58,7 +57,7 @@ export default function StoreHomePage() {
               </h2>
 
               <p className="max-w-xs text-sm leading-7 text-gray-300">
-                Your online shopping destination
+                Điểm đến mua sắm trực tuyến của bạn
               </p>
             </div>
           </div>
@@ -69,23 +68,23 @@ export default function StoreHomePage() {
         {[
           {
             icon: Truck,
-            title: "Fast Delivery",
-            description: "Delivery service information",
+            title: "Giao hàng nhanh",
+            description: "Thông tin dịch vụ giao hàng",
           },
           {
             icon: ShieldCheck,
-            title: "Secure Shopping",
-            description: "A convenient shopping experience",
+            title: "Mua sắm an toàn",
+            description: "Trải nghiệm mua sắm tiện lợi",
           },
           {
             icon: RefreshCcw,
-            title: "Easy Returns",
-            description: "Return policy information",
+            title: "Đổi trả dễ dàng",
+            description: "Thông tin chính sách đổi trả",
           },
           {
             icon: Headphones,
-            title: "Customer Support",
-            description: "We're here to help",
+            title: "Hỗ trợ khách hàng",
+            description: "Chúng tôi luôn sẵn sàng hỗ trợ",
           },
         ].map((item) => {
           const Icon = item.icon
@@ -115,19 +114,18 @@ export default function StoreHomePage() {
       <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-[1440px] px-5 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
-            Explore Our Collections
+            Khám phá bộ sưu tập
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-gray-500">
-            Product collections will appear here when
-            the Storefront Products API is integrated.
+            Các bộ sưu tập sản phẩm sẽ sớm được cập nhật tại đây.
           </p>
 
           <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-3">
             {[
-              "New Arrivals",
-              "Best Sellers",
-              "Featured Products",
+              "Sản phẩm mới",
+              "Sản phẩm bán chạy",
+              "Sản phẩm nổi bật",
             ].map((name) => (
               <div
                 key={name}

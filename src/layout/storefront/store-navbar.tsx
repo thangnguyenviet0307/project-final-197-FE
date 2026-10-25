@@ -16,7 +16,7 @@ export function StoreNavbar() {
   return (
     <nav
       className="relative z-40 w-full bg-[#55b000]"
-      aria-label="Store navigation"
+      aria-label="Điều hướng cửa hàng"
     >
       <div className="mx-auto max-w-[1440px] px-4 sm:px-5">
         <div className="flex min-h-14 items-center gap-5">
@@ -26,18 +26,18 @@ export function StoreNavbar() {
           </div>
 
           {/* DESKTOP LINKS */}
-          <div className="hidden h-14 min-w-0 flex-1 items-center gap-5 lg:flex xl:gap-6">
+          <div className="hidden h-14 min-w-0 flex-1 items-center gap-3 lg:flex xl:gap-5">
             <Link
               to="/"
               className="flex h-full shrink-0 items-center text-sm font-semibold text-white transition-colors hover:text-black"
             >
-              HOME
+              TRANG CHỦ
             </Link>
 
             <span className="text-sm text-white/40">|</span>
 
             <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
-              SHOP
+              CỬA HÀNG
             </span>
 
             <span className="text-sm text-white/40">|</span>
@@ -49,13 +49,13 @@ export function StoreNavbar() {
             <span className="text-sm text-white/40">|</span>
 
             <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
-              PAGES
+              CÁC TRANG
             </span>
 
             <span className="text-sm text-white/40">|</span>
 
             <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
-              BLOG
+              TIN TỨC
             </span>
 
             <span className="text-sm text-white/40">|</span>
@@ -64,20 +64,20 @@ export function StoreNavbar() {
               to="/contact"
               className="flex h-full shrink-0 items-center text-sm font-semibold text-white transition-colors hover:text-black"
             >
-              CONTACT US
+              LIÊN HỆ
             </Link>
           </div>
 
           {/* PHONE AREA */}
-          <div className="ml-auto hidden shrink-0 items-center gap-3 rounded-full bg-white/15 px-4 py-2 text-white xl:flex">
+          <div className="ml-auto hidden shrink-0 items-center gap-3 rounded-full bg-white/15 px-4 py-2 text-white 2xl:flex">
             <Phone size={19} />
 
             <div className="leading-tight">
               <p className="text-[11px] font-medium">
-                Customer Support
+                Hỗ trợ khách hàng
               </p>
               <p className="text-xs font-bold">
-                Contact Us
+                Liên hệ
               </p>
             </div>
           </div>
@@ -92,7 +92,7 @@ export function StoreNavbar() {
               type="button"
               onClick={() => setMobileOpen((previous) => !previous)}
               aria-label={
-                mobileOpen ? "Close navigation" : "Open navigation"
+                mobileOpen ? "Đóng menu điều hướng" : "Mở menu điều hướng"
               }
               aria-expanded={mobileOpen}
               className="rounded-md p-2 text-white hover:bg-white/15"
@@ -111,7 +111,7 @@ export function StoreNavbar() {
                 onClick={closeMobileMenu}
                 className="block rounded-md px-4 py-3 text-sm font-semibold text-white hover:bg-white/15"
               >
-                HOME
+                TRANG CHỦ
               </Link>
 
               <div className="px-1 py-2">
@@ -119,19 +119,19 @@ export function StoreNavbar() {
               </div>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                SHOP
+                CỬA HÀNG
               </p>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                MEGAMENU
+                KHÁM PHÁ
               </p>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                PAGES
+                CÁC TRANG
               </p>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                BLOG
+                TIN TỨC
               </p>
 
               <Link
@@ -139,7 +139,7 @@ export function StoreNavbar() {
                 onClick={closeMobileMenu}
                 className="block rounded-md px-4 py-3 text-sm font-semibold text-white hover:bg-white/15"
               >
-                CONTACT US
+                LIÊN HỆ
               </Link>
 
               <Link
@@ -147,7 +147,7 @@ export function StoreNavbar() {
                 onClick={closeMobileMenu}
                 className="block rounded-md px-4 py-3 text-sm font-semibold text-white hover:bg-white/15"
               >
-                MY ACCOUNT
+                TÀI KHOẢN CỦA TÔI
               </Link>
             </div>
           </div>

@@ -5,9 +5,9 @@ import { deleteProductImage, uploadProductImage } from "@/features/products/serv
 export function useProductImages() {
   const client = useQueryClient()
   const refresh = () => client.invalidateQueries({ queryKey: ["products"] })
-  const upload = useMutation({ mutationFn: uploadProductImage, meta: { successMessage: "Image uploaded successfully." }, onSuccess: refresh })
-  const remove = useMutation({ mutationFn: deleteProductImage, meta: { successMessage: "Image removed from gallery." }, onSuccess: result => {
-    if (result.cleanupPending) toast.warning("The image was removed from the gallery, but Cloudinary cleanup needs administrator attention.")
+  const upload = useMutation({ mutationFn: uploadProductImage, meta: { successMessage: "Tải ảnh lên thành công." }, onSuccess: refresh })
+  const remove = useMutation({ mutationFn: deleteProductImage, meta: { successMessage: "Đã xóa ảnh khỏi thư viện." }, onSuccess: result => {
+    if (result.cleanupPending) toast.warning("Đã xóa ảnh khỏi thư viện. Quản trị viên cần kiểm tra việc xóa ảnh trên Cloudinary.")
     return refresh()
   } })
   return { upload, remove }

@@ -425,7 +425,7 @@ export function CalendarMain({
                     setShowEventDialog(false)
                   }}
                 >
-                  Edit
+                  Chỉnh sửa
                 </Button>
                 <Button
                   variant="destructive"
@@ -434,7 +434,7 @@ export function CalendarMain({
                     setShowEventDialog(false)
                   }}
                 >
-                  Delete
+                  Xóa
                 </Button>
               </div>
             </div>

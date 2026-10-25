@@ -16,28 +16,28 @@ import {
 
 const menuSections = [
   {
-    title: "Browse Products",
+    title: "Khám phá sản phẩm",
     items: [
       {
-        title: "Free Blocks",
+        title: "Khối giao diện miễn phí",
         description: "Essential UI components and sections",
         icon: Package,
         href: "#free-blocks",
       },
       {
-        title: "Premium Templates",
+        title: "Giao diện mẫu cao cấp",
         description: "Complete page templates and layouts",
         icon: Crown,
         href: "#premium-templates",
       },
       {
-        title: "Admin Dashboards",
+        title: "Bảng quản trị",
         description: "Full-featured dashboard solutions",
         icon: BarChart3,
         href: "#admin-dashboards",
       },
       {
-        title: "Landing Pages",
+        title: "Trang giới thiệu",
         description: "Marketing and product landing templates",
         icon: Layout,
         href: "#landing-pages",
@@ -45,7 +45,7 @@ const menuSections = [
     ],
   },
   {
-    title: "Categories",
+    title: "Danh mục",
     items: [
       {
         title: "E-commerce",
@@ -74,28 +74,28 @@ const menuSections = [
     ],
   },
   {
-    title: "Resources",
+    title: "Tài nguyên",
     items: [
       {
-        title: "Documentation",
+        title: "Tài liệu",
         description: "Integration guides and setup instructions",
         icon: Database,
         href: "#docs",
       },
       {
-        title: "Component Showcase",
+        title: "Trưng bày thành phần",
         description: "Interactive preview of all components",
         icon: Palette,
         href: "#showcase",
       },
       {
-        title: "GitHub Repository",
+        title: "Kho mã GitHub",
         description: "Open source foundation and community",
         icon: Settings,
         href: "#github",
       },
       {
-        title: "Design System",
+        title: "Hệ thống thiết kế",
         description: "shadcn/ui standards and customization",
         icon: Zap,
         href: "#design-system",

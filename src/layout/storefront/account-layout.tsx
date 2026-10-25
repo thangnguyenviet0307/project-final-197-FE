@@ -10,22 +10,22 @@ import {
 
 const accountMenus = [
   {
-    label: "My Profile",
+    label: "Hồ sơ của tôi",
     path: "/account/profile",
     icon: UserRound,
   },
   {
-    label: "My Orders",
+    label: "Đơn hàng của tôi",
     path: "/account/orders",
     icon: Package,
   },
   {
-    label: "My Addresses",
+    label: "Địa chỉ của tôi",
     path: "/account/addresses",
     icon: MapPin,
   },
   {
-    label: "Change Password",
+    label: "Đổi mật khẩu",
     path: "/account/change-password",
     icon: LockKeyhole,
   },
@@ -37,10 +37,10 @@ export function AccountLayout() {
       <div className="mx-auto max-w-[1440px] px-5 py-8 sm:py-12">
         <div className="mb-8">
           <p className="text-xs text-gray-500">
-            Home / My Account
+            Trang chủ / Tài khoản của tôi
           </p>
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
-            MY ACCOUNT
+            TÀI KHOẢN CỦA TÔI
           </h1>
           <div className="mt-4 h-1 w-14 bg-[#55b000]" />
         </div>
@@ -52,14 +52,14 @@ export function AccountLayout() {
                 <UserRound size={28} />
               </div>
               <h2 className="mt-4 text-lg font-bold">
-                My Account
+                Tài khoản của tôi
               </h2>
               <p className="mt-1 text-xs text-gray-300">
-                Customer area preview
+                Bản xem trước khu vực khách hàng
               </p>
             </div>
 
-            <nav aria-label="Account navigation" className="p-3">
+            <nav aria-label="Điều hướng tài khoản" className="p-3">
               {accountMenus.map((item) => {
                 const Icon = item.icon
 

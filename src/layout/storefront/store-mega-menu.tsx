@@ -64,7 +64,7 @@ export function StoreMegaMenu() {
         onClick={() => setOpen((previous) => !previous)}
         className="flex h-14 items-center gap-1.5 text-sm font-bold tracking-[0.05em] text-white transition-colors duration-200 hover:text-black focus-visible:outline-2 focus-visible:outline-white"
       >
-        MEGAMENU
+        KHÁM PHÁ
 
         <ChevronDown
           size={14}

@@ -34,7 +34,7 @@ export function LoginForm2({
         </Field>
         <Field>
           <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">Mật khẩu</FieldLabel>
             <a
               href="/templates/dashboard/shadcn-dashboard-landing-template/auth/forgot-password-2"
               className="ml-auto text-sm underline-offset-4 hover:underline"

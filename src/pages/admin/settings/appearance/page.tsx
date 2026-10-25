@@ -54,9 +54,9 @@ export default function AppearanceSettings() {
     <BaseLayout>
       <div className="flex flex-col gap-6 px-4 lg:px-6">
         <div>
-          <h1 className="text-3xl font-bold">Appearance</h1>
+          <h1 className="text-3xl font-bold">Giao diện</h1>
           <p className="text-muted-foreground">
-            Customize the appearance of the application.
+            Tùy chỉnh giao diện ứng dụng.
           </p>
         </div>
         <form
@@ -70,7 +70,7 @@ export default function AppearanceSettings() {
               name="theme"
               render={({ field, fieldState }) => (
                 <FieldSet data-invalid={fieldState.invalid}>
-                  <FieldLegend>Theme</FieldLegend>
+                  <FieldLegend>Chủ đề</FieldLegend>
                   <RadioGroup
                     name={field.name}
                     value={field.value}
@@ -103,7 +103,7 @@ export default function AppearanceSettings() {
                               </div>
                             </div>
                           </div>
-                          <span className="text-sm font-medium">Light</span>
+                          <span className="text-sm font-medium">Sáng</span>
                         </div>
                       </div>
                     </FieldLabel>
@@ -133,7 +133,7 @@ export default function AppearanceSettings() {
                               </div>
                             </div>
                           </div>
-                          <span className="text-sm font-medium">Dark</span>
+                          <span className="text-sm font-medium">Tối</span>
                         </div>
                       </div>
                     </FieldLabel>
@@ -151,13 +151,13 @@ export default function AppearanceSettings() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="appearance-font-family">
-                    Font Family
+                    Phông chữ
                   </FieldLabel>
                   <Select
                     items={{
                       inter: "Inter",
                       roboto: "Roboto",
-                      system: "System Default",
+                      system: "Mặc định hệ thống",
                     }}
                     name={field.name}
                     onValueChange={field.onChange}
@@ -168,13 +168,13 @@ export default function AppearanceSettings() {
                       aria-invalid={fieldState.invalid}
                       className="cursor-pointer"
                     >
-                      <SelectValue placeholder="Select a font" />
+                      <SelectValue placeholder="Chọn phông chữ" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectItem value="inter">Inter</SelectItem>
                         <SelectItem value="roboto">Roboto</SelectItem>
-                        <SelectItem value="system">System Default</SelectItem>
+                        <SelectItem value="system">Mặc định hệ thống</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -190,10 +190,10 @@ export default function AppearanceSettings() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="appearance-font-size">
-                    Font Size
+                    Cỡ chữ
                   </FieldLabel>
                   <Select
-                    items={{ small: "Small", medium: "Medium", large: "Large" }}
+                    items={{ small: "Nhỏ", medium: "Vừa", large: "Lớn" }}
                     name={field.name}
                     onValueChange={field.onChange}
                     value={field.value}
@@ -203,13 +203,13 @@ export default function AppearanceSettings() {
                       aria-invalid={fieldState.invalid}
                       className="cursor-pointer"
                     >
-                      <SelectValue placeholder="Select font size" />
+                      <SelectValue placeholder="Chọn cỡ chữ" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="small">Small</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="large">Large</SelectItem>
+                        <SelectItem value="small">Nhỏ</SelectItem>
+                        <SelectItem value="medium">Vừa</SelectItem>
+                        <SelectItem value="large">Lớn</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -227,13 +227,13 @@ export default function AppearanceSettings() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="appearance-sidebar-width">
-                    Sidebar Width
+                    Độ rộng thanh bên
                   </FieldLabel>
                   <Select
                     items={{
-                      compact: "Compact",
-                      comfortable: "Comfortable",
-                      spacious: "Spacious",
+                      compact: "Gọn",
+                      comfortable: "Vừa phải",
+                      spacious: "Rộng",
                     }}
                     name={field.name}
                     onValueChange={field.onChange}
@@ -244,13 +244,13 @@ export default function AppearanceSettings() {
                       aria-invalid={fieldState.invalid}
                       className="cursor-pointer"
                     >
-                      <SelectValue placeholder="Select sidebar width" />
+                      <SelectValue placeholder="Chọn độ rộng thanh bên" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="compact">Compact</SelectItem>
-                        <SelectItem value="comfortable">Comfortable</SelectItem>
-                        <SelectItem value="spacious">Spacious</SelectItem>
+                        <SelectItem value="compact">Gọn</SelectItem>
+                        <SelectItem value="comfortable">Vừa phải</SelectItem>
+                        <SelectItem value="spacious">Rộng</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -266,13 +266,13 @@ export default function AppearanceSettings() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="appearance-content-width">
-                    Content Width
+                    Độ rộng nội dung
                   </FieldLabel>
                   <Select
                     items={{
-                      fixed: "Fixed",
-                      fluid: "Fluid",
-                      container: "Container",
+                      fixed: "Cố định",
+                      fluid: "Linh hoạt",
+                      container: "Khung nội dung",
                     }}
                     name={field.name}
                     onValueChange={field.onChange}
@@ -283,13 +283,13 @@ export default function AppearanceSettings() {
                       aria-invalid={fieldState.invalid}
                       className="cursor-pointer"
                     >
-                      <SelectValue placeholder="Select content width" />
+                      <SelectValue placeholder="Chọn độ rộng nội dung" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="fixed">Fixed</SelectItem>
-                        <SelectItem value="fluid">Fluid</SelectItem>
-                        <SelectItem value="container">Container</SelectItem>
+                        <SelectItem value="fixed">Cố định</SelectItem>
+                        <SelectItem value="fluid">Linh hoạt</SelectItem>
+                        <SelectItem value="container">Khung nội dung</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -303,10 +303,10 @@ export default function AppearanceSettings() {
 
           <div className="flex gap-2 mt-12">
             <Button type="submit" className="cursor-pointer">
-              Save Preferences
+              Lưu tùy chọn
             </Button>
             <Button variant="outline" type="button" className="cursor-pointer">
-              Cancel
+              Hủy
             </Button>
           </div>
         </form>

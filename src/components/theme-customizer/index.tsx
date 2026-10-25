@@ -172,10 +172,10 @@ export function ThemeCustomizer({ open, onOpenChange }: ThemeCustomizerProps) {
               <div className="py-2">
                 <TabsList className="w-full rounded-none group-data-horizontal/tabs:h-10">
                   <TabsTrigger value="theme" className="cursor-pointer">
-                    <Palette /> Theme
+                    <Palette /> Chủ đề
                   </TabsTrigger>
                   <TabsTrigger value="layout" className="cursor-pointer">
-                    <Layout /> Layout
+                    <Layout /> Bố cục
                   </TabsTrigger>
                 </TabsList>
               </div>

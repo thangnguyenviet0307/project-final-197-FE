@@ -7,7 +7,7 @@ export function useLogin(onError?: (error: Error) => void, storefront = false) {
   const location = useLocation()
   return useMutation({
     mutationFn: login,
-    meta: { successMessage: "Signed in successfully.", suppressGlobalErrorToast: true },
+    meta: { successMessage: "Đăng nhập thành công.", suppressGlobalErrorToast: true },
     onSuccess: (user) => {
       if (storefront) {
         navigate("/", { replace: true })

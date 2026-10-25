@@ -8,8 +8,8 @@ import { useProductListLocation } from "@/features/products/hooks/use-product-li
 export default function ProductCreatePage() {
   const mutation = useCreateProduct()
   const returnTo = useProductListLocation()
-  return <BaseLayout title="Add product"><div className="space-y-4 px-4 lg:px-6">
-    <div className="pb-4"><Button nativeButton={false} role="link" variant="outline" size="lg" render={<Link to={returnTo} />}><ArrowLeft />Back to products</Button></div>
+  return <BaseLayout title="Thêm sản phẩm"><div className="space-y-4 px-4 lg:px-6">
+    <div className="pb-4"><Button nativeButton={false} role="link" variant="outline" size="lg" render={<Link to={returnTo} />}><ArrowLeft />Về danh sách sản phẩm</Button></div>
     <ProductForm save={mutation.mutateAsync} pending={mutation.isPending} />
   </div></BaseLayout>
 }

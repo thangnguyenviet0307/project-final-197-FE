@@ -224,7 +224,7 @@ export function CustomerFormDialog({
           size="icon"
           className="h-8 w-8 cursor-pointer"
           onClick={() => setOpen(true)}
-          aria-label={`Edit ${customer.first_name} ${customer.last_name}`}
+          aria-label={`Chỉnh sửa ${customer.first_name} ${customer.last_name}`}
         >
           <Pencil className="size-4" />
         </Button>
@@ -235,7 +235,7 @@ export function CustomerFormDialog({
           onClick={() => setOpen(true)}
         >
           <Plus className="mr-2 size-4" />
-          Add Customer
+          Thêm khách hàng
         </Button>
       )}
 
@@ -250,14 +250,14 @@ export function CustomerFormDialog({
           <DialogHeader>
             <DialogTitle>
               {customer
-                ? "Edit Customer"
-                : "Add New Customer"}
+                ? "Chỉnh sửa khách hàng"
+                : "Thêm khách hàng mới"}
             </DialogTitle>
 
             <DialogDescription>
               {customer
-                ? "Update customer information below."
-                : "Create a customer contact record. This does not create a sign-in account."}
+                ? "Cập nhật thông tin khách hàng bên dưới."
+                : "Tạo hồ sơ liên hệ khách hàng. Thao tác này không tạo tài khoản đăng nhập."}
             </DialogDescription>
           </DialogHeader>
 
@@ -271,12 +271,12 @@ export function CustomerFormDialog({
                 <FieldLabel
                   htmlFor={`${formId}-first-name`}
                 >
-                  First Name
+                  Tên
                 </FieldLabel>
 
                 <Input
                   id={`${formId}-first-name`}
-                  placeholder="First name"
+                  placeholder="Nhập tên"
                   disabled={saving}
                   aria-invalid={!!errors.first_name}
                   {...form.register("first_name")}
@@ -291,12 +291,12 @@ export function CustomerFormDialog({
                 <FieldLabel
                   htmlFor={`${formId}-last-name`}
                 >
-                  Last Name
+                  Họ
                 </FieldLabel>
 
                 <Input
                   id={`${formId}-last-name`}
-                  placeholder="Last name"
+                  placeholder="Nhập họ"
                   disabled={saving}
                   aria-invalid={!!errors.last_name}
                   {...form.register("last_name")}
@@ -327,13 +327,13 @@ export function CustomerFormDialog({
 
             <Field data-invalid={!!errors.phone}>
               <FieldLabel htmlFor={`${formId}-phone`}>
-                Phone
+                Điện thoại
               </FieldLabel>
 
               <Input
                 id={`${formId}-phone`}
                 type="tel"
-                placeholder="Phone number"
+                placeholder="Nhập số điện thoại"
                 disabled={saving}
                 aria-invalid={!!errors.phone}
                 {...form.register("phone")}
@@ -344,12 +344,12 @@ export function CustomerFormDialog({
 
             <Field data-invalid={!!errors.street}>
               <FieldLabel htmlFor={`${formId}-street`}>
-                Street
+                Đường
               </FieldLabel>
 
               <Input
                 id={`${formId}-street`}
-                placeholder="Street address"
+                placeholder="Địa chỉ đường"
                 disabled={saving}
                 aria-invalid={!!errors.street}
                 {...form.register("street")}
@@ -361,12 +361,12 @@ export function CustomerFormDialog({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.city}>
                 <FieldLabel htmlFor={`${formId}-city`}>
-                  City
+                  Tỉnh/thành phố
                 </FieldLabel>
 
                 <Input
                   id={`${formId}-city`}
-                  placeholder="City"
+                  placeholder="Tỉnh/thành phố"
                   disabled={saving}
                   aria-invalid={!!errors.city}
                   {...form.register("city")}
@@ -377,12 +377,12 @@ export function CustomerFormDialog({
 
               <Field data-invalid={!!errors.state}>
                 <FieldLabel htmlFor={`${formId}-state`}>
-                  State
+                  Bang/khu vực
                 </FieldLabel>
 
                 <Input
                   id={`${formId}-state`}
-                  placeholder="State"
+                  placeholder="Bang/khu vực"
                   disabled={saving}
                   aria-invalid={!!errors.state}
                   {...form.register("state")}
@@ -403,7 +403,7 @@ export function CustomerFormDialog({
                 disabled={saving}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                Hủy
               </Button>
 
               <Button
@@ -415,8 +415,8 @@ export function CustomerFormDialog({
                   ? "Saving..."
                   : submitLabel ??
                     (customer
-                      ? "Save Changes"
-                      : "Create Customer")}
+                      ? "Lưu thay đổi"
+                      : "Tạo khách hàng")}
               </Button>
             </DialogFooter>
           </form>

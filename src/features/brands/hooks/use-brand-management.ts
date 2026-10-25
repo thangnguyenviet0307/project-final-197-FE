@@ -14,7 +14,7 @@ export function useCreateBrand() {
   const client = useQueryClient()
   return useMutation({
     mutationFn: brandsService.createBrand,
-    meta: { successMessage: "Brand created." },
+    meta: { successMessage: "Đã tạo thương hiệu." },
     onSuccess: () => invalidateCatalog(client, "brands"),
   })
 }

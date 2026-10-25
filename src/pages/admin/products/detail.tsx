@@ -19,26 +19,26 @@ export default function ProductDetailPage() {
   const admin = useAuthStore(state => state.user?.role === "admin")
   const product = query.data
   const returnTo = useProductListLocation()
-  return <BaseLayout title={product?.product_name ?? "Product detail"}><div className="space-y-6 px-4 lg:px-6">
-    <div className="flex gap-2"><Button nativeButton={false} role="link" variant="outline" render={<Link to={returnTo} />}><ArrowLeft />Back</Button>
-      {admin && product && <Button nativeButton={false} role="link" render={<Link to={`/products/${id}/edit`} state={{ returnTo }} />}><Pencil />Edit</Button>}</div>
+  return <BaseLayout title={product?.product_name ?? "Chi tiết sản phẩm"}><div className="space-y-6 px-4 lg:px-6">
+    <div className="flex gap-2"><Button nativeButton={false} role="link" variant="outline" render={<Link to={returnTo} />}><ArrowLeft />Quay lại</Button>
+      {admin && product && <Button nativeButton={false} role="link" render={<Link to={`/products/${id}/edit`} state={{ returnTo }} />}><Pencil />Chỉnh sửa</Button>}</div>
     {query.isError || !product ? <ProductQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
       <div className="grid gap-6 md:grid-cols-2"><div className="space-y-3"><ProductImage src={product.thumbnail} alt={product.product_name} className="h-80 w-full rounded-lg border" />
         <div className="flex flex-wrap gap-2">{product.images?.map(image => <ProductImage key={image.public_id} src={image.secure_url} alt={product.product_name} className="size-24 border" />)}</div></div>
         <dl className="grid grid-cols-2 content-start gap-3 text-sm">{[
-          ["Category", catalogName(product.category)], ["Brand", catalogName(product.brand)],
-          ["Price", product.price === undefined ? "—" : formatPrice(product.price)], ["Discount", product.discount === undefined ? "—" : `${product.discount}%`],
-          ["Stock", product.stock], ["Model year", product.model_year], ["Slug", product.slug], ["Created", product.createdAt], ["Updated", product.updatedAt],
+          ["Danh mục", catalogName(product.category)], ["Thương hiệu", catalogName(product.brand)],
+          ["Giá", product.price === undefined ? "—" : formatPrice(product.price)], ["Giảm giá", product.discount === undefined ? "—" : `${product.discount}%`],
+          ["Tồn kho", product.stock], ["Năm sản xuất", product.model_year], ["Đường dẫn", product.slug], ["Ngày tạo", product.createdAt], ["Updated", product.updatedAt],
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value ?? "—"}</dd></div>)}
-          <div><dt className="text-muted-foreground">Status</dt><dd><Badge variant="secondary">{product.is_active ? "Active" : "Inactive"}</Badge></dd></div></dl>
+          <div><dt className="text-muted-foreground">Trạng thái</dt><dd><Badge variant="secondary">{product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></dd></div></dl>
       </div>
       {admin && <ProductGallery product={product} />}
-      {product.description && <section><h2 className="mb-2 text-lg font-semibold">Description</h2><div className="product-description-content" dangerouslySetInnerHTML={{ __html: descriptionToHtml(product.description) }} /></section>}
-      <section className="space-y-4"><h2 className="text-lg font-semibold">Variants</h2>{!product.variants?.length && <p className="text-sm text-muted-foreground">No variants.</p>}
+      {product.description && <section><h2 className="mb-2 text-lg font-semibold">Mô tả</h2><div className="product-description-content" dangerouslySetInnerHTML={{ __html: descriptionToHtml(product.description) }} /></section>}
+      <section className="space-y-4"><h2 className="text-lg font-semibold">Biến thể</h2>{!product.variants?.length && <p className="text-sm text-muted-foreground">Chưa có biến thể.</p>}
         {product.variants?.map(variant => <article key={variant._id ?? variant.sku} className="space-y-3 rounded-lg border p-4"><h3 className="font-medium">{variant.variant_name || variant.sku}</h3>
           <dl className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">{[
-            ["SKU", variant.sku], ["Price", formatPrice(variant.price)], ["Stock", variant.stock], ["Color", variant.color], ["Size", variant.size],
-            ["Compare at price", variant.compare_at_price == null ? null : formatPrice(variant.compare_at_price)],
+            ["SKU", variant.sku], ["Giá", formatPrice(variant.price)], ["Tồn kho", variant.stock], ["Màu sắc", variant.color], ["Kích thước", variant.size],
+            ["Giá so sánh", variant.compare_at_price == null ? null : formatPrice(variant.compare_at_price)],
             ...Object.entries(variant.attributes ?? {}).map(([name, value]) => [name, value === null ? "null" : String(value)]),
           ].map(([label, value], index) => value != null && <div key={`${label}-${index}`} className="min-w-0"><dt className="text-muted-foreground">{label}</dt><dd className="break-words">{value}</dd></div>)}</dl>
           <div className="flex flex-wrap gap-2">{[...new Set([variant.image, ...(variant.images ?? [])].filter((url): url is string => !!url))].map(url => <ProductImage key={url} src={url} alt={variant.variant_name || variant.sku} className="size-24 border" />)}</div>

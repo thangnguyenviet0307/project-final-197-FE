@@ -22,10 +22,10 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 const accountFormSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  firstName: z.string().min(1, "Vui lòng nhập tên"),
+  lastName: z.string().min(1, "Vui lòng nhập họ"),
+  email: z.string().email("Địa chỉ email không hợp lệ"),
+  username: z.string().min(3, "Tên đăng nhập phải có ít nhất 3 ký tự"),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional(),
@@ -56,9 +56,9 @@ export default function AccountSettings() {
     <BaseLayout>
       <div className="flex flex-col gap-6 px-4 lg:px-6">
         <div>
-          <h1 className="text-3xl font-bold">Account Settings</h1>
+          <h1 className="text-3xl font-bold">Cài đặt tài khoản</h1>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences.
+            Quản lý thông tin và tùy chọn tài khoản.
           </p>
         </div>
         <form
@@ -67,10 +67,9 @@ export default function AccountSettings() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
+              <CardTitle>Thông tin cá nhân</CardTitle>
               <CardDescription>
-                Update your personal information that will be displayed on your
-                profile.
+                Cập nhật thông tin cá nhân hiển thị trên hồ sơ.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -81,13 +80,13 @@ export default function AccountSettings() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="account-first-name">
-                        First Name
+                        Tên
                       </FieldLabel>
 
                       <Input
                         id="account-first-name"
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter your first name"
+                        placeholder="Nhập tên của bạn"
                         {...field}
                       />
                       {fieldState.invalid && (
@@ -102,13 +101,13 @@ export default function AccountSettings() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="account-last-name">
-                        Last Name
+                        Họ
                       </FieldLabel>
 
                       <Input
                         id="account-last-name"
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter your last name"
+                        placeholder="Nhập họ của bạn"
                         {...field}
                       />
                       {fieldState.invalid && (
@@ -124,14 +123,14 @@ export default function AccountSettings() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="account-email">
-                      Email Address
+                      Địa chỉ email
                     </FieldLabel>
 
                     <Input
                       id="account-email"
                       aria-invalid={fieldState.invalid}
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="Nhập địa chỉ email"
                       {...field}
                     />
                     {fieldState.invalid && (
@@ -145,12 +144,12 @@ export default function AccountSettings() {
                 name="username"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="account-username">Username</FieldLabel>
+                    <FieldLabel htmlFor="account-username">Tên đăng nhập</FieldLabel>
 
                     <Input
                       id="account-username"
                       aria-invalid={fieldState.invalid}
-                      placeholder="Enter your username"
+                      placeholder="Nhập tên đăng nhập"
                       {...field}
                     />
                     {fieldState.invalid && (
@@ -164,9 +163,9 @@ export default function AccountSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>Đổi mật khẩu</CardTitle>
               <CardDescription>
-                Update your password to keep your account secure.
+                Cập nhật mật khẩu để bảo vệ tài khoản.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -176,14 +175,14 @@ export default function AccountSettings() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="account-current-password">
-                      Current Password
+                      Mật khẩu hiện tại
                     </FieldLabel>
 
                     <Input
                       id="account-current-password"
                       aria-invalid={fieldState.invalid}
                       type="password"
-                      placeholder="Enter current password"
+                      placeholder="Nhập mật khẩu hiện tại"
                       {...field}
                     />
                     {fieldState.invalid && (
@@ -198,14 +197,14 @@ export default function AccountSettings() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="account-new-password">
-                      New Password
+                      Mật khẩu mới
                     </FieldLabel>
 
                     <Input
                       id="account-new-password"
                       aria-invalid={fieldState.invalid}
                       type="password"
-                      placeholder="Enter new password"
+                      placeholder="Nhập mật khẩu mới"
                       {...field}
                     />
                     {fieldState.invalid && (
@@ -220,14 +219,14 @@ export default function AccountSettings() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="account-confirm-password">
-                      Confirm New Password
+                      Xác nhận mật khẩu mới
                     </FieldLabel>
 
                     <Input
                       id="account-confirm-password"
                       aria-invalid={fieldState.invalid}
                       type="password"
-                      placeholder="Confirm new password"
+                      placeholder="Nhập lại mật khẩu mới"
                       {...field}
                     />
                     {fieldState.invalid && (
@@ -241,18 +240,18 @@ export default function AccountSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Danger Zone</CardTitle>
+              <CardTitle>Thao tác nguy hiểm</CardTitle>
               <CardDescription>
-                Irreversible and destructive actions.
+                Các thao tác xóa dữ liệu không thể hoàn tác.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Separator />
               <div className="flex flex-wrap gap-2 items-center justify-between">
                 <div>
-                  <h4 className="font-semibold">Delete Account</h4>
+                  <h4 className="font-semibold">Xóa tài khoản</h4>
                   <p className="text-sm text-muted-foreground">
-                    Permanently delete your account and all associated data.
+                    Xóa vĩnh viễn tài khoản và tất cả dữ liệu liên quan.
                   </p>
                 </div>
                 <Button
@@ -260,7 +259,7 @@ export default function AccountSettings() {
                   type="button"
                   className="cursor-pointer"
                 >
-                  Delete Account
+                  Xóa tài khoản
                 </Button>
               </div>
             </CardContent>
@@ -268,10 +267,10 @@ export default function AccountSettings() {
 
           <div className="flex gap-2">
             <Button type="submit" className="cursor-pointer">
-              Save Changes
+              Lưu thay đổi
             </Button>
             <Button variant="outline" type="reset" className="cursor-pointer">
-              Cancel
+              Hủy
             </Button>
           </div>
         </form>

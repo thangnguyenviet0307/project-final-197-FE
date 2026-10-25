@@ -77,7 +77,7 @@ export function DataTableToolbar<TData extends RowData>({
             onValueChange={handleStatusChange}
           >
             <SelectTrigger className="w-full cursor-pointer">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -104,17 +104,17 @@ export function DataTableToolbar<TData extends RowData>({
 
           {/* Category Filter */}
           <Select
-            items={[{ label: "All Categories", value: "all" }, ...categories]}
+            items={[{ label: "Tất cả danh mục", value: "all" }, ...categories]}
             value={categoryFilter || "all"}
             onValueChange={handleCategoryChange}
           >
             <SelectTrigger className="w-full cursor-pointer">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder="Danh mục" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all" className="cursor-pointer">
-                  All Categories
+                  Tất cả danh mục
                 </SelectItem>
                 {categories.map((category) => (
                   <SelectItem

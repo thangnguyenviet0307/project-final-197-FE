@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 
 export function DiscardDialog({ open, keep, discard }: { open: boolean; keep: () => void; discard: () => void }) {
   return <Dialog open={open} onOpenChange={value => { if (!value) keep() }}>
-    <DialogContent><DialogHeader><DialogTitle>Discard unsaved changes?</DialogTitle><DialogDescription>Your changes have not been saved. Leaving will discard them.</DialogDescription></DialogHeader>
-      <DialogFooter><Button type="button" variant="outline" onClick={keep}>Keep editing</Button><Button type="button" variant="destructive" onClick={discard}>Discard changes</Button></DialogFooter>
+    <DialogContent><DialogHeader><DialogTitle>Bỏ các thay đổi chưa lưu?</DialogTitle><DialogDescription>Các thay đổi chưa được lưu. Nếu rời trang, bạn sẽ mất các thay đổi này.</DialogDescription></DialogHeader>
+      <DialogFooter><Button type="button" variant="outline" onClick={keep}>Tiếp tục chỉnh sửa</Button><Button type="button" variant="destructive" onClick={discard}>Bỏ thay đổi</Button></DialogFooter>
     </DialogContent>
   </Dialog>
 }

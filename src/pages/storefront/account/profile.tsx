@@ -16,9 +16,9 @@ export default function ProfilePage() {
       <div className="flex items-center gap-3 border-b border-gray-200 pb-5">
         <UserRound size={24} className="text-[#55b000]" />
         <div>
-          <h2 className="text-2xl font-bold">My Profile</h2>
+          <h2 className="text-2xl font-bold">Hồ sơ của tôi</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Personal information preview
+            Bản xem trước thông tin cá nhân
           </p>
         </div>
       </div>
@@ -30,33 +30,33 @@ export default function ProfilePage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="first-name" className="mb-2 block text-sm">
-              First Name
+              Tên
             </label>
             <input
               id="first-name"
               className={inputClass}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              placeholder="First name"
+              placeholder="Nhập tên"
             />
           </div>
 
           <div>
             <label htmlFor="last-name" className="mb-2 block text-sm">
-              Last Name
+              Họ
             </label>
             <input
               id="last-name"
               className={inputClass}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              placeholder="Last name"
+              placeholder="Nhập họ"
             />
           </div>
 
           <div>
             <label htmlFor="email" className="mb-2 block text-sm">
-              Email Address
+              Địa chỉ email
             </label>
             <input
               id="email"
@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
           <div>
             <label htmlFor="phone" className="mb-2 block text-sm">
-              Phone Number
+              Số điện thoại
             </label>
             <input
               id="phone"
@@ -78,7 +78,7 @@ export default function ProfilePage() {
               className={inputClass}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone number"
+              placeholder="Nhập số điện thoại"
             />
           </div>
         </div>
@@ -88,12 +88,11 @@ export default function ProfilePage() {
           disabled
           className="rounded-md bg-[#55b000] px-7 py-3 text-sm font-bold text-white opacity-60"
         >
-          SAVE CHANGES
+          LƯU THAY ĐỔI
         </button>
 
         <p className="text-xs text-gray-500">
-          Preview only. Editing customer profiles requires
-          customer authentication and an appropriate API.
+          Đây là bản xem trước. Tính năng chỉnh sửa hồ sơ sẽ khả dụng khi hệ thống tài khoản khách hàng được hoàn thiện.
         </p>
       </form>
     </section>

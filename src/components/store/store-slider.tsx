@@ -29,7 +29,7 @@ export function StoreSlider({
 
   return (
     <section
-      aria-label="Store Slider"
+      aria-label="Trình chiếu cửa hàng"
       className={`relative w-full overflow-hidden ${className}`}
     >
       {/* Slide content */}

@@ -19,19 +19,19 @@ import { Github } from "@/components/icons/brand-icons"
 
 const contactFormSchema = z.object({
   firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
+    message: "Tên phải có ít nhất 2 ký tự.",
   }),
   lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
+    message: "Họ phải có ít nhất 2 ký tự.",
   }),
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Vui lòng nhập địa chỉ email hợp lệ.",
   }),
   subject: z.string().min(5, {
-    message: "Subject must be at least 5 characters.",
+    message: "Chủ đề phải có ít nhất 5 ký tự.",
   }),
   message: z.string().min(10, {
-    message: "Message must be at least 10 characters.",
+    message: "Lời nhắn phải có ít nhất 10 ký tự.",
   }),
 })
 
@@ -59,14 +59,13 @@ export function ContactSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Get In Touch
+            Liên hệ với chúng tôi
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Need help or have questions?
+            Bạn cần hỗ trợ hoặc có thắc mắc?
           </h2>
           <p className="text-lg text-muted-foreground">
-            Our team is here to help you get the most out of ShadcnStore. Choose
-            the best way to reach out to us.
+            Đội ngũ của chúng tôi luôn sẵn sàng giúp bạn sử dụng ShadcnStore hiệu quả. Hãy chọn cách liên hệ phù hợp.
           </p>
         </div>
 
@@ -77,13 +76,12 @@ export function ContactSection() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="size-5 text-primary" />
-                  Discord Community
+                  Cộng đồng Discord
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-3">
-                  Join our active community for quick help and discussions with
-                  other developers.
+                  Tham gia cộng đồng để được hỗ trợ và trao đổi với các lập trình viên khác.
                 </p>
                 <Button
                   variant="outline"
@@ -98,7 +96,7 @@ export function ContactSection() {
                     />
                   }
                 >
-                  Join Discord
+                  Tham gia Discord
                 </Button>
               </CardContent>
             </Card>
@@ -107,13 +105,12 @@ export function ContactSection() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Github className="size-5 text-primary" />
-                  GitHub Issues
+                  Báo lỗi trên GitHub
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-3">
-                  Report bugs, request features, or contribute to our open
-                  source repository.
+                  Báo lỗi, đề xuất tính năng hoặc đóng góp vào kho mã nguồn mở.
                 </p>
                 <Button
                   variant="outline"
@@ -128,7 +125,7 @@ export function ContactSection() {
                     />
                   }
                 >
-                  View on GitHub
+                  Xem trên GitHub
                 </Button>
               </CardContent>
             </Card>
@@ -137,13 +134,12 @@ export function ContactSection() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="size-5 text-primary" />
-                  Documentation
+                  Tài liệu
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-3">
-                  Browse our comprehensive guides, tutorials, and component
-                  documentation.
+                  Khám phá hướng dẫn và tài liệu chi tiết về các thành phần.
                 </p>
                 <Button
                   variant="outline"
@@ -152,7 +148,7 @@ export function ContactSection() {
                   nativeButton={false}
                   render={<a href="#" />}
                 >
-                  View Docs
+                  Xem tài liệu
                 </Button>
               </CardContent>
             </Card>
@@ -164,7 +160,7 @@ export function ContactSection() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="size-5" />
-                  Send us a message
+                  Gửi lời nhắn cho chúng tôi
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -179,7 +175,7 @@ export function ContactSection() {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="contact-section-first-name">
-                            First name
+                            Nhập tên
                           </FieldLabel>
 
                           <Input
@@ -200,7 +196,7 @@ export function ContactSection() {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="contact-section-last-name">
-                            Last name
+                            Nhập họ
                           </FieldLabel>
 
                           <Input
@@ -245,13 +241,13 @@ export function ContactSection() {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="contact-section-subject">
-                            Subject
+                            Chủ đề
                           </FieldLabel>
 
                           <Input
                             id="contact-section-subject"
                             aria-invalid={fieldState.invalid}
-                            placeholder="Component request, bug report, general inquiry..."
+                            placeholder="Yêu cầu thành phần, báo lỗi, thắc mắc..."
                             {...field}
                           />
                           {fieldState.invalid && (
@@ -266,13 +262,13 @@ export function ContactSection() {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="contact-section-message">
-                            Message
+                            Lời nhắn
                           </FieldLabel>
 
                           <Textarea
                             id="contact-section-message"
                             aria-invalid={fieldState.invalid}
-                            placeholder="Tell us how we can help you with ShadcnStore components..."
+                            placeholder="Hãy cho biết bạn cần hỗ trợ gì về các thành phần ShadcnStore..."
                             rows={10}
                             className="min-h-50"
                             {...field}
@@ -285,7 +281,7 @@ export function ContactSection() {
                     />
                   </FieldGroup>
                   <Button type="submit" className="w-full cursor-pointer">
-                    Send Message
+                    Gửi lời nhắn
                   </Button>
                 </form>
               </CardContent>

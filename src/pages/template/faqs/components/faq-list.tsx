@@ -36,13 +36,13 @@ interface FAQListProps {
 }
 
 export function FAQList({ faqs, categories }: FAQListProps) {
-  const [selectedCategory, setSelectedCategory] = useState("All")
+  const [selectedCategory, setSelectedCategory] = useState("Tất cả")
   const [searchQuery, setSearchQuery] = useState("")
 
   // Filter FAQs based on selected category and search query
   const filteredFaqs = faqs.filter((faq) => {
     const matchesCategory =
-      selectedCategory === "All" || faq.category === selectedCategory
+      selectedCategory === "Tất cả" || faq.category === selectedCategory
     const matchesSearch =
       searchQuery === "" ||
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,7 +55,7 @@ export function FAQList({ faqs, categories }: FAQListProps) {
       {/* Categories Sidebar */}
       <Card className="lg:col-span-2 xl:col-span-1">
         <CardHeader>
-          <CardTitle className="text-lg">Categories</CardTitle>
+          <CardTitle className="text-lg">Danh mục</CardTitle>
           <InputGroup>
             <InputGroupInput
               placeholder="Search FAQs..."
@@ -86,7 +86,7 @@ export function FAQList({ faqs, categories }: FAQListProps) {
                   selectedCategory === category.name && "bg-background"
                 )}
               >
-                {category.name === "All" ? faqs.length : category.count}
+                {category.name === "Tất cả" ? faqs.length : category.count}
               </Badge>
             </div>
           ))}
@@ -98,7 +98,7 @@ export function FAQList({ faqs, categories }: FAQListProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">
-              {selectedCategory === "All"
+              {selectedCategory === "Tất cả"
                 ? "All FAQs"
                 : `${selectedCategory} FAQs`}
               <span className="text-sm font-normal text-muted-foreground ml-2">

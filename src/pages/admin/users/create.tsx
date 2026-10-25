@@ -4,7 +4,7 @@ import { UserForm } from "@/features/users/components/user-form"
 
 export default function UserCreatePage() {
   const navigate = useNavigate()
-  return <CreatePageLayout title="Add user" backTo="/users" backLabel="Back to users">
+  return <CreatePageLayout title="Thêm người dùng" backTo="/users" backLabel="Về danh sách người dùng">
     <UserForm onSaved={() => navigate("/users")} onCancel={() => navigate("/users")} />
   </CreatePageLayout>
 }

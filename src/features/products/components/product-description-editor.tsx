@@ -15,7 +15,7 @@ export function ProductDescriptionEditor({ value, onChange, onBlur, disabled, in
     if (!root) return
     root.id = "description"
     root.setAttribute("role", "textbox")
-    root.setAttribute("aria-label", "Description")
+    root.setAttribute("aria-label", "Mô tả")
     root.setAttribute("aria-multiline", "true")
     root.setAttribute("aria-invalid", String(invalid))
     root.setAttribute("aria-describedby", "description-hint description-error")
@@ -25,6 +25,6 @@ export function ProductDescriptionEditor({ value, onChange, onBlur, disabled, in
       onBlur={onBlur} onChange={(html, _delta, source, instance) => {
         if (source === "user") onChange(instance.getText().trim() ? sanitizeDescription(html) : "")
       }} />
-    <p id="description-hint" className="mt-2 text-xs text-muted-foreground">{value.length}/2000 characters including formatting. Images are managed separately.</p>
+    <p id="description-hint" className="mt-2 text-xs text-muted-foreground">{value.length}/2000 ký tự, bao gồm định dạng. Hình ảnh được quản lý riêng.</p>
   </div>
 }

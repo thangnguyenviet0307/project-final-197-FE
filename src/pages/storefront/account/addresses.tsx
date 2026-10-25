@@ -5,7 +5,7 @@ export default function AddressesPage() {
   return (
     <section>
       <h2 className="border-b border-gray-200 pb-5 text-2xl font-bold">
-        My Addresses
+        Địa chỉ của tôi
       </h2>
 
       <div className="flex min-h-80 flex-col items-center justify-center text-center">
@@ -14,12 +14,11 @@ export default function AddressesPage() {
         </div>
 
         <h3 className="mt-6 text-lg font-bold">
-          Delivery Addresses
+          Địa chỉ giao hàng
         </h3>
 
         <p className="mt-3 max-w-md text-sm leading-7 text-gray-500">
-          Saved delivery addresses will be displayed here
-          when customer account management is implemented.
+          Địa chỉ giao hàng đã lưu sẽ hiển thị tại đây khi tính năng quản lý tài khoản khách hàng được triển khai.
         </p>
       </div>
     </section>

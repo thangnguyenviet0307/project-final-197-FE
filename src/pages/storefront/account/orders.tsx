@@ -5,7 +5,7 @@ export default function OrdersPage() {
   return (
     <section>
       <h2 className="border-b border-gray-200 pb-5 text-2xl font-bold">
-        My Orders
+        Đơn hàng của tôi
       </h2>
 
       <div className="flex min-h-80 flex-col items-center justify-center text-center">
@@ -14,12 +14,11 @@ export default function OrdersPage() {
         </div>
 
         <h3 className="mt-6 text-lg font-bold">
-          Order History
+          Lịch sử đơn hàng
         </h3>
 
         <p className="mt-3 max-w-md text-sm leading-7 text-gray-500">
-          Customer order history will appear here when
-          storefront authentication and order APIs are available.
+          Lịch sử đơn hàng sẽ hiển thị tại đây khi tính năng tài khoản và tra cứu đơn hàng khả dụng.
         </p>
       </div>
     </section>

@@ -52,127 +52,127 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const searchItems: SearchItem[] = [
     // Overview
     {
-      title: "Dashboard",
+      title: "Bảng điều khiển",
       url: "/admin/dashboard",
-      group: "Overview",
+      group: "Tổng quan",
       icon: LayoutDashboard,
     },
 
     // Apps
-    { title: "Products", url: "/products", group: "Apps", icon: Package },
-    { title: "Orders", url: "/orders", group: "Apps", icon: Package },
-    { title: "Categories", url: "/categories", group: "Apps", icon: Package },
-    { title: "Brands", url: "/brands", group: "Apps", icon: Package },
-    { title: "Customers", url: "/customers", group: "Apps", icon: Users },
-    { title: "Mail", url: "/mail", group: "Apps", icon: Mail },
-    { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
-    { title: "Chat", url: "/chat", group: "Apps", icon: MessageCircle },
-    { title: "Calendar", url: "/calendar", group: "Apps", icon: Calendar },
-    { title: "User Management", url: "/users", group: "Apps", icon: Users },
-    { title: "Change password", url: "/change-password", group: "Settings", icon: Shield },
+    { title: "Sản phẩm", url: "/products", group: "Ứng dụng", icon: Package },
+    { title: "Đơn hàng", url: "/orders", group: "Ứng dụng", icon: Package },
+    { title: "Danh mục", url: "/categories", group: "Ứng dụng", icon: Package },
+    { title: "Thương hiệu", url: "/brands", group: "Ứng dụng", icon: Package },
+    { title: "Khách hàng", url: "/customers", group: "Ứng dụng", icon: Users },
+    { title: "Thư", url: "/mail", group: "Ứng dụng", icon: Mail },
+    { title: "Công việc", url: "/tasks", group: "Ứng dụng", icon: CheckSquare },
+    { title: "Trò chuyện", url: "/chat", group: "Ứng dụng", icon: MessageCircle },
+    { title: "Lịch", url: "/calendar", group: "Ứng dụng", icon: Calendar },
+    { title: "Quản lý người dùng", url: "/users", group: "Ứng dụng", icon: Users },
+    { title: "Đổi mật khẩu", url: "/change-password", group: "Cài đặt", icon: Shield },
 
     // Auth Pages
     {
-      title: "Sign In 1",
+      title: "Đăng nhập 1",
       url: "/auth/sign-in",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
     {
-      title: "Sign In 2",
+      title: "Đăng nhập 2",
       url: "/auth/sign-in-2",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
     {
-      title: "Sign Up 1",
+      title: "Đăng ký 1",
       url: "/auth/sign-up",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
     {
-      title: "Sign Up 2",
+      title: "Đăng ký 2",
       url: "/auth/sign-up-2",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
     {
-      title: "Forgot Password 1",
+      title: "Quên mật khẩu 1",
       url: "/auth/forgot-password",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
     {
-      title: "Forgot Password 2",
+      title: "Quên mật khẩu 2",
       url: "/auth/forgot-password-2",
-      group: "Auth Pages",
+      group: "Trang xác thực",
       icon: Shield,
     },
 
     // Errors
     {
-      title: "Unauthorized",
+      title: "Chưa xác thực",
       url: "/errors/unauthorized",
-      group: "Errors",
+      group: "Trang lỗi",
       icon: AlertTriangle,
     },
     {
-      title: "Forbidden",
+      title: "Không có quyền truy cập",
       url: "/errors/forbidden",
-      group: "Errors",
+      group: "Trang lỗi",
       icon: AlertTriangle,
     },
     {
-      title: "Not Found",
+      title: "Không tìm thấy",
       url: "/errors/not-found",
-      group: "Errors",
+      group: "Trang lỗi",
       icon: AlertTriangle,
     },
     {
-      title: "Internal Server Error",
+      title: "Lỗi máy chủ",
       url: "/errors/internal-server-error",
-      group: "Errors",
+      group: "Trang lỗi",
       icon: AlertTriangle,
     },
     {
-      title: "Under Maintenance",
+      title: "Đang bảo trì",
       url: "/errors/under-maintenance",
-      group: "Errors",
+      group: "Trang lỗi",
       icon: AlertTriangle,
     },
 
     // Settings
     {
-      title: "User Profile",
+      title: "Hồ sơ người dùng",
       url: "/settings/user",
-      group: "Settings",
+      group: "Cài đặt",
       icon: User,
     },
     {
-      title: "Appearance",
+      title: "Giao diện",
       url: "/settings/appearance",
-      group: "Settings",
+      group: "Cài đặt",
       icon: Palette,
     },
     {
-      title: "Notifications",
+      title: "Thông báo",
       url: "/settings/notifications",
-      group: "Settings",
+      group: "Cài đặt",
       icon: Bell,
     },
     {
-      title: "Connections",
+      title: "Kết nối",
       url: "/settings/connections",
-      group: "Settings",
+      group: "Cài đặt",
       icon: Link2,
     },
 
     // Pages
-    { title: "FAQs", url: "/faqs", group: "Pages", icon: HelpCircle },
+    { title: "Câu hỏi thường gặp", url: "/faqs", group: "Các trang", icon: HelpCircle },
   ]
 
   const groupedItems = searchItems.filter((item) =>
-    item.group !== "Auth Pages" && item.group !== "Errors" &&
+    item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
     (!["/users", "/brands", "/customers"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
@@ -194,14 +194,14 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     <CommandDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Command Search"
-      description="Search pages and settings"
+      title="Tìm kiếm nhanh"
+      description="Tìm trang và cài đặt"
       className="sm:max-w-[640px]"
     >
       <Command>
-        <CommandInput placeholder="What do you need?" autoFocus />
+        <CommandInput placeholder="Bạn cần tìm gì?" autoFocus />
         <CommandList className="max-h-[400px]">
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>Không tìm thấy kết quả.</CommandEmpty>
           {Object.entries(groupedItems).map(([group, items]) => (
             <CommandGroup key={group} heading={group}>
               {items.map((item) => {
@@ -234,7 +234,7 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
       className="relative w-full justify-start font-normal text-muted-foreground sm:pr-12 md:w-36 lg:w-56"
     >
       <Search data-icon="inline-start" />
-      Search...
+      Tìm kiếm...
       <Kbd className="absolute top-1/2 right-1.5 hidden -translate-y-1/2 sm:inline-flex">
         ⌘K
       </Kbd>

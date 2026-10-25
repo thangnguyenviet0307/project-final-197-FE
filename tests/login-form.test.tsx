@@ -35,15 +35,15 @@ function setup() {
 }
 function submit(email = " TEST@example.com ", password = "Password123") {
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: email } })
-  fireEvent.change(screen.getByLabelText("Password"), { target: { value: password } })
-  fireEvent.click(screen.getByRole("button", { name: "Sign in" }))
+  fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: password } })
+  fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
 }
 
 it("validates invalid email/password without sending an API request", async () => {
   authApi.defaults.adapter = vi.fn<AxiosAdapter>()
   setup(); submit("invalid", "123")
-  expect(await screen.findByText("Invalid email address.")).toBeTruthy()
-  expect(screen.getByText("Password must contain at least 6 characters.")).toBeTruthy()
+  expect(await screen.findByText("Địa chỉ email không hợp lệ.")).toBeTruthy()
+  expect(screen.getByText("Mật khẩu phải có ít nhất 6 ký tự.")).toBeTruthy()
   expect(authApi.defaults.adapter).not.toHaveBeenCalled()
 })
 
@@ -55,26 +55,26 @@ it.each([
   authApi.defaults.adapter = vi.fn<AxiosAdapter>()
   setup()
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: email } })
-  fireEvent.change(screen.getByLabelText("Password"), { target: { value: password } })
-  const link = screen.getByRole("link", { name: "Forgot password?" })
+  fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: password } })
+  const link = screen.getByRole("link", { name: "Quên mật khẩu?" })
   expect(link.closest("form")).toBeNull()
   const submitEvent = vi.fn()
-  const form = screen.getByRole("button", { name: "Sign in" }).closest("form")!
+  const form = screen.getByRole("button", { name: "Đăng nhập" }).closest("form")!
   form.addEventListener("submit", submitEvent)
   fireEvent.click(link)
-  expect(await screen.findByText("Your account is managed by an administrator.")).toBeTruthy()
+  expect(await screen.findByText("Tài khoản của bạn do quản trị viên quản lý.")).toBeTruthy()
   expect(submitEvent).not.toHaveBeenCalled()
   expect(authApi.defaults.adapter).not.toHaveBeenCalled()
   expect(screen.queryByRole("alert")).toBeNull()
 })
 
 it("shows login errors and offers admin password recovery without public registration", async () => {
-  authApi.defaults.adapter = async (config) => { throw new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, undefined, {
+  authApi.defaults.adapter = async (config) => { throw new AxiosError("Chưa xác thực", "ERR_BAD_REQUEST", config, undefined, {
     status: 401, statusText: "", headers: new AxiosHeaders(), config, data: { message: "Invalid email or password" },
   }) }
   setup(); submit()
   expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Invalid email or password")
-  expect(screen.getByRole("link", { name: "Forgot password?" }).getAttribute("href")).toBe("/forgot-password")
+  expect(screen.getByRole("link", { name: "Quên mật khẩu?" }).getAttribute("href")).toBe("/forgot-password")
   expect(screen.queryByRole("link", { name: /sign up/i })).toBeNull()
 })
 
@@ -82,7 +82,7 @@ it("normalizes email and returns to the originally requested admin page after lo
   authApi.defaults.adapter = async (config) => {
     expect(JSON.parse(config.data)).toEqual({ email: "test@example.com", password: "Password123" })
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-      user: { id: "a", email: "test@example.com", firstName: "Test", lastName: "Admin", role: "admin", mustChangePassword: false },
+      user: { id: "a", email: "test@example.com", firstName: "Test", lastName: "Quản trị viên", role: "admin", mustChangePassword: false },
       accessToken: "access", refreshToken: "refresh",
     } } }
   }
@@ -92,7 +92,7 @@ it("normalizes email and returns to the originally requested admin page after lo
 
 it("requires a password change before visiting the saved destination", async () => {
   authApi.defaults.adapter = async (config) => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-    user: { id: "a", email: "test@example.com", firstName: "Test", lastName: "Staff", role: "staff", mustChangePassword: true },
+    user: { id: "a", email: "test@example.com", firstName: "Test", lastName: "Nhân viên", role: "staff", mustChangePassword: true },
     accessToken: "access", refreshToken: "refresh",
   } } })
   setup(); submit()

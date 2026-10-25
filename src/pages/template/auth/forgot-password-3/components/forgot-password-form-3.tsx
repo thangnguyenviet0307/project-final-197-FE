@@ -49,7 +49,7 @@ export function ForgotPasswordForm3({
                   href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-in-3"
                   className="underline underline-offset-4"
                 >
-                  Back to sign in
+                  Quay lại đăng nhập
                 </a>
               </div>
             </div>
@@ -64,8 +64,8 @@ export function ForgotPasswordForm3({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Điều khoản sử dụng</a>{" "}
+        and <a href="#">Chính sách bảo mật</a>.
       </div>
     </div>
   )

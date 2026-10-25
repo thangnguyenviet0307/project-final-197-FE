@@ -8,7 +8,7 @@ export function useCreateUser(options: MutationCallbacks<void, CreateUserInput> 
   return useMutation({
     ...options,
     mutationFn: createUser,
-    meta: { successMessage: "Account created successfully." },
+    meta: { successMessage: "Tạo tài khoản thành công." },
     onSuccess: (...args) => {
       void queryClient.invalidateQueries({ queryKey: ["users"] })
       return options.onSuccess?.(...args)

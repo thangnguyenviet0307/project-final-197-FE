@@ -43,166 +43,166 @@ const data = {
   },
   navGroups: [
     {
-      label: "Overview",
+      label: "Tổng quan",
       items: [
         {
-          title: "Dashboard",
+          title: "Bảng điều khiển",
           url: "/admin/dashboard",
           icon: LayoutDashboard,
         },
       ],
     },
     {
-      label: "Apps",
+      label: "Ứng dụng",
       items: [
         {
-          title: "Mail",
+          title: "Thư",
           url: "/mail",
           icon: Mail,
         },
         {
-          title: "Tasks",
+          title: "Công việc",
           url: "/tasks",
           icon: CheckSquare,
         },
         {
-          title: "Chat",
+          title: "Trò chuyện",
           url: "/chat",
           icon: MessageCircle,
         },
         {
-          title: "Calendar",
+          title: "Lịch",
           url: "/calendar",
           icon: Calendar,
         },
         {
-          title: "Categories",
+          title: "Danh mục",
           url: "/categories",
           icon: FolderTree,
         },
-        { title: "Products", url: "/products", icon: Package },
-        { title: "Orders", url: "/orders", icon: ShoppingBag },
+        { title: "Sản phẩm", url: "/products", icon: Package },
+        { title: "Đơn hàng", url: "/orders", icon: ShoppingBag },
         {
-          title: "Users",
+          title: "Người dùng",
           url: "/users",
           icon: Users,
         },
         {
-          title: "Brands",
+          title: "Thương hiệu",
           url: "/brands",
           icon: Tags,
         },
         {
-          title: "Customers",
+          title: "Khách hàng",
           url: "/customers",
           icon: UserRound,
         },
       ],
     },
     {
-      label: "Pages",
+      label: "Các trang",
       items: [
         {
-          title: "Landing",
+          title: "Trang giới thiệu",
           url: "/landing",
           target: "_blank",
           icon: LayoutTemplate,
         },
         {
-          title: "Auth Pages",
+          title: "Trang xác thực",
           url: "#",
           icon: Shield,
           items: [
             {
-              title: "Sign In 1",
+              title: "Đăng nhập 1",
               url: "/auth/sign-in",
             },
             {
-              title: "Sign In 2",
+              title: "Đăng nhập 2",
               url: "/auth/sign-in-2",
             },
             {
-              title: "Sign In 3",
+              title: "Đăng nhập 3",
               url: "/auth/sign-in-3",
             },
             {
-              title: "Sign Up 1",
+              title: "Đăng ký 1",
               url: "/auth/sign-up",
             },
             {
-              title: "Sign Up 2",
+              title: "Đăng ký 2",
               url: "/auth/sign-up-2",
             },
             {
-              title: "Sign Up 3",
+              title: "Đăng ký 3",
               url: "/auth/sign-up-3",
             },
             {
-              title: "Forgot Password 1",
+              title: "Quên mật khẩu 1",
               url: "/auth/forgot-password",
             },
             {
-              title: "Forgot Password 2",
+              title: "Quên mật khẩu 2",
               url: "/auth/forgot-password-2",
             },
             {
-              title: "Forgot Password 3",
+              title: "Quên mật khẩu 3",
               url: "/auth/forgot-password-3",
             },
           ],
         },
         {
-          title: "Errors",
+          title: "Trang lỗi",
           url: "#",
           icon: AlertTriangle,
           items: [
             {
-              title: "Unauthorized",
+              title: "Chưa xác thực",
               url: "/errors/unauthorized",
             },
             {
-              title: "Forbidden",
+              title: "Không có quyền truy cập",
               url: "/errors/forbidden",
             },
             {
-              title: "Not Found",
+              title: "Không tìm thấy",
               url: "/errors/not-found",
             },
             {
-              title: "Internal Server Error",
+              title: "Lỗi máy chủ",
               url: "/errors/internal-server-error",
             },
             {
-              title: "Under Maintenance",
+              title: "Đang bảo trì",
               url: "/errors/under-maintenance",
             },
           ],
         },
         {
-          title: "Settings",
+          title: "Cài đặt",
           url: "#",
           icon: Settings,
           items: [
             {
-              title: "User Profile",
+              title: "Hồ sơ người dùng",
               url: "/settings/user",
             },
             {
-              title: "Appearance",
+              title: "Giao diện",
               url: "/settings/appearance",
             },
             {
-              title: "Notifications",
+              title: "Thông báo",
               url: "/settings/notifications",
             },
             {
-              title: "Connections",
+              title: "Kết nối",
               url: "/settings/connections",
             },
           ],
         },
         {
-          title: "FAQs",
+          title: "Câu hỏi thường gặp",
           url: "/faqs",
           icon: HelpCircle,
         },
@@ -218,8 +218,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   ...group,
    items: group.items.filter(
     (item) =>
-      item.title !== "Auth Pages" &&
-      item.title !== "Errors" &&
+      item.title !== "Trang xác thực" &&
+      item.title !== "Trang lỗi" &&
       (!["/users", "/brands", "/customers"].includes(item.url) ||
        user?.role === "admin")
     ),
@@ -236,7 +236,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">ShadcnStore</span>
-                <span className="truncate text-xs">Admin Dashboard</span>
+                <span className="truncate text-xs">Quản trị cửa hàng</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

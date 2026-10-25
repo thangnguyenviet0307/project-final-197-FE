@@ -36,18 +36,18 @@ export default function ConnectionSettings() {
     <BaseLayout>
       <div className="flex flex-col gap-6 px-4 lg:px-6">
         <div>
-          <h1 className="text-3xl font-bold">Connections</h1>
+          <h1 className="text-3xl font-bold">Kết nối</h1>
           <p className="text-muted-foreground">
-            Connect your account with third-party services and integrations.
+            Kết nối tài khoản với các dịch vụ bên thứ ba.
           </p>
         </div>
 
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Connected Accounts</CardTitle>
+              <CardTitle>Tài khoản đã kết nối</CardTitle>
               <CardDescription>
-                Display content from your connected accounts on your site
+                Hiển thị nội dung từ tài khoản đã kết nối trên trang web
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -58,7 +58,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Apple</div>
                       <div className="text-sm text-muted-foreground">
-                        Calendar and contacts
+                        Lịch và danh bạ
                       </div>
                     </div>
                   </div>
@@ -75,7 +75,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Google</div>
                       <div className="text-sm text-muted-foreground">
-                        Calendar and contacts
+                        Lịch và danh bạ
                       </div>
                     </div>
                   </div>
@@ -92,7 +92,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Github</div>
                       <div className="text-sm text-muted-foreground">
-                        Manage your Git repositories
+                        Quản lý kho mã Git
                       </div>
                     </div>
                   </div>
@@ -109,7 +109,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Slack</div>
                       <div className="text-sm text-muted-foreground">
-                        Communication
+                        Trao đổi thông tin
                       </div>
                     </div>
                   </div>
@@ -125,9 +125,9 @@ export default function ConnectionSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Social Accounts</CardTitle>
+              <CardTitle>Tài khoản mạng xã hội</CardTitle>
               <CardDescription>
-                Display content from your connected accounts on your site
+                Hiển thị nội dung từ tài khoản đã kết nối trên trang web
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -139,11 +139,11 @@ export default function ConnectionSettings() {
                       <div className="font-medium">
                         Facebook
                         <Badge variant="outline" className="ml-2">
-                          Not Connected
+                          Chưa kết nối
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Share updates on Facebook
+                        Chia sẻ cập nhật trên Facebook
                       </div>
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export default function ConnectionSettings() {
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Share updates on Twitter
+                        Chia sẻ cập nhật trên Twitter
                       </div>
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export default function ConnectionSettings() {
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Stay connected at Instagram
+                        Giữ kết nối trên Instagram
                       </div>
                     </div>
                   </div>
@@ -211,11 +211,11 @@ export default function ConnectionSettings() {
                       <div className="font-medium">
                         Dribbble
                         <Badge variant="outline" className="ml-2">
-                          Not Connected
+                          Chưa kết nối
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Stay connected at Dribbble
+                        Giữ kết nối trên Dribbble
                       </div>
                     </div>
                   </div>
@@ -235,9 +235,9 @@ export default function ConnectionSettings() {
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>API Integrations</CardTitle>
+              <CardTitle>Tích hợp API</CardTitle>
               <CardDescription>
-                Configure API connections and webhooks.
+                Cấu hình kết nối API và webhook.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -248,7 +248,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Zapier</div>
                       <div className="text-sm text-muted-foreground">
-                        Automate workflows with Zapier
+                        Tự động hóa quy trình với Zapier
                       </div>
                     </div>
                   </div>
@@ -265,7 +265,7 @@ export default function ConnectionSettings() {
                     <div>
                       <div className="font-medium">Webhooks</div>
                       <div className="text-sm text-muted-foreground">
-                        Configure custom webhook endpoints
+                        Cấu hình địa chỉ webhook tùy chỉnh
                       </div>
                     </div>
                   </div>
@@ -280,9 +280,9 @@ export default function ConnectionSettings() {
                   <div className="flex items-center gap-3">
                     <Database className="size-8" />
                     <div>
-                      <div className="font-medium">Database Sync</div>
+                      <div className="font-medium">Đồng bộ cơ sở dữ liệu</div>
                       <div className="text-sm text-muted-foreground">
-                        Sync data with external databases
+                        Đồng bộ dữ liệu với cơ sở dữ liệu bên ngoài
                       </div>
                     </div>
                   </div>
@@ -298,16 +298,16 @@ export default function ConnectionSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>API Keys</CardTitle>
+              <CardTitle>Khóa API</CardTitle>
               <CardDescription>
-                Manage your API keys and access tokens.
+                Quản lý khóa API và mã truy cập.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
-                    <div className="font-medium">Production API Key</div>
+                    <div className="font-medium">Khóa API môi trường thực tế</div>
                     <div className="text-sm text-muted-foreground font-mono">
                       sk_live_••••••••••••••••••••••••4234
                     </div>
@@ -318,21 +318,21 @@ export default function ConnectionSettings() {
                       size="sm"
                       className="cursor-pointer"
                     >
-                      Regenerate
+                      Tạo lại
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       className="cursor-pointer"
                     >
-                      Copy
+                      Sao chép
                     </Button>
                   </div>
                 </div>
                 <Separator />
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
-                    <div className="font-medium">Development API Key</div>
+                    <div className="font-medium">Khóa API môi trường phát triển</div>
                     <div className="text-sm text-muted-foreground font-mono">
                       sk_test_••••••••••••••••••••••••5678
                     </div>
@@ -343,21 +343,21 @@ export default function ConnectionSettings() {
                       size="sm"
                       className="cursor-pointer"
                     >
-                      Regenerate
+                      Tạo lại
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       className="cursor-pointer"
                     >
-                      Copy
+                      Sao chép
                     </Button>
                   </div>
                 </div>
                 <Separator />
                 <div className="pt-4">
                   <Button variant="outline" className="cursor-pointer">
-                    Add New API Key
+                    Thêm khóa API mới
                   </Button>
                 </div>
               </div>

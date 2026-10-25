@@ -24,8 +24,8 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
   })
   return <div className={cn("flex flex-col gap-6", className)} {...props}>
     <Card><CardHeader className="text-center">
-      <CardTitle className="text-xl">Admin Sign In</CardTitle>
-      <CardDescription>Use the account provided by your administrator.</CardDescription>
+      <CardTitle className="text-xl">Đăng nhập quản trị</CardTitle>
+      <CardDescription>Sử dụng tài khoản do quản trị viên cung cấp.</CardDescription>
     </CardHeader><CardContent>
       {typeof location.state?.message === "string" && <p role="status" className="mb-4 text-sm">{location.state.message}</p>}
       <form className="space-y-4" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
@@ -35,17 +35,17 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
           <FieldError errors={[form.formState.errors.email]} />
         </Field>
         <Field data-invalid={!!form.formState.errors.password}>
-          <FieldLabel htmlFor="login-password">Password</FieldLabel>
+          <FieldLabel htmlFor="login-password">Mật khẩu</FieldLabel>
           <Input id="login-password" type="password" autoComplete="current-password" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
           <FieldError errors={[form.formState.errors.password]} />
         </Field>
         {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
         <Button type="submit" className="w-full" disabled={mutation.isPending}>
-          {mutation.isPending && <LoaderCircle className="animate-spin" />} {mutation.isPending ? "Signing in…" : "Sign in"}
+          {mutation.isPending && <LoaderCircle className="animate-spin" />} {mutation.isPending ? "Đang đăng nhập…" : "Đăng nhập"}
         </Button>
       </form>
       <div className="mt-4 text-right">
-        <Link to="/forgot-password" className="text-sm underline-offset-4 hover:underline">Forgot password?</Link>
+        <Link to="/forgot-password" className="text-sm underline-offset-4 hover:underline">Quên mật khẩu?</Link>
       </div>
     </CardContent></Card>
   </div>

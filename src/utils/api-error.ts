@@ -3,25 +3,25 @@ import { ZodError } from "zod"
 import type { ApiError } from "@/types/api"
 
 const localizedMessages: Array<[RegExp, string]> = [
-  [/^email hoặc mật khẩu không chính xác$/i, "The email or password is incorrect, or this account is disabled."],
-  [/^token không được cung cấp$/i, "Your sign-in token is missing. Please sign in again."],
-  [/^token không hợp lệ$/i, "Your sign-in token is invalid. Please sign in again."],
-  [/^token đã hết hạn$/i, "Your sign-in token has expired. Please sign in again."],
-  [/^phiên đăng nhập không còn hợp lệ$/i, "Your session is no longer valid. Please sign in again."],
-  [/^refresh token không hợp lệ$/i, "Your refresh session is no longer valid. Please sign in again."],
-  [/^refresh token là bắt buộc$/i, "The refresh session token is missing. Please sign in again."],
-  [/^không có quyền truy cập$/i, "Your account does not have permission to perform this action."],
-  [/^chưa xác thực$/i, "Your session could not be verified. Please sign in again."],
-  [/^quá nhiều yêu cầu xác thực/i, "Too many sign-in attempts. Wait a few minutes before trying again."],
-  [/^làm mới token thành công$/i, "The session was refreshed successfully."],
-  [/^số lượng phải\s*>=\s*1$/i, "Quantity must be at least 1."],
-  [/^đơn hàng phải có ít nhất 1 sản phẩm$/i, "An order must include at least one product."],
-  [/^họ không được để trống$/i, "First name is required."],
-  [/^tên không được để trống$/i, "Last name is required."],
-  [/^số điện thoại không hợp lệ$/i, "Enter a valid phone number."],
-  [/^sku phải có ít nhất 3 ký tự$/i, "SKU must contain at least 3 characters."],
-  [/^sku tối đa 64 ký tự$/i, "SKU cannot exceed 64 characters."],
-  [/^giá biến thể không được nhỏ hơn 0$/i, "Variant price cannot be less than 0."],
+  [/^email hoặc mật khẩu không chính xác$/i, "Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa."],
+  [/^token không được cung cấp$/i, "Thiếu thông tin xác thực. Vui lòng đăng nhập lại."],
+  [/^token không hợp lệ$/i, "Thông tin xác thực không hợp lệ. Vui lòng đăng nhập lại."],
+  [/^token đã hết hạn$/i, "Thông tin xác thực đã hết hạn. Vui lòng đăng nhập lại."],
+  [/^phiên đăng nhập không còn hợp lệ$/i, "Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại."],
+  [/^refresh token không hợp lệ$/i, "Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại."],
+  [/^refresh token là bắt buộc$/i, "Thiếu thông tin gia hạn phiên. Vui lòng đăng nhập lại."],
+  [/^không có quyền truy cập$/i, "Tài khoản của bạn không có quyền thực hiện thao tác này."],
+  [/^chưa xác thực$/i, "Không thể xác minh phiên đăng nhập. Vui lòng đăng nhập lại."],
+  [/^quá nhiều yêu cầu xác thực/i, "Bạn đã thử đăng nhập quá nhiều lần. Vui lòng chờ vài phút rồi thử lại."],
+  [/^làm mới token thành công$/i, "Đã gia hạn phiên đăng nhập thành công."],
+  [/^số lượng phải\s*>=\s*1$/i, "Số lượng phải từ 1 trở lên."],
+  [/^đơn hàng phải có ít nhất 1 sản phẩm$/i, "Đơn hàng phải có ít nhất một sản phẩm."],
+  [/^họ không được để trống$/i, "Vui lòng nhập tên."],
+  [/^tên không được để trống$/i, "Vui lòng nhập họ."],
+  [/^số điện thoại không hợp lệ$/i, "Vui lòng nhập số điện thoại hợp lệ."],
+  [/^sku phải có ít nhất 3 ký tự$/i, "Mã SKU phải có ít nhất 3 ký tự."],
+  [/^sku tối đa 64 ký tự$/i, "Mã SKU không được vượt quá 64 ký tự."],
+  [/^giá biến thể không được nhỏ hơn 0$/i, "Giá biến thể không được nhỏ hơn 0."],
 ]
 
 function isLocalized(message: string): boolean {
@@ -39,41 +39,41 @@ function isLoginRequest(url: string | undefined): boolean {
 
 function statusMessage(status: number, loginRequest: boolean): string {
   switch (status) {
-    case 400: return "The request contains invalid or incomplete information. Review the indicated fields and try again."
+    case 400: return "Thông tin không hợp lệ hoặc chưa đầy đủ. Hãy kiểm tra các trường được đánh dấu và thử lại."
     case 401:
       return loginRequest
-        ? "The email or password is incorrect, or this account is disabled."
-        : "Your session has expired or is no longer valid. Please sign in again."
-    case 403: return "Your account does not have permission to perform this action."
-    case 404: return "The requested record or API endpoint could not be found."
-    case 408: return "The server timed out while processing this request. Please try again."
-    case 409: return "This operation conflicts with the current data. Review the details and try again."
-    case 413: return "The selected file or request is too large. Choose a smaller file and try again."
-    case 415: return "This file type is not supported. Choose a supported file format and try again."
-    case 422: return "The request could not be processed because one or more values are invalid."
-    case 429: return "Too many requests were made. Wait a few minutes before trying again."
+        ? "Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa."
+        : "Phiên đăng nhập đã hết hạn hoặc không còn hợp lệ. Vui lòng đăng nhập lại."
+    case 403: return "Tài khoản của bạn không có quyền thực hiện thao tác này."
+    case 404: return "Không tìm thấy dữ liệu hoặc dịch vụ được yêu cầu."
+    case 408: return "Máy chủ xử lý quá thời gian cho phép. Vui lòng thử lại."
+    case 409: return "Thao tác xung đột với dữ liệu hiện tại. Hãy kiểm tra thông tin và thử lại."
+    case 413: return "Tệp hoặc yêu cầu quá lớn. Hãy chọn tệp nhỏ hơn và thử lại."
+    case 415: return "Loại tệp không được hỗ trợ. Hãy chọn định dạng phù hợp và thử lại."
+    case 422: return "Không thể xử lý yêu cầu vì có giá trị không hợp lệ."
+    case 429: return "Có quá nhiều yêu cầu. Vui lòng chờ vài phút rồi thử lại."
     case 502:
-    case 503: return "The API is temporarily unavailable. Check that the backend is running and try again."
-    case 504: return "The API did not respond in time. Try again in a moment."
+    case 503: return "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau."
+    case 504: return "Dịch vụ phản hồi quá chậm. Vui lòng thử lại sau giây lát."
     default:
-      if (status >= 500) return "The API encountered a server error. Please try again or contact your administrator."
-      return "The API rejected the request. Review the details and try again."
+      if (status >= 500) return "Dịch vụ gặp lỗi máy chủ. Vui lòng thử lại hoặc liên hệ quản trị viên."
+      return "Yêu cầu bị từ chối. Hãy kiểm tra thông tin và thử lại."
   }
 }
 
 function transportMessage(error: unknown): string {
   if (axios.isCancel(error) || (axios.isAxiosError(error) && error.code === "ERR_CANCELED")) {
-    return "The request was canceled because the page or sign-in session changed. Retry the action if it did not complete."
+    return "Yêu cầu đã bị hủy do trang hoặc phiên đăng nhập thay đổi. Hãy thử lại nếu thao tác chưa hoàn tất."
   }
   if (!axios.isAxiosError(error)) return ""
   if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
-    return "The API took too long to respond. Check your connection and try again."
+    return "Dịch vụ phản hồi quá chậm. Hãy kiểm tra kết nối và thử lại."
   }
   if (error.code === "ERR_NETWORK") {
-    return "Could not reach the API. Check that the backend is running and that your network connection is available."
+    return "Không thể kết nối dịch vụ. Hãy kiểm tra kết nối mạng và thử lại."
   }
   if (error.code === "ERR_BAD_RESPONSE") {
-    return "The API returned a response the application could not read. Please try again or contact your administrator."
+    return "Ứng dụng không thể đọc phản hồi từ dịch vụ. Vui lòng thử lại hoặc liên hệ quản trị viên."
   }
   return ""
 }
@@ -87,22 +87,21 @@ function validationLabel(field: string, url = ""): string {
   const variant = /^variants\.(\d+)\.(.+)$/.exec(path)
   const key = (variant?.[2] ?? path).split(".").at(-1) ?? ""
   const labels: Record<string, string> = {
-    product_name: "Product name", model_year: "Model year", sku: "SKU", variant_name: "Variant name",
-    stock: "Stock", price: "Price", compare_at_price: "Compare at price", discount: "Discount",
-    category: "Category", brand: "Brand", thumbnail: "Thumbnail path", description: "Description",
-    firstName: "First name", lastName: "Last name", email: "Email address", password: "Password",
-    currentPassword: "Current password", newPassword: "New password", confirmPassword: "Password confirmation",
-    personalEmail: "Personal email address", phone: "Phone number", location: "Location", bio: "Bio",
-    parent: "Parent category", icon: "Category thumbnail", logoUrl: "Brand thumbnail", role: "Role",
-    expectedVersion: "Product version", isActive: "Status", is_active: "Status", active: "Status",
+    product_name: "Tên sản phẩm", model_year: "Năm sản xuất", sku: "SKU", variant_name: "Tên biến thể",
+    stock: "Tồn kho", price: "Giá", compare_at_price: "Giá so sánh", discount: "Giảm giá",
+    category: "Danh mục", brand: "Thương hiệu", thumbnail: "Đường dẫn ảnh đại diện", description: "Mô tả",
+    firstName: "Tên", lastName: "Họ", email: "Địa chỉ email", password: "Mật khẩu",
+    currentPassword: "Mật khẩu hiện tại", newPassword: "Mật khẩu mới", confirmPassword: "Xác nhận mật khẩu",
+    personalEmail: "Địa chỉ email cá nhân", phone: "Số điện thoại", location: "Địa điểm", bio: "Giới thiệu",
+    parent: "Danh mục cha", icon: "Ảnh danh mục", logoUrl: "Ảnh thương hiệu", role: "Vai trò",
+    expectedVersion: "Phiên bản sản phẩm", isActive: "Trạng thái", is_active: "Trạng thái", active: "Trạng thái",
   }
-  let label = labels[key] ?? (key ? key.replace(/_/g, " ").replace(/^./, value => value.toUpperCase()) : "This field")
-  if (key === "name") label = /brands/.test(url) ? "Brand name" : /categories/.test(url) ? "Category name" : "Name"
+  let label = labels[key] ?? (key ? key.replace(/_/g, " ").replace(/^./, value => value.toUpperCase()) : "Trường này")
+  if (key === "name") label = /brands/.test(url) ? "Tên thương hiệu" : /categories/.test(url) ? "Tên danh mục" : "Tên"
   if (variant) {
-    if (/\.images\./.test(path)) label = "Image path"
-    if (/\.options\./.test(path)) label = key === "name" ? "Option name" : "Option value"
-    label = label.replace(/^Variant /, "")
-    return `Variant ${Number(variant[1]) + 1} ${label === "SKU" ? label : label.toLowerCase()}`
+    if (/\.images\./.test(path)) label = "Đường dẫn ảnh"
+    if (/\.options\./.test(path)) label = key === "name" ? "Tên tùy chọn" : "Giá trị tùy chọn"
+    return `Biến thể ${Number(variant[1]) + 1}: ${label === "SKU" ? label : label.toLowerCase()}`
   }
   return label
 }
@@ -113,15 +112,15 @@ function validationMessage(message: string, label: string): string {
     const minimum = limit[1].toLowerCase() === "small"
     const kind = limit[2].toLowerCase()
     const bound = limit[3]
-    if (kind === "number" && minimum && Number(bound) === 0) return `${label} cannot be negative.`
-    if (kind === "string") return minimum ? `${label} must contain at least ${bound} characters.` : `${label} cannot exceed ${bound} characters.`
-    if (kind === "array") return `${label} must contain ${minimum ? "at least" : "no more than"} ${bound} items.`
-    return `${label} must be ${minimum ? "at least" : "no more than"} ${bound}.`
+    if (kind === "number" && minimum && Number(bound) === 0) return `${label} không được âm.`
+    if (kind === "string") return minimum ? `${label} phải có ít nhất ${bound} ký tự.` : `${label} không được vượt quá ${bound} ký tự.`
+    if (kind === "array") return `${label} phải có ${minimum ? "ít nhất" : "không quá"} ${bound} phần tử.`
+    return `${label} phải ${minimum ? "từ" : "không quá"} ${bound}.`
   }
-  if (/^Invalid input: expected int\b/i.test(message)) return `${label} must be a whole number.`
-  if (/^Invalid input: expected number\b/i.test(message)) return `Enter a valid number for ${label.toLowerCase()}.`
-  if (/^Invalid option:/i.test(message)) return `Select a valid ${label.toLowerCase()}.`
-  if (/^Invalid (input|type|string)(:|$)/i.test(message)) return `Enter a valid value for ${label.toLowerCase()}.`
+  if (/^Invalid input: expected int\b/i.test(message)) return `${label} phải là số nguyên.`
+  if (/^Invalid input: expected number\b/i.test(message)) return `Vui lòng nhập số hợp lệ cho ${label.toLowerCase()}.`
+  if (/^Invalid option:/i.test(message)) return `Vui lòng chọn ${label.toLowerCase()} hợp lệ.`
+  if (/^Invalid (input|type|string)(:|$)/i.test(message)) return `Vui lòng nhập giá trị hợp lệ cho ${label.toLowerCase()}.`
   return translateIssueMessage(message)
 }
 
@@ -129,7 +128,7 @@ export function getApiError(error: unknown): ApiError {
   if (error instanceof ZodError) {
     return {
       statusCode: 0,
-      message: "The API returned data that does not match the expected format. Please contact your administrator.",
+      message: "Dịch vụ trả về dữ liệu không đúng định dạng. Vui lòng liên hệ quản trị viên.",
     }
   }
 
@@ -153,7 +152,7 @@ export function getApiError(error: unknown): ApiError {
         : translateIssueMessage(responseMessage)
       : statusCode
         ? statusMessage(statusCode, isLoginRequest(error.config?.url))
-        : transportMessage(error) || "The request could not be completed. Check your connection and try again."
+        : transportMessage(error) || "Không thể hoàn tất yêu cầu. Hãy kiểm tra kết nối và thử lại."
 
     return {
       statusCode,
@@ -165,15 +164,15 @@ export function getApiError(error: unknown): ApiError {
   if (error instanceof Error) {
     switch (error.message) {
       case "Session changed":
-        return { statusCode: 0, message: "The sign-in session changed while this request was running. Retry the action." }
+        return { statusCode: 0, message: "Phiên đăng nhập thay đổi khi đang xử lý yêu cầu. Vui lòng thử lại thao tác." }
       case "Invalid token response":
-        return { statusCode: 0, message: "The API returned an invalid sign-in session. Please sign in again." }
+        return { statusCode: 0, message: "Dịch vụ trả về phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại." }
       case "Your session has expired.":
-        return { statusCode: 401, message: "Your session has expired. Please sign in again." }
+        return { statusCode: 401, message: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." }
       default:
         return { statusCode: 0, message: error.message }
     }
   }
 
-  return { statusCode: 0, message: "An unexpected error occurred while processing the request." }
+  return { statusCode: 0, message: "Đã xảy ra lỗi khi xử lý yêu cầu." }
 }

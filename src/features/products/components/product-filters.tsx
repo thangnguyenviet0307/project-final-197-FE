@@ -19,23 +19,23 @@ export function ProductFilters({ initial, onChange, onReset }: {
     const timer = window.setTimeout(() => onChange(next), 350)
     return () => window.clearTimeout(timer)
   }, [draft, initialKey, onChange])
-  return <section aria-label="Product filters" className="space-y-3 rounded-lg border p-4">
+  return <section aria-label="Bộ lọc sản phẩm" className="space-y-3 rounded-lg border p-4">
     <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Field><FieldLabel htmlFor="filter-search">Product name</FieldLabel>
+      <Field><FieldLabel htmlFor="filter-search">Tên sản phẩm</FieldLabel>
         <Input id="filter-search" value={draft.search} onChange={event => setDraft(previous => ({ ...previous, search: event.target.value }))} />
       </Field>
-      {([['category', 'Category', categories], ['brand', 'Brand', brands]] as const).map(([name, label, query]) => <Field key={name}>
+      {([['category', "Danh mục", categories], ['brand', "Thương hiệu", brands]] as const).map(([name, label, query]) => <Field key={name}>
         <FieldLabel htmlFor={`filter-${name}`}>{label}</FieldLabel><select id={`filter-${name}`} className="h-8 rounded-md border bg-background px-2 text-sm" disabled={query.isPending} value={draft[name]} onChange={event => setDraft(previous => ({ ...previous, [name]: event.target.value }))}>
-          <option value="">All {label.toLowerCase()}</option>{draft[name] && !query.data?.some(item => item._id === draft[name]) && <option value={draft[name]}>Selected {label.toLowerCase()}</option>}
+          <option value="">Tất cả {label.toLowerCase()}</option>{draft[name] && !query.data?.some(item => item._id === draft[name]) && <option value={draft[name]}>Đã chọn {label.toLowerCase()}</option>}
           {query.data?.map(item => <option key={item._id} value={item._id}>{item.name}</option>)}
-        </select>{query.isError && <Button variant="outline" onClick={() => void query.refetch()}>Retry {label.toLowerCase()}</Button>}
+        </select>{query.isError && <Button variant="outline" onClick={() => void query.refetch()}>Thử lại {label.toLowerCase()}</Button>}
       </Field>)}
-      <Field><FieldLabel htmlFor="filter-stock">Stock</FieldLabel>
+      <Field><FieldLabel htmlFor="filter-stock">Tồn kho</FieldLabel>
         <select id="filter-stock" className="h-8 rounded-md border bg-background px-2 text-sm" value={draft.stockStatus} onChange={event => setDraft(previous => ({ ...previous, stockStatus: event.target.value }))}>
-          <option value="">All stock</option><option value="in_stock">In stock (&gt; 0)</option><option value="low_stock">Low stock (1–5)</option><option value="out_of_stock">Out of stock (0)</option>
+          <option value="">Tất cả tồn kho</option><option value="in_stock">Còn hàng (&gt; 0)</option><option value="low_stock">Sắp hết hàng (1–5)</option><option value="out_of_stock">Hết hàng (0)</option>
         </select>
       </Field>
-      <Button type="button" variant="outline" className="sm:col-span-2 lg:col-span-4 lg:justify-self-end" onClick={() => { setDraft({ search: "", category: "", brand: "", stockStatus: "" }); onReset() }}>Reset filters</Button>
+      <Button type="button" variant="outline" className="sm:col-span-2 lg:col-span-4 lg:justify-self-end" onClick={() => { setDraft({ search: "", category: "", brand: "", stockStatus: "" }); onReset() }}>Đặt lại bộ lọc</Button>
     </div>
   </section>
 }

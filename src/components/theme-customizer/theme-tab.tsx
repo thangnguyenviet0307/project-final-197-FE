@@ -109,7 +109,7 @@ export function ThemeTab({
       <Field>
         <div className="flex items-center justify-between">
           <FieldLabel htmlFor="customizer-shadcn-ui-theme">
-            Shadcn UI Theme Presets
+            Chủ đề Shadcn UI có sẵn
           </FieldLabel>
           <Button
             variant="outline"
@@ -118,7 +118,7 @@ export function ThemeTab({
             className="cursor-pointer"
           >
             <Dices data-icon="inline-start" />
-            Random
+            Ngẫu nhiên
           </Button>
         </div>
 
@@ -138,7 +138,7 @@ export function ThemeTab({
             id="customizer-shadcn-ui-theme"
             className="w-full cursor-pointer"
           >
-            <SelectValue placeholder="Choose Shadcn Theme" />
+            <SelectValue placeholder="Chọn chủ đề Shadcn" />
           </SelectTrigger>
           <SelectContent className="max-h-60">
             <SelectGroup>
@@ -190,7 +190,7 @@ export function ThemeTab({
       <Field>
         <div className="flex items-center justify-between">
           <FieldLabel htmlFor="customizer-tweakcn-theme">
-            Tweakcn Theme Presets
+            Chủ đề Tweakcn có sẵn
           </FieldLabel>
           <Button
             variant="outline"
@@ -199,7 +199,7 @@ export function ThemeTab({
             className="cursor-pointer"
           >
             <Dices data-icon="inline-start" />
-            Random
+            Ngẫu nhiên
           </Button>
         </div>
 
@@ -224,7 +224,7 @@ export function ThemeTab({
             id="customizer-tweakcn-theme"
             className="w-full cursor-pointer"
           >
-            <SelectValue placeholder="Choose Tweakcn Theme" />
+            <SelectValue placeholder="Chọn chủ đề Tweakcn" />
           </SelectTrigger>
           <SelectContent className="max-h-60">
             <SelectGroup>
@@ -274,7 +274,7 @@ export function ThemeTab({
 
       {/* Radius Selection */}
       <FieldSet>
-        <FieldLegend variant="label">Radius</FieldLegend>
+        <FieldLegend variant="label">Độ bo góc</FieldLegend>
         <ToggleGroup
           variant="outline"
           spacing={2}
@@ -298,7 +298,7 @@ export function ThemeTab({
 
       {/* Mode Section */}
       <FieldSet>
-        <FieldLegend variant="label">Mode</FieldLegend>
+        <FieldLegend variant="label">Chế độ</FieldLegend>
         <ToggleGroup
           variant="outline"
           size="sm"
@@ -312,7 +312,7 @@ export function ThemeTab({
             className="cursor-pointer"
           >
             <Sun />
-            Light
+            Sáng
           </ToggleGroupItem>
           <ToggleGroupItem
             value="dark"
@@ -320,7 +320,7 @@ export function ThemeTab({
             className="cursor-pointer"
           >
             <Moon />
-            Dark
+            Tối
           </ToggleGroupItem>
         </ToggleGroup>
       </FieldSet>
@@ -336,7 +336,7 @@ export function ThemeTab({
           className="w-full cursor-pointer"
         >
           <Upload data-icon="inline-start" />
-          Import Theme
+          Nhập chủ đề
         </Button>
       </div>
 
@@ -347,7 +347,7 @@ export function ThemeTab({
           className="border border-border rounded-lg overflow-hidden"
         >
           <AccordionTrigger className="items-center px-4 py-3 hover:no-underline hover:bg-muted/50 transition-colors">
-            <span className="text-sm font-medium">Brand Colors</span>
+            <span className="text-sm font-medium">Màu thương hiệu</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col px-4 pb-4 pt-2 gap-3 border-t border-border bg-muted/20">
             {baseColors.map((color) => (
@@ -371,11 +371,10 @@ export function ThemeTab({
       <div className="flex flex-col p-4 bg-muted rounded-lg gap-3">
         <div className="flex items-center gap-2">
           <Palette className="size-4 text-primary" />
-          <span className="text-sm font-medium">Advanced Customization</span>
+          <span className="text-sm font-medium">Tùy chỉnh nâng cao</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          For advanced theme customization with real-time preview, visual color
-          picker, and hundreds of prebuilt themes, visit{" "}
+          Để tùy chỉnh nâng cao với bản xem trước trực tiếp, bảng chọn màu và hàng trăm chủ đề có sẵn, hãy truy cập{" "}
           <a
             href="https://tweakcn.com/editor/theme"
             target="_blank"
@@ -394,7 +393,7 @@ export function ThemeTab({
           }
         >
           <ExternalLink data-icon="inline-start" />
-          Open Tweakcn
+          Mở Tweakcn
         </Button>
       </div>
     </div>

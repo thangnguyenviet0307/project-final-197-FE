@@ -99,7 +99,7 @@ function DeleteCustomerDialog({
         variant="ghost"
         size="icon"
         className="h-8 w-8 cursor-pointer text-destructive"
-        aria-label={`Delete ${customer.first_name} ${customer.last_name}`}
+        aria-label={`Xóa ${customer.first_name} ${customer.last_name}`}
         onClick={() => setOpen(true)}
       >
         <Trash2 className="size-4" />
@@ -131,7 +131,7 @@ function DeleteCustomerDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={deleting}>
-            Cancel
+            Hủy
           </AlertDialogCancel>
 
           <AlertDialogAction
@@ -144,7 +144,7 @@ function DeleteCustomerDialog({
           >
             {deleting
               ? "Deleting..."
-              : "Delete Customer"}
+              : "Xóa khách hàng"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -240,8 +240,8 @@ export function CustomerTable({
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
             <Input
-              aria-label="Search customers"
-              placeholder="Search customers..."
+              aria-label="Tìm khách hàng"
+              placeholder="Tìm khách hàng..."
               value={searchValue}
               onChange={(event) => {
                 const value = event.target.value
@@ -270,7 +270,7 @@ export function CustomerTable({
               >
                 <X className="size-4" />
                 <span className="sr-only">
-                  Clear search
+                  Xóa tìm kiếm
                 </span>
               </Button>
             )}
@@ -280,13 +280,13 @@ export function CustomerTable({
             type="submit"
             variant="outline"
           >
-            Search
+            Tìm kiếm
           </Button>
         </form>
 
         <CustomerFormDialog
           onSubmit={onAdd}
-          submitLabel="Create Customer"
+          submitLabel="Tạo khách hàng"
         />
       </div>
 
@@ -297,7 +297,7 @@ export function CustomerTable({
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  aria-label="Select all customers on page"
+                  aria-label="Chọn tất cả khách hàng trên trang"
                   checked={allPageSelected}
                   indeterminate={
                     !allPageSelected &&
@@ -309,10 +309,10 @@ export function CustomerTable({
                 />
               </TableHead>
 
-              <TableHead>Customer</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Khách hàng</TableHead>
+              <TableHead>Điện thoại</TableHead>
+              <TableHead>Địa chỉ</TableHead>
+              <TableHead>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -322,7 +322,7 @@ export function CustomerTable({
                 <TableRow key={customer._id}>
                   <TableCell>
                     <Checkbox
-                      aria-label={`Select ${customer.first_name} ${customer.last_name}`}
+                      aria-label={`Chọn ${customer.first_name} ${customer.last_name}`}
                       checked={selectedIds.has(
                         customer._id
                       )}
@@ -386,7 +386,7 @@ export function CustomerTable({
                             values
                           )
                         }
-                        submitLabel="Save Changes"
+                        submitLabel="Lưu thay đổi"
                       />
 
                       <DeleteCustomerDialog
@@ -403,8 +403,8 @@ export function CustomerTable({
                   colSpan={5}
                   className="h-24 text-center"
                 >
-                  No customers found.
-                  {page > 1 && <Button variant="outline" onClick={() => onPageChange(totalPages)}>Return to available customers</Button>}
+                  Không tìm thấy khách hàng.
+                  {page > 1 && <Button variant="outline" onClick={() => onPageChange(totalPages)}>Về trang khách hàng hiện có</Button>}
                 </TableCell>
               </TableRow>
             )}
@@ -413,14 +413,14 @@ export function CustomerTable({
       </div>
 
       {/* Phân trang */}
-      <nav aria-label="Customers pagination" className="flex flex-wrap items-center justify-between gap-4 py-4">
+      <nav aria-label="Phân trang khách hàng" className="flex flex-wrap items-center justify-between gap-4 py-4">
         <span className="text-sm text-muted-foreground">
-          Total: {total} customers
+          Tổng cộng: {total} khách hàng
         </span>
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
+            Trang {page} / {totalPages}
           </span>
 
           <Button
@@ -430,7 +430,7 @@ export function CustomerTable({
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
           >
-            Previous
+            Trước
           </Button>
 
           <Button
@@ -442,7 +442,7 @@ export function CustomerTable({
             }
             onClick={() => onPageChange(page + 1)}
           >
-            Next
+            Tiếp
           </Button>
         </div>
       </nav>

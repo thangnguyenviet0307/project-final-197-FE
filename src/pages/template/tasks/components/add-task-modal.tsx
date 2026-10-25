@@ -166,7 +166,7 @@ export function AddTaskModal({ onAddTask, trigger }: AddTaskModalProps) {
 
             {/* Task Description */}
             <Field>
-              <FieldLabel htmlFor="description">Description</FieldLabel>
+              <FieldLabel htmlFor="description">Mô tả</FieldLabel>
               <Textarea
                 id="description"
                 placeholder="Provide additional details about the task..."
@@ -186,7 +186,7 @@ export function AddTaskModal({ onAddTask, trigger }: AddTaskModalProps) {
           <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Task Status */}
             <Field>
-              <FieldLabel htmlFor="status">Status</FieldLabel>
+              <FieldLabel htmlFor="status">Trạng thái</FieldLabel>
               <Select
                 items={statuses}
                 value={formData.status}
@@ -195,7 +195,7 @@ export function AddTaskModal({ onAddTask, trigger }: AddTaskModalProps) {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Chọn trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -216,7 +216,7 @@ export function AddTaskModal({ onAddTask, trigger }: AddTaskModalProps) {
 
             {/* Task Category */}
             <Field>
-              <FieldLabel htmlFor="category">Category</FieldLabel>
+              <FieldLabel htmlFor="category">Danh mục</FieldLabel>
               <Select
                 items={categories}
                 value={formData.category}
@@ -277,7 +277,7 @@ export function AddTaskModal({ onAddTask, trigger }: AddTaskModalProps) {
               onClick={handleCancel}
               className="cursor-pointer"
             >
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" className="cursor-pointer">
               <Plus data-icon="inline-start" />

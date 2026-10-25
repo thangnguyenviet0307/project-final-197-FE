@@ -80,7 +80,7 @@ Không tạo `redux/` vì ứng dụng đang dùng Zustand. State cục bộ gi�
 
 Component riêng một trang có thể nằm trong `components/` con cạnh trang đó. CSS riêng nằm cạnh trang/component; global styles giữ ở `src/index.css`. Trang mẫu được giữ để tham khảo trong `pages/template/`; mẫu Users và dữ liệu minh họa nằm ở `pages/template/users/`, không được đăng ký route.
 
-Storefront hiện có `/contact` và `/account/*`; `/landing` nằm trong `pages/public/landing/`. Các trang account chỉ là bản xem trước, chưa có đăng nhập khách hàng hoặc lưu API. Catalog công khai, giỏ hàng và checkout chưa được đăng ký trong router. Thư mục trang mới không tự tạo URL.
+Storefront có homepage `/`, `/contact`, đăng ký `/register` và đăng nhập khách hàng `/account/login`; `/landing` nằm trong `pages/public/landing/`. Đăng ký gọi `/auth/register`, thành công chuyển sang đăng nhập; đăng nhập thành công về homepage. Các trang hồ sơ/đơn hàng/địa chỉ trong account vẫn là bản xem trước, chưa lưu API. Catalog công khai, giỏ hàng và checkout chưa được đăng ký trong router. Thư mục trang mới không tự tạo URL.
 
 Pages giữ giao diện, điều hướng và trạng thái URL; hook nghiệp vụ giữ query, mutation và cập nhật cache. Service không chứa schema form. `types/api.ts` cung cấp envelope, response, error và pagination dùng chung; endpoint có khác biệt metadata phải giữ đúng hợp đồng thay vì giả định mọi response giống nhau.
 

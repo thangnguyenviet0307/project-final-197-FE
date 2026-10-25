@@ -18,50 +18,50 @@ import { Image3D } from "@/components/image-3d"
 const mainFeatures = [
   {
     icon: Package,
-    title: "Curated Component Library",
+    title: "Thư viện thành phần chọn lọc",
     description:
-      "Hand-picked blocks and templates for quality and reliability.",
+      "Các khối giao diện và mẫu được chọn lọc về chất lượng và độ tin cậy.",
   },
   {
     icon: Crown,
-    title: "Free & Premium Options",
+    title: "Lựa chọn miễn phí và cao cấp",
     description:
-      "Start free, upgrade to premium collections when you need more.",
+      "Bắt đầu miễn phí, nâng cấp lên bộ sưu tập cao cấp khi cần thêm tính năng.",
   },
   {
     icon: Layout,
-    title: "Ready-to-Use Templates",
-    description: "Copy-paste components that just work out of the box.",
+    title: "Giao diện mẫu sẵn dùng",
+    description: "Sao chép và sử dụng thành phần ngay trong dự án.",
   },
   {
     icon: Zap,
-    title: "Regular Updates",
-    description: "New blocks and templates added weekly to keep you current.",
+    title: "Cập nhật thường xuyên",
+    description: "Khối giao diện và mẫu mới được bổ sung hằng tuần.",
   },
 ]
 
 const secondaryFeatures = [
   {
     icon: BarChart3,
-    title: "Multiple Frameworks",
+    title: "Hỗ trợ nhiều nền tảng",
     description:
-      "React, Next.js, and Vite compatibility for flexible development.",
+      "Tương thích React, Next.js và Vite để phát triển linh hoạt.",
   },
   {
     icon: Palette,
-    title: "Modern Tech Stack",
-    description: "Built with shadcn/ui, Tailwind CSS, and TypeScript.",
+    title: "Công nghệ hiện đại",
+    description: "Được xây dựng bằng shadcn/ui, Tailwind CSS và TypeScript.",
   },
   {
     icon: Users,
-    title: "Responsive Design",
-    description: "Mobile-first components for all screen sizes and devices.",
+    title: "Thiết kế thích ứng",
+    description: "Thành phần ưu tiên thiết bị di động, phù hợp mọi kích thước màn hình.",
   },
   {
     icon: Database,
-    title: "Developer-Friendly",
+    title: "Thuận tiện cho lập trình viên",
     description:
-      "Clean code, well-documented, easy integration and customization.",
+      "Mã nguồn rõ ràng, tài liệu đầy đủ, dễ tích hợp và tùy chỉnh.",
   },
 ]
 
@@ -72,15 +72,13 @@ export function FeaturesSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Marketplace Features
+            Tính năng thư viện
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Everything you need to build amazing web applications
+            Mọi thứ cần thiết để xây dựng ứng dụng web
           </h2>
           <p className="text-lg text-muted-foreground">
-            Our marketplace provides curated blocks, templates, landing pages,
-            and admin dashboards to help you build professional applications
-            faster than ever.
+            Thư viện cung cấp các khối giao diện, mẫu, trang giới thiệu và bảng quản trị được chọn lọc để phát triển ứng dụng chuyên nghiệp nhanh hơn.
           </p>
         </div>
 
@@ -90,19 +88,17 @@ export function FeaturesSection() {
           <Image3D
             lightSrc="feature-1-light.png"
             darkSrc="feature-1-dark.png"
-            alt="Analytics dashboard"
+            alt="Bảng phân tích"
             direction="left"
           />
           {/* Right Content */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4">
               <h3 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-                Components that accelerate development
+                Thành phần giúp tăng tốc phát triển
               </h3>
               <p className="text-muted-foreground text-base text-pretty">
-                Our curated marketplace offers premium blocks and templates
-                designed to save time and ensure consistency across your admin
-                projects.
+                Các khối giao diện và mẫu cao cấp giúp tiết kiệm thời gian và duy trì sự nhất quán trong dự án quản trị.
               </p>
             </div>
 
@@ -136,12 +132,12 @@ export function FeaturesSection() {
                   href="https://shadcnstore.com/templates"
                   className="flex items-center"
                 >
-                  Browse Templates
+                  Khám phá giao diện mẫu
                   <ArrowRight className="ms-2 size-4" aria-hidden="true" />
                 </a>
               </Button>
               <Button size="lg" variant="outline" className="cursor-pointer">
-                <a href="https://shadcnstore.com/blocks">View Components</a>
+                <a href="https://shadcnstore.com/blocks">Xem thành phần</a>
               </Button>
             </div>
           </div>
@@ -153,12 +149,10 @@ export function FeaturesSection() {
           <div className="flex flex-col gap-6 order-2 lg:order-1">
             <div className="flex flex-col gap-4">
               <h3 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-                Built for modern development workflows
+                Dành cho quy trình phát triển hiện đại
               </h3>
               <p className="text-muted-foreground text-base text-pretty">
-                Every component follows best practices with TypeScript,
-                responsive design, and clean code architecture that integrates
-                seamlessly into your projects.
+                Mỗi thành phần sử dụng TypeScript, thiết kế thích ứng và kiến trúc rõ ràng để dễ dàng tích hợp vào dự án.
               </p>
             </div>
 
@@ -189,7 +183,7 @@ export function FeaturesSection() {
             <div className="flex flex-col sm:flex-row gap-4 pe-4 pt-2">
               <Button size="lg" className="cursor-pointer">
                 <a href="#" className="flex items-center">
-                  View Documentation
+                  Xem tài liệu
                   <ArrowRight className="ms-2 size-4" aria-hidden="true" />
                 </a>
               </Button>
@@ -199,7 +193,7 @@ export function FeaturesSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  GitHub Repository
+                  Kho mã GitHub
                 </a>
               </Button>
             </div>
@@ -209,7 +203,7 @@ export function FeaturesSection() {
           <Image3D
             lightSrc="feature-2-light.png"
             darkSrc="feature-2-dark.png"
-            alt="Performance dashboard"
+            alt="Bảng hiệu suất"
             direction="right"
             className="order-1 lg:order-2"
           />

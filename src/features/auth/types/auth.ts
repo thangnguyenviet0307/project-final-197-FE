@@ -20,6 +20,11 @@ export interface LoginCredentials {
   password: string
 }
 
+export interface RegisterCustomerInput extends LoginCredentials {
+  firstName: string
+  lastName: string
+}
+
 export interface TokenPair {
   accessToken: string
   refreshToken?: string

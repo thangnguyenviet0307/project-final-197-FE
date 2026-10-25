@@ -11,21 +11,21 @@ export function useOrder(id: string) {
 }
 export function useStartOrder() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: startOrder, meta: { successMessage: "Order assigned and processing started." },
+  return useMutation({ mutationFn: startOrder, meta: { successMessage: "Đã phân công và bắt đầu xử lý đơn hàng." },
     onSuccess: () => client.invalidateQueries({ queryKey: orderKeys.all }),
     onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) },
   })
 }
 export function useUpdateOrderDates() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: updateOrderDates, meta: { successMessage: "Order dates updated." },
+  return useMutation({ mutationFn: updateOrderDates, meta: { successMessage: "Đã cập nhật ngày của đơn hàng." },
     onSuccess: () => client.invalidateQueries({ queryKey: orderKeys.all }),
     onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) },
   })
 }
 export function useUpdateOrderStatus() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: updateOrderStatus, meta: { successMessage: "Order status updated." },
+  return useMutation({ mutationFn: updateOrderStatus, meta: { successMessage: "Đã cập nhật trạng thái đơn hàng." },
     onSuccess: async (_order, { input }) => {
       await Promise.all([client.invalidateQueries({ queryKey: orderKeys.all }), ...(input.orderStatus === 3 ? [client.invalidateQueries({ queryKey: ["products"] })] : [])])
     },
@@ -34,7 +34,7 @@ export function useUpdateOrderStatus() {
 }
 export function useDeleteOrder() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: deleteOrder, meta: { successMessage: "Order deleted." }, onSuccess: async (_data, id) => {
+  return useMutation({ mutationFn: deleteOrder, meta: { successMessage: "Đã xóa đơn hàng." }, onSuccess: async (_data, id) => {
     client.removeQueries({ queryKey: orderKeys.detail(id), exact: true })
     await client.invalidateQueries({ queryKey: orderKeys.all })
   }, onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) } })
@@ -42,7 +42,7 @@ export function useDeleteOrder() {
 
 export function useReassignOrder() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: reassignOrder, meta: { successMessage: "Order handler reassigned." },
+  return useMutation({ mutationFn: reassignOrder, meta: { successMessage: "Đã đổi nhân viên xử lý đơn hàng." },
     onSuccess: () => Promise.all([client.invalidateQueries({ queryKey: orderKeys.all }), client.invalidateQueries({ queryKey: ["users"] })]),
     onError: () => { void client.invalidateQueries({ queryKey: orderKeys.all }) },
   })

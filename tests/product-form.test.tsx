@@ -9,29 +9,29 @@ import { api } from "@/services/api"
 import { queryClient } from "@/services/query-client"
 import type { Product } from "@/features/products/types/products"
 const original = api.defaults.adapter
-vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Description" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
+vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Mô tả" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 const id = "a".repeat(24)
-const product: Product = { _id: id, product_name: "Phone case", category: { _id: id, name: "Cases" }, brand: { _id: id, name: "Brand" }, model_year: 2026, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 2, attributes: { warranty: 12, wireless: false } }] }
+const product: Product = { _id: id, product_name: "Phone case", category: { _id: id, name: "Cases" }, brand: { _id: id, name: "Thương hiệu" }, model_year: 2026, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 2, attributes: { warranty: 12, wireless: false } }] }
 beforeEach(() => {
   queryClient.clear()
-  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, name: config.url === "/categories" ? "Cases" : "Brand", isActive: true }] } })
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, name: config.url === "/categories" ? "Cases" : "Thương hiệu", isActive: true }] } })
 })
 afterEach(() => { api.defaults.adapter = original; queryClient.clear() })
 function wrap(children: ReactNode) { return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: "*", element: children }])} /></QueryClientProvider>) }
 it.each([
-  ["Variant stock", "-5", "Variant stock cannot be negative."],
-  ["Variant stock", "1.5", "Variant stock must be a whole number."],
-  ["Variant price", "-1", "Variant price cannot be negative."],
-  ["Compare at price", "-1", "Compare at price cannot be negative."],
-  ["Discount (%)", "71", "Discount cannot exceed 70%."],
-  ["Model year", "1899", "Model year must be 1900 or later."],
+  ["Tồn kho biến thể", "-5", "Tồn kho biến thể không được âm."],
+  ["Tồn kho biến thể", "1.5", "Tồn kho biến thể phải là số nguyên."],
+  ["Giá biến thể", "-1", "Giá biến thể không được âm."],
+  ["Giá so sánh", "-1", "Giá so sánh không được âm."],
+  ["Giảm giá (%)", "71", "Mức giảm giá không được vượt quá 70%."],
+  ["Năm sản xuất", "1899", "Năm sản xuất phải từ 1900 trở đi."],
 ])("shows a useful error next to %s when its value is %s", async (label, value, message) => {
   const save = vi.fn()
   wrap(<ProductForm product={product} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
   const input = screen.getByLabelText(label)
   fireEvent.change(input, { target: { value } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   const error = await screen.findByText(message)
   expect(input.getAttribute("aria-invalid")).toBe("true")
   expect(input.getAttribute("aria-describedby")).toBe(error.id)
@@ -41,11 +41,11 @@ it.each([
 it("loads catalog data and submits retained variants with typed options", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   wrap(<ProductForm product={product} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  expect(screen.getByText("Calculated from variant stock.")).toBeTruthy()
-  fireEvent.change(screen.getByLabelText("Product name"), { target: { value: "Updated case" } })
-  fireEvent.change(screen.getByLabelText("Variant price"), { target: { value: "120" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  expect(screen.getByText("Được tính từ tồn kho của các biến thể.")).toBeTruthy()
+  fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "Updated case" } })
+  fireEvent.change(screen.getByLabelText("Giá biến thể"), { target: { value: "120" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(save).toHaveBeenCalledOnce())
   expect(save.mock.calls[0][0]).toMatchObject({ product_name: "Updated case", variants: [{ _id: "b".repeat(24), price: 120, attributes: { warranty: 12, wireless: false } }] })
   expect(save.mock.calls[0][0]).not.toHaveProperty("category")
@@ -55,13 +55,13 @@ it("loads catalog data and submits retained variants with typed options", async 
 it("validates fields and supports adding and removing variants", async () => {
   const save = vi.fn()
   wrap(<ProductForm save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  fireEvent.click(screen.getByRole("button", { name: "Add variant" }))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Thêm biến thể" }))
   expect(screen.getByLabelText("SKU")).toBeTruthy()
-  fireEvent.click(screen.getByRole("button", { name: "Create product" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tạo sản phẩm" }))
   await waitFor(() => expect(screen.getByLabelText("SKU").getAttribute("aria-invalid")).toBe("true"))
   expect(save).not.toHaveBeenCalled()
-  fireEvent.click(screen.getByRole("button", { name: "Remove variant 1" }))
+  fireEvent.click(screen.getByRole("button", { name: "Xóa biến thể 1" }))
   expect(screen.queryByLabelText("SKU")).toBeNull()
 })
 it("displays backend validation errors under the matching variant field", async () => {
@@ -70,48 +70,48 @@ it("displays backend validation errors under the matching variant field", async 
     data: { message: "Validation failed", errors: [{ field: "body.variants.0.sku", message: "SKU is already used" }] },
   }))
   wrap(<ProductForm product={product} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
   fireEvent.change(screen.getByLabelText("SKU"), { target: { value: "CASE-2" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(screen.getByLabelText("SKU").getAttribute("aria-invalid")).toBe("true"))
   expect(document.getElementById("variants.0.sku-error")?.textContent).toBe("SKU is already used")
 })
 it("submits only a changed description even when the original category is inactive", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
-    data: config.url === "/categories" ? [{ _id: id, name: "Cases", isActive: false }] : [{ _id: id, name: "Brand", isActive: true }],
+    data: config.url === "/categories" ? [{ _id: id, name: "Cases", isActive: false }] : [{ _id: id, name: "Thương hiệu", isActive: true }],
   } })
   wrap(<ProductForm product={{ ...product, slug: "custom-case" }} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  fireEvent.change(screen.getByLabelText("Description"), { target: { value: "New description" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.change(screen.getByLabelText("Mô tả"), { target: { value: "New description" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(save).toHaveBeenCalledOnce())
   expect(save.mock.calls[0][0]).toEqual({ description: "New description" })
 })
 it("does not send an empty update when saving an untouched form", async () => {
   const save = vi.fn()
   wrap(<ProductForm product={product} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
-  await waitFor(() => expect(screen.queryByRole("button", { name: "Save changes" })?.hasAttribute("disabled")).toBe(false))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await waitFor(() => expect(screen.queryByRole("button", { name: "Lưu thay đổi" })?.hasAttribute("disabled")).toBe(false))
   expect(save).not.toHaveBeenCalled()
 })
 it("keeps nullable typed attributes untouched during an unrelated edit", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   const nullableProduct = { ...product, variants: [{ ...product.variants![0], attributes: { wireless: false, warranty: 12, nullable: null } }] }
   wrap(<ProductForm product={nullableProduct} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  fireEvent.change(screen.getByLabelText("Description"), { target: { value: "New description" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.change(screen.getByLabelText("Mô tả"), { target: { value: "New description" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(save).toHaveBeenCalledOnce())
   expect(save.mock.calls[0][0]).toEqual({ description: "New description" })
 })
 it("sends null when an existing compare-at price is cleared", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   wrap(<ProductForm product={{ ...product, variants: [{ ...product.variants![0], compare_at_price: 150 }] }} save={save} pending={false} />)
-  await waitFor(() => expect(screen.queryByText("Loading categories and brands…")).toBeNull())
-  fireEvent.change(screen.getByLabelText("Compare at price"), { target: { value: "" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.change(screen.getByLabelText("Giá so sánh"), { target: { value: "" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(save).toHaveBeenCalledOnce())
   const payload = JSON.parse(JSON.stringify(save.mock.calls[0][0]))
   expect(payload.variants[0].compare_at_price).toBeNull()

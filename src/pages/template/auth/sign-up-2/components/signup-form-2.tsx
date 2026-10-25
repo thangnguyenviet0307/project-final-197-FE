@@ -21,11 +21,11 @@ export function SignupForm2({
       <FieldGroup className="grid gap-6">
         <FieldGroup className="grid grid-cols-2 gap-3">
           <Field>
-            <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+            <FieldLabel htmlFor="firstName">Tên</FieldLabel>
             <Input id="firstName" placeholder="John" required />
           </Field>
           <Field>
-            <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+            <FieldLabel htmlFor="lastName">Họ</FieldLabel>
             <Input id="lastName" placeholder="Doe" required />
           </Field>
         </FieldGroup>
@@ -34,7 +34,7 @@ export function SignupForm2({
           <Input id="email" type="email" placeholder="m@example.com" required />
         </Field>
         <Field>
-          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <FieldLabel htmlFor="password">Mật khẩu</FieldLabel>
           <Input id="password" type="password" required />
         </Field>
         <Field>
@@ -49,14 +49,14 @@ export function SignupForm2({
               href="#"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Terms of Service
+              Điều khoản sử dụng
             </a>{" "}
             and{" "}
             <a
               href="#"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Privacy Policy
+              Chính sách bảo mật
             </a>
           </FieldLabel>
         </Field>
@@ -84,7 +84,7 @@ export function SignupForm2({
           href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-in-2"
           className="underline underline-offset-4"
         >
-          Sign in
+          Đăng nhập
         </a>
       </div>
     </form>

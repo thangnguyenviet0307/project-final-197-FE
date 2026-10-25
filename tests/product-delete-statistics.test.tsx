@@ -12,7 +12,7 @@ afterEach(() => { api.defaults.adapter = adapter; queryClient.clear() })
 function Statistics() {
   const stats = useProductStatistics()
   const mutation = useDeleteProduct()
-  return <><output data-testid="total">{stats.data?.total}</output><button onClick={() => mutation.mutate("a".repeat(24))}>Delete</button></>
+  return <><output data-testid="total">{stats.data?.total}</output><button onClick={() => mutation.mutate("a".repeat(24))}>Xóa</button></>
 }
 it("refetches active statistics after successful deletion", async () => {
   queryClient.clear()
@@ -25,7 +25,7 @@ it("refetches active statistics after successful deletion", async () => {
   }
   render(<QueryClientProvider client={queryClient}><Statistics /></QueryClientProvider>)
   await waitFor(() => expect(screen.getByTestId("total").textContent).toBe("10"))
-  fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+  fireEvent.click(screen.getByRole("button", { name: "Xóa" }))
   await waitFor(() => expect(screen.getByTestId("total").textContent).toBe("9"))
   expect(statsReads).toBe(2)
 })

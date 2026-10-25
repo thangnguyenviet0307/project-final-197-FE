@@ -52,7 +52,7 @@ export function StoreHeader() {
                 Giỏ hàng
               </span>
               <span className="text-sm font-semibold text-gray-800">
-                $0.00
+                0 ₫
               </span>
             </div>
           </div>

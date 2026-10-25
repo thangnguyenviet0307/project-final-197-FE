@@ -60,7 +60,7 @@ export function DataTableRowActions<TData extends RowData>({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" variant="destructive">
-            Delete
+            Xóa
             <DropdownMenuShortcut className="text-destructive">
               ⌘⌫
             </DropdownMenuShortcut>

@@ -60,7 +60,7 @@ export function Calendar({ events, eventDates }: CalendarProps) {
             style={{ position: "absolute" }}
           >
             <SheetHeader className="p-4 pb-2">
-              <SheetTitle>Calendar</SheetTitle>
+              <SheetTitle>Lịch</SheetTitle>
               <SheetDescription>
                 Browse dates and manage your calendar events
               </SheetDescription>

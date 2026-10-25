@@ -10,29 +10,28 @@ export function UnauthorizedError() {
     <div className="mx-auto flex min-h-dvh flex-col items-center justify-center gap-8 p-8 md:gap-12 md:p-16">
       <img
         src="https://ui.shadcn.com/placeholder.svg"
-        alt="placeholder image"
+        alt="Ảnh minh họa"
         className="aspect-video w-240 rounded-xl object-cover dark:brightness-[0.95] dark:invert"
       />
       <div className="text-center">
         <h1 className="mb-4 text-3xl font-bold">401</h1>
-        <h2 className="mb-3 text-2xl font-semibold">Unauthorized</h2>
+        <h2 className="mb-3 text-2xl font-semibold">Chưa xác thực</h2>
         <p>
-          You don't have permission to access this resource. Please sign in or
-          contact your administrator.
+          Bạn không có quyền truy cập nội dung này. Vui lòng đăng nhập hoặc liên hệ quản trị viên.
         </p>
         <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
           <Button
             className="cursor-pointer"
             onClick={() => navigate("/dashboard")}
           >
-            Go Back Home
+            Về trang chính
           </Button>
           <Button
             variant="outline"
             className="flex cursor-pointer items-center gap-1"
             onClick={() => navigate("#")}
           >
-            Contact Us
+            Liên hệ
           </Button>
         </div>
       </div>

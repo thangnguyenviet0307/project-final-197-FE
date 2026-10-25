@@ -22,69 +22,69 @@ type Department = {
 
 const departments: Department[] = [
   {
-    label: "New Arrivals",
+    label: "Sản phẩm mới",
     icon: Phone,
   },
   {
-    label: "Top 100 Best Seller",
+    label: "100 sản phẩm bán chạy nhất",
     icon: Printer,
   },
   {
-    label: "TV & Video",
+    label: "Tivi và thiết bị video",
     icon: Monitor,
     children: [
-      "Smart TV",
-      "LED TV",
-      "Projectors",
-      "Streaming Devices",
+      "Tivi thông minh",
+      "Tivi LED",
+      "Máy chiếu",
+      "Thiết bị phát trực tuyến",
     ],
   },
   {
-    label: "Home Audio & Theater",
+    label: "Âm thanh và rạp phim tại nhà",
     icon: Mic,
     children: [
-      "Home Theater",
-      "Soundbars",
-      "Speakers",
-      "Amplifiers",
+      "Hệ thống rạp phim tại nhà",
+      "Loa thanh",
+      "Loa",
+      "Bộ khuếch đại",
     ],
   },
   {
-    label: "Cell Phones & Laptop",
+    label: "Điện thoại và máy tính xách tay",
     icon: Zap,
     children: [
-      "Mobile Phones",
-      "Laptops",
-      "Laptop Accessories",
-      "Chargers",
+      "Điện thoại di động",
+      "Máy tính xách tay",
+      "Phụ kiện máy tính xách tay",
+      "Bộ sạc",
     ],
   },
   {
-    label: "Camera, Photo & Video",
+    label: "Máy ảnh và máy quay",
     icon: Camera,
     children: [
-      "Digital Cameras",
-      "Action Cameras",
-      "Camera Lenses",
-      "Tripods",
+      "Máy ảnh kỹ thuật số",
+      "Máy quay hành trình",
+      "Ống kính máy ảnh",
+      "Chân máy ảnh",
     ],
   },
   {
-    label: "Headphones",
+    label: "Tai nghe",
     icon: Headphones,
     children: [
-      "Wireless Headphones",
-      "Gaming Headsets",
-      "Earbuds",
-      "Bluetooth Headphones",
+      "Tai nghe không dây",
+      "Tai nghe chơi game",
+      "Tai nghe nhét tai",
+      "Tai nghe Bluetooth",
     ],
   },
   {
-    label: "Smart Phone & Tablets",
+    label: "Điện thoại và máy tính bảng",
     icon: Smartphone,
   },
   {
-    label: "Fax Machine",
+    label: "Máy fax",
     icon: Printer,
   },
 ]
@@ -140,7 +140,7 @@ export function StoreDepartmentsMenu() {
         className="flex h-14 w-full items-center justify-between rounded-t-lg bg-black px-5 text-white transition-colors hover:bg-[#171717]"
       >
         <span className="text-sm font-bold uppercase tracking-wider">
-          ALL DEPARTMENTS
+          TẤT CẢ DANH MỤC
         </span>
         <Menu size={23} />
       </button>
@@ -240,7 +240,7 @@ export function StoreDepartmentsMenu() {
             onClick={() => setActiveIndex(null)}
             className="flex min-h-[52px] w-full items-center justify-between bg-gray-100 px-5 text-left text-sm text-gray-700 transition-colors hover:bg-[#edf6e4] hover:text-[#55b000]"
           >
-            <span>All Categories</span>
+            <span>Tất cả danh mục</span>
             <ChevronRight size={16} />
           </button>
         </div>

@@ -15,7 +15,7 @@ it("removes executable markup, embeds and unsafe links while retaining formattin
 it("mounts the real Quill editor, loads existing text without dirtying the form, and emits rich HTML", async () => {
   const onChange = vi.fn()
   render(<ProductDescriptionEditor value="Legacy description" onChange={onChange} onBlur={vi.fn()} disabled={false} invalid={false} />)
-  const editor = screen.getByRole("textbox", { name: "Description" })
+  const editor = screen.getByRole("textbox", { name: "Mô tả" })
   expect(editor.textContent).toContain("Legacy description")
   expect(onChange).not.toHaveBeenCalled()
   editor.innerHTML = "<p><strong>Formatted case</strong></p>"
@@ -25,7 +25,7 @@ it("mounts the real Quill editor, loads existing text without dirtying the form,
 })
 it("renders readonly editor content and exposes validation accessibly", () => {
   render(<ProductDescriptionEditor value="<p><em>Case</em></p>" onChange={vi.fn()} onBlur={vi.fn()} disabled invalid />)
-  const editor = screen.getByRole("textbox", { name: "Description" })
+  const editor = screen.getByRole("textbox", { name: "Mô tả" })
   expect(editor.getAttribute("contenteditable")).toBe("false")
   expect(editor.getAttribute("aria-invalid")).toBe("true")
   expect(editor.querySelector("em")?.textContent).toBe("Case")

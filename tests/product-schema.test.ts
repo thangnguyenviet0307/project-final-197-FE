@@ -19,7 +19,7 @@ it("allows products without a price or variants and enforces backend limits", ()
 })
 it("rejects invalid SKUs, duplicate SKUs, negative prices and duplicate option names", () => {
   const variant = { sku: "CASE-1", price: 0, stock: 0, images: [], options: [] }
-  for (const variants of [[{ ...variant, sku: "lower" }], [variant, variant], [{ ...variant, price: -1 }], [{ ...variant, options: [{ name: "Color", value: "red" }, { name: "Color", value: "blue" }] }]]) {
+  for (const variants of [[{ ...variant, sku: "lower" }], [variant, variant], [{ ...variant, price: -1 }], [{ ...variant, options: [{ name: "Màu sắc", value: "red" }, { name: "Màu sắc", value: "blue" }] }]]) {
     expect(productSchema.safeParse({ ...values(), variants }).success).toBe(false)
   }
 })

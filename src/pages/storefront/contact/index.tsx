@@ -55,14 +55,14 @@ export default function ContactPage() {
       form.message.trim().length < 10
     ) {
       setNotice(
-        "Please complete all fields and enter a message of at least 10 characters."
+        "Vui lòng điền đầy đủ thông tin và nhập lời nhắn có ít nhất 10 ký tự."
       )
       return
     }
 
     // Chưa có API gửi liên hệ dành cho khách hàng.
     setNotice(
-      "Your form is valid. Message sending will be available when the Contact API is integrated."
+      "Thông tin hợp lệ. Tính năng gửi lời nhắn hiện chưa khả dụng. Vui lòng quay lại sau."
     )
   }
 
@@ -71,19 +71,19 @@ export default function ContactPage() {
       {/* BREADCRUMB */}
       <div className="mx-auto max-w-[1440px] px-5">
         <nav
-          aria-label="Breadcrumb"
+          aria-label="Đường dẫn điều hướng"
           className="flex items-center gap-2 py-7 text-xs text-gray-500"
         >
           <Link
             to="/"
             className="transition-colors hover:text-[#55b000]"
           >
-            Home
+            Trang chủ
           </Link>
 
           <ChevronRight size={14} />
 
-          <span className="text-gray-900">Contact Us</span>
+          <span className="text-gray-900">Liên hệ</span>
         </nav>
       </div>
 
@@ -106,16 +106,15 @@ export default function ContactPage() {
           </div>
 
           <span className="text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
-            DEMO STORE SUPPORT
+            HỖ TRỢ TỪ DEMO STORE
           </span>
 
           <h1 className="mt-4 text-3xl font-bold tracking-wide sm:text-4xl lg:text-5xl">
-            CONTACT US
+            LIÊN HỆ
           </h1>
 
           <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-gray-300 sm:text-base">
-            We're here to help. Get in touch with our team
-            and let us know how we can assist you.
+            Chúng tôi luôn sẵn sàng hỗ trợ. Hãy liên hệ và cho chúng tôi biết bạn cần giúp đỡ điều gì.
           </p>
 
           <div className="mt-6 h-1 w-16 rounded-full bg-[#55b000]" />
@@ -126,16 +125,15 @@ export default function ContactPage() {
       <section className="mx-auto w-full max-w-[1440px] px-5 py-14 sm:py-20">
         <div className="mb-12 text-center">
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#55b000]">
-            GET IN TOUCH
+            KẾT NỐI VỚI CHÚNG TÔI
           </span>
 
           <h2 className="mt-3 text-2xl font-bold sm:text-3xl">
-            We'd Love To Hear From You
+            Chúng tôi mong nhận được ý kiến của bạn
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-gray-500">
-            Have questions about our products or services?
-            Feel free to send us a message.
+            Bạn có thắc mắc về sản phẩm hoặc dịch vụ? Hãy gửi lời nhắn cho chúng tôi.
           </p>
         </div>
 
@@ -149,10 +147,10 @@ export default function ContactPage() {
 
               <div>
                 <h3 className="text-xl font-bold">
-                  Send Us A Message
+                  Gửi lời nhắn cho chúng tôi
                 </h3>
                 <p className="mt-1 text-xs text-gray-500">
-                  Fill out the form below.
+                  Vui lòng điền thông tin bên dưới.
                 </p>
               </div>
             </div>
@@ -167,7 +165,7 @@ export default function ContactPage() {
                     htmlFor="contact-name"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Your Name *
+                    Họ và tên *
                   </label>
 
                   <input
@@ -176,7 +174,7 @@ export default function ContactPage() {
                     required
                     maxLength={100}
                     autoComplete="name"
-                    placeholder="Enter your name"
+                    placeholder="Nhập họ và tên"
                     value={form.name}
                     onChange={(event) =>
                       updateField("name", event.target.value)
@@ -190,7 +188,7 @@ export default function ContactPage() {
                     htmlFor="contact-email"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Email Address *
+                    Địa chỉ email *
                   </label>
 
                   <input
@@ -199,7 +197,7 @@ export default function ContactPage() {
                     required
                     maxLength={150}
                     autoComplete="email"
-                    placeholder="Enter your email"
+                    placeholder="Nhập địa chỉ email"
                     value={form.email}
                     onChange={(event) =>
                       updateField("email", event.target.value)
@@ -214,7 +212,7 @@ export default function ContactPage() {
                   htmlFor="contact-subject"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Subject *
+                  Chủ đề *
                 </label>
 
                 <input
@@ -222,7 +220,7 @@ export default function ContactPage() {
                   type="text"
                   required
                   maxLength={150}
-                  placeholder="What is your message about?"
+                  placeholder="Nhập chủ đề bạn muốn trao đổi"
                   value={form.subject}
                   onChange={(event) =>
                     updateField("subject", event.target.value)
@@ -236,7 +234,7 @@ export default function ContactPage() {
                   htmlFor="contact-message"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Your Message *
+                  Lời nhắn *
                 </label>
 
                 <textarea
@@ -245,7 +243,7 @@ export default function ContactPage() {
                   minLength={10}
                   maxLength={2000}
                   rows={7}
-                  placeholder="Write your message here..."
+                  placeholder="Nhập lời nhắn tại đây..."
                   value={form.message}
                   onChange={(event) =>
                     updateField("message", event.target.value)
@@ -269,11 +267,11 @@ export default function ContactPage() {
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#55b000] px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#55b000]"
               >
                 <Send size={17} />
-                SEND MESSAGE
+                GỬI LỜI NHẮN
               </button>
 
               <p className="text-xs leading-5 text-gray-400">
-                Demo mode: messages are not sent or stored.
+                Chế độ xem trước: lời nhắn chưa được gửi hoặc lưu lại.
               </p>
             </form>
           </div>
@@ -297,13 +295,11 @@ export default function ContactPage() {
               </div>
 
               <h3 className="relative mt-6 text-2xl font-bold">
-                Find Our Store
+                Tìm cửa hàng của chúng tôi
               </h3>
 
               <p className="relative mt-3 max-w-sm text-sm leading-7 text-gray-500">
-                Our store location and interactive map
-                will be available once the official
-                address is confirmed.
+                Vị trí cửa hàng và bản đồ sẽ được cập nhật khi địa chỉ chính thức được xác nhận.
               </p>
             </div>
 
@@ -313,7 +309,7 @@ export default function ContactPage() {
               </p>
 
               <p className="mt-2 text-xs leading-6 text-gray-300">
-                Store information will be updated soon.
+                Thông tin cửa hàng sẽ sớm được cập nhật.
               </p>
             </div>
           </div>
@@ -335,11 +331,11 @@ export default function ContactPage() {
         <div className="relative mx-auto w-full max-w-[1440px] px-5 py-16 sm:py-20">
           <div className="mb-10 text-center">
             <span className="text-xs font-bold uppercase tracking-widest text-[#9ee15c]">
-              CONTACT INFORMATION
+              THÔNG TIN LIÊN HỆ
             </span>
 
             <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
-              How To Reach Us
+              Cách liên hệ với chúng tôi
             </h2>
           </div>
 
@@ -351,7 +347,7 @@ export default function ContactPage() {
               </div>
 
               <h3 className="mt-6 text-sm font-bold uppercase tracking-wider">
-                OUR ADDRESS
+                ĐỊA CHỈ
               </h3>
 
               <div className="mt-4 h-0.5 w-12 bg-[#55b000]" />
@@ -361,8 +357,7 @@ export default function ContactPage() {
               </p>
 
               <p className="mt-2 text-sm leading-7 text-gray-500">
-                Official store address will be updated
-                when the storefront launches.
+                Địa chỉ chính thức sẽ được cập nhật khi cửa hàng ra mắt.
               </p>
             </div>
 
@@ -379,12 +374,11 @@ export default function ContactPage() {
               <div className="mt-4 h-0.5 w-12 bg-[#55b000]" />
 
               <p className="mt-5 text-sm font-semibold">
-                Customer Support
+                Hỗ trợ khách hàng
               </p>
 
               <p className="mt-2 text-sm leading-7 text-gray-500">
-                Our official email address will be
-                announced soon.
+                Địa chỉ email chính thức sẽ sớm được công bố.
               </p>
             </div>
 
@@ -395,22 +389,22 @@ export default function ContactPage() {
               </div>
 
               <h3 className="mt-6 text-sm font-bold uppercase tracking-wider">
-                PHONE
+                ĐIỆN THOẠI
               </h3>
 
               <div className="mt-4 h-0.5 w-12 bg-[#55b000]" />
 
               <p className="mt-5 text-sm font-semibold">
-                Customer Service
+                Chăm sóc khách hàng
               </p>
 
               <p className="mt-2 text-sm leading-7 text-gray-500">
-                Phone number coming soon.
+                Số điện thoại sẽ sớm được cập nhật.
               </p>
 
               <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
                 <Clock3 size={15} />
-                Working hours to be announced
+                Giờ làm việc sẽ được thông báo sau
               </div>
             </div>
           </div>

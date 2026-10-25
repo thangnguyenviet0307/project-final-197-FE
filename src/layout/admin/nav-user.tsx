@@ -83,21 +83,21 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer" render={<Link to="/settings/user" />}>
-                <CircleUser />User Profile
+                <CircleUser />Hồ sơ người dùng
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
                 render={<Link to="/change-password" />}
               >
                 <KeyRound />
-                Change password
+                Đổi mật khẩu
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
                 render={<Link to="/settings/notifications" />}
               >
                 <BellDot />
-                Notifications
+                Thông báo
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -108,7 +108,7 @@ export function NavUser({
                 onClick={() => logoutMutation.mutate()}
               >
                 <LogOut />
-                Sign out
+                Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

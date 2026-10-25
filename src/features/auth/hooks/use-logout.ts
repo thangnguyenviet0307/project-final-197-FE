@@ -6,7 +6,7 @@ export function useLogout(redirectTo = "/login") {
   const navigate = useNavigate()
   return useMutation({
     mutationFn: logout,
-    meta: { successMessage: "Signed out successfully." },
+    meta: { successMessage: "Đã đăng xuất thành công." },
     onSettled: () => navigate(redirectTo, { replace: true }),
   })
 }

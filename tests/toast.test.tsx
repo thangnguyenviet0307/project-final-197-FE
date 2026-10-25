@@ -11,9 +11,9 @@ afterEach(() => { toast.dismiss(); queryClient.clear(); vi.useRealTimers(); vi.u
 
 it("shows compact, centered notifications without a close button in the bottom-left corner", async () => {
   render(<ThemeProvider defaultTheme="light" storageKey="toast-test-theme"><Toaster>
-    <button onClick={() => toast.success("Saved successfully.")}>Save</button>
+    <button onClick={() => toast.success("Saved successfully.")}>Lưu</button>
   </Toaster></ThemeProvider>)
-  fireEvent.click(screen.getByRole("button", { name: "Save" }))
+  fireEvent.click(screen.getByRole("button", { name: "Lưu" }))
   expect(await screen.findByText("Saved successfully.")).toBeTruthy()
   const viewport = document.querySelector("[data-sonner-toaster]")
   expect(viewport?.getAttribute("data-x-position")).toBe("left")
@@ -30,10 +30,10 @@ it("shows action success messages and API failures through the shared query clie
   const success = vi.spyOn(toast, "success")
   const failure = vi.spyOn(toast, "error")
   const mutation = queryClient.getMutationCache().build(queryClient, {
-    mutationFn: async () => undefined, meta: { successMessage: "Account created successfully." },
+    mutationFn: async () => undefined, meta: { successMessage: "Tạo tài khoản thành công." },
   })
   await mutation.execute(undefined)
-  expect(success).toHaveBeenCalledWith("Account created successfully.")
+  expect(success).toHaveBeenCalledWith("Tạo tài khoản thành công.")
   const failed = queryClient.getMutationCache().build(queryClient, {
     mutationFn: async () => { throw new Error("Action failed.") },
   })

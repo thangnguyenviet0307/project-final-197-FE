@@ -17,40 +17,38 @@ export function CTASection() {
               <div className="flex flex-col items-center gap-4">
                 <Badge variant="outline" className="flex items-center gap-2">
                   <TrendingUp />
-                  Productivity Suite
+                  Bộ công cụ nâng cao năng suất
                 </Badge>
 
                 <div className="text-muted-foreground flex items-center gap-4 text-sm">
                   <span className="flex items-center gap-1">
                     <div className="size-2 rounded-full bg-success" />
-                    150+ Blocks
+                    Hơn 150 khối giao diện
                   </span>
                   <Separator orientation="vertical" className="h-4! data-vertical:self-center" />
-                  <span>25K+ Downloads</span>
+                  <span>Hơn 25 nghìn lượt tải</span>
                   <Separator orientation="vertical" className="h-4! data-vertical:self-center" />
-                  <span>4.9★ Rating</span>
+                  <span>Đánh giá 4,9★</span>
                 </div>
               </div>
 
               {/* Main Content */}
               <div className="flex flex-col gap-6">
                 <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                  Supercharge your team's
+                  Nâng cao
                   <span className="flex sm:inline-flex justify-center">
                     <span className="relative mx-2">
                       <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                        performance
+                        hiệu suất đội ngũ
                       </span>
                       <div className="absolute start-0 -bottom-2 h-1 w-full bg-gradient-to-r from-primary/30 to-secondary/30" />
                     </span>
-                    today
+                    ngay hôm nay
                   </span>
                 </h1>
 
                 <p className="text-muted-foreground mx-auto max-w-2xl text-balance lg:text-xl">
-                  Stop building from scratch. Get production-ready components,
-                  templates and dashboards that integrate seamlessly with your
-                  shadcn/ui projects.
+                  Sử dụng các thành phần, giao diện mẫu và bảng điều khiển sẵn sàng triển khai, dễ dàng tích hợp vào dự án shadcn/ui của bạn.
                 </p>
               </div>
 
@@ -69,7 +67,7 @@ export function CTASection() {
                   }
                 >
                   <Package className="size-5" data-icon="inline-start" />
-                  Browse Components
+                  Khám phá thành phần
                 </Button>
                 <Button
                   variant="outline"
@@ -85,7 +83,7 @@ export function CTASection() {
                   }
                 >
                   <Github className="size-5" data-icon="inline-start" />
-                  View on GitHub
+                  Xem trên GitHub
                   <ArrowRight
                     className="transition-transform group-hover:translate-x-1"
                     data-icon="inline-end"
@@ -98,17 +96,17 @@ export function CTASection() {
                 <div className="flex items-center gap-2">
                   <div className="size-2 rounded-full bg-success me-1" />
 
-                  <span>Free components available</span>
+                  <span>Có các thành phần miễn phí</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="size-2 rounded-full bg-info me-1" />
 
-                  <span>Commercial license included</span>
+                  <span>Bao gồm giấy phép thương mại</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="size-2 rounded-full bg-warning me-1" />
 
-                  <span>Regular updates & support</span>
+                  <span>Cập nhật và hỗ trợ thường xuyên</span>
                 </div>
               </div>
             </div>

@@ -29,19 +29,19 @@ function setup(resource: "categories" | "brands" | "users") {
 }
 
 it.each([
-  ["categories", "Category name", "Back to categories"],
-  ["brands", "Brand Name", "Back to brands"],
-  ["users", "First name", "Back to users"],
+  ["categories", "Tên danh mục", "Về danh sách danh mục"],
+  ["brands", "Tên thương hiệu", "Về danh sách thương hiệu"],
+  ["users", "Nhập tên", "Về danh sách người dùng"],
 ] as const)("protects dirty %s forms during route navigation and Cancel", async (resource, field, back) => {
   setup(resource)
   fireEvent.change(await screen.findByLabelText(field), { target: { value: "Unsaved value" } })
   fireEvent.click(screen.getByText(back))
-  expect(await screen.findByRole("dialog", { name: "Discard unsaved changes?" })).toBeTruthy()
-  fireEvent.click(screen.getByRole("button", { name: "Keep editing" }))
+  expect(await screen.findByRole("dialog", { name: "Bỏ các thay đổi chưa lưu?" })).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Tiếp tục chỉnh sửa" }))
   expect((screen.getByLabelText(field) as HTMLInputElement).value).toBe("Unsaved value")
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-  fireEvent.click(screen.getByRole("button", { name: "Cancel" }))
-  fireEvent.click(await screen.findByRole("button", { name: "Discard changes" }))
+  fireEvent.click(screen.getByRole("button", { name: "Hủy" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Bỏ thay đổi" }))
   expect(await screen.findByText("Returned to list")).toBeTruthy()
 })
 
@@ -52,10 +52,10 @@ it("saves a Brand with a long existing-compatible description and inactive statu
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [] } }
   }
   setup("brands")
-  fireEvent.change(screen.getByLabelText("Brand Name"), { target: { value: "Inactive brand" } })
-  fireEvent.change(screen.getByLabelText("Description"), { target: { value: "a".repeat(501) } })
-  fireEvent.click(screen.getByLabelText("Active brand"))
-  fireEvent.click(screen.getByRole("button", { name: "Create Brand" }))
+  fireEvent.change(screen.getByLabelText("Tên thương hiệu"), { target: { value: "Inactive brand" } })
+  fireEvent.change(screen.getByLabelText("Mô tả"), { target: { value: "a".repeat(501) } })
+  fireEvent.click(screen.getByLabelText("Thương hiệu đang hoạt động"))
+  fireEvent.click(screen.getByRole("button", { name: "Tạo thương hiệu" }))
   expect(await screen.findByText("Returned to list")).toBeTruthy()
   expect(writes).toHaveBeenCalledWith({ name: "Inactive brand", description: "a".repeat(501), logoUrl: "", isActive: false })
   expect(screen.queryByRole("dialog")).toBeNull()

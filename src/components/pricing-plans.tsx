@@ -97,7 +97,7 @@ export function PricingPlans({
         return "Downgrade Plan"
       }
     }
-    return "Get Started"
+    return "Bắt đầu"
   }
 
   const getButtonVariant = (plan: PricingPlan) => {

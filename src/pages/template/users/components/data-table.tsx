@@ -103,13 +103,13 @@ export function DataTable({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active":
+      case "Đang hoạt động":
         return "text-success bg-success/10"
-      case "Pending":
+      case "Chờ xử lý":
         return "text-warning bg-warning/10"
       case "Error":
         return "text-destructive bg-destructive/10"
-      case "Inactive":
+      case "Ngừng hoạt động":
         return "text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20"
       default:
         return "text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20"
@@ -118,7 +118,7 @@ export function DataTable({
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case "Admin":
+      case "Quản trị viên":
         return "text-destructive bg-destructive/10"
       case "Editor":
         return "text-info bg-info/10"
@@ -195,7 +195,7 @@ export function DataTable({
     },
     {
       accessorKey: "role",
-      header: "Role",
+      header: "Vai trò",
       cell: ({ row }) => {
         const role = row.getValue("role") as string
         return (
@@ -225,7 +225,7 @@ export function DataTable({
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: "Trạng thái",
       cell: ({ row }) => {
         const status = row.getValue("status") as string
         return (
@@ -238,7 +238,7 @@ export function DataTable({
     },
     {
       id: "actions",
-      header: "Actions",
+      header: "Thao tác",
       cell: ({ row }) => {
         const user = row.original
         return (
@@ -353,12 +353,12 @@ export function DataTable({
       <FieldGroup className="grid gap-2 sm:grid-cols-4 sm:gap-4">
         <Field>
           <FieldLabel htmlFor="role-filter" className="text-sm font-medium">
-            Role
+            Vai trò
           </FieldLabel>
           <Select
             items={{
               all: "All Roles",
-              Admin: "Admin",
+              Admin: "Quản trị viên",
               Author: "Author",
               Editor: "Editor",
               Maintainer: "Maintainer",
@@ -377,7 +377,7 @@ export function DataTable({
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
+                <SelectItem value="Quản trị viên">Quản trị viên</SelectItem>
                 <SelectItem value="Author">Author</SelectItem>
                 <SelectItem value="Editor">Editor</SelectItem>
                 <SelectItem value="Maintainer">Maintainer</SelectItem>
@@ -419,15 +419,15 @@ export function DataTable({
         </Field>
         <Field>
           <FieldLabel htmlFor="status-filter" className="text-sm font-medium">
-            Status
+            Trạng thái
           </FieldLabel>
           <Select
             items={{
               all: "All Status",
-              Active: "Active",
-              Pending: "Pending",
+              Active: "Đang hoạt động",
+              Pending: "Chờ xử lý",
               Error: "Error",
-              Inactive: "Inactive",
+              Inactive: "Ngừng hoạt động",
             }}
             value={statusFilter || ""}
             onValueChange={(value) =>
@@ -442,10 +442,10 @@ export function DataTable({
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                <SelectItem value="Chờ xử lý">Chờ xử lý</SelectItem>
                 <SelectItem value="Error">Error</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
+                <SelectItem value="Ngừng hoạt động">Ngừng hoạt động</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -568,7 +568,7 @@ export function DataTable({
         </div>
         <div className="flex items-center gap-x-6 lg:gap-x-8">
           <div className="hidden items-center gap-2 sm:flex">
-            <p className="text-sm font-medium">Page</p>
+            <p className="text-sm font-medium">Trang</p>
             <strong className="text-sm">
               {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
             </strong>
@@ -581,7 +581,7 @@ export function DataTable({
               disabled={!table.getCanPreviousPage()}
               className="cursor-pointer"
             >
-              Previous
+              Trước
             </Button>
             <Button
               variant="outline"
@@ -590,7 +590,7 @@ export function DataTable({
               disabled={!table.getCanNextPage()}
               className="cursor-pointer"
             >
-              Next
+              Tiếp
             </Button>
           </div>
         </div>

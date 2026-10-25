@@ -35,18 +35,18 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
     },
   })
 
- return (<> <form aria-label="Create account" className="max-w-3xl space-y-6" noValidate onSubmit={form.handleSubmit(async values => {
+ return (<> <form aria-label="Tạo tài khoản" className="max-w-3xl space-y-6" noValidate onSubmit={form.handleSubmit(async values => {
    try { await mutation.mutateAsync(values) } catch { /* Field errors are set by the mutation callback. */ }
  })}>
                 <fieldset disabled={mutation.isPending} className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field data-invalid={!!form.formState.errors.firstName}>
-                    <FieldLabel htmlFor="create-first-name">First name</FieldLabel>
+                    <FieldLabel htmlFor="create-first-name">Nhập tên</FieldLabel>
                     <Input id="create-first-name"  autoComplete="off" aria-invalid={!!form.formState.errors.firstName} {...form.register("firstName")} />
                     <FieldError errors={[form.formState.errors.firstName]} />
                   </Field>
                   <Field data-invalid={!!form.formState.errors.lastName}>
-                    <FieldLabel htmlFor="create-last-name">Last name</FieldLabel>
+                    <FieldLabel htmlFor="create-last-name">Nhập họ</FieldLabel>
                     <Input id="create-last-name"  autoComplete="off" aria-invalid={!!form.formState.errors.lastName} {...form.register("lastName")} />
                     <FieldError errors={[form.formState.errors.lastName]} />
                   </Field>
@@ -60,7 +60,7 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field data-invalid={!!form.formState.errors.role}>
-                    <FieldLabel htmlFor="create-role">Role</FieldLabel>
+                    <FieldLabel htmlFor="create-role">Vai trò</FieldLabel>
                     <Controller name="role" control={form.control} render={({ field }) => (
                       <Select value={field.value} onValueChange={value => {
                         if (value !== "staff" && value !== "admin") return
@@ -70,18 +70,18 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
                         <SelectTrigger id="create-role" ref={field.ref} onBlur={field.onBlur}
                           aria-invalid={!!form.formState.errors.role}
                           className="w-full">
-                          <SelectValue>{field.value === "admin" ? "Admin" : "Staff"}</SelectValue>
+                          <SelectValue>{field.value === "admin" ? "Quản trị viên" : "Nhân viên"}</SelectValue>
                         </SelectTrigger>
                         <SelectContent alignItemWithTrigger={false} align="start" className="rounded-xl p-1.5">
-                          <SelectItem value="staff" className="cursor-pointer rounded-lg px-3 py-2">Staff</SelectItem>
-                          <SelectItem value="admin" className="cursor-pointer rounded-lg px-3 py-2">Admin</SelectItem>
+                          <SelectItem value="staff" className="cursor-pointer rounded-lg px-3 py-2">Nhân viên</SelectItem>
+                          <SelectItem value="admin" className="cursor-pointer rounded-lg px-3 py-2">Quản trị viên</SelectItem>
                         </SelectContent>
                       </Select>
                     )} />
                     <FieldError errors={[form.formState.errors.role]} />
                   </Field>
                   <Field data-invalid={!!form.formState.errors.password}>
-                    <FieldLabel htmlFor="create-password">Temporary password</FieldLabel>
+                    <FieldLabel htmlFor="create-password">Mật khẩu tạm thời</FieldLabel>
                     <Input id="create-password"  type="text" readOnly autoComplete="off" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
                     <FieldError errors={[form.formState.errors.password]} />
                   </Field>
@@ -92,13 +92,13 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
 
                 <div className="flex items-center justify-end gap-3 pt-2">
                   <Button type="button" variant="outline"  disabled={mutation.isPending} onClick={() => form.reset()}>
-                    Reset
+                    Đặt lại
                   </Button>
                   <Button type="submit" disabled={mutation.isPending} >
                     {mutation.isPending && <LoaderCircle className="animate-spin" />}
-                    Create account
+                    Tạo tài khoản
                   </Button>
-                  <Button type="button" variant="outline" disabled={mutation.isPending} onClick={() => navigation.confirmDiscard(onCancel)}>Cancel</Button>
+                  <Button type="button" variant="outline" disabled={mutation.isPending} onClick={() => navigation.confirmDiscard(onCancel)}>Hủy</Button>
                 </div>
               </form>{navigation.guard}</>)
 }

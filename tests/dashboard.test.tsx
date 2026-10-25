@@ -36,8 +36,8 @@ it("uses server-wide counts and bounded recent/low-stock lists instead of demo d
   view()
   expect(await screen.findByRole("link", { name: "ORD-ABC234" })).toHaveProperty("href", expect.stringContaining(`/orders/${"c".repeat(24)}`))
   expect(screen.getByText("Jane Smith")).toBeTruthy()
-  expect(within(screen.getByRole("region", { name: "Order statistics" })).getByText("22")).toBeTruthy()
-  expect(within(screen.getByRole("region", { name: "Product statistics" })).getByText("42")).toBeTruthy()
+  expect(within(screen.getByRole("region", { name: "Thống kê đơn hàng" })).getByText("22")).toBeTruthy()
+  expect(within(screen.getByRole("region", { name: "Thống kê sản phẩm" })).getByText("42")).toBeTruthy()
   expect(screen.getByRole("link", { name: "Phone case" })).toBeTruthy()
   expect(requests).toContainEqual({ url: "/orders", params: { page: 1, limit: 5 } })
   expect(requests).toContainEqual({ url: "/products", params: { page: 1, limit: 5, stockStatus: "low_stock" } })
@@ -48,31 +48,31 @@ it("uses server-wide counts and bounded recent/low-stock lists instead of demo d
 it("explains the staff order scope and shows real empty states", async () => {
   const { view } = setup({ role: "staff", empty: true })
   view()
-  expect(await screen.findByText("No orders yet.")).toBeTruthy()
-  expect(await screen.findByText("No low-stock products.")).toBeTruthy()
-  expect(screen.getByText(/orders assigned to you and unassigned orders/)).toBeTruthy()
-  expect(within(screen.getByRole("region", { name: "Order statistics" })).getAllByText("0")).toHaveLength(5)
+  expect(await screen.findByText("Chưa có đơn hàng.")).toBeTruthy()
+  expect(await screen.findByText("Không có sản phẩm sắp hết hàng.")).toBeTruthy()
+  expect(screen.getByText(/đơn hàng được giao cho bạn và đơn hàng chưa được phân công/)).toBeTruthy()
+  expect(within(screen.getByRole("region", { name: "Thống kê đơn hàng" })).getAllByText("0")).toHaveLength(5)
 })
 
 it("does not represent failed product statistics as zero and permits retry", async () => {
   const { view, state } = setup()
   state.failStatistics = true
   view()
-  await screen.findByRole("button", { name: "Retry product statistics" })
-  const section = screen.getByRole("region", { name: "Product statistics" })
+  await screen.findByRole("button", { name: "Tải lại thống kê sản phẩm" })
+  const section = screen.getByRole("region", { name: "Thống kê sản phẩm" })
   expect(within(section).getAllByText("—")).toHaveLength(4)
   state.failStatistics = false
-  fireEvent.click(screen.getByRole("button", { name: "Retry product statistics" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tải lại thống kê sản phẩm" }))
   expect(await within(section).findByText("42")).toBeTruthy()
 })
 
 it("refreshes the live query data on demand", async () => {
   const { view, state } = setup()
   view()
-  const section = screen.getByRole("region", { name: "Product statistics" })
+  const section = screen.getByRole("region", { name: "Thống kê sản phẩm" })
   await within(section).findByText("42")
-  await waitFor(() => expect(screen.getByRole("button", { name: "Refresh" }).hasAttribute("disabled")).toBe(false))
+  await waitFor(() => expect(screen.getByRole("button", { name: "Làm mới" }).hasAttribute("disabled")).toBe(false))
   state.total = 43
-  fireEvent.click(screen.getByRole("button", { name: "Refresh" }))
+  fireEvent.click(screen.getByRole("button", { name: "Làm mới" }))
   expect(await within(section).findByText("43")).toBeTruthy()
 })

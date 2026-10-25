@@ -15,25 +15,25 @@ const blogs = [
     id: 1,
     image: "https://ui.shadcn.com/placeholder.svg",
     category: "Technology",
-    title: "AI Development Catalysts",
+    title: "AI thúc đẩy phát triển phần mềm",
     description:
-      "Exploring how AI-driven tools are transforming software development workflows and accelerating innovation.",
+      "Khám phá cách công cụ AI thay đổi quy trình phát triển phần mềm và thúc đẩy đổi mới.",
   },
   {
     id: 2,
     image: "https://ui.shadcn.com/placeholder.svg",
     category: "Lifestyle",
-    title: "Minimalist Living Guide",
+    title: "Hướng dẫn sống tối giản",
     description:
-      "Minimalist living approaches that can help reduce stress and create more meaningful daily experiences.",
+      "Các phương pháp sống tối giản giúp giảm căng thẳng và tạo trải nghiệm ý nghĩa mỗi ngày.",
   },
   {
     id: 3,
     image: "https://ui.shadcn.com/placeholder.svg",
     category: "Design",
-    title: "Accessible UI Trends",
+    title: "Xu hướng giao diện dễ tiếp cận",
     description:
-      "How modern UI trends are embracing accessibility while maintaining sleek, intuitive user experiences.",
+      "Cách thiết kế giao diện hiện đại kết hợp khả năng tiếp cận với trải nghiệm tinh gọn, trực quan.",
   },
 ]
 
@@ -44,14 +44,13 @@ export function BlogSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Latest Insights
+            Bài viết mới nhất
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            From our blog
+            Từ chuyên mục tin tức
           </h2>
           <p className="text-lg text-muted-foreground">
-            Stay updated with the latest trends, best practices, and insights
-            from our team of experts.
+            Cập nhật xu hướng, kinh nghiệm và kiến thức từ đội ngũ chuyên gia.
           </p>
         </div>
 
@@ -85,7 +84,7 @@ export function BlogSection() {
                   onClick={(e) => e.preventDefault()}
                   className="inline-flex items-center gap-2 text-primary hover:underline cursor-pointer"
                 >
-                  Learn More
+                  Tìm hiểu thêm
                   <ArrowRight className="size-4" />
                 </a>
               </CardFooter>
