@@ -1,11 +1,22 @@
 # Trang bán hàng
 
-Đặt các trang cho khách hàng tại đây, ví dụ `home/index.tsx`, `products/index.tsx`, `products/detail.tsx`, `cart/index.tsx`, `checkout/index.tsx`.
+Các trang storefront hiện có:
 
-Dùng nghiệp vụ từ `src/features/`, UI dùng chung từ `src/components/`, và layout bán hàng tại `src/layout/storefront/` khi triển khai. Đăng ký URL trong `src/router/routes.tsx`.
+- `home/index.tsx`: homepage theo thứ tự hero, danh mục nhanh, tiện ích, bộ sưu tập,
+  tab ưu đãi/bán chạy/đánh giá, ba nhóm sản phẩm và testimonial.
+- `products/index.tsx`: danh sách sản phẩm và bộ lọc.
+- `products/detail.tsx`: chi tiết, gallery, chọn biến thể, tab nội dung và sản phẩm liên quan.
 
-Hiện có homepage `/`, `/contact`, đăng ký `/register` và đăng nhập `/account/login`, dùng `layout/storefront/`. Đăng ký thành công chuyển sang đăng nhập; đăng nhập thành công về homepage. Trang `/landing` nằm trong `pages/public/landing/` và cũng dùng layout cửa hàng. Khu vực account yêu cầu tài khoản customer. Hồ sơ và đổi mật khẩu đã dùng API thật; đơn hàng và địa chỉ vẫn là bản xem trước. Thư mục không tự tạo URL; chỉ các trang được đăng ký trong router mới truy cập được. Xem [quy tắc tổ chức Frontend](../../../docs/frontend-structure.md).
+Các trang storefront được đăng ký trong router và dùng `src/layout/storefront/`.
+Homepage và catalog dùng component/dữ liệu demo trong `src/features/storefront/`;
+trang `/landing` là landing page riêng, còn `/shop` và `/shop/:slug` là storefront.
+Xem [quy tắc tổ chức Frontend](../../../docs/frontend-structure.md).
 
-Customers hiện là hồ sơ liên hệ để kiểm thử API, chưa phải tài khoản khách hàng đăng nhập. Chưa triển khai giỏ hàng/checkout hoặc mở quyền truy cập catalog công khai. Xem [hợp đồng cần chốt trước khi phát triển](../../../docs/storefront-contract.md).
+Catalog storefront hiện dùng dữ liệu demo vì Backend chưa có API catalog công khai.
+Đăng ký và đăng nhập khách hàng đang dùng API xác thực hiện có; trang tài khoản
+yêu cầu session customer. Hồ sơ và đổi mật khẩu dùng API thật; đơn hàng và địa chỉ
+vẫn là bản xem trước. Customers hiện là hồ sơ liên hệ, chưa được tự động liên kết
+với tài khoản chỉ dựa trên email.
 
-Account profile and password pages now call the shared auth APIs and require a customer session. Orders/addresses remain previews. Read [PROJECT_RULES.md](../../../PROJECT_RULES.md) for current behavior and pnpm checks.
+Giỏ hàng, checkout và luồng đặt hàng công khai chưa được bật. Xem
+[hợp đồng storefront](../../../docs/storefront-contract.md) trước khi triển khai.
