@@ -12,12 +12,14 @@ import { useRegisterCustomer } from "@/features/auth/hooks/use-register-customer
 import { customerRegistrationSchema, loginSchema } from "@/features/auth/schemas/auth-schemas"
 import { PageLayout } from "@/layout/storefront/page-layout"
 import { getApiError } from "@/services/api"
+import "./customer-auth-form.css"
 
 type FormValues = z.infer<typeof customerRegistrationSchema>
 
 export function CustomerAuthForm({ registration = false }: { registration?: boolean }) {
   const location = useLocation()
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const form = useForm<FormValues>({
     resolver: zodResolver(registration ? customerRegistrationSchema : loginSchema.extend({
       firstName: z.string(), lastName: z.string(), confirmPassword: z.string(),
@@ -46,7 +48,7 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
   ]
 
   return <PageLayout title={title} breadcrumbs={[{ label: title }]}>
-    <section className="mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8" aria-label={title}>
+    <section className="customer-auth-form mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-6 text-gray-900 shadow-sm sm:p-8" aria-label={title}>
       <h2 className="text-2xl font-bold">{registration ? "Chào mừng đến DEMO STORE" : "Chào mừng bạn trở lại"}</h2>
       <p className="mt-2 mb-6 text-sm text-gray-500">{registration ? "Tạo tài khoản để mua sắm thuận tiện hơn." : "Nhập thông tin tài khoản để tiếp tục mua sắm."}</p>
       {!registration && typeof location.state?.message === "string" && <p role="status" className="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{location.state.message}</p>}
@@ -59,17 +61,24 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
         loginMutation.mutate({ email: values.email, password: values.password })
       })}>
         <fieldset disabled={isPending} className="space-y-4">
-          {fields.map(({ name, label, autoComplete, type = "text" }) => <Field key={name} data-invalid={!!form.formState.errors[name]}>
+          {fields.map(({ name, label, autoComplete, type = "text" }) => {
+            const passwordVisible = name === "confirmPassword" ? showConfirmPassword : showPassword
+            const descriptionId = registration && type === "password" ? `customer-${name}-hint` : undefined
+            const describedBy = [descriptionId, form.formState.errors[name] ? `customer-${name}-error` : undefined].filter(Boolean).join(" ") || undefined
+            return <Field key={name} data-invalid={!!form.formState.errors[name]}>
             <FieldLabel htmlFor={`customer-${name}`}>{label}</FieldLabel>
             <div className="relative">
-              <Input id={`customer-${name}`} type={type === "password" && showPassword ? "text" : type} autoComplete={autoComplete} aria-invalid={!!form.formState.errors[name]} aria-describedby={form.formState.errors[name] ? `customer-${name}-error` : undefined} className={type === "password" ? "pr-12" : undefined} {...form.register(name)} />
-              {name === "password" && <button type="button" className="absolute inset-y-0 right-0 px-3 text-gray-500" aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>}
+              <Input id={`customer-${name}`} type={type === "password" && passwordVisible ? "text" : type} autoComplete={autoComplete} aria-invalid={!!form.formState.errors[name]} aria-describedby={describedBy} className={type === "password" ? "customer-auth-password" : undefined} {...form.register(name)} />
+              {type === "password" && <button type="button" className="absolute inset-y-0 right-0 rounded-r-lg px-3 text-gray-500 hover:text-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#459000]" aria-label={`${passwordVisible ? "Ẩn" : "Hiện"} ${name === "confirmPassword" ? "mật khẩu xác nhận" : "mật khẩu"}`} aria-pressed={passwordVisible} onClick={() => name === "confirmPassword" ? setShowConfirmPassword(previous => !previous) : setShowPassword(previous => !previous)}>{passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}</button>}
             </div>
+            {descriptionId && <p id={descriptionId} className="text-xs leading-5 text-gray-500">
+              {name === "password" ? "Mật khẩu phải có ít nhất 6 ký tự và không vượt quá 1024 ký tự." : "Nhập lại mật khẩu giống với mật khẩu ở trên."}
+            </p>}
             <FieldError id={`customer-${name}-error`} errors={[form.formState.errors[name]]} />
-          </Field>)}
+          </Field>})}
         </fieldset>
         {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}
-        <Button type="submit" disabled={isPending} className="w-full bg-[#55b000] text-white hover:bg-[#459000]">
+        <Button type="submit" disabled={isPending} className="h-11 w-full bg-[#55b000] text-white hover:bg-[#459000]">
           {isPending && <LoaderCircle className="animate-spin" />}{isPending ? registration ? "Đang đăng ký…" : "Đang đăng nhập…" : registration ? "Đăng ký" : "Đăng nhập"}
         </Button>
       </form>

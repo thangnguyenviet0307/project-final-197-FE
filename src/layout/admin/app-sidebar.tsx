@@ -3,10 +3,6 @@
 import * as React from "react"
 import {
   LayoutDashboard,
-  Mail,
-  CheckSquare,
-  MessageCircle,
-  Calendar,
   Shield,
   AlertTriangle,
   Settings,
@@ -55,26 +51,6 @@ const data = {
     {
       label: "Ứng dụng",
       items: [
-        {
-          title: "Thư",
-          url: "/mail",
-          icon: Mail,
-        },
-        {
-          title: "Công việc",
-          url: "/tasks",
-          icon: CheckSquare,
-        },
-        {
-          title: "Trò chuyện",
-          url: "/chat",
-          icon: MessageCircle,
-        },
-        {
-          title: "Lịch",
-          url: "/calendar",
-          icon: Calendar,
-        },
         {
           title: "Danh mục",
           url: "/categories",
@@ -220,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/users", "/brands", "/customers"].includes(item.url) ||
+      (!["/users", "/brands"].includes(item.url) ||
        user?.role === "admin")
     ),
   }))

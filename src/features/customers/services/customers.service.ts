@@ -38,6 +38,7 @@ function mapCustomer(customer: BackendCustomer): ICustomer {
     last_name: customer.lastName,
     email: customer.email,
     phone: customer.phone,
+    isActive: customer.isActive,
     street: customer.address?.street ?? "",
     city: customer.address?.city ?? "",
     state: customer.address?.state ?? "",
@@ -79,7 +80,7 @@ function toBackendCustomer(
 
 export const customersService = {
   // GET danh sách Customers
-  getCustomers: async (params: { page: number; limit: number; search?: string }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
+  getCustomers: async (params: { page: number; limit: number; search?: string; isActive?: boolean }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
     const response = await api.get<CustomersListResponse>(
       "/customers",
       {

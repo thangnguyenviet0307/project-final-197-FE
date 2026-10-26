@@ -64,6 +64,26 @@ it("rejects mismatched confirmation without calling the API", async () => {
   expect(authApi.defaults.adapter).not.toHaveBeenCalled()
 })
 
+it("toggles each registration password independently and describes the requirements", () => {
+  authApi.defaults.adapter = vi.fn<AxiosAdapter>()
+  setup()
+  const password = screen.getByLabelText("Mật khẩu")
+  const confirmation = screen.getByLabelText("Xác nhận mật khẩu")
+  expect(password.getAttribute("aria-describedby")).toBe("customer-password-hint")
+  expect(screen.getByText("Mật khẩu phải có ít nhất 6 ký tự và không vượt quá 1024 ký tự.")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Hiện mật khẩu" }))
+  expect(password).toHaveProperty("type", "text")
+  expect(confirmation).toHaveProperty("type", "password")
+  fireEvent.click(screen.getByRole("button", { name: "Hiện mật khẩu xác nhận" }))
+  expect(confirmation).toHaveProperty("type", "text")
+  fireEvent.click(screen.getByRole("button", { name: "Ẩn mật khẩu" }))
+  expect(password).toHaveProperty("type", "password")
+  expect(confirmation).toHaveProperty("type", "text")
+  fireEvent.click(screen.getByRole("button", { name: "Ẩn mật khẩu xác nhận" }))
+  expect(confirmation).toHaveProperty("type", "password")
+  expect(authApi.defaults.adapter).not.toHaveBeenCalled()
+})
+
 it("keeps the registration form and displays duplicate-email errors", async () => {
   authApi.defaults.adapter = async config => { throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, {
     status: 409, statusText: "", headers: new AxiosHeaders(), config, data: { message: "Email already exists" },

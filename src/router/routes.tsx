@@ -138,6 +138,7 @@ export const routes: RouteObject[] = [
   {
     element: <ProtectedRoute allowedRoles={["admin", "staff"]} />,
     children: [
+      { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
       // MAIN DASHBOARD
       {
         path: "/dashboard",
@@ -158,30 +159,6 @@ export const routes: RouteObject[] = [
       },
 
       // TEMPLATE PAGES
-      {
-        path: "/mail",
-        lazy: page(() =>
-          import("@/pages/template/mail/page")
-        ),
-      },
-      {
-        path: "/tasks",
-        lazy: page(() =>
-          import("@/pages/template/tasks/page")
-        ),
-      },
-      {
-        path: "/chat",
-        lazy: page(() =>
-          import("@/pages/template/chat/page")
-        ),
-      },
-      {
-        path: "/calendar",
-        lazy: page(() =>
-          import("@/pages/template/calendar/page")
-        ),
-      },
       {
         path: "/faqs",
         lazy: page(() =>
@@ -304,12 +281,7 @@ export const routes: RouteObject[] = [
           },
 
           // CUSTOMERS
-          {
-            path: "/customers",
-            lazy: page(() =>
-              import("@/pages/admin/customers/index")
-            ),
-          },
+
 
           // USERS
           {

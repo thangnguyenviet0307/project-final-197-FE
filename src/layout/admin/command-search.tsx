@@ -5,10 +5,6 @@ import {
   Search,
   Package,
   LayoutDashboard,
-  Mail,
-  CheckSquare,
-  MessageCircle,
-  Calendar,
   Shield,
   AlertTriangle,
   HelpCircle,
@@ -64,10 +60,6 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     { title: "Danh mục", url: "/categories", group: "Ứng dụng", icon: Package },
     { title: "Thương hiệu", url: "/brands", group: "Ứng dụng", icon: Package },
     { title: "Khách hàng", url: "/customers", group: "Ứng dụng", icon: Users },
-    { title: "Thư", url: "/mail", group: "Ứng dụng", icon: Mail },
-    { title: "Công việc", url: "/tasks", group: "Ứng dụng", icon: CheckSquare },
-    { title: "Trò chuyện", url: "/chat", group: "Ứng dụng", icon: MessageCircle },
-    { title: "Lịch", url: "/calendar", group: "Ứng dụng", icon: Calendar },
     { title: "Quản lý người dùng", url: "/users", group: "Ứng dụng", icon: Users },
     { title: "Đổi mật khẩu", url: "/change-password", group: "Cài đặt", icon: Shield },
 
@@ -173,7 +165,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/users", "/brands", "/customers"].includes(item.url) || role === "admin")
+    (!["/users", "/brands"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

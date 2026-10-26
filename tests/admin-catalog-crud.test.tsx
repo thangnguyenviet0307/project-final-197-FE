@@ -70,26 +70,61 @@ it("loads later customer pages on the server, retains totals and resets page on 
   expect(screen.getByTestId("location").textContent).toContain("page=1")
 })
 
-it("creates, edits and deletes customer contacts through the rendered forms", async () => {
+it("shows global customer status counts and applies status filters on the server", async () => {
+  const requests = vi.fn()
+  api.defaults.adapter = async config => {
+    requests(config.params)
+    const total = config.params?.isActive === true ? 80 : config.params?.isActive === false ? 21 : 101
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: [{ ...customer, isActive: config.params?.isActive !== false }], pagination: { page: config.params?.page ?? 1, limit: config.params?.limit ?? 10, total, totalPages: Math.ceil(total / (config.params?.limit ?? 10)) } } }
+  }
+  setup(<CustomersPage />, "/customers?page=3&search=An")
+  await screen.findByText("an@example.com")
+  const statistics = screen.getByRole("region", { name: "Thống kê khách hàng" })
+  await waitFor(() => expect(within(statistics).getByText("101")).toBeTruthy())
+  expect(within(statistics).getByText("80")).toBeTruthy()
+  expect(within(statistics).getByText("21")).toBeTruthy()
+  fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "inactive" } })
+  await waitFor(() => expect(requests).toHaveBeenCalledWith({ page: 1, limit: 10, search: "An", isActive: false }))
+  await screen.findByText("an@example.com")
+  expect(within(screen.getByRole("table")).getByText("Ngừng hoạt động")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Đặt lại" }))
+  await waitFor(() => expect(requests).toHaveBeenCalledWith({ page: 1, limit: 10 }))
+  expect(screen.getByTestId("location").textContent).not.toContain("status=")
+  expect(screen.getByTestId("location").textContent).not.toContain("search=")
+})
+
+it("creates and deletes customer contacts without an admin edit form", async () => {
   const { writes } = mockApi("customers")
   setup(<CustomersPage />)
   await screen.findByText("an@example.com")
   fireEvent.click(screen.getByRole("button", { name: "Thêm khách hàng" }))
-  let dialog = await screen.findByRole("dialog", { name: "Thêm khách hàng mới" })
+  const dialog = await screen.findByRole("dialog", { name: "Thêm khách hàng mới" })
   expect(within(dialog).queryByLabelText(/Birthday|Password/)).toBeNull()
   for (const [label, value] of [["Tên", "An"], ["Họ", "Nguyen"], ["Email", "an@example.com"], ["Điện thoại", "0901234567"], ["Đường", "One"], ["Tỉnh/thành phố", "Tỉnh/thành phố"], ["Bang/khu vực", "Bang/khu vực"]]) fireEvent.change(within(dialog).getByLabelText(label), { target: { value } })
   fireEvent.click(within(dialog).getByRole("button", { name: "Tạo khách hàng" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/customers", expect.objectContaining({ firstName: "An", lastName: "Nguyen" })))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa An Nguyen" }))
-  dialog = await screen.findByRole("dialog", { name: "Chỉnh sửa khách hàng" })
-  fireEvent.change(within(dialog).getByLabelText("Tên"), { target: { value: "Binh" } })
-  fireEvent.click(within(dialog).getByRole("button", { name: "Lưu thay đổi" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", `/customers/${customer._id}`, expect.objectContaining({ firstName: "Binh", lastName: "Nguyen" })))
-  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
   fireEvent.click(screen.getByRole("button", { name: "Xóa An Nguyen" }))
   fireEvent.click(await screen.findByRole("button", { name: "Xóa khách hàng" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/customers/${customer._id}`, undefined))
+})
+
+it.each(["admin", "staff"] as const)("%s can inspect customer details without checkboxes or an edit action", async role => {
+  const { writes } = mockApi("customers")
+  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role } : null }))
+  setup(<CustomersPage />)
+  await screen.findByText("an@example.com")
+  expect(screen.queryByRole("checkbox")).toBeNull()
+  expect(screen.queryByRole("button", { name: "Chỉnh sửa An Nguyen" })).toBeNull()
+  if (role === "admin") expect(screen.getByRole("button", { name: "Xóa An Nguyen" })).toBeTruthy()
+  else expect(screen.queryByRole("button", { name: "Xóa An Nguyen" })).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Xem An Nguyen" }))
+  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ khách hàng" })
+  expect(within(dialog).getByText("0901234567")).toBeTruthy()
+  expect(within(dialog).getByText("One")).toBeTruthy()
+  expect(within(dialog).getByText(customer._id)).toBeTruthy()
+  expect(within(dialog).queryByRole("textbox")).toBeNull()
+  expect(writes).not.toHaveBeenCalled()
 })
 
 it("creates and updates brands and invalidates the product selector cache", async () => {

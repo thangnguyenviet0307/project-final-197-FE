@@ -100,7 +100,7 @@ it.each([
   expect(screen.queryByRole("link", { name: /Test/ })?.getAttribute("href")).toBe("/")
 })
 
-it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {
+it.each(["/brands", "/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {
   session("staff")
   render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
   expect(await screen.findByText("Trang /403")).toBeTruthy()
@@ -110,4 +110,10 @@ it.each(["/brands", "/customers", "/brands/new", "/categories/new", "/users/new"
   session("admin")
   render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
   expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
+})
+
+it("allows staff to view customer management", async () => {
+  session("staff")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/customers"] })} />)
+  expect(await screen.findByText("Trang /customers")).toBeTruthy()
 })

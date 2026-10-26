@@ -7,7 +7,7 @@ import { OrderQueryState, OrderStatusBadge } from "@/features/orders/components/
 import { useOrders } from "@/features/orders/hooks/use-orders"
 import { isOrderStatus, orderCustomer, orderDate, orderStatuses, personName } from "@/features/orders/utils/order-status"
 import { formatPrice } from "@/features/products/types/products"
-import { pageNumbers } from "@/utils/pagination"
+import { ListPagination } from "@/components/list-pagination"
 import { OrderStatistics } from "@/features/orders/components/order-statistics"
 import { OrderDateFilter } from "@/features/orders/components/order-date-filter"
 import { orderDateBoundary, validOrderDate } from "@/features/orders/utils/order-date"
@@ -48,7 +48,7 @@ export default function AdminOrdersPage() {
         const customer = orderCustomer(order)
         return <TableRow key={order._id}><TableCell className="font-mono text-xs"><Link className="hover:underline" to={`/orders/${order._id}`} state={{ returnTo: location.pathname + location.search }}>{order.orderCode ?? order._id}</Link></TableCell><TableCell>{personName(customer)}</TableCell><TableCell><div>{customer?.email ?? "—"}</div><div className="text-muted-foreground">{customer?.phone ?? "—"}</div></TableCell><TableCell className="whitespace-nowrap">{orderDate(order.orderDate)}</TableCell><TableCell className="whitespace-nowrap">{formatPrice(order.totalAmount)}</TableCell><TableCell><OrderStatusBadge status={order.orderStatus} /></TableCell><TableCell>{typeof order.userId === "object" ? personName(order.userId) : order.userId ?? "Chưa phân công"}</TableCell><TableCell><div className="flex items-center gap-2"><Button size="sm" variant="outline" nativeButton={false} role="link" render={<Link to={`/orders/${order._id}`} state={{ returnTo: location.pathname + location.search }} />}>Xem</Button><OrderActions order={order} disabled={query.isPlaceholderData || query.isFetching} onDeleted={() => { if (orders.length === 1 && page > 1) change("page", String(page - 1)) }} /></div></TableCell></TableRow>
       })}</TableBody></Table></div>}
-      <nav aria-label="Phân trang đơn hàng" className="flex flex-wrap items-center justify-end gap-2"><span className="text-sm">Trang {page} / {totalPages}</span><Button variant="outline" disabled={page <= 1 || query.isFetching} onClick={() => change("page", String(page - 1))}>Trước</Button>{pageNumbers(page, totalPages).map(value => typeof value === "string" ? <span key={value}>…</span> : <Button key={value} variant={page === value ? "default" : "outline"} aria-label={`Page ${value}`} aria-current={page === value ? "page" : undefined} disabled={query.isFetching} onClick={() => change("page", String(value))}>{value}</Button>)}<Button variant="outline" disabled={page >= totalPages || query.isFetching} onClick={() => change("page", String(page + 1))}>Tiếp</Button></nav>
+      <ListPagination label="Phân trang đơn hàng" page={page} totalPages={totalPages} disabled={query.isFetching} onPageChange={value => change("page", String(value))} />
     </>}
   </div></BaseLayout>
 }
