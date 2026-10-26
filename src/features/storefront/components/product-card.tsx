@@ -1,4 +1,4 @@
-import { ArrowUpRight, Star } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import type { StorefrontProduct } from "@/features/storefront/types/storefront"
 import { formatStorePrice } from "@/features/storefront/utils/format-price"
@@ -36,16 +36,15 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
         >
           {product.name}
         </Link>
-        <div className="flex items-center gap-1 text-xs text-amber-500">
-          <Star size={14} fill="currentColor" />
-          <span className="font-semibold">{product.rating.toFixed(1)}</span>
-          <span className="text-gray-400">({product.reviewCount})</span>
-        </div>
-        <div className="flex flex-wrap items-baseline gap-2 pt-1">
-          <span className="font-bold text-gray-950">{formatStorePrice(product.price)}</span>
-          {product.compareAtPrice && (
-            <span className="text-xs text-gray-400 line-through">
-              {formatStorePrice(product.compareAtPrice)}
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-1">
+          <span>
+            <span className="block text-[10px] font-medium text-gray-400">Giá sỉ</span>
+            <span className="font-bold text-gray-950">{formatStorePrice(product.price)}</span>
+          </span>
+          {product.cashPrice !== undefined && (
+            <span>
+              <span className="block text-[10px] font-medium text-gray-400">Giá CK</span>
+              <span className="text-sm font-semibold text-[#4d9210]">{formatStorePrice(product.cashPrice)}</span>
             </span>
           )}
         </div>

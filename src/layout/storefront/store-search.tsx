@@ -6,15 +6,18 @@ import { StoreSearchCategory } from "./store-search-category"
 export function StoreSearch() {
   const [keyword, setKeyword] = useState("")
   const navigate = useNavigate()
-  const [category, setCategory] = useState("Tất cả danh mục")
+  const [category, setCategory] = useState("")
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const value = keyword.trim()
-    if (!value) return
+    if (!value && !category) return
 
-    navigate(`/shop?search=${encodeURIComponent(value)}`)
+    const params = new URLSearchParams()
+    if (value) params.set("search", value)
+    if (category) params.set("category", category)
+    navigate(`/shop?${params.toString()}`)
   }
 
   return (
@@ -23,10 +26,7 @@ export function StoreSearch() {
       role="search"
       className="flex w-full overflow-hidden rounded-full border border-gray-200 bg-white"
     >
-    <StoreSearchCategory
-    value={category}
-    onChange={setCategory}
-    />
+      <StoreSearchCategory value={category} onChange={setCategory} />
       <input
         type="search"
         value={keyword}

@@ -1,26 +1,23 @@
-import { Headphones, Smartphone, Watch } from "lucide-react"
 import { Link } from "react-router-dom"
-
-const categories = [
-  { label: "Tai nghe", category: "Âm thanh", Icon: Headphones },
-  { label: "Điện thoại", category: "Điện thoại", Icon: Smartphone },
-  { label: "Đồng hồ", category: "Đồng hồ", Icon: Watch },
-]
+import { storefrontCategories } from "@/features/storefront/data/products"
 
 export function HomeCategoryLinks() {
   return (
     <nav aria-label="Danh mục nhanh" className="mx-auto max-w-7xl px-4 pt-5">
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {categories.map(({ label, category, Icon }) => (
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
+        {storefrontCategories.map(({ name, image, caption }) => (
           <Link
-            key={category}
-            to={`/shop?category=${encodeURIComponent(category)}`}
-            className="group flex flex-col items-center gap-2 border border-gray-100 bg-white px-2 py-4 text-center transition hover:border-[#57952b] hover:bg-[#f7faf3] sm:flex-row sm:gap-3 sm:px-4 sm:py-5 sm:text-left"
+            key={name}
+            to={`/shop?category=${encodeURIComponent(name)}`}
+            className="group flex min-w-0 items-center gap-3 border border-gray-100 bg-white p-2 text-left transition hover:border-[#57952b] hover:bg-[#f7faf3] sm:p-3"
           >
-            <span className="flex size-10 items-center justify-center rounded-full bg-[#f2f5ef] text-[#57952b] transition group-hover:bg-[#57952b] group-hover:text-white">
-              <Icon size={19} />
+            <span className="size-12 shrink-0 overflow-hidden bg-gray-100 sm:size-14">
+              <img src={image} alt="" loading="lazy" className="size-full object-cover transition duration-300 group-hover:scale-105" />
             </span>
-            <span className="text-sm font-semibold text-gray-800">{label}</span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-gray-800">{name}</span>
+              <span className="mt-1 hidden text-xs text-gray-500 sm:block">{caption}</span>
+            </span>
           </Link>
         ))}
       </div>

@@ -1,12 +1,10 @@
 import { Globe2, MapPin, RotateCcw, Truck } from "lucide-react"
 import { CollectionGallery } from "@/features/storefront/components/collection-gallery"
-import { CustomerStories } from "@/features/storefront/components/customer-stories"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
 import { HomeCategoryLinks } from "@/features/storefront/components/home-category-links"
 import { HomeHeroSlider } from "@/features/storefront/components/home-hero-slider"
-import { ProductCard } from "@/features/storefront/components/product-card"
-import { SectionHeading } from "@/features/storefront/components/section-heading"
-import { storefrontProducts } from "@/features/storefront/data/products"
+import { StorefrontBuyingGuide } from "@/features/storefront/components/storefront-buying-guide"
+import { StorefrontNewsSection } from "@/features/storefront/components/storefront-news-section"
 
 const storeBenefits = [
   { Icon: Truck, title: "Giao hàng nhanh", description: "Thông tin giao hàng rõ ràng" },
@@ -16,14 +14,6 @@ const storeBenefits = [
 ]
 
 export default function StorefrontHomePage() {
-  const featuredProducts = storefrontProducts.slice(0, 3)
-  const topRatedProducts = [...storefrontProducts]
-    .sort((left, right) => right.rating - left.rating || right.reviewCount - left.reviewCount)
-    .slice(0, 3)
-  const bestSellers = [...storefrontProducts]
-    .sort((left, right) => right.soldCount - left.soldCount)
-    .slice(0, 3)
-
   return (
     <div className="bg-white">
       <HomeHeroSlider />
@@ -47,38 +37,8 @@ export default function StorefrontHomePage() {
 
       <CollectionGallery />
       <FeaturedParts />
-
-      <section id="san-pham-noi-bat" className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
-        <SectionHeading
-          eyebrow="Khám phá thêm"
-          title="Sản phẩm nổi bật"
-          to="/shop"
-          linkLabel="Xem tất cả"
-        />
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
-          {featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
-        <SectionHeading
-          eyebrow="Khách hàng lựa chọn"
-          title="Sản phẩm được đánh giá cao"
-          to="/shop?sort=popular"
-          linkLabel="Xem thêm"
-        />
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
-          {topRatedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
-        <SectionHeading eyebrow="Bán chạy" title="Sản phẩm bán chạy" to="/shop?sort=popular" linkLabel="Xem tất cả" />
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
-          {bestSellers.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
-      </section>
-      <CustomerStories />
+      <StorefrontBuyingGuide />
+      <StorefrontNewsSection />
     </div>
   )
 }

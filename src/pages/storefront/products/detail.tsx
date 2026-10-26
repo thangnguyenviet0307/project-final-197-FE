@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowLeft, Check, Minus, Plus, ShieldCheck, ShoppingBag, Star, Truck } from "lucide-react"
+import { ArrowLeft, Check, Minus, Plus, ShieldCheck, ShoppingBag, Truck } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { ProductCard } from "@/features/storefront/components/product-card"
 import { SectionHeading } from "@/features/storefront/components/section-heading"
@@ -53,18 +53,19 @@ export default function StorefrontProductDetailPage() {
         <div className="lg:py-5">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#57952b]">{product.brand} · {product.category}</p>
           <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-gray-950 sm:text-4xl">{product.name}</h1>
-          <div className="mt-4 flex items-center gap-2 text-sm">
-            <span className="flex items-center gap-1 text-amber-500"><Star size={15} fill="currentColor" /><b>{product.rating.toFixed(1)}</b></span>
-            <span className="text-gray-400">·</span><span className="text-gray-500">{product.reviewCount} đánh giá</span>
-            <span className="text-gray-400">·</span><span className="text-gray-500">Đã bán {product.soldCount}</span>
-          </div>
-          <div className="mt-6 flex flex-wrap items-baseline gap-3">
-            <span className="text-2xl font-bold text-gray-950">{formatStorePrice(product.price)}</span>
-            {product.compareAtPrice && <span className="text-base text-gray-400 line-through">{formatStorePrice(product.compareAtPrice)}</span>}
-            {product.compareAtPrice && <span className="rounded-full bg-[#eff7e9] px-3 py-1 text-xs font-bold text-[#4d9210]">Tiết kiệm {formatStorePrice(product.compareAtPrice - product.price)}</span>}
+          <div className="mt-5 flex flex-wrap items-baseline gap-5">
+            <span>
+              <span className="block text-xs font-medium text-gray-400">Giá sỉ tham khảo</span>
+              <span className="text-2xl font-bold text-gray-950">{formatStorePrice(product.price)}</span>
+            </span>
+            {product.cashPrice !== undefined && (
+              <span>
+                <span className="block text-xs font-medium text-gray-400">Giá CK tham khảo</span>
+                <span className="text-lg font-semibold text-[#4d9210]">{formatStorePrice(product.cashPrice)}</span>
+              </span>
+            )}
           </div>
           <p className="mt-5 text-sm leading-7 text-gray-600">{product.description}</p>
-
           {product.variants.length > 0 && (
             <fieldset className="mt-7">
               <legend className="text-sm font-semibold text-gray-900">Màu sắc: <span className="font-normal text-gray-500">{variant.name}</span></legend>
@@ -82,13 +83,13 @@ export default function StorefrontProductDetailPage() {
             <div className="flex h-12 items-center rounded-xl border border-gray-200 bg-white">
               <button type="button" aria-label="Giảm số lượng" disabled={quantity <= 1} onClick={() => setQuantity((current) => Math.max(1, current - 1))} className="flex size-11 items-center justify-center text-gray-500 disabled:opacity-40"><Minus size={15} /></button>
               <span aria-live="polite" className="min-w-8 text-center text-sm font-semibold">{quantity}</span>
-              <button type="button" aria-label="Tăng số lượng" onClick={() => setQuantity((current) => Math.min(variant.stock, current + 1))} disabled={quantity >= variant.stock} className="flex size-11 items-center justify-center text-gray-500 disabled:opacity-40"><Plus size={15} /></button>
+              <button type="button" aria-label="Tăng số lượng" onClick={() => setQuantity((current) => variant.stock === undefined ? current + 1 : Math.min(variant.stock, current + 1))} disabled={variant.stock !== undefined && quantity >= variant.stock} className="flex size-11 items-center justify-center text-gray-500 disabled:opacity-40"><Plus size={15} /></button>
             </div>
             <button type="button" disabled title="Đặt hàng trực tuyến sẽ được bổ sung khi storefront API sẵn sàng." className="inline-flex h-12 flex-1 cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-300 px-5 text-sm font-bold text-gray-600 sm:flex-none">
               <ShoppingBag size={17} /> Đặt hàng sắp mở
             </button>
           </div>
-          <p className="mt-3 flex items-center gap-2 text-xs text-gray-500"><Check size={15} className="text-[#4d9210]" /> Còn {variant.stock} sản phẩm · Màu {variant.name}</p>
+          <p className="mt-3 flex items-center gap-2 text-xs text-gray-500"><Check size={15} className="text-[#4d9210]" /> {variant.stock === undefined ? `Mẫu ${variant.name}` : `Còn ${variant.stock} sản phẩm · Mẫu ${variant.name}`}</p>
 
           <div className="mt-8 grid gap-3 border-t border-gray-200 pt-6 sm:grid-cols-2">
             <div className="flex gap-3 rounded-xl bg-white p-4"><Truck size={18} className="shrink-0 text-[#57952b]" /><div><p className="text-sm font-semibold">Thông tin giao hàng</p><p className="mt-1 text-xs leading-5 text-gray-500">Phí và thời gian giao hàng được xác nhận khi đặt mua.</p></div></div>
@@ -106,7 +107,11 @@ export default function StorefrontProductDetailPage() {
           {activeTab === "description" ? (
             <p>{product.description} Chọn màu sắc phù hợp với bạn và khám phá thêm các sản phẩm cùng bộ sưu tập.</p>
           ) : (
-            <ul className="space-y-3">{product.features.map((feature) => <li key={feature} className="flex items-start gap-2"><Check size={17} className="mt-1 shrink-0 text-[#57952b]" />{feature}</li>)}</ul>
+            product.features.length > 0 ? (
+              <ul className="space-y-3">{product.features.map((feature) => <li key={feature} className="flex items-start gap-2"><Check size={17} className="mt-1 shrink-0 text-[#57952b]" />{feature}</li>)}</ul>
+            ) : (
+              <p>Thông số, quy cách và khả năng tương thích được cập nhật trên trang sản phẩm của website nguồn.</p>
+            )
           )}
         </div>
       </section>

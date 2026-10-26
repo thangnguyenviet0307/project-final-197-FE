@@ -54,9 +54,9 @@ export function StoreNavbar() {
 
             <span className="text-sm text-white/40">|</span>
 
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
+            <a href="/#tin-tuc" className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90 hover:text-black">
               TIN TỨC
-            </span>
+            </a>
 
             <span className="text-sm text-white/40">|</span>
 
@@ -130,9 +130,9 @@ export function StoreNavbar() {
                 CÁC TRANG
               </p>
 
-              <p className="px-4 py-3 text-sm font-semibold text-white/80">
+              <a href="/#tin-tuc" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/15">
                 TIN TỨC
-              </p>
+              </a>
 
               <Link
                 to="/contact"

@@ -1,33 +1,14 @@
  import { useEffect, useState } from "react"
-import { ArrowLeft, ArrowRight } from "lucide-react"
-import { Link } from "react-router-dom"
+ import { ArrowLeft, ArrowRight } from "lucide-react"
+ import { Link } from "react-router-dom"
+ import { storefrontCategories } from "@/features/storefront/data/products"
 
-const slides = [
-  {
-    eyebrow: "Thiết bị cho ngày mới",
-    title: "Công nghệ hay,\ntrải nghiệm khác.",
-    description: "Chọn những thiết bị đồng hành cùng bạn trong công việc và những phút giây thư giãn.",
-    image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1800&q=85",
-    action: "Khám phá cửa hàng",
-    category: "Điện thoại",
-  },
-  {
-    eyebrow: "Âm thanh theo cách bạn muốn",
-    title: "Nghe rõ từng nhịp,\nở bất cứ đâu.",
-    description: "Tai nghe và loa không dây cho những bản nhạc luôn ở bên bạn.",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1800&q=85",
-    action: "Khám phá âm thanh",
-    category: "Âm thanh",
-  },
-  {
-    eyebrow: "Lưu lại điều đáng nhớ",
-    title: "Khoảnh khắc đẹp,\ntrong tầm tay.",
-    description: "Tìm thiết bị chụp ảnh phù hợp cho chuyến đi và những câu chuyện của bạn.",
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1800&q=85",
-    action: "Xem máy ảnh",
-    category: "Máy ảnh",
-  },
-]
+ const slides = storefrontCategories.map((category) => ({
+   ...category,
+   eyebrow: "Khám phá danh mục",
+   title: `${category.name},\nđúng nhu cầu mỗi ngày.`,
+   action: `Khám phá ${category.name}`,
+ }))
 
 export function HomeHeroSlider() {
   const [activeSlide, setActiveSlide] = useState(0)
@@ -66,7 +47,7 @@ export function HomeHeroSlider() {
             </h1>
             <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 sm:text-base">{slide.description}</p>
             <Link
-              to={`/shop?category=${encodeURIComponent(slide.category)}`}
+              to={`/shop?category=${encodeURIComponent(slide.name)}`}
               className="mt-7 inline-flex h-12 items-center gap-3 rounded-lg bg-[#69ad27] px-6 text-sm font-bold text-white transition hover:bg-[#57951f]"
             >
               {slide.action}<ArrowRight size={17} />
@@ -85,7 +66,7 @@ export function HomeHeroSlider() {
         <div className="absolute bottom-8 left-6 hidden gap-2 sm:left-12 sm:flex lg:left-16">
           {slides.map((item, index) => (
             <button
-              key={item.eyebrow}
+              key={item.name}
               type="button"
               aria-label={`Chuyển đến banner ${index + 1}`}
               aria-pressed={activeSlide === index}

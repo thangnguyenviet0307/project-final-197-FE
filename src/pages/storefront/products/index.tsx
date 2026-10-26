@@ -11,6 +11,7 @@ export default function StorefrontProductsPage() {
   const budget = searchParams.get("budget") ?? ""
   const search = searchParams.get("search") ?? ""
   const sort = searchParams.get("sort") ?? "featured"
+  const selectedCategory = storefrontCategories.find((item) => item.name === category)
 
   const products = useMemo(() => {
     let result = storefrontProducts.filter((product) => {
@@ -25,7 +26,7 @@ export default function StorefrontProductsPage() {
 
     if (sort === "price-asc") result = [...result].sort((left, right) => left.price - right.price)
     if (sort === "price-desc") result = [...result].sort((left, right) => right.price - left.price)
-    if (sort === "popular") result = [...result].sort((left, right) => right.soldCount - left.soldCount)
+    if (sort === "name-asc") result = [...result].sort((left, right) => left.name.localeCompare(right.name, "vi"))
     return result
   }, [brand, budget, category, search, sort])
 
@@ -41,9 +42,9 @@ export default function StorefrontProductsPage() {
       <header className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:py-11">
           <nav aria-label="Điều hướng breadcrumb" className="text-xs text-gray-500"><Link to="/" className="hover:text-[#4d9210]">Trang chủ</Link><span className="px-2">/</span>Sản phẩm</nav>
-          <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">Bộ sưu tập</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">Sản phẩm công nghệ</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">Khám phá thiết bị cho công việc, giải trí và những khoảnh khắc đáng nhớ.</p>
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">{selectedCategory ? "Danh mục sản phẩm" : "Khám phá cửa hàng"}</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">{selectedCategory?.name ?? "Phụ kiện công nghệ"}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">{selectedCategory?.description ?? "Khám phá phụ kiện theo nhu cầu, kiểm tra thông tin và giá cập nhật tại website nguồn."}</p>
         </div>
       </header>
 
@@ -92,7 +93,7 @@ export default function StorefrontProductsPage() {
               Sắp xếp
               <select value={sort} onChange={(event) => updateFilter("sort", event.target.value)} className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none">
                 <option value="featured">Nổi bật</option>
-                <option value="popular">Bán chạy</option>
+                <option value="name-asc">Tên A–Z</option>
                 <option value="price-asc">Giá thấp đến cao</option>
                 <option value="price-desc">Giá cao đến thấp</option>
               </select>
