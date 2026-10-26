@@ -195,7 +195,7 @@ export function CustomerTable({
       </form>
       {/* Bảng Customers */}
       <div className="overflow-x-auto rounded-md border">
-        <Table>
+        <Table aria-label="Hồ sơ khách hàng">
           <TableHeader>
             <TableRow>
 
@@ -228,14 +228,14 @@ export function CustomerTable({
 
                   {/* Số điện thoại */}
                   <TableCell>
-                    {customer.phone}
+                    {customer.phone || "Chưa cung cấp"}
                   </TableCell>
 
                   {/* Địa chỉ */}
                   <TableCell>
                     <div className="flex flex-col">
                       <span>
-                        {customer.street}
+                        {customer.street || (!customer.city && !customer.state ? "Chưa cung cấp" : "")}
                       </span>
 
                       <span className="text-sm text-muted-foreground">

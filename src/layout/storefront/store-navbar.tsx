@@ -1,9 +1,8 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Menu, Phone, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 
-import { StoreMegaMenu } from "./store-mega-menu"
 import { StoreDepartmentsMenu } from "./store-departments-menu"
 
 export function StoreNavbar() {
@@ -26,7 +25,7 @@ export function StoreNavbar() {
           </div>
 
           {/* DESKTOP LINKS */}
-          <div className="hidden h-14 min-w-0 flex-1 items-center gap-3 lg:flex xl:gap-5">
+          <div className="hidden h-14 min-w-0 flex-1 items-center justify-between gap-3 px-4 lg:flex xl:px-6">
             <Link
               to="/"
               className="flex h-full shrink-0 items-center text-sm font-semibold text-white transition-colors hover:text-black"
@@ -37,19 +36,7 @@ export function StoreNavbar() {
             <span className="text-sm text-white/40">|</span>
 
             <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
-              CỬA HÀNG
-            </span>
-
-            <span className="text-sm text-white/40">|</span>
-
-            <div className="flex h-full shrink-0 items-center">
-              <StoreMegaMenu />
-            </div>
-
-            <span className="text-sm text-white/40">|</span>
-
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
-              CÁC TRANG
+              KHÁM PHÁ
             </span>
 
             <span className="text-sm text-white/40">|</span>
@@ -66,20 +53,6 @@ export function StoreNavbar() {
             >
               LIÊN HỆ
             </Link>
-          </div>
-
-          {/* PHONE AREA */}
-          <div className="ml-auto hidden shrink-0 items-center gap-3 rounded-full bg-white/15 px-4 py-2 text-white 2xl:flex">
-            <Phone size={19} />
-
-            <div className="leading-tight">
-              <p className="text-[11px] font-medium">
-                Hỗ trợ khách hàng
-              </p>
-              <p className="text-xs font-bold">
-                Liên hệ
-              </p>
-            </div>
           </div>
 
           {/* MOBILE NAVBAR */}
@@ -119,15 +92,7 @@ export function StoreNavbar() {
               </div>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                CỬA HÀNG
-              </p>
-
-              <p className="px-4 py-3 text-sm font-semibold text-white/80">
                 KHÁM PHÁ
-              </p>
-
-              <p className="px-4 py-3 text-sm font-semibold text-white/80">
-                CÁC TRANG
               </p>
 
               <p className="px-4 py-3 text-sm font-semibold text-white/80">

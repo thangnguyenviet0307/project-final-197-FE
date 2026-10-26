@@ -81,7 +81,7 @@ it("allows an admin to open the product creation route", async () => {
 })
 
 it.each(["/account/login", "/register"])("opens customer auth route %s for guests", async path => {
-  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} />)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
   expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
 })
 
@@ -94,11 +94,10 @@ it.each(["/account/login", "/register", "/login"])("returns signed-in customers 
 it.each([
   ["admin", "/account/login"], ["admin", "/register"],
   ["staff", "/account/login"], ["staff", "/register"],
-] as const)("keeps %s sessions on the storefront when opening %s", async (role, path) => {
-  session(role, true)
+] as const)("returns %s sessions to the dashboard when opening %s", async (role, path) => {
+  session(role)
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
-  expect(await screen.findByText("Trang /")).toBeTruthy()
-  expect(screen.queryByRole("link", { name: /Test/ })?.getAttribute("href")).toBe("/")
+  expect(await screen.findByText("Trang /dashboard")).toBeTruthy()
 })
 
 it.each(["/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {

@@ -4,6 +4,14 @@ export interface CategoryParent {
   slug?: string;
 }
 
+export interface PublicCategory {
+  _id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  parent?: string | null;
+}
+
 export interface Category {
   icon?: string;
   _id: string;

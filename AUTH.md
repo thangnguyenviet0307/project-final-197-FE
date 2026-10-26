@@ -10,11 +10,13 @@
 
 ## Accounts and navigation
 
-Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. All sign-ins from this form return to `/`. Authenticated sessions opening customer sign-in/registration also return to `/`, regardless of role. Storefront account links stay on the storefront and sign-out returns to `/account/login`. `/login` remains the separate administration sign-in page.
+Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. Sign-in redirects by role: customer to `/`, admin/staff to the admin dashboard. Authenticated sessions opening sign-in/registration follow the same rule. A required password change takes precedence: customers go to `/account/change-password`, admin/staff to `/change-password`. Storefront sign-out returns to `/account/login`. `/login` remains the separate administration sign-in page.
 
 `/register` validates customer names (1–50 characters), email, password and confirmation, then sends only firstName, lastName, email and password to `POST /auth/register`. Successful registration opens `/account/login` with a confirmation message and empty password field; it does not sign in automatically. Successful customer sign-in opens the storefront homepage `/`. Customer account pages remain previews.
 
 Admin provisions staff/admin accounts at `/users`; public registration creates only customer accounts. Share temporary staff/admin credentials privately. Admin-provisioned accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
+
+Public registration creates the customer User and a Customer contact atomically in a MongoDB transaction, linked by `Customer.accountId`. New registrations appear directly in the admin contact list and its statistics. Phone/address are initially blank. Existing contacts are never claimed by email; conflicts return 409. Earlier registrations are not backfilled automatically. Removing a contact does not remove its login account.
 
 Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password reset forms generate a unique temporary password using the browser cryptographic random generator. Reset passwords remain stable while their dialog is open; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
 

@@ -55,6 +55,23 @@ it("maps customer names in both directions and sends only supported contact fiel
   expect(writes).toHaveBeenLastCalledWith("put", `/customers/${customer._id}`, { firstName: "Binh" })
 })
 
+it("shows newly registered contacts in the single contact list without an account section", async () => {
+  const requests: string[] = []
+  api.defaults.adapter = async config => {
+    requests.push(config.url ?? "")
+    expect(config.url).toBe("/customers")
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
+      data: [{ ...customer, email: "registered@example.com", phone: "", address: { street: "", city: "", state: "" } }],
+      pagination: { page: 1, limit: 10, total: 1, totalPages: 1 },
+    } }
+  }
+  setup(<CustomersPage />, "/customers")
+  expect(await screen.findByText("registered@example.com")).toBeTruthy()
+  expect(screen.queryByText("Tài khoản đăng ký")).toBeNull()
+  expect(screen.getAllByText("Chưa cung cấp")).toHaveLength(2)
+  expect(requests).not.toContain("/customers/accounts")
+})
+
 it("loads later customer pages on the server, retains totals and resets page on search", async () => {
   const { gets } = mockApi("customers")
   setup(<CustomersPage />, "/customers?page=10")
@@ -86,7 +103,7 @@ it("shows global customer status counts and applies status filters on the server
   fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "inactive" } })
   await waitFor(() => expect(requests).toHaveBeenCalledWith({ page: 1, limit: 10, search: "An", isActive: false }))
   await screen.findByText("an@example.com")
-  expect(within(screen.getByRole("table")).getByText("Ngừng hoạt động")).toBeTruthy()
+  expect(within(screen.getByRole("table", { name: "Hồ sơ khách hàng" })).getByText("Ngừng hoạt động")).toBeTruthy()
   fireEvent.click(screen.getByRole("button", { name: "Đặt lại" }))
   await waitFor(() => expect(requests).toHaveBeenCalledWith({ page: 1, limit: 10 }))
   expect(screen.getByTestId("location").textContent).not.toContain("status=")
