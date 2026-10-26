@@ -56,12 +56,12 @@ export function StoreFooter() {
               to="/"
               className="text-3xl font-black tracking-tight text-white"
             >
-              Demo<span className="text-[#65b719]">STORE</span>
+              Phụ Kiện{" "}
+              <span className="text-[#65b719]">Giá Xưởng</span>
             </Link>
 
             <p className="mt-5 text-sm leading-7 text-gray-400">
-              Demo Store - Mang đến trải nghiệm mua sắm trực tuyến
-              tiện lợi, hiện đại và đáng tin cậy.
+              Khám phá các nhóm phụ kiện công nghệ với hình ảnh sản phẩm và thông tin rõ ràng.
             </p>
 
             <div className="mt-5 space-y-3 text-sm">
@@ -188,7 +188,7 @@ export function StoreFooter() {
       {/* Copyright */}
       <div className="border-t border-gray-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-5 text-center text-xs text-gray-400 sm:flex-row">
-          <p>© {new Date().getFullYear()} Demo Store. Bảo lưu mọi quyền.</p>
+          <p>© {new Date().getFullYear()} Phụ Kiện Giá Xưởng. Bảo lưu mọi quyền.</p>
           <p>Thiết kế cho Project Final 197</p>
         </div>
       </div>

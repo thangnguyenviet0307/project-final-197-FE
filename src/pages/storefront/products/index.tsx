@@ -44,7 +44,7 @@ export default function StorefrontProductsPage() {
           <nav aria-label="Điều hướng breadcrumb" className="text-xs text-gray-500"><Link to="/" className="hover:text-[#4d9210]">Trang chủ</Link><span className="px-2">/</span>Sản phẩm</nav>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">{selectedCategory ? "Danh mục sản phẩm" : "Khám phá cửa hàng"}</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">{selectedCategory?.name ?? "Phụ kiện công nghệ"}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">{selectedCategory?.description ?? "Khám phá phụ kiện theo nhu cầu, kiểm tra thông tin và giá cập nhật tại website nguồn."}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">{selectedCategory?.description ?? "Khám phá phụ kiện theo nhu cầu, xem hình ảnh và thông tin để tìm sản phẩm phù hợp."}</p>
         </div>
       </header>
 

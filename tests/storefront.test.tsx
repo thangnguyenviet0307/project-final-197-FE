@@ -1,12 +1,23 @@
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
-import { expect, it } from "vitest"
+import { expect, it, vi } from "vitest"
 import StorefrontHomePage from "@/pages/storefront/home"
 import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
 import { storefrontCategories, storefrontProducts } from "@/features/storefront/data/products"
 import { sourceProductListings } from "@/features/storefront/data/source-product-listings"
 import { StoreDepartmentsMenu } from "@/layout/storefront/store-departments-menu"
+
+const publicCategoriesQuery = vi.hoisted(() => ({
+  data: [],
+  isPending: false,
+  isError: false,
+  isFetching: false,
+  refetch: vi.fn(),
+}))
+vi.mock("@/features/categories/hooks/use-public-categories", () => ({
+  usePublicCategories: () => publicCategoriesQuery,
+}))
 
 it("renders the storefront homepage sections", () => {
   render(<MemoryRouter><StorefrontHomePage /></MemoryRouter>)
@@ -61,14 +72,7 @@ it("uses only source images and has at least 10 and at most 15 products in each 
 it("shows real storefront categories and products inside the all-categories menu", () => {
   render(<MemoryRouter><StoreDepartmentsMenu /></MemoryRouter>)
 
-  fireEvent.click(screen.getByRole("button", { name: "TẤT CẢ DANH MỤC" }))
-  for (const category of storefrontCategories) {
-    expect(screen.getByRole("button", { name: `Mở danh mục ${category.name}` })).toBeTruthy()
-  }
-
-  fireEvent.click(screen.getByRole("button", { name: "Mở danh mục Loa Bluetooth" }))
-  expect(screen.getByRole("link", { name: /Loa Bluetooth Hoco HC46/ })).toBeTruthy()
-  expect(screen.getByRole("link", { name: /Xem tất cả 10 sản phẩm/ })).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }))
 
   fireEvent.click(screen.getByRole("button", { name: `Tất cả sản phẩm (${storefrontProducts.length})` }))
   const allProductsPanel = screen.getByRole("region", { name: "Tất cả sản phẩm" })

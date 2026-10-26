@@ -1,4 +1,4 @@
-import { Check, ExternalLink, Search } from "lucide-react"
+import { Check, Search, ShoppingBag } from "lucide-react"
 import { SectionHeading } from "./section-heading"
 
 const guides = [
@@ -13,9 +13,9 @@ const guides = [
     description: "Với cáp và kính, hãy kiểm tra đúng cổng kết nối hoặc dòng máy. Với phụ kiện khác, xem kiểu kết nối và quy cách.",
   },
   {
-    Icon: ExternalLink,
-    title: "Kiểm tra giá và thông tin mới nhất",
-    description: "Giá hiển thị là giá tham khảo từ website nguồn; mở liên kết sản phẩm để xác nhận giá, chi tiết và tình trạng hiện tại.",
+    Icon: ShoppingBag,
+    title: "Xem kỹ sản phẩm",
+    description: "Mở trang chi tiết để xem hình ảnh, thông tin mô tả và các sản phẩm liên quan trước khi lựa chọn.",
   },
 ]
 
@@ -26,7 +26,7 @@ export function StorefrontBuyingGuide() {
         <SectionHeading
           eyebrow="Mua sắm dễ dàng"
           title="Cách chọn đúng phụ kiện"
-          description="Một vài bước kiểm tra giúp bạn tìm được sản phẩm phù hợp và xem đúng thông tin từ nguồn."
+          description="Một vài bước đơn giản giúp bạn tìm và chọn phụ kiện phù hợp với thiết bị đang sử dụng."
         />
         <div className="grid gap-4 md:grid-cols-3">
           {guides.map(({ Icon, title, description }, index) => (

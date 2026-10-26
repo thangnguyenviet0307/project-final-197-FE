@@ -1,4 +1,4 @@
-import { Globe2, MapPin, RotateCcw, Truck } from "lucide-react"
+import { Image, PackageCheck, Search, Shapes } from "lucide-react"
 import { CollectionGallery } from "@/features/storefront/components/collection-gallery"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
 import { HomeCategoryLinks } from "@/features/storefront/components/home-category-links"
@@ -7,10 +7,10 @@ import { StorefrontBuyingGuide } from "@/features/storefront/components/storefro
 import { StorefrontNewsSection } from "@/features/storefront/components/storefront-news-section"
 
 const storeBenefits = [
-  { Icon: Truck, title: "Giao hàng nhanh", description: "Thông tin giao hàng rõ ràng" },
-  { Icon: MapPin, title: "Nhận hàng linh hoạt", description: "Tư vấn điểm nhận phù hợp" },
-  { Icon: Globe2, title: "Hỗ trợ nhiều khu vực", description: "Liên hệ để biết chính sách giao hàng" },
-  { Icon: RotateCcw, title: "Chính sách đổi trả", description: "Mua sắm với thông tin minh bạch" },
+  { Icon: Search, title: "Tìm theo nhu cầu", description: "Khám phá từng nhóm phụ kiện" },
+  { Icon: Image, title: "Xem hình sản phẩm", description: "Tham khảo hình ảnh trực quan" },
+  { Icon: Shapes, title: "Nhiều danh mục", description: "Từ cáp sạc đến phụ kiện máy tính" },
+  { Icon: PackageCheck, title: "Chi tiết sản phẩm", description: "Xem thông tin trước khi chọn mua" },
 ]
 
 export default function StorefrontHomePage() {
@@ -19,7 +19,7 @@ export default function StorefrontHomePage() {
       <HomeHeroSlider />
       <HomeCategoryLinks />
 
-      <section aria-label="Cam kết cửa hàng" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10">
+      <section aria-label="Khám phá cửa hàng" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10">
         <div className="grid divide-y divide-gray-100 border-y border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {storeBenefits.map(({ Icon, title, description }) => (
             <div key={title} className="flex items-center gap-4 px-4 py-5 sm:px-5 sm:py-6">

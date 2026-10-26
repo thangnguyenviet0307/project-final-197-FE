@@ -5,6 +5,12 @@ import type {
   UpdateCategoryInput,
 } from "@/features/categories/types/categories";
 import type { ApiResult } from "@/types/api";
+import type { PublicCategory } from "@/features/categories/types/categories";
+
+export async function listPublicCategories(signal?: AbortSignal): Promise<PublicCategory[]> {
+  const { data } = await api.get<ApiResult<PublicCategory[]>>("/categories/public", { signal });
+  return data.data;
+}
 
 export async function listCategories(signal?: AbortSignal): Promise<Category[]> {
   const { data } = await api.get<ApiResult<Category[]> & { count: number }>("/categories", { signal });

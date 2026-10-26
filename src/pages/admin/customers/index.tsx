@@ -25,8 +25,9 @@ export default function CustomersPage() {
   function changePage(next: number) {
     setParams(previous => { const nextParams = new URLSearchParams(previous); nextParams.set("page", String(next)); return nextParams })
   }
-  return <BaseLayout title="Khách hàng" description="Quản lý hồ sơ liên hệ khách hàng. Tài khoản đăng nhập khách hàng hiện chưa khả dụng.">
+  return <BaseLayout title="Khách hàng" description="Quản lý hồ sơ liên hệ của khách hàng, bao gồm khách đăng ký trên website.">
     <div className="space-y-4 px-4 lg:px-6">
+      <h2 className="text-lg font-semibold">Hồ sơ liên hệ</h2>
       <CustomerStatistics />
       {success && <p role="status">{success}</p>}
       {query.isPending ? <ContentSkeleton /> : query.isError ? <div role="alert"><p>{getApiError(query.error).message}</p><Button variant="outline" onClick={() => void query.refetch()}>Tải lại khách hàng</Button></div> : <CustomerTable

@@ -10,7 +10,7 @@ export function FeaturedParts() {
       <SectionHeading
         eyebrow="Khám phá cửa hàng"
         title="Chọn phụ kiện theo nhu cầu"
-        description="Xem nhanh các nhóm sản phẩm, so sánh giá sỉ và giá chuyển khoản tham khảo, rồi mở danh mục để xem đủ sản phẩm."
+        description="Khám phá các nhóm phụ kiện, xem nhanh sản phẩm nổi bật và mở danh mục để xem toàn bộ lựa chọn."
       />
       {storefrontCategories.map((category) => {
         const products = storefrontProducts.filter((product) => product.category === category.name)
