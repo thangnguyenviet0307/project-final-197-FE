@@ -19,39 +19,39 @@ type FaqItem = {
 const faqItems: FaqItem[] = [
   {
     value: "item-1",
-    question: "How do I integrate ShadcnStore components into my project?",
+    question: "Làm thế nào để tích hợp thành phần ShadcnStore vào dự án?",
     answer:
-      "Integration is simple! All our components are built with shadcn/ui and work with React, Next.js, and Vite. Just copy the component code, install any required dependencies, and paste it into your project. Each component comes with detailed installation instructions and examples.",
+      "Các thành phần sử dụng shadcn/ui và hoạt động với React, Next.js và Vite. Sao chép mã thành phần, cài các thư viện cần thiết rồi tích hợp vào dự án. Mỗi thành phần đều có hướng dẫn và ví dụ.",
   },
   {
     value: "item-2",
-    question: "What's the difference between free and premium components?",
+    question: "Thành phần miễn phí và cao cấp khác nhau thế nào?",
     answer:
-      "Free components include essential UI elements like buttons, forms, and basic layouts. Premium components offer advanced features like complex data tables, analytics dashboards, authentication flows, and complete admin templates. Premium also includes Figma files, priority support, and commercial licenses.",
+      "Thành phần miễn phí bao gồm nút bấm, biểu mẫu và bố cục cơ bản. Gói cao cấp cung cấp bảng dữ liệu nâng cao, bảng phân tích, luồng xác thực và giao diện quản trị hoàn chỉnh, kèm tệp Figma, hỗ trợ ưu tiên và giấy phép thương mại.",
   },
   {
     value: "item-3",
-    question: "Can I use these components in commercial projects?",
+    question: "Tôi có thể sử dụng các thành phần trong dự án thương mại không?",
     answer:
-      "Yes! Free components come with an MIT license for unlimited use. Premium components include a commercial license that allows usage in client projects, SaaS applications, and commercial products without attribution requirements.",
+      "Có. Thành phần miễn phí sử dụng giấy phép MIT. Thành phần cao cấp có giấy phép thương mại cho phép dùng trong dự án khách hàng, ứng dụng SaaS và sản phẩm thương mại mà không cần ghi nguồn.",
   },
   {
     value: "item-4",
-    question: "Do you provide support and updates?",
+    question: "Có hỗ trợ và cập nhật không?",
     answer:
-      "Absolutely! We provide community support for free components through our Discord server and GitHub issues. Premium subscribers get priority email support, regular component updates, and early access to new releases. We also maintain compatibility with the latest shadcn/ui versions.",
+      "Người dùng miễn phí có thể nhận hỗ trợ qua Discord và GitHub. Người dùng cao cấp được hỗ trợ email ưu tiên, cập nhật thường xuyên và tiếp cận sớm các bản phát hành mới. Các thành phần cũng được duy trì tương thích với shadcn/ui.",
   },
   {
     value: "item-5",
-    question: "What frameworks and tools do you support?",
+    question: "Những nền tảng và công cụ nào được hỗ trợ?",
     answer:
-      "Our components work with React 18+, Next.js 13+, and Vite. We use TypeScript, Tailwind CSS, and follow shadcn/ui conventions. Components are tested with popular tools like React Hook Form, TanStack Query, and Zustand for state management.",
+      "Các thành phần hoạt động với React 18+, Next.js 13+ và Vite, sử dụng TypeScript, Tailwind CSS và quy ước shadcn/ui. Chúng được kiểm tra với React Hook Form, TanStack Query và Zustand.",
   },
   {
     value: "item-6",
-    question: "How often do you release new components?",
+    question: "Bao lâu có thành phần mới?",
     answer:
-      "We release new components and templates weekly. Premium subscribers get early access to new releases, while free components are updated regularly based on community feedback. You can track our roadmap and request specific components through our GitHub repository.",
+      "Chúng tôi phát hành thành phần và giao diện mẫu mới hằng tuần. Người dùng cao cấp được tiếp cận sớm; thành phần miễn phí được cập nhật dựa trên phản hồi cộng đồng. Bạn có thể theo dõi lộ trình và đề xuất qua GitHub.",
   },
 ]
 
@@ -62,14 +62,13 @@ const FaqSection = () => {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            FAQ
+            Hỏi đáp
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Frequently Asked Questions
+            Câu hỏi thường gặp
           </h2>
           <p className="text-lg text-muted-foreground">
-            Everything you need to know about ShadcnStore components, licensing,
-            and integration. Still have questions? We're here to help!
+            Thông tin về thành phần ShadcnStore, giấy phép và cách tích hợp. Chúng tôi luôn sẵn sàng giải đáp thêm.
           </p>
         </div>
 
@@ -106,14 +105,14 @@ const FaqSection = () => {
           {/* Contact Support CTA */}
           <div className="text-center mt-12">
             <p className="text-muted-foreground mb-4">
-              Still have questions? We're here to help.
+              Bạn vẫn còn thắc mắc? Chúng tôi luôn sẵn sàng hỗ trợ.
             </p>
             <Button
               className="cursor-pointer"
               nativeButton={false}
               render={<a href="#contact" />}
             >
-              Contact Support
+              Liên hệ hỗ trợ
             </Button>
           </div>
         </div>

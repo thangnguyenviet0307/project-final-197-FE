@@ -49,5 +49,5 @@ export interface ProductsResult {
   pagination: { page: number; limit: number; total: number; totalPages: number }
 }
 export function catalogId(value: Product["category"]): string { return typeof value === "string" ? value : value?._id ?? "" }
-export function catalogName(value: Product["category"]): string { return typeof value === "string" ? value : value?.name ?? "Unavailable" }
+export function catalogName(value: Product["category"]): string { return typeof value === "string" ? value : value?.name ?? "Không có thông tin" }
 export const formatPrice = (value: number) => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(value)

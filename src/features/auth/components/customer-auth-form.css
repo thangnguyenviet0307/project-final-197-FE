@@ -1,0 +1,36 @@
+/* Storefront auth cards stay light even when the admin theme is dark. */
+.customer-auth-form {
+  color-scheme: light;
+  --input: #d1d5db;
+  --ring: #55b000;
+  --destructive: #b91c1c;
+}
+
+.customer-auth-form [data-slot="input"] {
+  height: 2.75rem;
+  border-color: #d1d5db;
+  background-color: #fff;
+  color: #111827;
+  padding-inline: 0.875rem;
+}
+
+.customer-auth-form [data-slot="input"].customer-auth-password {
+  padding-right: 3rem;
+}
+
+/* Edge's native reveal control duplicates the form's visibility button. */
+.customer-auth-form .customer-auth-password::-ms-reveal {
+  display: none;
+}
+
+.customer-auth-form [data-slot="input"]:focus-visible {
+  border-color: #459000;
+}
+
+.customer-auth-form [data-slot="input"][aria-invalid="true"] {
+  border-color: #b91c1c;
+}
+
+.customer-auth-form [data-slot="input"]:disabled {
+  background-color: #f3f4f6;
+}

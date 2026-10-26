@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { listProducts } from "@/features/products/services/products.service"
 import { useDeleteCategory } from "@/features/categories/hooks/use-delete-category"
-import type { Category } from "@/features/categories/services/categories.service"
+import type { Category } from "@/features/categories/types/categories"
 import { getApiError } from "@/services/api"
 import { ProductQuickView } from "@/features/products/components/product-quick-view"
 
@@ -24,14 +24,14 @@ export function DeleteCategoryDialog({ category, onClose }: { category: Category
   const totalPages = Math.max(1, products.data?.pagination.totalPages ?? 1)
   return <Dialog open onOpenChange={open => { if (!open && !remove.isPending) onClose() }}>
     <DialogContent showCloseButton={!remove.isPending} className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
-      <DialogHeader><DialogTitle>Delete category?</DialogTitle><DialogDescription>Delete "{category.name}"? Products must be moved to another category or deleted before this category can be removed.</DialogDescription></DialogHeader>
-      {categories.isPending ? <p role="status">Checking child categories...</p> : categories.isError ? <div role="alert"><p>Could not check child categories.</p><Button variant="outline" onClick={() => void categories.refetch()}>Retry categories</Button></div> : children.length > 0 ? <div role="alert" className="rounded-lg border p-3 text-sm"><p>Deleting this category will move {children.length} direct child categories to the root level. Their products will stay in those categories.</p><ul className="mt-2 list-inside list-disc">{children.map(child => <li key={child._id}>{child.name}</li>)}</ul></div> : null}
-      {products.isPending ? <p role="status">Checking related products...</p> : products.isError ? <div role="alert" className="space-y-2"><p>Could not check related products. {getApiError(products.error).message}</p><Button variant="outline" onClick={() => void products.refetch()}>Retry products</Button></div> : count > 0 ? <section aria-label="Related products" className="space-y-3">
-        <p className="text-sm font-medium">{count} products use this category. It cannot be deleted yet.</p>
-        <p className="text-xs text-muted-foreground">Select a product to preview it here.</p>
+      <DialogHeader><DialogTitle>Xóa danh mục?</DialogTitle><DialogDescription>Xóa danh mục "{category.name}"? Cần chuyển sản phẩm sang danh mục khác hoặc xóa sản phẩm trước khi xóa danh mục này.</DialogDescription></DialogHeader>
+      {categories.isPending ? <p role="status">Đang kiểm tra danh mục con...</p> : categories.isError ? <div role="alert"><p>Không thể kiểm tra danh mục con.</p><Button variant="outline" onClick={() => void categories.refetch()}>Tải lại danh mục</Button></div> : children.length > 0 ? <div role="alert" className="rounded-lg border p-3 text-sm"><p>Xóa danh mục này sẽ chuyển {children.length} danh mục con trực tiếp thành danh mục gốc. Sản phẩm vẫn thuộc các danh mục đó.</p><ul className="mt-2 list-inside list-disc">{children.map(child => <li key={child._id}>{child.name}</li>)}</ul></div> : null}
+      {products.isPending ? <p role="status">Đang kiểm tra sản phẩm liên quan...</p> : products.isError ? <div role="alert" className="space-y-2"><p>Không thể kiểm tra sản phẩm liên quan. {getApiError(products.error).message}</p><Button variant="outline" onClick={() => void products.refetch()}>Tải lại sản phẩm</Button></div> : count > 0 ? <section aria-label="Sản phẩm liên quan" className="space-y-3">
+        <p className="text-sm font-medium">{count} sản phẩm thuộc danh mục này. Chưa thể xóa danh mục.</p>
+        <p className="text-xs text-muted-foreground">Chọn một sản phẩm để xem trước tại đây.</p>
         <ul className="divide-y rounded-lg border px-3">{products.data?.data.map(product => <li key={product._id} className="py-2"><ProductQuickView id={product._id} name={product.product_name} /></li>)}</ul>
-        {totalPages > 1 && <nav aria-label="Related products pagination" className="flex flex-wrap items-center justify-end gap-2 text-sm"><Button variant="outline" disabled={page <= 1 || products.isFetching} onClick={() => setPage(page - 1)}>Previous products</Button><span>Page {page} of {totalPages}</span><Button variant="outline" disabled={page >= totalPages || products.isFetching} onClick={() => setPage(page + 1)}>Next products</Button></nav>}
-      </section> : <p className="text-sm text-muted-foreground">No related products found.</p>}
+        {totalPages > 1 && <nav aria-label="Phân trang sản phẩm liên quan" className="flex flex-wrap items-center justify-end gap-2 text-sm"><Button variant="outline" disabled={page <= 1 || products.isFetching} onClick={() => setPage(page - 1)}>Các sản phẩm trước</Button><span>Trang {page} / {totalPages}</span><Button variant="outline" disabled={page >= totalPages || products.isFetching} onClick={() => setPage(page + 1)}>Các sản phẩm tiếp theo</Button></nav>}
+      </section> : <p className="text-sm text-muted-foreground">Không tìm thấy sản phẩm liên quan.</p>}
       {remove.error && <p role="alert" className="rounded bg-destructive/15 p-3 text-sm text-destructive">{getApiError(remove.error).message}</p>}
       <div className="mt-4 flex justify-end gap-2"><Button variant="outline" disabled={remove.isPending} onClick={onClose}>Hủy bỏ</Button><Button variant="destructive" disabled={remove.isPending || categories.isPending || categories.isError || products.isFetching || products.isError || count > 0} onClick={() => remove.mutate(category._id)}>{remove.isPending && <LoaderCircle className="size-4 animate-spin" />}Xác nhận xóa</Button></div>
     </DialogContent>

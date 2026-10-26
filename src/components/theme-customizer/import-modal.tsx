@@ -111,14 +111,14 @@ export function ImportModal({
               onClick={() => onOpenChange(false)}
               className="cursor-pointer"
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               onClick={processImport}
               disabled={!importText.trim()}
               className="cursor-pointer"
             >
-              Import Theme
+              Nhập chủ đề
             </Button>
           </div>
         </div>

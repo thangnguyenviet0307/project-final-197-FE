@@ -48,9 +48,9 @@ it.each([1, 2, 3, 4] as const)("staff only sees status edits for own open orders
   mockApi()
   const order: Order = { _id: id, userId: id, customerId, orderStatus, orderDate: "2026-10-20", street: "Street", city: "City", state: "State", paymentType: 1, totalAmount: 100, orderItems: [] }
   setup(<OrderActions order={order} onDeleted={vi.fn()} />)
-  expect(screen.queryByRole("button", { name: /Delete order/ })).toBeNull()
-  if (orderStatus === 1 || orderStatus === 2) expect(screen.getByRole("button", { name: /Update status/ })).toBeTruthy()
-  else expect(screen.queryByRole("button", { name: /Update status/ })).toBeNull()
+  expect(screen.queryByRole("button", { name: /Xóa đơn hàng/ })).toBeNull()
+  if (orderStatus === 1 || orderStatus === 2) expect(screen.getByRole("button", { name: /Cập nhật trạng thái/ })).toBeTruthy()
+  else expect(screen.queryByRole("button", { name: /Cập nhật trạng thái/ })).toBeNull()
 })
 it("staff can create a manual order with server-controlled prices", async () => {
   const writes = mockApi()
@@ -67,8 +67,8 @@ it("staff can view brands without add, edit or delete actions", async () => {
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, name: "Acme", slug: "acme", isActive: true }] } })
   setup(<BrandsPage />)
   await screen.findByText("Acme")
-  expect(screen.queryByRole("link", { name: /Add Brand/ })).toBeNull()
-  expect(screen.queryByRole("button", { name: /Edit|Delete/ })).toBeNull()
+  expect(screen.queryByRole("link", { name: /Thêm thương hiệu/ })).toBeNull()
+  expect(screen.queryByRole("button", { name: /Chỉnh sửa|Xóa/ })).toBeNull()
 })
 it("staff can edit notes on their own open order", async () => {
   const writes = mockApi()
@@ -82,7 +82,7 @@ it("staff can add customers and inspect history without edit, delete or export c
   mockApi()
   setup(<CustomersPage />)
   await screen.findByText("jane@example.com")
-  expect(screen.getByRole("link", { name: "Order history" }).getAttribute("href")).toBe(`/orders?customerId=${customerId}`)
+  expect(screen.getByRole("link", { name: "Lịch sử đơn hàng" }).getAttribute("href")).toBe(`/orders?customerId=${customerId}`)
   expect(screen.queryByRole("button", { name: /Delete Jane/ })).toBeNull()
   expect(screen.queryByRole("button", { name: /Edit/ })).toBeNull()
   expect(screen.queryByRole("button", { name: /Export/ })).toBeNull()

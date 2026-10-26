@@ -2,7 +2,8 @@ import { z } from "zod"
 import { api, authApi, clearAuth, getApiError, refreshAccessToken } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
-import type { ApiResponse, ChangePasswordInput, LoginCredentials, TokenPair } from "@/features/auth/types/auth"
+import type { ApiResponse } from "@/types/api"
+import type { ChangePasswordInput, LoginCredentials, RegisterCustomerInput, TokenPair } from "@/features/auth/types/auth"
 import type { ProfileValues } from "@/features/profile/schemas/profile-schema"
 
 const userSchema = z.object({
@@ -22,6 +23,11 @@ const userSchema = z.object({
   ...user,
   name: `${user.firstName} ${user.lastName}`.trim() || user.name?.trim() || user.email,
 }))
+
+export async function registerCustomer(input: RegisterCustomerInput) {
+  const { email, password, firstName, lastName } = input
+  await authApi.post<ApiResponse<unknown>>("/auth/register", { email, password, firstName, lastName })
+}
 
 export async function login(credentials: LoginCredentials) {
   const version = useAuthStore.getState().sessionVersion

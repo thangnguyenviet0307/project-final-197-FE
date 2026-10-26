@@ -7,11 +7,11 @@ import type { Product } from "@/features/products/types/products"
 export function DeleteProductConfirmation({ product, onClose, onDeleted }: { product: Product; onClose: () => void; onDeleted: () => void }) {
   const mutation = useDeleteProduct()
   return <Dialog open onOpenChange={open => { if (!open && !mutation.isPending) onClose() }}>
-    <DialogContent showCloseButton={!mutation.isPending}><DialogHeader><DialogTitle className="flex items-center gap-2"><TriangleAlert className="size-4 text-destructive" />Delete product?</DialogTitle>
-      <DialogDescription>Delete “{product.product_name}”? This action cannot be undone.</DialogDescription></DialogHeader>
+    <DialogContent showCloseButton={!mutation.isPending}><DialogHeader><DialogTitle className="flex items-center gap-2"><TriangleAlert className="size-4 text-destructive" />Xóa sản phẩm?</DialogTitle>
+      <DialogDescription>Xóa “{product.product_name}”? Thao tác này không thể hoàn tác.</DialogDescription></DialogHeader>
       {mutation.error && <p role="alert" className="text-destructive">{getApiError(mutation.error).message}</p>}
-      <DialogFooter><Button variant="outline" disabled={mutation.isPending} onClick={onClose}>Cancel</Button>
-        <Button variant="destructive" disabled={mutation.isPending} onClick={() => mutation.mutate(product._id, { onSuccess: onDeleted })}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Confirm deletion</Button></DialogFooter>
+      <DialogFooter><Button variant="outline" disabled={mutation.isPending} onClick={onClose}>Hủy</Button>
+        <Button variant="destructive" disabled={mutation.isPending} onClick={() => mutation.mutate(product._id, { onSuccess: onDeleted })}>{mutation.isPending && <LoaderCircle className="animate-spin" />}Xác nhận xóa</Button></DialogFooter>
     </DialogContent>
   </Dialog>
 }

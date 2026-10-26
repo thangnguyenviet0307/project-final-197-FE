@@ -113,9 +113,9 @@ export default function NotificationSettings() {
     <BaseLayout>
       <div className="flex flex-col gap-6 px-4 lg:px-6">
         <div>
-          <h1 className="text-3xl font-bold">Notifications</h1>
+          <h1 className="text-3xl font-bold">Thông báo</h1>
           <p className="text-muted-foreground">
-            Configure how you receive notifications.
+            Cấu hình cách nhận thông báo.
           </p>
         </div>
         <form
@@ -125,9 +125,9 @@ export default function NotificationSettings() {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Email Notifications</CardTitle>
+                <CardTitle>Thông báo qua email</CardTitle>
                 <CardDescription>
-                  Choose what email notifications you want to receive.
+                  Chọn các thông báo bạn muốn nhận qua email.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
@@ -148,11 +148,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-email-security">
-                            Security alerts
+                            Cảnh báo bảo mật
                           </FieldLabel>
                           <FieldDescription>
-                            Get notified when there are security events on your
-                            account.
+                            Nhận thông báo khi tài khoản có sự kiện bảo mật.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -174,10 +173,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-email-updates">
-                            Product updates
+                            Cập nhật sản phẩm
                           </FieldLabel>
                           <FieldDescription>
-                            Receive updates about new features and improvements.
+                            Nhận cập nhật về tính năng và cải tiến mới.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -199,11 +198,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-email-marketing">
-                            Marketing emails
+                            Email tiếp thị
                           </FieldLabel>
                           <FieldDescription>
-                            Receive emails about our latest offers and
-                            promotions.
+                            Nhận email về ưu đãi và khuyến mãi mới nhất.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -215,9 +213,9 @@ export default function NotificationSettings() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Push Notifications</CardTitle>
+                <CardTitle>Thông báo đẩy</CardTitle>
                 <CardDescription>
-                  Configure browser and mobile push notifications.
+                  Cấu hình thông báo đẩy trên trình duyệt và điện thoại.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
@@ -238,10 +236,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-push-messages">
-                            New messages
+                            Tin nhắn mới
                           </FieldLabel>
                           <FieldDescription>
-                            Get notified when you receive new messages.
+                            Nhận thông báo khi có tin nhắn mới.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -263,10 +261,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-push-mentions">
-                            Mentions
+                            Lượt nhắc đến
                           </FieldLabel>
                           <FieldDescription>
-                            Get notified when someone mentions you.
+                            Nhận thông báo khi có người nhắc đến bạn.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -288,10 +286,10 @@ export default function NotificationSettings() {
                         />
                         <FieldContent>
                           <FieldLabel htmlFor="notifications-push-tasks">
-                            Task updates
+                            Cập nhật công việc
                           </FieldLabel>
                           <FieldDescription>
-                            Get notified about task assignments and updates.
+                            Nhận thông báo về phân công và cập nhật công việc.
                           </FieldDescription>
                         </FieldContent>
                       </Field>
@@ -303,9 +301,9 @@ export default function NotificationSettings() {
           </div>
           <Card>
             <CardHeader>
-              <CardTitle>Notification Frequency</CardTitle>
+              <CardTitle>Tần suất thông báo</CardTitle>
               <CardDescription>
-                Control how often you receive notifications.
+                Điều chỉnh tần suất nhận thông báo.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,15 +313,15 @@ export default function NotificationSettings() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="notifications-email-frequency">
-                      Email Frequency
+                      Tần suất email
                     </FieldLabel>
                     <Select
                       items={{
-                        instant: "Instant",
-                        hourly: "Hourly digest",
-                        daily: "Daily digest",
-                        weekly: "Weekly digest",
-                        never: "Never",
+                        instant: "Ngay lập tức",
+                        hourly: "Tổng hợp hằng giờ",
+                        daily: "Tổng hợp hằng ngày",
+                        weekly: "Tổng hợp hằng tuần",
+                        never: "Không bao giờ",
                       }}
                       name={field.name}
                       onValueChange={field.onChange}
@@ -334,15 +332,15 @@ export default function NotificationSettings() {
                         aria-invalid={fieldState.invalid}
                         className="w-full"
                       >
-                        <SelectValue placeholder="Select frequency" />
+                        <SelectValue placeholder="Chọn tần suất" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectItem value="instant">Instant</SelectItem>
-                          <SelectItem value="hourly">Hourly digest</SelectItem>
-                          <SelectItem value="daily">Daily digest</SelectItem>
-                          <SelectItem value="weekly">Weekly digest</SelectItem>
-                          <SelectItem value="never">Never</SelectItem>
+                          <SelectItem value="instant">Ngay lập tức</SelectItem>
+                          <SelectItem value="hourly">Tổng hợp hằng giờ</SelectItem>
+                          <SelectItem value="daily">Tổng hợp hằng ngày</SelectItem>
+                          <SelectItem value="weekly">Tổng hợp hằng tuần</SelectItem>
+                          <SelectItem value="never">Không bao giờ</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -354,7 +352,7 @@ export default function NotificationSettings() {
               />
               <Field>
                 <FieldLabel htmlFor="notifications-quiet-hours-start">
-                  Quiet Hours
+                  Giờ yên lặng
                 </FieldLabel>
                 <div className="flex gap-2">
                   <Controller
@@ -376,7 +374,7 @@ export default function NotificationSettings() {
                           aria-invalid={fieldState.invalid}
                           className="w-50"
                         >
-                          <SelectValue placeholder="Start" />
+                          <SelectValue placeholder="Bắt đầu" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
@@ -408,7 +406,7 @@ export default function NotificationSettings() {
                           aria-invalid={fieldState.invalid}
                           className="w-50"
                         >
-                          <SelectValue placeholder="End" />
+                          <SelectValue placeholder="Kết thúc" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
@@ -427,11 +425,11 @@ export default function NotificationSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
+              <CardTitle>Tùy chọn thông báo</CardTitle>
               <CardDescription>
-                We need permission from your browser to show notifications.{" "}
+                Cần được trình duyệt cho phép để hiển thị thông báo.{" "}
                 <Button variant="link" className="p-0 h-auto text-primary">
-                  Request Permission
+                  Yêu cầu cấp quyền
                 </Button>
               </CardDescription>
             </CardHeader>
@@ -440,16 +438,16 @@ export default function NotificationSettings() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[200px]">TYPE</TableHead>
+                      <TableHead className="w-[200px]">LOẠI</TableHead>
                       <TableHead className="text-center">EMAIL</TableHead>
-                      <TableHead className="text-center">BROWSER</TableHead>
-                      <TableHead className="text-center">APP</TableHead>
+                      <TableHead className="text-center">TRÌNH DUYỆT</TableHead>
+                      <TableHead className="text-center">ỨNG DỤNG</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
                       <TableCell className="font-medium">
-                        Order updates
+                        Cập nhật đơn hàng
                       </TableCell>
                       <TableCell className="text-center">
                         <Controller
@@ -459,7 +457,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-order-updates-email"
-                                aria-label="Order updates: email"
+                                aria-label="Cập nhật đơn hàng: email"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -476,7 +474,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-order-updates-browser"
-                                aria-label="Order updates: browser"
+                                aria-label="Cập nhật đơn hàng: trình duyệt"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -493,7 +491,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-order-updates-app"
-                                aria-label="Order updates: app"
+                                aria-label="Cập nhật đơn hàng: ứng dụng"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -505,7 +503,7 @@ export default function NotificationSettings() {
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">
-                        Invoice reminders
+                        Nhắc nhở hóa đơn
                       </TableCell>
                       <TableCell className="text-center">
                         <Controller
@@ -515,7 +513,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-invoice-reminders-email"
-                                aria-label="Invoice reminders: email"
+                                aria-label="Nhắc nhở hóa đơn: email"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -532,7 +530,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-invoice-reminders-browser"
-                                aria-label="Invoice reminders: browser"
+                                aria-label="Nhắc nhở hóa đơn: trình duyệt"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -549,7 +547,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-invoice-reminders-app"
-                                aria-label="Invoice reminders: app"
+                                aria-label="Nhắc nhở hóa đơn: ứng dụng"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -561,7 +559,7 @@ export default function NotificationSettings() {
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">
-                        Promotional offers
+                        Ưu đãi khuyến mãi
                       </TableCell>
                       <TableCell className="text-center">
                         <Controller
@@ -571,7 +569,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-promotional-offers-email"
-                                aria-label="Promotional offers: email"
+                                aria-label="Ưu đãi khuyến mãi: email"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -588,7 +586,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-promotional-offers-browser"
-                                aria-label="Promotional offers: browser"
+                                aria-label="Ưu đãi khuyến mãi: trình duyệt"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -605,7 +603,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-promotional-offers-app"
-                                aria-label="Promotional offers: app"
+                                aria-label="Ưu đãi khuyến mãi: ứng dụng"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -617,7 +615,7 @@ export default function NotificationSettings() {
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">
-                        System maintenance
+                        Bảo trì hệ thống
                       </TableCell>
                       <TableCell className="text-center">
                         <Controller
@@ -627,7 +625,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-system-maintenance-email"
-                                aria-label="System maintenance: email"
+                                aria-label="Bảo trì hệ thống: email"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -644,7 +642,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-system-maintenance-browser"
-                                aria-label="System maintenance: browser"
+                                aria-label="Bảo trì hệ thống: trình duyệt"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -661,7 +659,7 @@ export default function NotificationSettings() {
                             <Field data-invalid={fieldState.invalid} orientation="horizontal" className="justify-center">
                               <Checkbox
                                 id="notifications-system-maintenance-app"
-                                aria-label="System maintenance: app"
+                                aria-label="Bảo trì hệ thống: ứng dụng"
                                 aria-invalid={fieldState.invalid}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -681,13 +679,13 @@ export default function NotificationSettings() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="notifications-notification-timing">
-                          When should we send you notifications?
+                          Bạn muốn nhận thông báo khi nào?
                         </FieldLabel>
                         <Select
                           items={{
-                            online: "Only When I'm online",
-                            always: "Always",
-                            never: "Never",
+                            online: "Chỉ khi tôi trực tuyến",
+                            always: "Luôn luôn",
+                            never: "Không bao giờ",
                           }}
                           name={field.name}
                           onValueChange={field.onChange}
@@ -698,15 +696,15 @@ export default function NotificationSettings() {
                             aria-invalid={fieldState.invalid}
                             className="w-full max-w-sm"
                           >
-                            <SelectValue placeholder="Select timing" />
+                            <SelectValue placeholder="Chọn thời điểm" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
                               <SelectItem value="online">
-                                Only When I'm online
+                                Chỉ khi tôi trực tuyến
                               </SelectItem>
-                              <SelectItem value="always">Always</SelectItem>
-                              <SelectItem value="never">Never</SelectItem>
+                              <SelectItem value="always">Luôn luôn</SelectItem>
+                              <SelectItem value="never">Không bao giờ</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -723,10 +721,9 @@ export default function NotificationSettings() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Notification Channels</CardTitle>
+              <CardTitle>Kênh thông báo</CardTitle>
               <CardDescription>
-                Choose your preferred notification channels for different types
-                of alerts.
+                Chọn kênh nhận thông báo cho từng loại cảnh báo.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -750,7 +747,7 @@ export default function NotificationSettings() {
                             Email
                           </FieldLabel>
                           <div className="text-sm text-muted-foreground">
-                            Receive notifications via email
+                            Nhận thông báo qua email
                           </div>
                         </div>
                       </div>
@@ -781,10 +778,10 @@ export default function NotificationSettings() {
                             htmlFor="notifications-channel-push"
                             className="font-medium mb-1"
                           >
-                            Push Notifications
+                            Thông báo đẩy
                           </FieldLabel>
                           <div className="text-sm text-muted-foreground">
-                            Receive browser push notifications
+                            Nhận thông báo đẩy trên trình duyệt
                           </div>
                         </div>
                       </div>
@@ -818,7 +815,7 @@ export default function NotificationSettings() {
                             SMS
                           </FieldLabel>
                           <div className="text-sm text-muted-foreground">
-                            Receive notifications via SMS
+                            Nhận thông báo qua SMS
                           </div>
                         </div>
                       </div>
@@ -838,10 +835,10 @@ export default function NotificationSettings() {
 
           <div className="flex gap-2">
             <Button type="submit" className="cursor-pointer">
-              Save Preferences
+              Lưu tùy chọn
             </Button>
             <Button variant="outline" type="reset" className="cursor-pointer">
-              Cancel
+              Hủy
             </Button>
           </div>
         </form>

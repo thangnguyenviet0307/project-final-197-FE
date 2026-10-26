@@ -57,7 +57,7 @@ export function ModeToggle({ variant = "outline" }: ModeToggleProps) {
         <Moon className="size-[1.2rem] transition-transform duration-300 rotate-0 scale-100" />
       )}
       <span className="sr-only">
-        Switch to {isDarkMode ? "light" : "dark"} mode
+        Chuyển sang chế độ {isDarkMode ? "sáng" : "tối"}
       </span>
     </Button>
   )

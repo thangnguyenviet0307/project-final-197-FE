@@ -32,32 +32,32 @@ import { useTheme } from "@/hooks/theme/use-theme"
 import { cn } from "@/utils/utils"
 
 const navigationItems = [
-  { name: "Home", href: "#hero" },
+  { name: "Trang chủ", href: "#hero" },
   { name: "Features", href: "#features" },
   { name: "Solutions", href: "#features", hasMegaMenu: true },
   { name: "Team", href: "#team" },
   { name: "Pricing", href: "#pricing" },
-  { name: "FAQ", href: "#faq" },
+  { name: "Hỏi đáp", href: "#faq" },
   { name: "Contact", href: "#contact" },
 ]
 
 // Solutions menu items for mobile
 const solutionsItems = [
-  { title: "Browse Products" },
-  { name: "Free Blocks", href: "#free-blocks" },
-  { name: "Premium Templates", href: "#premium-templates" },
-  { name: "Admin Dashboards", href: "#admin-dashboards" },
-  { name: "Landing Pages", href: "#landing-pages" },
-  { title: "Categories" },
+  { title: "Khám phá sản phẩm" },
+  { name: "Khối giao diện miễn phí", href: "#free-blocks" },
+  { name: "Giao diện mẫu cao cấp", href: "#premium-templates" },
+  { name: "Bảng quản trị", href: "#admin-dashboards" },
+  { name: "Trang giới thiệu", href: "#landing-pages" },
+  { title: "Danh mục" },
   { name: "E-commerce", href: "#ecommerce" },
   { name: "SaaS Dashboards", href: "#saas-dashboards" },
   { name: "Analytics", href: "#analytics" },
   { name: "Authentication", href: "#authentication" },
-  { title: "Resources" },
-  { name: "Documentation", href: "#docs" },
-  { name: "Component Showcase", href: "#showcase" },
-  { name: "GitHub Repository", href: "#github" },
-  { name: "Design System", href: "#design-system" },
+  { title: "Tài nguyên" },
+  { name: "Tài liệu", href: "#docs" },
+  { name: "Trưng bày thành phần", href: "#showcase" },
+  { name: "Kho mã GitHub", href: "#github" },
+  { name: "Hệ thống thiết kế", href: "#design-system" },
 ]
 
 // Smooth scroll function
@@ -141,7 +141,7 @@ export function LandingNavbar() {
                 href="https://github.com/shadcnstore/shadcn-dashboard-landing-template"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GitHub Repository"
+                aria-label="Kho mã GitHub"
               />
             }
           >
@@ -160,7 +160,7 @@ export function LandingNavbar() {
             }
           >
             <LayoutDashboard data-icon="inline-start" />
-            Dashboard
+            Bảng điều khiển
           </Button>
           <Button
             variant="ghost"
@@ -168,14 +168,14 @@ export function LandingNavbar() {
             nativeButton={false}
             render={<a href={getAppUrl("/auth/sign-in")} />}
           >
-            Sign In
+            Đăng nhập
           </Button>
           <Button
             className="cursor-pointer"
             nativeButton={false}
             render={<a href={getAppUrl("/auth/sign-up")} />}
           >
-            Get Started
+            Bắt đầu
           </Button>
         </div>
 
@@ -188,7 +188,7 @@ export function LandingNavbar() {
             }
           >
             <Menu className="size-5" data-icon="inline-start" />
-            <span className="sr-only">Toggle menu</span>
+            <span className="sr-only">Ẩn/hiện menu</span>
           </SheetTrigger>
           <SheetContent
             side="right"
@@ -233,7 +233,7 @@ export function LandingNavbar() {
                           href="https://github.com/shadcnstore/shadcn-dashboard-landing-template"
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label="GitHub Repository"
+                          aria-label="Kho mã GitHub"
                         />
                       }
                     >
@@ -333,7 +333,7 @@ export function LandingNavbar() {
                     render={<a href={getAppUrl("/dashboard")} />}
                   >
                     <LayoutDashboard data-icon="inline-start" />
-                    Dashboard
+                    Bảng điều khiển
                   </Button>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -344,7 +344,7 @@ export function LandingNavbar() {
                       nativeButton={false}
                       render={<a href={getAppUrl("/auth/sign-in")} />}
                     >
-                      Sign In
+                      Đăng nhập
                     </Button>
                     <Button
                       size="lg"
@@ -352,7 +352,7 @@ export function LandingNavbar() {
                       nativeButton={false}
                       render={<a href={getAppUrl("/auth/sign-up")} />}
                     >
-                      Get Started
+                      Bắt đầu
                     </Button>
                   </div>
                 </div>

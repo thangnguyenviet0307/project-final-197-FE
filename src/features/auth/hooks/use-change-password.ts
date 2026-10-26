@@ -7,8 +7,8 @@ export function useChangePassword(onError?: (error: Error) => void) {
   const navigate = useNavigate()
   return useMutation({
     mutationFn: ({ currentPassword, newPassword }: ChangePasswordInput) => changePassword({ currentPassword, newPassword }),
-    meta: { successMessage: "Password changed. Please sign in again." },
-    onSuccess: () => navigate("/login", { replace: true, state: { message: "Password changed. Please sign in again." } }),
+    meta: { successMessage: "Đã đổi mật khẩu. Vui lòng đăng nhập lại." },
+    onSuccess: () => navigate("/login", { replace: true, state: { message: "Đã đổi mật khẩu. Vui lòng đăng nhập lại." } }),
     onError,
   })
 }

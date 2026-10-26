@@ -23,9 +23,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 const signupFormSchema = z
   .object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    email: z.email("Invalid email address"),
+    firstName: z.string().min(1, "Vui lòng nhập tên"),
+    lastName: z.string().min(1, "Vui lòng nhập họ"),
+    email: z.string().email("Địa chỉ email không hợp lệ"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Please confirm your password"),
     terms: z
@@ -80,7 +80,7 @@ export function SignupForm1({
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="signup-form-1-first-name">
-                          First Name
+                          Tên
                         </FieldLabel>
 
                         <Input
@@ -101,7 +101,7 @@ export function SignupForm1({
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="signup-form-1-last-name">
-                          Last Name
+                          Họ
                         </FieldLabel>
 
                         <Input
@@ -145,7 +145,7 @@ export function SignupForm1({
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="signup-form-1-password">
-                        Password
+                        Mật khẩu
                       </FieldLabel>
 
                       <Input
@@ -229,7 +229,7 @@ export function SignupForm1({
                   href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-in"
                   className="underline underline-offset-4"
                 >
-                  Sign in
+                  Đăng nhập
                 </a>
               </div>
             </div>
@@ -237,8 +237,8 @@ export function SignupForm1({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Điều khoản sử dụng</a>{" "}
+        and <a href="#">Chính sách bảo mật</a>.
       </div>
     </div>
   )

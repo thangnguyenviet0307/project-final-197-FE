@@ -6,7 +6,7 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 
 | Khu vực | Backend hiện tại | Giới hạn cho storefront |
 | --- | --- | --- |
-| Đăng nhập | `/auth/login`, `/auth/me`, refresh/logout | Tài khoản admin/staff; chưa có luồng đăng ký/đăng nhập người mua |
+| Đăng nhập | `/auth/register`, `/auth/login`, `/auth/me`, refresh/logout | Đã có tài khoản role customer; đăng ký → đăng nhập → homepage. Khách không có quyền quản trị |
 | Customers | CRUD `/customers`, phân trang/search | Hồ sơ liên hệ, không chứa thông tin xác thực hoặc quan hệ với session người mua |
 | Catalog | `/products`, `/categories`, `/brands` | Yêu cầu xác thực và quyền nội bộ; không gọi bằng tài khoản admin nhúng trong Frontend |
 | Tạo đơn | `POST /orders` với `customerId`, địa chỉ, paymentType, product/variant ID và quantity | Chỉ admin có quyền tạo; chưa có checkout dành cho khách |

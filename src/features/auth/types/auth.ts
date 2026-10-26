@@ -20,6 +20,11 @@ export interface LoginCredentials {
   password: string
 }
 
+export interface RegisterCustomerInput extends LoginCredentials {
+  firstName: string
+  lastName: string
+}
+
 export interface TokenPair {
   accessToken: string
   refreshToken?: string
@@ -27,19 +32,6 @@ export interface TokenPair {
 
 export interface AuthResponse extends TokenPair {
   user: User
-}
-
-export interface ApiResponse<T> {
-  success: boolean
-  statusCode: number
-  message: string
-  data: T
-}
-
-export interface ApiError {
-  statusCode: number
-  message: string
-  errors?: { field: string; message: string; code?: string }[]
 }
 
 export interface ChangePasswordInput {

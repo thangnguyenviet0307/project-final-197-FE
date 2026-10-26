@@ -8,7 +8,7 @@ export function useUpdateProfile(options: MutationCallbacks<Awaited<ReturnType<t
   return useMutation({
     ...options,
     mutationFn: updateProfile,
-    meta: { successMessage: "Profile updated." },
+    meta: { successMessage: "Đã cập nhật hồ sơ." },
     onSuccess: async (...args) => {
       const version = useAuthStore.getState().sessionVersion
       queryClient.setQueryData(["auth", "me", version], args[0])

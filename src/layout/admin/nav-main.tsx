@@ -82,14 +82,14 @@ export function NavMain({
                             <Link
                               to={subItem.url}
                               target={
-                                item.title === "Auth Pages" ||
-                                item.title === "Errors"
+                                item.title === "Trang xác thực" ||
+                                item.title === "Trang lỗi"
                                   ? "_blank"
                                   : undefined
                               }
                               rel={
-                                item.title === "Auth Pages" ||
-                                item.title === "Errors"
+                                item.title === "Trang xác thực" ||
+                                item.title === "Trang lỗi"
                                   ? "noopener noreferrer"
                                   : undefined
                               }

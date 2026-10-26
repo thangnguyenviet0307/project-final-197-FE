@@ -10,20 +10,20 @@ export interface Feature {
 export const features: Feature[] = [
   {
     id: 1,
-    title: "Premium Quality",
+    title: "Chất lượng cao cấp",
     description:
       "Handcrafted with premium materials and meticulous attention to detail.",
     icon: Sparkles,
   },
   {
     id: 2,
-    title: "Secure Shopping",
+    title: "Mua sắm an toàn",
     description: "100% secure payment processing with end-to-end encryption.",
     icon: Shield,
   },
   {
     id: 3,
-    title: "Fast Delivery",
+    title: "Giao hàng nhanh",
     description:
       "Free worldwide shipping and hassle-free returns within 30 days.",
     icon: Truck,

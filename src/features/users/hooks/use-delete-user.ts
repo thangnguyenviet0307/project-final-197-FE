@@ -7,7 +7,7 @@ export function useDeleteUser(id: string, options: MutationCallbacks<void, void>
   return useMutation({
     ...options,
     mutationFn: () => deleteUser(id),
-    meta: { successMessage: "Account deleted." },
+    meta: { successMessage: "Đã xóa tài khoản." },
     onSuccess: (...args) => {
       void queryClient.invalidateQueries({ queryKey: ["users"] })
       return options.onSuccess?.(...args)

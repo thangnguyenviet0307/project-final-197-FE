@@ -47,7 +47,7 @@ export function DataTablePagination<TData extends RowData>({
             <ChevronLeft data-icon="inline-end" />
           </Button>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.state.pagination.pageIndex + 1} of{" "}
+            Trang {table.state.pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
           <Button

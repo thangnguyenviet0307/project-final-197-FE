@@ -1,3 +1,4 @@
+import type { ApiResult, Pagination } from "@/types/api"
 
 import { api } from "@/services/api"
 
@@ -23,25 +24,11 @@ interface BackendCustomer {
   updatedAt?: string
 }
 
-interface CustomerResponse<T> {
-  success: boolean
-  message?: string
-  data: T
-}
+type CustomerResponse<T> = ApiResult<T>
 
-export interface CustomerPagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-}
+export type CustomerPagination = Pagination
 
-interface CustomersListResponse {
-  success: boolean
-  message?: string
-  data: BackendCustomer[]
-  pagination: CustomerPagination
-}
+type CustomersListResponse = ApiResult<BackendCustomer[]> & { pagination: Pagination }
 
 // Chuyển dữ liệu Backend sang định dạng đang dùng trên FE
 function mapCustomer(customer: BackendCustomer): ICustomer {
@@ -51,6 +38,7 @@ function mapCustomer(customer: BackendCustomer): ICustomer {
     last_name: customer.lastName,
     email: customer.email,
     phone: customer.phone,
+    isActive: customer.isActive,
     street: customer.address?.street ?? "",
     city: customer.address?.city ?? "",
     state: customer.address?.state ?? "",
@@ -92,7 +80,7 @@ function toBackendCustomer(
 
 export const customersService = {
   // GET danh sách Customers
-  getCustomers: async (params: { page: number; limit: number; search?: string }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
+  getCustomers: async (params: { page: number; limit: number; search?: string; isActive?: boolean }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
     const response = await api.get<CustomersListResponse>(
       "/customers",
       {

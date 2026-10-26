@@ -1,59 +1,14 @@
-import { z } from "zod";
-import { imageUrlSchema } from "@/utils/image-url";
 import { api } from "@/services/api";
-
-export const categorySchema = z.object({
-  icon: imageUrlSchema.optional(),
-  name: z.string().trim().min(1, "Category name is required."),
-  description: z.string().trim().optional(),
-  parent: z.string().nullable().optional(),
-  isActive: z.boolean().optional(),
-});
-
-export type CategoryFormInput = z.infer<typeof categorySchema>;
-
-export interface CategoryParent {
-  _id: string;
-  name: string;
-  slug?: string;
-}
-
-export interface Category {
-  icon?: string;
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  parent?: CategoryParent | string | null;
-  isActive: boolean;
-  isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateCategoryInput {
-  icon?: string;
-  name: string;
-  description?: string;
-  parent?: string | null;
-  isActive?: boolean;
-}
-
-export interface UpdateCategoryInput {
-  icon?: string;
-  name?: string;
-  description?: string;
-  parent?: string | null;
-  isActive?: boolean;
-}
+import type { Category, CreateCategoryInput, UpdateCategoryInput } from "@/features/categories/types/categories";
+import type { ApiResult } from "@/types/api";
 
 export async function listCategories(signal?: AbortSignal): Promise<Category[]> {
-  const { data } = await api.get<{ success: boolean; count: number; data: Category[] }>("/categories", { signal });
+  const { data } = await api.get<ApiResult<Category[]> & { count: number }>("/categories", { signal });
   return data.data || [];
 }
 
 export async function getCategoryById(id: string, signal?: AbortSignal): Promise<Category> {
-  const { data } = await api.get<{ success: boolean; data: Category }>(
+  const { data } = await api.get<ApiResult<Category>>(
     `/categories/${encodeURIComponent(id)}`,
     { signal }
   );
@@ -68,7 +23,7 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
-  const { data } = await api.post<{ success: boolean; data: Category }>("/categories", payload);
+  const { data } = await api.post<ApiResult<Category>>("/categories", payload);
   return data.data;
 }
 
@@ -86,7 +41,7 @@ export async function updateCategory({
   if (input.parent !== undefined) payload.parent = input.parent ? input.parent : null;
   if (input.isActive !== undefined) payload.isActive = input.isActive;
 
-  const { data } = await api.put<{ success: boolean; data: Category }>(
+  const { data } = await api.put<ApiResult<Category>>(
     `/categories/${encodeURIComponent(id)}`,
     payload
   );

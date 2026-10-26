@@ -24,26 +24,24 @@ export function HeroSection() {
           <div className="mb-8 flex justify-center">
             <Badge variant="outline" className="px-4 py-2 border-foreground">
               <Star className="fill-current" />
-              New: Premium Template Collection
+              Mới: Bộ sưu tập giao diện cao cấp
               <ArrowRight />
             </Badge>
           </div>
 
           {/* Main Headline */}
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            Build Better
+            Xây dựng
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               {" "}
-              Web Applications{" "}
+              ứng dụng web tốt hơn{" "}
             </span>
-            with Ready-Made Components
+            với các thành phần có sẵn
           </h1>
 
           {/* Subheading */}
           <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Accelerate your development with our curated collection of blocks,
-            templates, landing pages, and admin dashboards. From free components
-            to complete solutions, built with shadcn/ui.
+            Tăng tốc phát triển với bộ sưu tập khối giao diện, mẫu, trang giới thiệu và bảng quản trị. Từ thành phần miễn phí đến giải pháp hoàn chỉnh, tất cả được xây dựng với shadcn/ui.
           </p>
 
           {/* CTA Buttons */}
@@ -54,7 +52,7 @@ export function HeroSection() {
               nativeButton={false}
               render={<a href={getAppUrl("/auth/sign-up")} />}
             >
-              Get Started Free
+              Bắt đầu miễn phí
               <ArrowRight data-icon="inline-end" />
             </Button>
             <Button
@@ -65,7 +63,7 @@ export function HeroSection() {
               render={<a href="#" />}
             >
               <Play data-icon="inline-start" />
-              Watch Demo
+              Xem bản giới thiệu
             </Button>
           </div>
         </div>
@@ -80,14 +78,14 @@ export function HeroSection() {
               {/* Light mode dashboard image */}
               <img
                 src={assetUrl("dashboard-light.png")}
-                alt="Dashboard Preview - Light Mode"
+                alt="Xem trước bảng điều khiển - Giao diện sáng"
                 className="w-full rounded-xl object-cover block dark:hidden"
               />
 
               {/* Dark mode dashboard image */}
               <img
                 src={assetUrl("dashboard-dark.png")}
-                alt="Dashboard Preview - Dark Mode"
+                alt="Xem trước bảng điều khiển - Giao diện tối"
                 className="w-full rounded-xl object-cover hidden dark:block"
               />
 
@@ -100,7 +98,7 @@ export function HeroSection() {
                   size="lg"
                   className="rounded-full size-16 p-0 cursor-pointer hover:scale-105 transition-transform"
                   nativeButton={false}
-                  render={<a href="#" aria-label="Watch demo video" />}
+                  render={<a href="#" aria-label="Xem video giới thiệu" />}
                 >
                   <Play className="size-6 fill-current" />
                 </Button>

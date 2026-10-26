@@ -17,7 +17,7 @@ const originalAdapter = api.defaults.adapter
 beforeEach(() => {
   queryClient.clear()
   clearAuth()
-  useAuthStore.getState().setSession({ id: "self", name: "Admin", firstName: "Admin", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
+  useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
 })
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
 function UserTestRoutes() { return <Routes><Route path="/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
@@ -101,7 +101,7 @@ it("keeps the Accounts table columns aligned across pages with different content
   expect(table.parentElement?.classList.contains("overflow-x-auto")).toBe(true)
   expect(table.parentElement?.parentElement?.classList.contains("overflow-x-auto")).toBe(false)
 
-  fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tiếp" }))
   await screen.findByText("page2@example.com")
   expect(requests).toContainEqual(expect.objectContaining({ page: 1, limit: 10 }))
   expect(requests).toContainEqual(expect.objectContaining({ page: 2, limit: 10 }))
@@ -135,10 +135,10 @@ it("searches accounts by name or account email and shows an empty search result"
   let releaseSearch!: () => void
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
 
-  const search = await screen.findByRole("textbox", { name: "Search accounts by name or account email" })
+  const search = await screen.findByRole("textbox", { name: "Tìm tài khoản theo tên hoặc email" })
   expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Users" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
+  expect(screen.getByRole("heading", { name: "Người dùng" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(screen.getByRole("navigation", { name: "Phân trang người dùng" })).toBeTruthy()
   const requestCount = requests.length
   fireEvent.change(search, { target: { value: "Jane Smith" } })
   expect(requests).toHaveLength(requestCount)
@@ -148,7 +148,7 @@ it("searches accounts by name or account email and shows an empty search result"
   expect(screen.getByText("jane@example.com")).toBeTruthy()
   expect(screen.getByText("Searching")).toBeTruthy()
   releaseSearch()
-  expect(await screen.findByText('No accounts found for "Jane Smith".')).toBeTruthy()
+  expect(await screen.findByText('Không tìm thấy tài khoản cho "Jane Smith".')).toBeTruthy()
 
   const secondRequestCount = requests.length
   fireEvent.change(search, { target: { value: "jane@example.com" } })
@@ -156,34 +156,34 @@ it("searches accounts by name or account email and shows an empty search result"
   await waitFor(() => expect(requests).toContainEqual(expect.objectContaining({
     page: 1, limit: 10, search: "jane@example.com",
   })))
-  expect(await screen.findByText('No accounts found for "jane@example.com".')).toBeTruthy()
+  expect(await screen.findByText('Không tìm thấy tài khoản cho "jane@example.com".')).toBeTruthy()
 })
 
 it.each(["staff", "admin"] as const)("creates %s accounts using the requested default password", async role => {
   const writes = setup()
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("link", { name: "Add User" }))
-  fireEvent.click(await screen.findByRole("combobox", { name: "Role" }))
-  const option = await screen.findByRole("option", { name: role === "admin" ? "Admin" : "Staff" })
+  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
+  fireEvent.click(await screen.findByRole("combobox", { name: "Vai trò" }))
+  const option = await screen.findByRole("option", { name: role === "admin" ? "Quản trị viên" : "Nhân viên" })
   fireEvent.mouseMove(option)
   fireEvent.mouseDown(option)
   fireEvent.mouseUp(option)
   fireEvent.click(option)
-  const password = (screen.getByLabelText("Temporary password") as HTMLInputElement).value
+  const password = (screen.getByLabelText("Mật khẩu tạm thời") as HTMLInputElement).value
   expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
-  fireEvent.change(screen.getByLabelText("First name"), { target: { value: "New" } })
-  fireEvent.change(screen.getByLabelText("Last name"), { target: { value: "User" } })
+  fireEvent.change(screen.getByLabelText("Nhập tên"), { target: { value: "New" } })
+  fireEvent.change(screen.getByLabelText("Nhập họ"), { target: { value: "User" } })
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } })
-  fireEvent.click(screen.getByRole("button", { name: "Create account" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tạo tài khoản" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users", expect.objectContaining({ role, password })))
 })
 
 it.each(["staff", "admin"] as const)("resets %s accounts using the role-based default password", async role => {
   const writes = setup(role)
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Reset password" }))
-  const field = screen.getByLabelText("New temporary password")
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Đặt lại mật khẩu" }))
+  const field = screen.getByLabelText("Mật khẩu tạm thời mới")
   const password = (field as HTMLInputElement).value
   expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
   fireEvent.submit(field.closest("form")!)
@@ -193,10 +193,10 @@ it.each(["staff", "admin"] as const)("resets %s accounts using the role-based de
 it("confirms account deletion from the Edit actions menu", async () => {
   const writes = setup()
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Delete account" }))
-  expect(await screen.findByText(/You are about to delete the account/)).toBeTruthy()
-  fireEvent.click(screen.getByRole("button", { name: "Confirm deletion" }))
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Xóa tài khoản" }))
+  expect(await screen.findByText(/Bạn sắp xóa tài khoản/)).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Xác nhận xóa" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", "/users/target", undefined))
 })
 
@@ -206,10 +206,10 @@ it("confirms account deletion from the Edit actions menu", async () => {
 it("edits account access without silently resetting its password", async () => {
   const writes = setup()
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Edit" }))
-  fireEvent.change(screen.getByLabelText("Status"), { target: { value: "suspended" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save changes" }))
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Chỉnh sửa" }))
+  fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "suspended" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { role: "staff", active: false }))
 })
 
@@ -218,18 +218,18 @@ it("keeps account actions while using the shared catalog controls", async () => 
   setup()
   await screen.findByText("target@example.com")
   expect(screen.queryByRole("button", { name: "Invite User" })).toBeNull()
-  expect(screen.queryByRole("button", { name: "View" })).toBeNull()
+  expect(screen.queryByRole("button", { name: "Xem" })).toBeNull()
   expect(screen.queryByRole("checkbox")).toBeNull()
   expect(screen.queryByRole("combobox", { name: "Users per page" })).toBeNull()
-  expect(screen.getByRole("navigation", { name: "Users pagination" })).toBeTruthy()
-  expect(screen.getByRole("region", { name: "User management" }).classList.contains("dark")).toBe(false)
+  expect(screen.getByRole("navigation", { name: "Phân trang người dùng" })).toBeTruthy()
+  expect(screen.getByRole("region", { name: "Quản lý người dùng" }).classList.contains("dark")).toBe(false)
 })
 
 it("sorts by username only and provides a pointer cursor on its control", async () => {
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
     data: [
-      { _id: "zeta", firstName: "Alpha", lastName: "Name", email: "zeta@example.com", role: "staff", active: true },
-      { _id: "alpha", firstName: "Zeta", lastName: "Name", email: "alpha@example.com", role: "admin", active: true },
+      { _id: "zeta", firstName: "Alpha", lastName: "Tên", email: "zeta@example.com", role: "staff", active: true },
+      { _id: "alpha", firstName: "Zeta", lastName: "Tên", email: "alpha@example.com", role: "admin", active: true },
     ].sort((a, b) => config.params.sortOrder === "desc" ? b.email.localeCompare(a.email) : a.email.localeCompare(b.email)), pagination: { total: 2, totalPages: 1 },
   } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
@@ -237,9 +237,9 @@ it("sorts by username only and provides a pointer cursor on its control", async 
   const usernames = () => within(screen.getByRole("table")).getAllByRole("row").slice(1)
     .map(row => within(row).getAllByRole("cell")[0].querySelector("span.truncate")?.textContent)
   expect(usernames()).toEqual(["alpha", "zeta"])
-  const sort = screen.getByRole("button", { name: "Sort by username" })
+  const sort = screen.getByRole("button", { name: "Sắp xếp theo tên đăng nhập" })
   expect(sort.classList.contains("cursor-pointer")).toBe(true)
-  expect(within(screen.getByRole("columnheader", { name: "Name" })).queryByRole("button")).toBeNull()
+  expect(within(screen.getByRole("columnheader", { name: "Tên" })).queryByRole("button")).toBeNull()
   expect(within(screen.getByRole("columnheader", { name: "Email" })).queryByRole("button")).toBeNull()
   fireEvent.click(sort)
   await waitFor(() => expect(usernames()).toEqual(["zeta", "alpha"]))
@@ -253,16 +253,16 @@ it("uses only active/suspended statuses and admin/staff roles, including tempora
   } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   const row = (await screen.findByText("temporary@example.com")).closest("tr")!
-  expect(within(row).getByText("Active")).toBeTruthy()
+  expect(within(row).getByText("Đang hoạt động")).toBeTruthy()
   expect(screen.queryByText("Invited")).toBeNull()
-  const status = screen.getByRole("combobox", { name: "Account status" })
-  expect(within(status).getByRole("option", { name: "Suspended" })).toBeTruthy()
+  const status = screen.getByRole("combobox", { name: "Trạng thái tài khoản" })
+  expect(within(status).getByRole("option", { name: "Bị đình chỉ" })).toBeTruthy()
   expect(within(status).queryByRole("option", { name: "Invited" })).toBeNull()
   fireEvent.change(status, { target: { value: "all" } })
-  fireEvent.click(screen.getByRole("link", { name: "Add User" }))
-  const role = await screen.findByRole("combobox", { name: "Role" })
+  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
+  const role = await screen.findByRole("combobox", { name: "Vai trò" })
   fireEvent.click(role)
-  expect((await screen.findAllByRole("option")).map(option => option.textContent)).toEqual(["Staff", "Admin"])
+  expect((await screen.findAllByRole("option")).map(option => option.textContent)).toEqual(["Nhân viên", "Quản trị viên"])
   expect(screen.queryByText("Manager")).toBeNull()
   expect(screen.queryByText("Cashier")).toBeNull()
 })
@@ -271,13 +271,13 @@ it("opens the selected user's profile and closes it without writing account data
   const writes = setup()
   const row = (await screen.findByText("target@example.com")).closest("tr")!
   fireEvent.click(within(row).getAllByRole("cell")[1])
-  const dialog = await screen.findByRole("dialog", { name: "User profile" })
-  expect(within(dialog).getByText("Username")).toBeTruthy()
+  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })
+  expect(within(dialog).getByText("Tên đăng nhập")).toBeTruthy()
   expect(within(dialog).getAllByText("target@example.com")).toHaveLength(2)
-  expect(within(dialog).getByText("Staff")).toBeTruthy()
-  expect(within(dialog).getByText("Active")).toBeTruthy()
-  expect(within(dialog).queryByText(/password/i)).toBeNull()
-  fireEvent.click(within(dialog).getByRole("button", { name: "Close" }))
+  expect(within(dialog).getByText("Nhân viên")).toBeTruthy()
+  expect(within(dialog).getByText("Đang hoạt động")).toBeTruthy()
+  expect(within(dialog).queryByText(/Mật khẩu/i)).toBeNull()
+  fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
   expect(writes).not.toHaveBeenCalled()
 })
@@ -287,18 +287,18 @@ it.each(["Enter", " "])("opens a focused user row with the %s key", async key =>
   const row = (await screen.findByText("target@example.com")).closest("tr")!
   row.focus()
   fireEvent.keyDown(row, { key })
-  expect(await screen.findByRole("dialog", { name: "User profile" })).toBeTruthy()
+  expect(await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })).toBeTruthy()
 })
 
 it("keeps the account action menu separate from the profile dialog", async () => {
   setup()
   await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Edit account target@example.com" }))
-  expect(await screen.findByRole("menuitem", { name: "Edit" })).toBeTruthy()
-  expect(screen.queryByRole("dialog", { name: "User profile" })).toBeNull()
-  fireEvent.click(screen.getByRole("menuitem", { name: "Edit" }))
-  expect(await screen.findByRole("dialog", { name: "Edit account" })).toBeTruthy()
-  expect(screen.queryByRole("dialog", { name: "User profile" })).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  expect(await screen.findByRole("menuitem", { name: "Chỉnh sửa" })).toBeTruthy()
+  expect(screen.queryByRole("dialog", { name: "Hồ sơ người dùng" })).toBeNull()
+  fireEvent.click(screen.getByRole("menuitem", { name: "Chỉnh sửa" }))
+  expect(await screen.findByRole("dialog", { name: "Chỉnh sửa tài khoản" })).toBeTruthy()
+  expect(screen.queryByRole("dialog", { name: "Hồ sơ người dùng" })).toBeNull()
 })
 
 it("shows the clicked account rather than the signed-in admin or a previous selection", async () => {
@@ -310,11 +310,11 @@ it("shows the clicked account rather than the signed-in admin or a previous sele
   } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   fireEvent.click((await screen.findByText("one@example.com")).closest("tr")!)
-  fireEvent.click(within(await screen.findByRole("dialog", { name: "User profile" })).getByRole("button", { name: "Close" }))
+  fireEvent.click(within(await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })).getByRole("button", { name: "Đóng" }))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
   fireEvent.click(screen.getByText("two@example.com").closest("tr")!)
-  const dialog = await screen.findByRole("dialog", { name: "User profile" })
-  for (const text of ["personal@example.com", "0901234567", "Ho Chi Minh City", "Second user's biography", "Admin", "Suspended"]) {
+  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })
+  for (const text of ["personal@example.com", "0901234567", "Ho Chi Minh City", "Second user's biography", "Quản trị viên", "Bị đình chỉ"]) {
     expect(within(dialog).getByText(text)).toBeTruthy()
   }
   expect(within(dialog).queryByText("one@example.com")).toBeNull()
@@ -332,18 +332,18 @@ it("keeps fixed page size and resets search and filters", async () => {
   }
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   await screen.findByText("jane@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Next" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tiếp" }))
   await waitFor(() => expect(requests).toContainEqual({ page: 2, limit: 10, sortBy: "username", sortOrder: "asc" }))
-  await waitFor(() => expect(screen.getByRole("button", { name: "Next" }).hasAttribute("disabled")).toBe(false))
+  await waitFor(() => expect(screen.getByRole("button", { name: "Tiếp" }).hasAttribute("disabled")).toBe(false))
   expect(screen.queryByLabelText("Users per page")).toBeNull()
-  fireEvent.change(screen.getByLabelText("Search accounts by name or account email"), { target: { value: "Jane" } })
+  fireEvent.change(screen.getByLabelText("Tìm tài khoản theo tên hoặc email"), { target: { value: "Jane" } })
   await waitFor(() => expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", sortBy: "username", sortOrder: "asc" }))
-  fireEvent.change(screen.getByLabelText("Account status"), { target: { value: "suspended" } })
-  expect(await screen.findByText("No users match your filters.")).toBeTruthy()
+  fireEvent.change(screen.getByLabelText("Trạng thái tài khoản"), { target: { value: "suspended" } })
+  expect(await screen.findByText("Không có người dùng phù hợp với bộ lọc.")).toBeTruthy()
   expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", active: false, sortBy: "username", sortOrder: "asc" })
-  fireEvent.click(screen.getByRole("button", { name: "Reset filters" }))
+  fireEvent.click(screen.getByRole("button", { name: "Đặt lại bộ lọc" }))
   expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect((screen.getByLabelText("Search accounts by name or account email") as HTMLInputElement).value).toBe("")
-  expect((screen.getByLabelText("Account status") as HTMLSelectElement).value).toBe("all")
-  expect(screen.getByText("Page 1 of 3")).toBeTruthy()
+  expect((screen.getByLabelText("Tìm tài khoản theo tên hoặc email") as HTMLInputElement).value).toBe("")
+  expect((screen.getByLabelText("Trạng thái tài khoản") as HTMLSelectElement).value).toBe("all")
+  expect(screen.getByText("Trang 1 / 3")).toBeTruthy()
 })

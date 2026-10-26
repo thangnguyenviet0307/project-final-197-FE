@@ -142,6 +142,33 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  :where(
+    button,
+    a[href],
+    summary,
+    select,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    input[type="checkbox"],
+    input[type="radio"],
+    [role="button"],
+    [role="checkbox"],
+    [role="radio"],
+    [role="switch"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    [role="option"]
+  ):not(:disabled):not([aria-disabled="true"]):not([data-disabled]):not(
+    :disabled *,
+    [aria-disabled="true"] *,
+    [data-disabled] *
+  ) {
+    cursor: pointer;
+  }
 }
 
 /* Ensure consistent font rendering across different DPI levels */

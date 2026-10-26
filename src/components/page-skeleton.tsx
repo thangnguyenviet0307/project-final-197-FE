@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export function ContentSkeleton({ label = "Loading page", variant = "table" }: { label?: string; variant?: "table" | "form" | "profile" }) {
+export function ContentSkeleton({ label = "Đang tải trang", variant = "table" }: { label?: string; variant?: "table" | "form" | "profile" }) {
   return <div role="status" aria-label={label} aria-busy="true" className="w-full space-y-4 p-4">
     <span className="sr-only">{label}</span>
     <div aria-hidden="true" className="space-y-4">
@@ -26,7 +26,7 @@ export function PageSkeleton() {
       <div className="space-y-6 p-4 md:p-6">
         <div aria-hidden="true" className="space-y-3"><Skeleton className="h-8 w-48" /><Skeleton className="h-4 w-2/3 max-w-96" /></div>
         <div aria-hidden="true" className="grid grid-cols-2 gap-4 md:grid-cols-4">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-28 w-full" />)}</div>
-        <ContentSkeleton label="Loading page" />
+        <ContentSkeleton label="Đang tải trang" />
       </div>
     </div>
   </div>

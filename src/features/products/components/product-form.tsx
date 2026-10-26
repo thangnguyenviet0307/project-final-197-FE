@@ -48,9 +48,9 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
       <FieldLabel htmlFor={name}>{label}</FieldLabel>
       <Select value={field.value} onValueChange={(value) => field.onChange(value ?? "")}>
         <SelectTrigger id={name} className="w-full" aria-invalid={!!fieldState.error} aria-describedby={`${name}-error`} onBlur={field.onBlur} ref={field.ref}>
-          <SelectValue>{choices.find(item => item._id === field.value)?.name ?? unavailable?.name ?? "Select…"}</SelectValue>
+          <SelectValue>{choices.find(item => item._id === field.value)?.name ?? unavailable?.name ?? "Chọn…"}</SelectValue>
         </SelectTrigger>
-        <SelectContent>{unavailable && <SelectItem value={unavailable._id} disabled>{unavailable.name} (unavailable)</SelectItem>}
+        <SelectContent>{unavailable && <SelectItem value={unavailable._id} disabled>{unavailable.name} (không khả dụng)</SelectItem>}
           {choices.map(item => <SelectItem key={item._id} value={item._id}>{item.name}</SelectItem>)}
         </SelectContent>
       </Select><FieldError id={`${name}-error`} errors={[fieldState.error]} />
@@ -79,37 +79,37 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
       })
     }
   })}>
-    {catalogLoading && <ContentSkeleton label="Loading categories and brands…" variant="form" />}
-    {catalogError && <div role="alert" className="text-destructive">{getApiError(catalogError).message} <Button type="button" variant="outline" onClick={() => { void categories.refetch(); void brands.refetch() }}>Retry</Button></div>}
-    {!catalogLoading && !catalogError && (!categoryChoices.length || !brandChoices.length) && <p role="alert">An active category and brand are required to create a product.</p>}
+    {catalogLoading && <ContentSkeleton label="Đang tải danh mục và thương hiệu…" variant="form" />}
+    {catalogError && <div role="alert" className="text-destructive">{getApiError(catalogError).message} <Button type="button" variant="outline" onClick={() => { void categories.refetch(); void brands.refetch() }}>Thử lại</Button></div>}
+    {!catalogLoading && !catalogError && (!categoryChoices.length || !brandChoices.length) && <p role="alert">Cần có danh mục và thương hiệu đang hoạt động để tạo sản phẩm.</p>}
     <fieldset hidden={catalogLoading} disabled={busy || catalogLoading || !!catalogError} className="space-y-6 disabled:opacity-70">
       <div className="grid gap-4 sm:grid-cols-2">
-        <ProductInputField form={form} name="product_name" label="Product name" />
-        <ProductInputField form={form} name="model_year" label="Model year" numeric />
-        {catalogField("category", "Category", categoryChoices)}{catalogField("brand", "Brand", brandChoices)}
-        <ProductInputField form={form} name="price" label="Price (optional; defaults to lowest variant price)" numeric optional />
-        <ProductInputField form={form} name="discount" label="Discount (%)" numeric />
-        <ProductInputField form={form} name="thumbnail" label="Thumbnail path" />
-        <ProductImage src={thumbnail} alt="Thumbnail preview" className="size-24 border" />
-        {!product && <p className="text-xs text-muted-foreground">Save the product first, then upload gallery images from its detail page.</p>}
-        {variants.length ? <Field><FieldLabel>Total stock</FieldLabel><output className="text-sm">{variants.reduce((total, variant) => total + (Number(variant.stock) || 0), 0)}</output><p className="text-xs text-muted-foreground">Calculated from variant stock.</p></Field>
-          : <ProductInputField form={form} name="stock" label="Stock" numeric optional />}
+        <ProductInputField form={form} name="product_name" label="Tên sản phẩm" />
+        <ProductInputField form={form} name="model_year" label="Năm sản xuất" numeric />
+        {catalogField("category", "Danh mục", categoryChoices)}{catalogField("brand", "Thương hiệu", brandChoices)}
+        <ProductInputField form={form} name="price" label="Giá (không bắt buộc; mặc định là giá biến thể thấp nhất)" numeric optional />
+        <ProductInputField form={form} name="discount" label="Giảm giá (%)" numeric />
+        <ProductInputField form={form} name="thumbnail" label="Đường dẫn ảnh đại diện" />
+        <ProductImage src={thumbnail} alt="Xem trước ảnh đại diện" className="size-24 border" />
+        {!product && <p className="text-xs text-muted-foreground">Lưu sản phẩm trước, sau đó tải ảnh lên từ trang chi tiết sản phẩm.</p>}
+        {variants.length ? <Field><FieldLabel>Tổng tồn kho</FieldLabel><output className="text-sm">{variants.reduce((total, variant) => total + (Number(variant.stock) || 0), 0)}</output><p className="text-xs text-muted-foreground">Được tính từ tồn kho của các biến thể.</p></Field>
+          : <ProductInputField form={form} name="stock" label="Tồn kho" numeric optional />}
       </div>
       <Controller control={form.control} name="description" render={({ field, fieldState }) => <Field>
-        <FieldLabel htmlFor="description">Description</FieldLabel>
+        <FieldLabel htmlFor="description">Mô tả</FieldLabel>
         <ProductDescriptionEditor value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} disabled={busy || catalogLoading || !!catalogError} invalid={!!fieldState.error} />
         <FieldError id="description-error" errors={[fieldState.error]} />
       </Field>} />
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_active")} />Active product</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_active")} />Sản phẩm đang hoạt động</label>
       <ProductVariantsFields form={form} />
     </fieldset>
     {form.formState.errors.root && <p role="alert" className="text-destructive">{form.formState.errors.root.message}</p>}
-    <div className="flex flex-wrap gap-2"><Button type="submit" disabled={busy || catalogLoading || !!catalogError || (!product && (!categoryChoices.length || !brandChoices.length))}>{busy && <LoaderCircle className="animate-spin" />}{product ? "Save changes" : "Create product"}</Button>
-      <Button type="button" variant="outline" disabled={busy} onClick={() => navigate(product ? `/products/${product._id}` : returnTo, { state: { returnTo } })}>Cancel</Button></div>
+    <div className="flex flex-wrap gap-2"><Button type="submit" disabled={busy || catalogLoading || !!catalogError || (!product && (!categoryChoices.length || !brandChoices.length))}>{busy && <LoaderCircle className="animate-spin" />}{product ? "Lưu thay đổi" : "Tạo sản phẩm"}</Button>
+      <Button type="button" variant="outline" disabled={busy} onClick={() => navigate(product ? `/products/${product._id}` : returnTo, { state: { returnTo } })}>Hủy</Button></div>
     <Dialog open={blocker.state === "blocked"} onOpenChange={open => { if (!open && blocker.state === "blocked") blocker.reset() }}>
-      <DialogContent><DialogHeader><DialogTitle>Discard unsaved changes?</DialogTitle><DialogDescription>Your product changes have not been saved. Leaving this page will discard them.</DialogDescription></DialogHeader>
-        <DialogFooter><Button type="button" variant="outline" onClick={() => { if (blocker.state === "blocked") blocker.reset() }}>Keep editing</Button>
-          <Button type="button" variant="destructive" onClick={() => { if (blocker.state === "blocked") blocker.proceed() }}>Discard changes</Button></DialogFooter>
+      <DialogContent><DialogHeader><DialogTitle>Bỏ các thay đổi chưa lưu?</DialogTitle><DialogDescription>Thay đổi sản phẩm chưa được lưu. Rời trang sẽ làm mất các thay đổi này.</DialogDescription></DialogHeader>
+        <DialogFooter><Button type="button" variant="outline" onClick={() => { if (blocker.state === "blocked") blocker.reset() }}>Tiếp tục chỉnh sửa</Button>
+          <Button type="button" variant="destructive" onClick={() => { if (blocker.state === "blocked") blocker.proceed() }}>Bỏ thay đổi</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   </form>

@@ -28,7 +28,7 @@ function valuesFromUser(user: User | null): ProfileValues {
   }
 }
 
-function displayValue(value: string | undefined, fallback = "Not provided") {
+function displayValue(value: string | undefined, fallback = "Chưa cung cấp") {
   return value?.trim() || fallback
 }
 
@@ -87,12 +87,12 @@ export default function UserProfilePage() {
     setIsEditing(false)
   }
 
-  return <BaseLayout title="User Profile" description="View and manage your personal account information.">
+  return <BaseLayout title="Hồ sơ người dùng" description="Xem và quản lý thông tin tài khoản cá nhân.">
     <div className="space-y-6 px-4 lg:px-6">
-      {profile.isPending ? <Card><CardContent><ContentSkeleton label="Loading your profile…" variant="profile" /></CardContent></Card> : profile.isError ? <Card>
+      {profile.isPending ? <Card><CardContent><ContentSkeleton label="Đang tải hồ sơ…" variant="profile" /></CardContent></Card> : profile.isError ? <Card>
         <CardContent className="flex flex-col items-start gap-3 py-6">
           <p role="alert" className="text-sm text-destructive">{getApiError(profile.error).message}</p>
-          <Button variant="outline" onClick={() => void profile.refetch()}>Try again</Button>
+          <Button variant="outline" onClick={() => void profile.refetch()}>Thử lại</Button>
         </CardContent>
       </Card> : isEditing ? <Card>
         <CardHeader className="border-b">
@@ -102,7 +102,7 @@ export default function UserProfilePage() {
             </div>
             <div className="space-y-1">
               <CardTitle>Cập nhật thông tin cá nhân</CardTitle>
-              <CardDescription>Account email and role are managed by your administrator.</CardDescription>
+              <CardDescription>Email tài khoản và vai trò do quản trị viên quản lý.</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -114,41 +114,41 @@ export default function UserProfilePage() {
             <fieldset disabled={mutation.isPending} className="space-y-6">
               <section className="space-y-3">
                 <div>
-                  <h3 className="text-sm font-medium">Profile photo</h3>
-                  <p className="text-xs text-muted-foreground">JPG, PNG or GIF, up to 800 KB.</p>
+                  <h3 className="text-sm font-medium">Ảnh hồ sơ</h3>
+                  <p className="text-xs text-muted-foreground">JPG, PNG hoặc GIF, tối đa 800 KB.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <UserAvatar name={current?.name || current?.email || "User"} avatar={removeAvatar ? "" : preview ?? current?.avatar} className="size-14" />
-                  <Button type="button" size="sm" onClick={() => fileInput.current?.click()}><Upload />Upload new photo</Button>
-                  <Button type="button" size="sm" variant="outline" onClick={resetPhoto}>Reset photo</Button>
-                  <input ref={fileInput} type="file" aria-label="Profile photo" accept="image/jpeg,image/png,image/gif" className="hidden" onChange={(event) => selectPhoto(event.target.files?.[0])} />
+                  <Button type="button" size="sm" onClick={() => fileInput.current?.click()}><Upload />Tải ảnh mới lên</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={resetPhoto}>Đặt lại ảnh</Button>
+                  <input ref={fileInput} type="file" aria-label="Ảnh hồ sơ" accept="image/jpeg,image/png,image/gif" className="hidden" onChange={(event) => selectPhoto(event.target.files?.[0])} />
                 </div>
                 {avatarError && <p role="alert" className="text-sm text-destructive">{avatarError}</p>}
               </section>
               <Separator />
               <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
                 {([
-                  ["firstName", "First Name", "text"],
-                  ["lastName", "Last Name", "text"],
-                  ["personalEmail", "Personal email", "email"],
-                  ["phone", "Phone Number", "tel"],
-                  ["location", "Location", "text"],
+                  ["firstName", "Tên", "text"],
+                  ["lastName", "Họ", "text"],
+                  ["personalEmail", "Email cá nhân", "email"],
+                  ["phone", "Số điện thoại", "tel"],
+                  ["location", "Địa điểm", "text"],
                 ] as const).map(([name, label, type]) => <Field key={name} data-invalid={!!form.formState.errors[name]}>
                   <FieldLabel htmlFor={`profile-${name}`}>{label}</FieldLabel>
                   <Input id={`profile-${name}`} type={type} aria-invalid={!!form.formState.errors[name]} {...form.register(name)} />
                   <FieldError errors={[form.formState.errors[name]]} />
                 </Field>)}
                 <Field>
-                  <FieldLabel htmlFor="profile-account-email">Account email</FieldLabel>
+                  <FieldLabel htmlFor="profile-account-email">Email tài khoản</FieldLabel>
                   <Input id="profile-account-email" type="email" value={current?.email ?? ""} readOnly aria-readonly="true" className="bg-muted" />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="profile-role">Role</FieldLabel>
+                  <FieldLabel htmlFor="profile-role">Vai trò</FieldLabel>
                   <Input id="profile-role" value={current?.role ?? ""} readOnly aria-readonly="true" className="bg-muted capitalize" />
                 </Field>
                 <Field className="sm:col-span-2" data-invalid={!!form.formState.errors.bio}>
-                  <FieldLabel htmlFor="profile-bio">Bio</FieldLabel>
-                  <Textarea id="profile-bio" rows={4} aria-invalid={!!form.formState.errors.bio} placeholder="Share a little about yourself…" {...form.register("bio")} />
+                  <FieldLabel htmlFor="profile-bio">Giới thiệu</FieldLabel>
+                  <Textarea id="profile-bio" rows={4} aria-invalid={!!form.formState.errors.bio} placeholder="Chia sẻ đôi điều về bạn…" {...form.register("bio")} />
                   <div className="flex items-center justify-between gap-2">
                     <FieldError errors={[form.formState.errors.bio]} />
                     <span className="ml-auto text-xs text-muted-foreground">{bio.length}/1000</span>
@@ -172,14 +172,14 @@ export default function UserProfilePage() {
           <UserAvatar name={current?.name || current?.email || "User"} avatar={current?.avatar} className="size-24 ring-4 ring-background shadow-sm" />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="text-2xl">{current?.name || "Your profile"}</CardTitle>
+              <CardTitle className="text-2xl">{current?.name || "Hồ sơ của bạn"}</CardTitle>
               {current?.role && <Badge variant="secondary" className="capitalize">{current.role}</Badge>}
             </div>
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Mail className="size-4 shrink-0" /> <span className="break-all">{displayValue(current?.email, "Account email unavailable")}</span>
+              <Mail className="size-4 shrink-0" /> <span className="break-all">{displayValue(current?.email, "Chưa có email tài khoản")}</span>
             </p>
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ShieldCheck className="size-4 shrink-0 text-primary" /> Account managed by your administrator
+              <ShieldCheck className="size-4 shrink-0 text-primary" /> Tài khoản do quản trị viên quản lý
             </p>
           </div>
           <Button onClick={beginEditing}><Pencil />Cập nhật thông tin cá nhân</Button>
@@ -189,29 +189,29 @@ export default function UserProfilePage() {
           <section className="space-y-4">
             <div>
               <h2 className="font-semibold">Thông tin cá nhân</h2>
-              <p className="text-sm text-muted-foreground">Contact details and information visible to your team.</p>
+              <p className="text-sm text-muted-foreground">Thông tin liên hệ và hồ sơ hiển thị với đội ngũ của bạn.</p>
             </div>
             <dl className="grid gap-5 sm:grid-cols-2">
-              <ProfileDetail icon={Mail} label="Personal email" value={current?.personalEmail} />
-              <ProfileDetail icon={Phone} label="Phone number" value={current?.phone} />
-              <ProfileDetail icon={MapPin} label="Location" value={current?.location} />
+              <ProfileDetail icon={Mail} label="Email cá nhân" value={current?.personalEmail} />
+              <ProfileDetail icon={Phone} label="Nhập số điện thoại" value={current?.phone} />
+              <ProfileDetail icon={MapPin} label="Địa điểm" value={current?.location} />
             </dl>
           </section>
           <Separator />
           <section className="space-y-2">
-            <h2 className="font-semibold">About</h2>
-            <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">{displayValue(current?.bio, "No bio has been added yet.")}</p>
+            <h2 className="font-semibold">Giới thiệu</h2>
+            <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">{displayValue(current?.bio, "Chưa có nội dung giới thiệu.")}</p>
           </section>
           <Separator />
           <section className="grid gap-5 sm:grid-cols-2">
             <div>
-              <h2 className="font-semibold">Account email</h2>
+              <h2 className="font-semibold">Email tài khoản</h2>
               <p className="mt-1 break-all text-sm text-muted-foreground">{displayValue(current?.email)}</p>
             </div>
             <div>
-              <h2 className="font-semibold">Account role</h2>
+              <h2 className="font-semibold">Vai trò tài khoản</h2>
               <p className="mt-1 capitalize text-sm text-muted-foreground">{displayValue(current?.role)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Your role is assigned by an administrator.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Vai trò của bạn do quản trị viên chỉ định.</p>
             </div>
           </section>
         </CardContent>

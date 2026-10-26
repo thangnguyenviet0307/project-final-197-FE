@@ -20,87 +20,87 @@ type Testimonial = {
 const testimonials: Testimonial[] = [
   {
     name: "Alexandra Mitchell",
-    role: "Senior Frontend Developer",
+    role: "Lập trình viên giao diện cấp cao",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-1",
     quote:
-      "This platform has completely transformed our development workflow. The component system is so well-architected that even complex applications feel simple to build.",
+      "Nền tảng đã thay đổi quy trình phát triển của chúng tôi. Hệ thống thành phần có kiến trúc rõ ràng, giúp việc xây dựng ứng dụng phức tạp trở nên đơn giản.",
   },
   {
     name: "James Thompson",
-    role: "Technical Lead",
+    role: "Trưởng nhóm kỹ thuật",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-1",
     quote:
-      "After trying countless frameworks, this is the one that finally clicked. The documentation is exceptional.",
+      "Sau khi thử nhiều nền tảng, chúng tôi đã tìm được lựa chọn phù hợp. Tài liệu rất đầy đủ và dễ hiểu.",
   },
   {
     name: "Priya Sharma",
-    role: "Product Designer",
+    role: "Nhà thiết kế sản phẩm",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-2",
     quote:
-      "The design system is beautiful and consistent. I can prototype ideas quickly and hand them off to developers with confidence that the implementation will match perfectly.",
+      "Hệ thống thiết kế đẹp và nhất quán. Tôi có thể tạo nguyên mẫu nhanh và chuyển cho lập trình viên với sự tin tưởng vào kết quả triển khai.",
   },
   {
     name: "Robert Kim",
-    role: "Engineering Manager",
+    role: "Quản lý kỹ thuật",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-2",
     quote:
-      "We migrated our entire application to this platform in just two weeks. The performance improvements were immediate.",
+      "Chúng tôi chuyển toàn bộ ứng dụng sang nền tảng này trong hai tuần và nhận thấy hiệu năng cải thiện ngay lập tức.",
   },
   {
     name: "Maria Santos",
-    role: "Full Stack Engineer",
+    role: "Kỹ sư phát triển toàn diện",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-3",
     quote:
-      "The accessibility features are top-notch. Building inclusive applications has never been easier. Every component follows best practices out of the box, and the automated testing suite ensures we maintain high accessibility standards throughout our development process.",
+      "Các tính năng hỗ trợ tiếp cận rất tốt. Mỗi thành phần đều tuân theo quy chuẩn, còn bộ kiểm thử tự động giúp duy trì khả năng tiếp cận trong suốt quá trình phát triển.",
   },
   {
     name: "Thomas Anderson",
-    role: "Solutions Architect",
+    role: "Kiến trúc sư giải pháp",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-3",
     quote:
-      "Scalability was our biggest concern, but this platform handles enterprise-level complexity with ease.",
+      "Khả năng mở rộng từng là mối lo lớn nhất, nhưng nền tảng này đáp ứng tốt độ phức tạp của ứng dụng doanh nghiệp.",
   },
   {
     name: "Lisa Chang",
     role: "UX Researcher",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-4",
     quote:
-      "User testing results have been consistently positive since we adopted this platform. The user experience is intuitive and the performance is stellar. Our user satisfaction scores have increased by 40% since the migration.",
+      "Kết quả kiểm thử người dùng luôn tích cực từ khi chúng tôi sử dụng nền tảng. Trải nghiệm trực quan và hiệu năng tốt đã giúp mức độ hài lòng tăng 40%.",
   },
   {
     name: "Michael Foster",
     role: "DevOps Engineer",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-4",
     quote:
-      "Deployment and maintenance are a breeze. The platform integrates seamlessly with our CI/CD pipeline.",
+      "Triển khai và bảo trì rất thuận tiện. Nền tảng tích hợp tốt với quy trình CI/CD của chúng tôi.",
   },
   {
     name: "Sophie Laurent",
-    role: "Creative Director",
+    role: "Giám đốc sáng tạo",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-5",
     quote:
-      "The creative possibilities are endless. We can bring any design concept to life without compromising on technical quality or user experience.",
+      "Chúng tôi có thể hiện thực hóa ý tưởng thiết kế mà vẫn bảo đảm chất lượng kỹ thuật và trải nghiệm người dùng.",
   },
   {
     name: "Daniel Wilson",
-    role: "Backend Developer",
+    role: "Lập trình viên máy chủ",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-5",
     quote:
-      "The API design is exceptional. Clean, intuitive, and well-documented.",
+      "Thiết kế API rõ ràng, trực quan và có tài liệu đầy đủ.",
   },
   {
     name: "Natasha Petrov",
-    role: "Mobile App Developer",
+    role: "Lập trình viên ứng dụng di động",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=female-6",
     quote:
       "Cross-platform development has never been this efficient. One codebase, multiple platforms, consistent user experience. This is the future. The responsive design system ensures our apps look perfect on every device.",
   },
   {
     name: "Carlos Rivera",
-    role: "Startup Founder",
+    role: "Nhà sáng lập công ty khởi nghiệp",
     image: "https://notion-avatars.netlify.app/api/avatar?preset=male-6",
     quote:
-      "As a non-technical founder, this platform gave me the confidence to build our MVP quickly.",
+      "Dù không có chuyên môn kỹ thuật, tôi vẫn có thể tự tin xây dựng sản phẩm thử nghiệm nhanh chóng với nền tảng này.",
   },
 ]
 
@@ -111,14 +111,13 @@ export function TestimonialsSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Testimonials
+            Nhận xét của khách hàng
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Empowering Innovation Worldwide
+            Đồng hành cùng đổi mới trên toàn cầu
           </h2>
           <p className="text-lg text-muted-foreground">
-            Join thousands of developers and teams who trust our platform to
-            build exceptional digital experiences.
+            Cùng hàng nghìn lập trình viên và đội ngũ sử dụng nền tảng để xây dựng trải nghiệm số chất lượng.
           </p>
         </div>
 

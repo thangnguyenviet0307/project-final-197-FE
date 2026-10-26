@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="px-4 py-6 lg:px-6">
         <div className="flex flex-col items-center justify-center gap-2 text-center">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Made with</span>
+            <span>Được xây dựng với</span>
             <Heart className="size-4 fill-destructive text-destructive" />
             <span>by</span>
             <Link

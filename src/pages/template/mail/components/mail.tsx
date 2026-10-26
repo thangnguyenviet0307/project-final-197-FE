@@ -197,7 +197,7 @@ export function Mail({
               <form>
                 <InputGroup>
                   <InputGroupInput
-                    placeholder="Search"
+                    placeholder="Tìm kiếm"
                     className="cursor-text"
                   />
                   <InputGroupAddon>

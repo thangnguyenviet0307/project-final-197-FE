@@ -10,55 +10,55 @@ import { cn } from "@/utils/utils"
 const plans = [
   {
     name: "Free",
-    description: "Perfect for getting started with essential components",
+    description: "Phù hợp để bắt đầu với các thành phần thiết yếu",
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
-      "Access to 50+ free components",
-      "Basic dashboard templates",
-      "Community support",
+      "Truy cập hơn 50 thành phần miễn phí",
+      "Mẫu bảng điều khiển cơ bản",
+      "Hỗ trợ từ cộng đồng",
       "GitHub repository access",
-      "Documentation and guides",
+      "Tài liệu và hướng dẫn",
     ],
-    cta: "Get Started",
+    cta: "Bắt đầu",
     popular: false,
   },
   {
     name: "Pro",
-    description: "For developers who need premium templates and components",
+    description: "Dành cho lập trình viên cần mẫu và thành phần cao cấp",
     monthlyPrice: 19,
     yearlyPrice: 15,
     features: [
-      "Premium template collection",
-      "Advanced dashboard layouts",
-      "Priority support",
-      "Commercial use license",
-      "Early access to new releases",
-      "Figma design files",
-      "Custom component requests",
-      "Direct developer access",
-      "Exclusive design resources",
+      "Bộ sưu tập mẫu cao cấp",
+      "Bố cục bảng điều khiển nâng cao",
+      "Hỗ trợ ưu tiên",
+      "Giấy phép sử dụng thương mại",
+      "Tiếp cận sớm bản phát hành mới",
+      "Tệp thiết kế Figma",
+      "Yêu cầu thành phần tùy chỉnh",
+      "Liên hệ trực tiếp với lập trình viên",
+      "Tài nguyên thiết kế độc quyền",
     ],
-    cta: "Get Started",
+    cta: "Bắt đầu",
     popular: true,
-    includesPrevious: "All Free features, plus",
+    includesPrevious: "Toàn bộ tính năng miễn phí, cùng với",
   },
   {
     name: "Lifetime",
-    description: "One-time payment for lifetime access to everything",
+    description: "Thanh toán một lần để truy cập trọn đời",
     monthlyPrice: 299,
     yearlyPrice: 299,
     features: [
-      "Lifetime updates and support",
-      "Private Discord channel",
-      "No recurring fees ever",
-      "Future template access",
+      "Cập nhật và hỗ trợ trọn đời",
+      "Kênh Discord riêng",
+      "Không có phí định kỳ",
+      "Truy cập các mẫu trong tương lai",
       "VIP support priority",
-      "Exclusive beta features",
+      "Tính năng thử nghiệm độc quyền",
     ],
-    cta: "Get Started",
+    cta: "Bắt đầu",
     popular: false,
-    includesPrevious: "All Pro features, plus",
+    includesPrevious: "Toàn bộ tính năng Pro, cùng với",
   },
 ]
 
@@ -71,14 +71,13 @@ export function PricingSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center mb-12">
           <Badge variant="outline" className="mb-4">
-            Pricing Plans
+            Các gói dịch vụ
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Choose your plan
+            Chọn gói phù hợp
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Start building with our free components or upgrade to Pro for access
-            to premium templates and advanced features.
+            Bắt đầu với thành phần miễn phí hoặc nâng cấp lên Pro để sử dụng mẫu cao cấp và tính năng nâng cao.
           </p>
 
           {/* Billing Toggle */}
@@ -94,20 +93,19 @@ export function PricingSection() {
                 value="monthly"
                 className="data-pressed:bg-background data-pressed:border-border border-transparent border px-6 rounded-full! data-pressed:text-foreground hover:bg-transparent cursor-pointer transition-colors"
               >
-                Monthly
+                Hằng tháng
               </ToggleGroupItem>
               <ToggleGroupItem
                 value="yearly"
                 className="data-pressed:bg-background data-pressed:border-border border-transparent border px-6 rounded-full! data-pressed:text-foreground hover:bg-transparent cursor-pointer transition-colors"
               >
-                Annually
+                Hằng năm
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            <span className="text-primary font-semibold">Save 20%</span> On
-            Annual Billing
+            <span className="text-primary font-semibold">Tiết kiệm 20%</span> Khi thanh toán hằng năm
           </p>
         </div>
 
@@ -147,7 +145,7 @@ export function PricingSection() {
                     <div className="text-muted-foreground text-sm">
                       {plan.name === "Lifetime"
                         ? "One-time payment"
-                        : "Per month"}
+                        : "Mỗi tháng"}
                     </div>
                   </div>
 
@@ -197,14 +195,14 @@ export function PricingSection() {
         {/* Enterprise Note */}
         <div className="mt-16 text-center">
           <p className="text-muted-foreground">
-            Need custom components or have questions?{" "}
+            Bạn cần thành phần tùy chỉnh hoặc có thắc mắc?{" "}
             <Button
               variant="link"
               className="p-0 h-auto cursor-pointer"
               nativeButton={false}
               render={<a href="#contact" />}
             >
-              Contact our team
+              Liên hệ đội ngũ của chúng tôi
             </Button>
           </p>
         </div>

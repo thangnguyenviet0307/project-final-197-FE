@@ -1,6 +1,7 @@
 import { invalidateCatalog } from "@/features/products/utils/invalidate-catalog"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { updateCategory, type UpdateCategoryInput, type Category } from "@/features/categories/services/categories.service"
+import { updateCategory } from "@/features/categories/services/categories.service"
+import type { UpdateCategoryInput, Category } from "@/features/categories/types/categories"
 import type { MutationCallbacks } from "@/types/mutation"
 
 export function useUpdateCategory(

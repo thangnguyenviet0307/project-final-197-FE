@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { createUser, type CreateUserInput } from "@/features/users/services/users.service"
+import { createUser } from "@/features/users/services/users.service"
+import type { CreateUserInput } from "@/features/users/types/users"
 import type { MutationCallbacks } from "@/types/mutation"
 
 export function useCreateUser(options: MutationCallbacks<void, CreateUserInput> = {}) {
@@ -7,7 +8,7 @@ export function useCreateUser(options: MutationCallbacks<void, CreateUserInput> 
   return useMutation({
     ...options,
     mutationFn: createUser,
-    meta: { successMessage: "Account created successfully." },
+    meta: { successMessage: "Tạo tài khoản thành công." },
     onSuccess: (...args) => {
       void queryClient.invalidateQueries({ queryKey: ["users"] })
       return options.onSuccess?.(...args)

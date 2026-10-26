@@ -10,7 +10,7 @@ import { features as featuresData } from "@/pages/template/faqs/data/features"
 export default function FAQsPage() {
   return (
     <BaseLayout
-      title="Frequently Asked Questions"
+      title="Câu hỏi thường gặp"
       description="Everything you need to know about our different services."
     >
       <div className="px-4 lg:px-6">

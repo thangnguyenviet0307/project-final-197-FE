@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
+import { vi } from "react-day-picker/locale"
 import {
   DayPicker,
   getDefaultClassNames,
@@ -22,7 +23,7 @@ function Calendar({
   showOutsideDays = true,
   captionLayout = "label",
   buttonVariant = "ghost",
-  locale,
+  locale = vi,
   formatters,
   components,
   ...props

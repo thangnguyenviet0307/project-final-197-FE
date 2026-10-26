@@ -1,15 +1,18 @@
 "use client"
 
 import { useAuthStore } from "@/stores/auth.store"
-import { Link } from "react-router-dom"
+import { CustomerProfileDialog } from "@/features/customers/components/customer-profile-dialog"
 
 
 import { useState } from "react"
-import { Search, Trash2, X } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Search, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Field, FieldLabel } from "@/components/ui/field"
+import { ListPagination } from "@/components/list-pagination"
 
 import {
   Table,
@@ -36,7 +39,7 @@ import { CustomerFormDialog } from "@/features/customers/components/customer-for
 import type {
   ICustomer,
   CreateCustomerInput,
-  UpdateCustomerInput,
+  CustomerStatus,
 } from "@/features/customers/types/customers"
 
 interface CustomerTableProps {
@@ -46,12 +49,11 @@ interface CustomerTableProps {
   totalPages: number
   onPageChange: (page: number) => void
   searchQuery: string
+  status?: CustomerStatus
+  onStatusChange?: (status: CustomerStatus) => void
+  onResetFilters?: () => void
   onSearch: (value: string) => void
   onDelete: (id: string) => Promise<void> | void
-  onEdit: (
-    id: string,
-    values: UpdateCustomerInput
-  ) => Promise<void> | void
   onAdd: (
     values: CreateCustomerInput
   ) => Promise<void> | void
@@ -65,12 +67,13 @@ function DeleteCustomerDialog({
   customer: ICustomer
   onDelete: (id: string) => Promise<void> | void
 }) {
+  const admin = useAuthStore(state => state.user?.role === "admin")
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState("")
 
   async function handleDelete() {
-    if (deleting) return
+    if (!admin || deleting) return
 
     setDeleting(true)
     setError("")
@@ -102,7 +105,7 @@ function DeleteCustomerDialog({
         variant="ghost"
         size="icon"
         className="h-8 w-8 cursor-pointer text-destructive"
-        aria-label={`Delete ${customer.first_name} ${customer.last_name}`}
+        aria-label={`Xóa ${customer.first_name} ${customer.last_name}`}
         onClick={() => setOpen(true)}
       >
         <Trash2 className="size-4" />
@@ -134,7 +137,7 @@ function DeleteCustomerDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={deleting}>
-            Cancel
+            Hủy
           </AlertDialogCancel>
 
           <AlertDialogAction
@@ -147,7 +150,7 @@ function DeleteCustomerDialog({
           >
             {deleting
               ? "Deleting..."
-              : "Delete Customer"}
+              : "Xóa khách hàng"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -160,19 +163,15 @@ export function CustomerTable({
   customers,
   page, total, totalPages, onPageChange,
   searchQuery,
+  status = "all", onStatusChange, onResetFilters,
   onSearch,
   onDelete,
-  onEdit,
   onAdd,
 }: CustomerTableProps) {
   const admin = useAuthStore(state => state.user?.role === "admin")
   const [searchValue, setSearchValue] =
     useState(searchQuery)
 
-
-  const [selectedIds, setSelectedIds] = useState<
-    Set<string>
-  >(() => new Set())
 
   const [previousSearchQuery, setPreviousSearchQuery] = useState(searchQuery)
   if (previousSearchQuery !== searchQuery) {
@@ -184,139 +183,28 @@ export function CustomerTable({
   // Phân trang 10 khách hàng
   const visibleCustomers = customers
 
-  const allPageSelected =
-    visibleCustomers.length > 0 &&
-    visibleCustomers.every((customer) =>
-      selectedIds.has(customer._id)
-    )
-
-  const somePageSelected =
-    visibleCustomers.some((customer) =>
-      selectedIds.has(customer._id)
-    )
-
-  function toggleRow(
-    id: string,
-    checked: boolean
-  ) {
-    setSelectedIds((previous) => {
-      const next = new Set(previous)
-
-      if (checked) {
-        next.add(id)
-      } else {
-        next.delete(id)
-      }
-
-      return next
-    })
-  }
-
-  function togglePage(checked: boolean) {
-    setSelectedIds((previous) => {
-      const next = new Set(previous)
-
-      for (const customer of visibleCustomers) {
-        if (checked) {
-          next.add(customer._id)
-        } else {
-          next.delete(customer._id)
-        }
-      }
-
-      return next
-    })
-  }
-
   return (
     <div className="w-full space-y-4">
-      {/* Tìm kiếm và thêm Customer */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <form
-          className="flex max-w-sm flex-1 items-center gap-2"
-          onSubmit={(event) => {
-            event.preventDefault()
-            onSearch(searchValue)
-
-          }}
-        >
-          <div className="relative flex-1">
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-            <Input
-              aria-label="Search customers"
-              placeholder="Search customers..."
-              value={searchValue}
-              onChange={(event) => {
-                const value = event.target.value
-
-                setSearchValue(value)
-
-                if (!value.trim() && searchQuery) {
-                  onSearch("")
-
-                }
-              }}
-              className="pl-9 pr-9"
-            />
-
-            {searchValue && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2"
-                onClick={() => {
-                  setSearchValue("")
-                  onSearch("")
-
-                }}
-              >
-                <X className="size-4" />
-                <span className="sr-only">
-                  Clear search
-                </span>
-              </Button>
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            variant="outline"
-          >
-            Search
-          </Button>
-        </form>
-
-        <CustomerFormDialog
-          onSubmit={onAdd}
-          submitLabel="Create Customer"
-        />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Tổng cộng: {total} khách hàng</p>
+        <CustomerFormDialog onSubmit={onAdd} submitLabel="Tạo khách hàng" />
       </div>
-
+      <form aria-label="Bộ lọc khách hàng" className="grid items-end gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={event => { event.preventDefault(); onSearch(searchValue) }}>
+        <Field className="lg:col-span-2"><FieldLabel htmlFor="customer-search">Tên, email hoặc số điện thoại</FieldLabel><Input id="customer-search" aria-label="Tìm khách hàng" placeholder="Tìm khách hàng..." value={searchValue} onChange={event => { setSearchValue(event.target.value); if (!event.target.value.trim() && searchQuery) onSearch("") }} /></Field>
+        <Field><FieldLabel htmlFor="customer-status">Trạng thái</FieldLabel><select id="customer-status" className="h-8 rounded-md border bg-background px-2 text-sm" value={status} onChange={event => onStatusChange?.(event.target.value === "active" ? "active" : event.target.value === "inactive" ? "inactive" : "all")}><option value="all">Tất cả trạng thái</option><option value="active">Đang hoạt động</option><option value="inactive">Ngừng hoạt động</option></select></Field>
+        <div className="flex gap-2"><Button type="submit" variant="outline"><Search />Tìm kiếm</Button><Button type="button" variant="outline" onClick={() => { setSearchValue(""); if (onResetFilters) onResetFilters(); else onSearch("") }}>Đặt lại</Button></div>
+      </form>
       {/* Bảng Customers */}
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  aria-label="Select all customers on page"
-                  checked={allPageSelected}
-                  indeterminate={
-                    !allPageSelected &&
-                    somePageSelected
-                  }
-                  onCheckedChange={(checked) =>
-                    togglePage(checked === true)
-                  }
-                />
-              </TableHead>
 
-              <TableHead>Customer</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Khách hàng</TableHead>
+              <TableHead>Điện thoại</TableHead>
+              <TableHead>Địa chỉ</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -324,20 +212,6 @@ export function CustomerTable({
             {visibleCustomers.length > 0 ? (
               visibleCustomers.map((customer) => (
                 <TableRow key={customer._id}>
-                  <TableCell>
-                    <Checkbox
-                      aria-label={`Select ${customer.first_name} ${customer.last_name}`}
-                      checked={selectedIds.has(
-                        customer._id
-                      )}
-                      onCheckedChange={(checked) =>
-                        toggleRow(
-                          customer._id,
-                          checked === true
-                        )
-                      }
-                    />
-                  </TableCell>
 
                   {/* Họ tên và Email */}
                   <TableCell>
@@ -376,23 +250,14 @@ export function CustomerTable({
                     </div>
                   </TableCell>
 
-                  {/* Ngày sinh */}
+                  <TableCell><Badge variant={customer.isActive === false ? "destructive" : "secondary"}>{customer.isActive === undefined ? "Chưa xác định" : customer.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></TableCell>
 
 
                   {/* Chỉnh sửa và xóa */}
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Link className="text-sm underline" to={`/orders?customerId=${customer._id}`}>Order history</Link>
-                      {admin && <CustomerFormDialog
-                        customer={customer}
-                        onSubmit={(values) =>
-                          onEdit(
-                            customer._id,
-                            values
-                          )
-                        }
-                        submitLabel="Save Changes"
-                      />}
+                      <Link className="text-sm underline" to={`/orders?customerId=${customer._id}`}>Lịch sử đơn hàng</Link>
+                      <CustomerProfileDialog customer={customer} />
 
                       {admin && <DeleteCustomerDialog
                         customer={customer}
@@ -408,8 +273,8 @@ export function CustomerTable({
                   colSpan={5}
                   className="h-24 text-center"
                 >
-                  No customers found.
-                  {page > 1 && <Button variant="outline" onClick={() => onPageChange(totalPages)}>Return to available customers</Button>}
+                  Không tìm thấy khách hàng.
+                  {page > 1 && <Button variant="outline" onClick={() => onPageChange(totalPages)}>Về trang khách hàng hiện có</Button>}
                 </TableCell>
               </TableRow>
             )}
@@ -418,39 +283,7 @@ export function CustomerTable({
       </div>
 
       {/* Phân trang */}
-      <nav aria-label="Customers pagination" className="flex flex-wrap items-center justify-between gap-4 py-4">
-        <span className="text-sm text-muted-foreground">
-          Total: {total} customers
-        </span>
-
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => onPageChange(page - 1)}
-          >
-            Previous
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={
-              page >= totalPages
-            }
-            onClick={() => onPageChange(page + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      </nav>
+      <ListPagination label="Customers pagination" page={page} totalPages={totalPages} onPageChange={onPageChange} />
     </div>
   )
 }

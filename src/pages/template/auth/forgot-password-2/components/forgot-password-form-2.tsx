@@ -33,7 +33,7 @@ export function ForgotPasswordForm2({
           href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-in-2"
           className="underline underline-offset-4"
         >
-          Back to sign in
+          Quay lại đăng nhập
         </a>
       </div>
     </form>

@@ -11,12 +11,12 @@ it("shows a skeleton during initial route loading and removes it when the page i
     return { Component: () => <p>Page ready</p> }
   } }])
   render(<RouterProvider router={router} />)
-  const status = screen.getByRole("status", { name: "Loading page" })
+  const status = screen.getByRole("status", { name: "Đang tải trang" })
   expect(status.getAttribute("aria-busy")).toBe("true")
   expect(status.querySelector('[data-slot="skeleton"]')).toBeTruthy()
   await act(async () => { finish!() })
   expect(await screen.findByText("Page ready")).toBeTruthy()
-  expect(screen.queryByRole("status", { name: "Loading page" })).toBeNull()
+  expect(screen.queryByRole("status", { name: "Đang tải trang" })).toBeNull()
 })
 it.each(["table", "form", "profile"] as const)("provides an accessible %s loading skeleton", variant => {
   render(<ContentSkeleton label="Loading data" variant={variant} />)

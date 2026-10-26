@@ -1,7 +1,8 @@
 import { afterEach, expect, it } from "vitest"
 import { AxiosHeaders } from "axios"
 import { api } from "@/services/api"
-import { categorySchema, createCategory, updateCategory } from "@/features/categories/services/categories.service"
+import { categorySchema } from "@/features/categories/schemas/category-schema"
+import { createCategory, updateCategory } from "@/features/categories/services/categories.service"
 
 const originalAdapter = api.defaults.adapter
 afterEach(() => { api.defaults.adapter = originalAdapter })
@@ -28,10 +29,10 @@ it("validates category thumbnails with the shared image URL rules", () => {
   for (const icon of ["ftp://example.com/icon.png", "invalid-url"]) {
     const result = categorySchema.safeParse({ name: "Phones", icon })
     expect(result.success).toBe(false)
-    if (!result.success) expect(result.error.issues[0].message).toBe("Enter a valid HTTP or HTTPS image URL.")
+    if (!result.success) expect(result.error.issues[0].message).toBe("Vui lòng nhập đường dẫn ảnh HTTP hoặc HTTPS hợp lệ.")
   }
   const result = categorySchema.safeParse({ name: "Phones", icon: `https://example.com/${"a".repeat(255)}` })
   expect(result.success).toBe(false)
-  if (!result.success) expect(result.error.issues[0].message).toBe("Image URL cannot exceed 255 characters.")
+  if (!result.success) expect(result.error.issues[0].message).toBe("Đường dẫn ảnh không được vượt quá 255 ký tự.")
   expect(categorySchema.safeParse({ name: "Phones", icon: "" }).success).toBe(true)
 })

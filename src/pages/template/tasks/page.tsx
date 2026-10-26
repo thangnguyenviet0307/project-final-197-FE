@@ -56,7 +56,7 @@ export default function TaskPage() {
   if (loading) {
     return (
       <BaseLayout
-        title="Tasks"
+        title="Công việc"
         description="A powerful task and issue tracker built with Tanstack Table."
       >
         <div className="flex items-center justify-center h-96">
@@ -68,7 +68,7 @@ export default function TaskPage() {
 
   return (
     <BaseLayout
-      title="Tasks"
+      title="Công việc"
       description="A powerful task and issue tracker built with Tanstack Table."
     >
       {/* Mobile view placeholder - shows message instead of images */}
@@ -117,7 +117,7 @@ export default function TaskPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm font-medium">
-                    Completed
+                    Hoàn tất
                   </p>
                   <div className="mt-1 flex items-baseline gap-2">
                     <span className="text-2xl font-bold">
@@ -165,7 +165,7 @@ export default function TaskPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm font-medium">
-                    Pending
+                    Chờ xử lý
                   </p>
                   <div className="mt-1 flex items-baseline gap-2">
                     <span className="text-2xl font-bold">{stats.pending}</span>

@@ -17,30 +17,30 @@ export const radiusOptions: RadiusOption[] = [
 
 // Sidebar variant options
 export const sidebarVariants: SidebarVariant[] = [
-  { name: "Default", value: "sidebar", description: "Standard sidebar layout" },
+  { name: "Mặc định", value: "sidebar", description: "Bố cục thanh bên tiêu chuẩn" },
   {
-    name: "Floating",
+    name: "Nổi",
     value: "floating",
-    description: "Floating sidebar with border",
+    description: "Thanh bên nổi có đường viền",
   },
   {
-    name: "Inset",
+    name: "Lồng trong",
     value: "inset",
-    description: "Inset sidebar with rounded corners",
+    description: "Thanh bên lồng trong có góc bo tròn",
   },
 ]
 
 // Sidebar collapsible options
 export const sidebarCollapsibleOptions: SidebarCollapsibleOption[] = [
-  { name: "Off Canvas", value: "offcanvas", description: "Slides out of view" },
-  { name: "Icon", value: "icon", description: "Collapses to icon only" },
-  { name: "None", value: "none", description: "Always visible" },
+  { name: "Ẩn ra ngoài", value: "offcanvas", description: "Trượt ra ngoài màn hình" },
+  { name: "Biểu tượng", value: "icon", description: "Thu gọn chỉ còn biểu tượng" },
+  { name: "Không", value: "none", description: "Luôn hiển thị" },
 ]
 
 // Sidebar side options
 export const sidebarSideOptions: SidebarSideOption[] = [
-  { name: "Left", value: "left" },
-  { name: "Right", value: "right" },
+  { name: "Trái", value: "left" },
+  { name: "Phải", value: "right" },
 ]
 
 // Define brand colors for custom color inputs

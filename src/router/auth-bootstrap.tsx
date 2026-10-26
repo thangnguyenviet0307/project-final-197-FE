@@ -8,8 +8,8 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
   if (loading) return <RootFallback />
   if (error) return <div className="flex min-h-svh flex-col items-center justify-center gap-4 p-6">
     <p role="alert">{error}</p>
-    <Button onClick={() => void retry()}>Try again</Button>
-    <Button variant="outline" onClick={clear}>Back to sign in</Button>
+    <Button onClick={() => void retry()}>Thử lại</Button>
+    <Button variant="outline" onClick={clear}>Quay lại đăng nhập</Button>
   </div>
   return children
 }

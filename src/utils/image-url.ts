@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const imageUrlSchema = z.string({ error: "Enter an image URL." }).trim().max(255, "Image URL cannot exceed 255 characters.").refine(
+export const imageUrlSchema = z.string({ error: "Vui lòng nhập đường dẫn ảnh." }).trim().max(255, "Đường dẫn ảnh không được vượt quá 255 ký tự.").refine(
   value => !value || (URL.canParse(value) && /^https?:\/\//i.test(value)),
-  "Enter a valid HTTP or HTTPS image URL.",
+  "Vui lòng nhập đường dẫn ảnh HTTP hoặc HTTPS hợp lệ.",
 )

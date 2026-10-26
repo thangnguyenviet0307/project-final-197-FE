@@ -17,8 +17,8 @@ import {
 } from "@/components/icons/brand-icons"
 
 const newsletterSchema = z.object({
-  email: z.email({
-    error: "Please enter a valid email address.",
+  email: z.string().email({
+    message: "Vui lòng nhập địa chỉ email hợp lệ.",
   }),
 })
 
@@ -27,16 +27,16 @@ const footerLinks = {
     { name: "Features", href: "#features" },
     { name: "Pricing", href: "#pricing" },
     { name: "API", href: "#api" },
-    { name: "Documentation", href: "#docs" },
+    { name: "Tài liệu", href: "#docs" },
   ],
   company: [
-    { name: "About", href: "#about" },
+    { name: "Giới thiệu", href: "#about" },
     { name: "Blog", href: "#blog" },
     { name: "Careers", href: "#careers" },
     { name: "Press", href: "#press" },
   ],
   resources: [
-    { name: "Help Center", href: "#help" },
+    { name: "Trung tâm trợ giúp", href: "#help" },
     { name: "Community", href: "#community" },
     { name: "Guides", href: "#guides" },
     { name: "Webinars", href: "#webinars" },
@@ -45,7 +45,7 @@ const footerLinks = {
     { name: "Privacy", href: "#privacy" },
     { name: "Terms", href: "#terms" },
     { name: "Security", href: "#security" },
-    { name: "Status", href: "#status" },
+    { name: "Trạng thái", href: "#status" },
   ],
 }
 
@@ -81,10 +81,9 @@ export function LandingFooter() {
         {/* Newsletter Section */}
         <div className="mb-16">
           <div className="mx-auto max-w-2xl text-center">
-            <h3 className="text-2xl font-bold mb-4">Stay updated</h3>
+            <h3 className="text-2xl font-bold mb-4">Nhận cập nhật</h3>
             <p className="text-muted-foreground mb-6">
-              Get the latest updates, articles, and resources sent to your inbox
-              weekly.
+              Nhận cập nhật, bài viết và tài nguyên mới qua email hằng tuần.
             </p>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -100,7 +99,7 @@ export function LandingFooter() {
                         id="footer-email"
                         aria-invalid={fieldState.invalid}
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder="Nhập địa chỉ email"
                         {...field}
                       />
                       {fieldState.invalid && (
@@ -111,7 +110,7 @@ export function LandingFooter() {
                 />
               </FieldGroup>
               <Button type="submit" className="cursor-pointer">
-                Subscribe
+                Đăng ký
               </Button>
             </form>
           </div>
@@ -132,9 +131,7 @@ export function LandingFooter() {
               </a>
             </div>
             <p className="text-muted-foreground mb-6 max-lg:text-center max-lg:flex max-lg:justify-center">
-              Accelerating web development with curated blocks, templates,
-              landing pages, and admin dashboards designed for modern
-              developers.
+              Tăng tốc phát triển web với khối giao diện, mẫu, trang giới thiệu và bảng quản trị dành cho lập trình viên.
             </p>
             <div className="flex gap-4 max-lg:justify-center">
               {socialLinks.map((social) => (
@@ -160,7 +157,7 @@ export function LandingFooter() {
 
           {/* Links Columns */}
           <div className="max-md:col-span-2 lg:col-span-1">
-            <h4 className="font-semibold mb-4">Product</h4>
+            <h4 className="font-semibold mb-4">Sản phẩm</h4>
             <ul className="flex flex-col gap-3">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
@@ -176,7 +173,7 @@ export function LandingFooter() {
           </div>
 
           <div className="max-md:col-span-2 lg:col-span-1">
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h4 className="font-semibold mb-4">Công ty</h4>
             <ul className="flex flex-col gap-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -192,7 +189,7 @@ export function LandingFooter() {
           </div>
 
           <div className="max-md:col-span-2 lg:col-span-1">
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h4 className="font-semibold mb-4">Tài nguyên</h4>
             <ul className="flex flex-col gap-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
@@ -208,7 +205,7 @@ export function LandingFooter() {
           </div>
 
           <div className="max-md:col-span-2 lg:col-span-1">
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold mb-4">Pháp lý</h4>
             <ul className="flex flex-col gap-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -230,7 +227,7 @@ export function LandingFooter() {
         <div className="flex flex-col lg:flex-row justify-between items-center gap-2">
           <div className="flex flex-col sm:flex-row items-center gap-2 text-muted-foreground text-sm">
             <div className="flex items-center gap-1">
-              <span>Made with</span>
+              <span>Được xây dựng với</span>
               <Heart className="size-4 text-destructive fill-current" />
               <span>by</span>
               <a
@@ -243,7 +240,7 @@ export function LandingFooter() {
             </div>
             <span className="hidden sm:inline">•</span>
             <span>
-              © {new Date().getFullYear()} for the developer community
+              © {new Date().getFullYear()} dành cho cộng đồng lập trình viên
             </span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-4 md:mt-0">
@@ -251,19 +248,19 @@ export function LandingFooter() {
               href="#privacy"
               className="hover:text-foreground transition-colors"
             >
-              Privacy Policy
+              Chính sách bảo mật
             </a>
             <a
               href="#terms"
               className="hover:text-foreground transition-colors"
             >
-              Terms of Service
+              Điều khoản sử dụng
             </a>
             <a
               href="#cookies"
               className="hover:text-foreground transition-colors"
             >
-              Cookie Policy
+              Chính sách cookie
             </a>
           </div>
         </div>

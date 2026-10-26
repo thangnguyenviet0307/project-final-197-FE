@@ -4,10 +4,10 @@ import { ProductImage } from "@/features/products/components/product-image"
 
 it("shows a fallback for missing and broken images and recovers when the URL changes", () => {
   const { rerender } = render(<ProductImage alt="Case" />)
-  expect(screen.getByRole("img", { name: "Case: image unavailable" })).toBeTruthy()
+  expect(screen.getByRole("img", { name: "Case: ảnh không khả dụng" })).toBeTruthy()
   rerender(<ProductImage src="/broken.png" alt="Case" />)
   fireEvent.error(screen.getByRole("img", { name: "Case" }))
-  expect(screen.getByRole("img", { name: "Case: image unavailable" })).toBeTruthy()
+  expect(screen.getByRole("img", { name: "Case: ảnh không khả dụng" })).toBeTruthy()
   rerender(<ProductImage src="/working.png" alt="Case" />)
   expect(screen.getByRole("img", { name: "Case" }).getAttribute("src")).toBe("/working.png")
 })

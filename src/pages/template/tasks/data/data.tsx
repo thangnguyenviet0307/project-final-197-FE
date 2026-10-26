@@ -26,7 +26,7 @@ export const categories = [
 export const statuses = [
   {
     value: "pending",
-    label: "Pending",
+    label: "Chờ xử lý",
     icon: Clock,
   },
   {
@@ -41,7 +41,7 @@ export const statuses = [
   },
   {
     value: "completed",
-    label: "Completed",
+    label: "Hoàn tất",
     icon: CheckCircle2,
   },
 ]

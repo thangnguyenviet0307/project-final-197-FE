@@ -20,7 +20,7 @@ export function useAvatarUpload() {
     setIsReading(false)
     if (!file) return
     if (!["image/jpeg", "image/png", "image/gif"].includes(file.type) || file.size > 800 * 1024) {
-      setAvatarError("Choose a JPG, PNG or GIF image up to 800 KB.")
+      setAvatarError("Chọn ảnh JPG, PNG hoặc GIF, dung lượng tối đa 800 KB.")
       if (fileInput.current) fileInput.current.value = ""
       return
     }
@@ -28,7 +28,7 @@ export function useAvatarUpload() {
     readerRef.current = reader
     setIsReading(true)
     reader.onload = () => { setAvatar(file); setPreview(String(reader.result)); setRemoveAvatar(false); setAvatarError(""); setIsReading(false) }
-    reader.onerror = () => { setAvatarError("Unable to read the image. Please choose another file."); setIsReading(false) }
+    reader.onerror = () => { setAvatarError("Không thể đọc ảnh. Vui lòng chọn tệp khác."); setIsReading(false) }
     reader.readAsDataURL(file)
   }
 

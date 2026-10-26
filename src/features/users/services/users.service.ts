@@ -1,16 +1,6 @@
-import { z } from "zod";
 import { api } from "@/services/api";
-import type { ApiResponse } from "@/features/auth/types/auth";
-import { passwordSchema } from "@/features/auth/schemas/auth-schemas";
-
-export const createUserSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required.").max(50, "First name cannot exceed 50 characters."),
-  lastName: z.string().trim().min(1, "Last name is required.").max(50, "Last name cannot exceed 50 characters."),
-  email: z.string().trim().check(z.email("Invalid email address.")).toLowerCase(),
-  password: passwordSchema,
-  role: z.enum(["admin", "staff"], { error: "Select Admin or Staff." }),
-});
-export type CreateUserInput = z.infer<typeof createUserSchema>;
+import type { ApiResponse } from "@/types/api";
+import type { CreateUserInput, ManagedUser, UsersFilters } from "@/features/users/types/users";
 
 export function getDefaultUserPassword(role: "admin" | "staff") {
   return role === "admin" ? "Admin123" : "Staff123"
@@ -20,23 +10,6 @@ export function getDefaultUserPassword(role: "admin" | "staff") {
 export function getTemporaryPassword(role: "admin" | "staff") {
   return getDefaultUserPassword(role)
 }
-
-export interface ManagedUser {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: "admin" | "staff";
-  active: boolean;
-  mustChangePassword?: boolean;
-  personalEmail?: string;
-  phone?: string;
-  avatar?: string;
-  location?: string;
-  bio?: string;
-}
-
-export interface UsersFilters { role?: ManagedUser["role"]; active?: boolean; sortBy?: "username"; sortOrder?: "asc" | "desc" }
 
 export async function listUsers(
   page: number,

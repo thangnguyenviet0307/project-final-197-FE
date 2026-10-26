@@ -1,40 +1,38 @@
 import { z } from "zod"
 import { catalogId, type Product, type ProductInput } from "@/features/products/types/products"
 
-const objectId = z.string().regex(/^[a-f\d]{24}$/i, "Select a valid record.")
-const numeric = (label: string) => z.number({ error: `Enter a valid number for ${label.toLowerCase()}.` })
-const stock = (label: string) => numeric(label).int(`${label} must be a whole number.`)
-  .nonnegative(`${label} cannot be negative.`).max(Number.MAX_SAFE_INTEGER, `${label} cannot exceed ${Number.MAX_SAFE_INTEGER}.`)
-const optionalText = (label: string, max: number) => z.string({ error: `${label} must be text.` }).trim().max(max, `${label} cannot exceed ${max} characters.`).nullable().optional()
+const objectId = z.string().regex(/^[a-f\d]{24}$/i, "Vui lòng chọn bản ghi hợp lệ.")
+const numeric = (label: string) => z.number({ error: `Vui lòng nhập số hợp lệ cho ${label.toLowerCase()}.` })
+const stock = (label: string) => numeric(label).int(`${label} phải là số nguyên.`)
+  .nonnegative(`${label} không được âm.`).max(Number.MAX_SAFE_INTEGER, `${label} không được vượt quá ${Number.MAX_SAFE_INTEGER}.`)
+const optionalText = (label: string, max: number) => z.string({ error: `${label} phải là văn bản.` }).trim().max(max, `${label} không được vượt quá ${max} ký tự.`).nullable().optional()
 export const variantSchema = z.object({
   _id: objectId.optional(),
-  sku: z.string({ error: "Enter a SKU." }).trim().min(3, "SKU must contain at least 3 characters.").max(64, "SKU cannot exceed 64 characters.").regex(/^[A-Z0-9-]+$/, "SKU can only contain uppercase letters, numbers and hyphens."),
-  variant_name: z.union([z.string().trim().min(1).max(100, "Variant name cannot exceed 100 characters."), z.literal(""), z.null()], { error: "Enter a variant name of 1 to 100 characters, or leave it blank." }).optional(),
-  color: optionalText("Color", 50), size: optionalText("Size", 50),
-  price: numeric("Variant price").nonnegative("Variant price cannot be negative."), compare_at_price: numeric("Compare at price").nonnegative("Compare at price cannot be negative.").nullable().optional(),
-  stock: stock("Variant stock").optional(), image: optionalText("Primary image path", 255),
-  images: z.array(z.object({ url: z.string().trim().min(1, "Enter an image path.").max(255, "Image path cannot exceed 255 characters.") })),
-  options: z.array(z.object({ name: z.string().trim().min(1, "Enter an option name."), value: z.union([z.string(), z.number(), z.boolean(), z.null()]) })).check((ctx) => {
-    const options = ctx.value
+  sku: z.string({ error: "Vui lòng nhập mã SKU." }).trim().min(3, "Mã SKU phải có ít nhất 3 ký tự.").max(64, "Mã SKU không được vượt quá 64 ký tự.").regex(/^[A-Z0-9-]+$/, "Mã SKU chỉ được chứa chữ in hoa, chữ số và dấu gạch nối."),
+  variant_name: z.union([z.string().trim().min(1).max(100, "Tên biến thể không được vượt quá 100 ký tự."), z.literal(""), z.null()], { error: "Nhập tên biến thể từ 1 đến 100 ký tự, hoặc để trống." }).optional(),
+  color: optionalText("Màu sắc", 50), size: optionalText("Kích thước", 50),
+  price: numeric("Giá biến thể").nonnegative("Giá biến thể không được âm."), compare_at_price: numeric("Giá so sánh").nonnegative("Giá so sánh không được âm.").nullable().optional(),
+  stock: stock("Tồn kho biến thể").optional(), image: optionalText("Đường dẫn ảnh chính", 255),
+  images: z.array(z.object({ url: z.string().trim().min(1, "Vui lòng nhập đường dẫn ảnh.").max(255, "Đường dẫn ảnh không được vượt quá 255 ký tự.") })),
+  options: z.array(z.object({ name: z.string().trim().min(1, "Vui lòng nhập tên tùy chọn."), value: z.union([z.string(), z.number(), z.boolean(), z.null()]) })).superRefine((options, ctx) => {
     const names = new Set<string>()
     options.forEach((option, index) => {
-      if (names.has(option.name)) ctx.issues.push({ code: "custom", continue: true, input: option.name, path: [index, "name"], message: "Option names must be unique." })
+      if (names.has(option.name)) ctx.addIssue({ code: "custom", path: [index, "name"], message: "Tên tùy chọn không được trùng nhau." })
       names.add(option.name)
     })
   }),
 })
 export const productSchema = z.object({
-  product_name: z.string({ error: "Enter a product name." }).trim().min(3, "Product name must contain at least 3 characters.").max(255, "Product name cannot exceed 255 characters."),
-  category: z.string().regex(/^[a-f\d]{24}$/i, "Select a valid category."), brand: z.string().regex(/^[a-f\d]{24}$/i, "Select a valid brand."),
-  model_year: numeric("Model year").int("Model year must be a whole year.").min(1900, "Model year must be 1900 or later.").max(new Date().getFullYear() + 2, `Model year cannot be later than ${new Date().getFullYear() + 2}.`),
-  price: numeric("Price").nonnegative("Price cannot be negative.").optional(), discount: numeric("Discount").min(0, "Discount cannot be negative.").max(70, "Discount cannot exceed 70%."),
-  description: optionalText("Description", 2000), thumbnail: optionalText("Thumbnail path", 255),
-  stock: stock("Stock").optional(), is_active: z.boolean(), variants: z.array(variantSchema),
-}).check((ctx) => {
-  const { variants } = ctx.value
+  product_name: z.string({ error: "Vui lòng nhập tên sản phẩm." }).trim().min(3, "Tên sản phẩm phải có ít nhất 3 ký tự.").max(255, "Tên sản phẩm không được vượt quá 255 ký tự."),
+  category: z.string().regex(/^[a-f\d]{24}$/i, "Vui lòng chọn danh mục hợp lệ."), brand: z.string().regex(/^[a-f\d]{24}$/i, "Vui lòng chọn thương hiệu hợp lệ."),
+  model_year: numeric("Năm sản xuất").int("Năm sản xuất phải là số nguyên.").min(1900, "Năm sản xuất phải từ 1900 trở đi.").max(new Date().getFullYear() + 2, `Năm sản xuất không được sau ${new Date().getFullYear() + 2}.`),
+  price: numeric("Giá").nonnegative("Giá không được âm.").optional(), discount: numeric("Giảm giá").min(0, "Mức giảm giá không được âm.").max(70, "Mức giảm giá không được vượt quá 70%."),
+  description: optionalText("Mô tả", 2000), thumbnail: optionalText("Đường dẫn ảnh đại diện", 255),
+  stock: stock("Tồn kho").optional(), is_active: z.boolean(), variants: z.array(variantSchema),
+}).superRefine(({ variants }, ctx) => {
   const skus = new Set<string>()
   variants.forEach((variant, index) => {
-    if (skus.has(variant.sku)) ctx.issues.push({ code: "custom", continue: true, input: variant.sku, path: ["variants", index, "sku"], message: "SKU must be unique." })
+    if (skus.has(variant.sku)) ctx.addIssue({ code: "custom", path: ["variants", index, "sku"], message: "Mã SKU không được trùng nhau." })
     skus.add(variant.sku)
   })
 })

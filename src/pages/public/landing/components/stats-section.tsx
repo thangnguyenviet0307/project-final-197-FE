@@ -8,26 +8,26 @@ const stats = [
   {
     icon: Package,
     value: "500+",
-    label: "Components",
-    description: "Ready-to-use blocks",
+    label: "Thành phần",
+    description: "Khối giao diện sẵn dùng",
   },
   {
     icon: Download,
     value: "25K+",
-    label: "Downloads",
-    description: "Trusted worldwide",
+    label: "Lượt tải",
+    description: "Được tin dùng toàn cầu",
   },
   {
     icon: Users,
     value: "10K+",
-    label: "Developers",
-    description: "Active community",
+    label: "Lập trình viên",
+    description: "Cộng đồng năng động",
   },
   {
     icon: Star,
     value: "4.9",
-    label: "Rating",
-    description: "User satisfaction",
+    label: "Đánh giá",
+    description: "Sự hài lòng của người dùng",
   },
 ]
 

@@ -10,7 +10,7 @@ import faqsData from "@/pages/template/pricing/data/faqs.json"
 export default function PricingPage() {
   return (
     <BaseLayout
-      title="Pricing Plans"
+      title="Các gói dịch vụ"
       description="Choose the perfect plan for your team"
     >
       <div className="px-4 lg:px-6">

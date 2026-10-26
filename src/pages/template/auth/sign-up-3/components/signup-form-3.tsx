@@ -34,11 +34,11 @@ export function SignupForm3({
               </div>
               <FieldGroup className="grid grid-cols-2 gap-3">
                 <Field>
-                  <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+                  <FieldLabel htmlFor="firstName">Tên</FieldLabel>
                   <Input id="firstName" placeholder="John" required />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+                  <FieldLabel htmlFor="lastName">Họ</FieldLabel>
                   <Input id="lastName" placeholder="Doe" required />
                 </Field>
               </FieldGroup>
@@ -52,7 +52,7 @@ export function SignupForm3({
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">Mật khẩu</FieldLabel>
                 <Input id="password" type="password" required />
               </Field>
               <Field>
@@ -69,14 +69,14 @@ export function SignupForm3({
                     href="#"
                     className="underline underline-offset-4 hover:text-primary"
                   >
-                    Terms of Service
+                    Điều khoản sử dụng
                   </a>{" "}
                   and{" "}
                   <a
                     href="#"
                     className="underline underline-offset-4 hover:text-primary"
                   >
-                    Privacy Policy
+                    Chính sách bảo mật
                   </a>
                 </FieldLabel>
               </Field>
@@ -135,7 +135,7 @@ export function SignupForm3({
                   href="/templates/dashboard/shadcn-dashboard-landing-template/auth/sign-in-3"
                   className="underline underline-offset-4"
                 >
-                  Sign in
+                  Đăng nhập
                 </a>
               </div>
             </FieldGroup>
@@ -150,8 +150,8 @@ export function SignupForm3({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Điều khoản sử dụng</a>{" "}
+        and <a href="#">Chính sách bảo mật</a>.
       </div>
     </div>
   )

@@ -19,7 +19,7 @@ it("allows products without a price or variants and enforces backend limits", ()
 })
 it("rejects invalid SKUs, duplicate SKUs, negative prices and duplicate option names", () => {
   const variant = { sku: "CASE-1", price: 0, stock: 0, images: [], options: [] }
-  for (const variants of [[{ ...variant, sku: "lower" }], [variant, variant], [{ ...variant, price: -1 }], [{ ...variant, options: [{ name: "Color", value: "red" }, { name: "Color", value: "blue" }] }]]) {
+  for (const variants of [[{ ...variant, sku: "lower" }], [variant, variant], [{ ...variant, price: -1 }], [{ ...variant, options: [{ name: "Màu sắc", value: "red" }, { name: "Màu sắc", value: "blue" }] }]]) {
     expect(productSchema.safeParse({ ...values(), variants }).success).toBe(false)
   }
 })
@@ -28,8 +28,8 @@ it("reports duplicate options and SKUs together at their original field paths", 
   const result = productSchema.safeParse({ ...values(), variants: [variant, { ...variant, options: [] }] })
   expect(result.success).toBe(false)
   if (!result.success) expect(result.error.issues.map(({ path, message }) => ({ path, message }))).toEqual([
-    { path: ["variants", 0, "options", 1, "name"], message: "Option names must be unique." },
-    { path: ["variants", 1, "sku"], message: "SKU must be unique." },
+    { path: ["variants", 0, "options", 1, "name"], message: "Tên tùy chọn không được trùng nhau." },
+    { path: ["variants", 1, "sku"], message: "Mã SKU không được trùng nhau." },
   ])
 })
 it("preserves variant IDs, typed attributes and image paths when editing", () => {

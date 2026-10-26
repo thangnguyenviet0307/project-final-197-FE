@@ -65,7 +65,7 @@ export const columns: ColumnDef<DataTableFeatures, Task>[] = [
   {
     accessorKey: "category",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
+      <DataTableColumnHeader column={column} title="Danh mục" />
     ),
     cell: ({ row }) => {
       const category = categories.find(
@@ -89,7 +89,7 @@ export const columns: ColumnDef<DataTableFeatures, Task>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = statuses.find(

@@ -211,7 +211,7 @@ export function CalendarMain({ eventDates = [] }: CalendarMainProps) {
     <div className="size-full bg-background border-r">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold">Calendar</h2>
+          <h2 className="font-semibold">Lịch</h2>
           <Button size="sm" onClick={handleNewEvent}>
             <Plus data-icon="inline-start" />
             Event
@@ -308,7 +308,7 @@ export function CalendarMain({ eventDates = [] }: CalendarMainProps) {
                 <div className="hidden sm:flex items-center gap-2">
                   <Button variant="ghost" size="sm" className="text-xs">
                     <Search data-icon="inline-start" />
-                    Search
+                    Tìm kiếm
                   </Button>
                 </div>
 
@@ -361,7 +361,7 @@ export function CalendarMain({ eventDates = [] }: CalendarMainProps) {
       <Sheet open={showCalendarSheet} onOpenChange={setShowCalendarSheet}>
         <SheetContent side="left" className="w-80 p-0">
           <SheetHeader className="p-4 pb-2">
-            <SheetTitle>Calendar</SheetTitle>
+            <SheetTitle>Lịch</SheetTitle>
             <SheetDescription>
               Browse dates and manage your calendar events
             </SheetDescription>

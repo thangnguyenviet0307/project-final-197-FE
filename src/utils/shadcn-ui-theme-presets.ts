@@ -2,7 +2,7 @@ import type { ThemePreset } from "../types/theme"
 
 export const shadcnThemePresets: Record<string, ThemePreset> = {
   default: {
-    label: "Default",
+    label: "Mặc định",
     styles: {
       light: {
         background: "oklch(1 0 0)",

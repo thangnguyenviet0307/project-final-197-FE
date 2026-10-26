@@ -295,14 +295,14 @@ export function MessageList({
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer">
                                   <Copy />
-                                  Copy
+                                  Sao chép
                                 </DropdownMenuItem>
                                 {isOwnMessage && (
                                   <>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="cursor-pointer text-destructive">
                                       <Trash2 />
-                                      Delete
+                                      Xóa
                                     </DropdownMenuItem>
                                   </>
                                 )}

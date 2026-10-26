@@ -28,16 +28,16 @@ function apiError({
 
 it("distinguishes incorrect or disabled sign-in from an expired authenticated session", () => {
   expect(getApiError(apiError({ status: 401, url: "/auth/login" })).message)
-    .toBe("The email or password is incorrect, or this account is disabled.")
+    .toBe("Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa.")
   expect(getApiError(apiError({ status: 401, message: "Unauthorized", url: "/auth/login" })).message)
-    .toBe("The email or password is incorrect, or this account is disabled.")
+    .toBe("Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa.")
   expect(getApiError(apiError({ status: 401, url: "/auth/me" })).message)
-    .toBe("Your session has expired or is no longer valid. Please sign in again.")
+    .toBe("Phiên đăng nhập đã hết hạn hoặc không còn hợp lệ. Vui lòng đăng nhập lại.")
 })
 
 it("translates known Vietnamese auth messages and preserves specific backend errors", () => {
   expect(getApiError(apiError({ status: 401, message: "Email hoặc mật khẩu không chính xác" })).message)
-    .toBe("The email or password is incorrect, or this account is disabled.")
+    .toBe("Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa.")
   expect(getApiError(apiError({ status: 409, message: "Cannot delete a user referenced by orders" })).message)
     .toBe("Cannot delete a user referenced by orders")
   expect(getApiError(apiError({ status: 400, message: "Mã đơn hàng do máy chủ trả về" })).message)
@@ -50,39 +50,39 @@ it("shows localized validation details instead of the generic validation title",
     message: "Validation failed",
     errors: [{ field: "phone", message: "Số điện thoại không hợp lệ" }],
   }))).toMatchObject({
-    message: "Phone number: Enter a valid phone number.",
-    errors: [{ field: "phone", message: "Enter a valid phone number." }],
+    message: "Số điện thoại: Vui lòng nhập số điện thoại hợp lệ.",
+    errors: [{ field: "phone", message: "Vui lòng nhập số điện thoại hợp lệ." }],
   })
 })
 
 it.each([
-  [400, "The request contains invalid or incomplete information. Review the indicated fields and try again."],
-  [403, "Your account does not have permission to perform this action."],
-  [404, "The requested record or API endpoint could not be found."],
-  [409, "This operation conflicts with the current data. Review the details and try again."],
-  [413, "The selected file or request is too large. Choose a smaller file and try again."],
-  [415, "This file type is not supported. Choose a supported file format and try again."],
-  [429, "Too many requests were made. Wait a few minutes before trying again."],
-  [503, "The API is temporarily unavailable. Check that the backend is running and try again."],
+  [400, "Thông tin không hợp lệ hoặc chưa đầy đủ. Hãy kiểm tra các trường được đánh dấu và thử lại."],
+  [403, "Tài khoản của bạn không có quyền thực hiện thao tác này."],
+  [404, "Không tìm thấy dữ liệu hoặc dịch vụ được yêu cầu."],
+  [409, "Thao tác xung đột với dữ liệu hiện tại. Hãy kiểm tra thông tin và thử lại."],
+  [413, "Tệp hoặc yêu cầu quá lớn. Hãy chọn tệp nhỏ hơn và thử lại."],
+  [415, "Loại tệp không được hỗ trợ. Hãy chọn định dạng phù hợp và thử lại."],
+  [429, "Có quá nhiều yêu cầu. Vui lòng chờ vài phút rồi thử lại."],
+  [503, "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau."],
 ])("uses a status-specific fallback for HTTP %i", (status, message) => {
   expect(getApiError(apiError({ status })).message).toBe(message)
 })
 
 it("explains network, timeout, and canceled requests separately", () => {
   expect(getApiError(apiError({ code: "ERR_NETWORK" })).message)
-    .toBe("Could not reach the API. Check that the backend is running and that your network connection is available.")
+    .toBe("Không thể kết nối dịch vụ. Hãy kiểm tra kết nối mạng và thử lại.")
   expect(getApiError(apiError({ code: "ECONNABORTED" })).message)
-    .toBe("The API took too long to respond. Check your connection and try again.")
+    .toBe("Dịch vụ phản hồi quá chậm. Hãy kiểm tra kết nối và thử lại.")
   expect(getApiError(new axios.CanceledError("canceled")).message)
-    .toBe("The request was canceled because the page or sign-in session changed. Retry the action if it did not complete.")
+    .toBe("Yêu cầu đã bị hủy do trang hoặc phiên đăng nhập thay đổi. Hãy thử lại nếu thao tác chưa hoàn tất.")
 })
 
 it.each([
-  ["body.variants.0.stock", "Too small: expected number to be >=0", "Variant 1 stock cannot be negative."],
-  ["body.variants[1].price", "Too small: expected number to be >=0", "Variant 2 price cannot be negative."],
-  ["body.variants.0.stock", "Invalid input: expected int, received number", "Variant 1 stock must be a whole number."],
-  ["body.discount", "Too big: expected number to be <=70", "Discount must be no more than 70."],
-  ["body.firstName", "Too big: expected string to have <=50 characters", "First name cannot exceed 50 characters."],
+  ["body.variants.0.stock", "Too small: expected number to be >=0", "Biến thể 1: tồn kho không được âm."],
+  ["body.variants[1].price", "Too small: expected number to be >=0", "Biến thể 2: giá không được âm."],
+  ["body.variants.0.stock", "Invalid input: expected int, received number", "Biến thể 1: tồn kho phải là số nguyên."],
+  ["body.discount", "Too big: expected number to be <=70", "Giảm giá phải không quá 70."],
+  ["body.firstName", "Too big: expected string to have <=50 characters", "Tên không được vượt quá 50 ký tự."],
 ])("formats a backend validation error for %s without exposing schema wording", (field, raw, message) => {
   const failure = getApiError(apiError({ status: 400, message: "Validation failed", errors: [{ field, message: raw }] }))
   expect(failure.errors).toEqual([{ field, message }])

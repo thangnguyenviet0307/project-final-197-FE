@@ -17,9 +17,9 @@ const team = [
   {
     id: 1,
     name: "Alexandra Chen",
-    role: "Founder & CEO",
+    role: "Nhà sáng lập và giám đốc điều hành",
     description:
-      "Former co-founder of TechFlow. Early staff at Microsoft and Google.",
+      "Từng đồng sáng lập TechFlow và làm việc tại Microsoft, Google.",
     image:
       "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=60&w=150&auto=format&fit=crop",
     fallback: "AC",
@@ -32,8 +32,8 @@ const team = [
   {
     id: 2,
     name: "Marcus Rodriguez",
-    role: "Engineering Manager",
-    description: "Lead engineering teams at Stripe, Discord, and Meta Labs.",
+    role: "Quản lý kỹ thuật",
+    description: "Từng dẫn dắt đội ngũ kỹ thuật tại Stripe, Discord và Meta Labs.",
     image:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=60&w=150&auto=format&fit=crop",
     fallback: "MR",
@@ -46,8 +46,8 @@ const team = [
   {
     id: 3,
     name: "Sophie Laurent",
-    role: "Product Manager",
-    description: "Former PM for Linear, Lambda School, and On Deck.",
+    role: "Quản lý sản phẩm",
+    description: "Từng quản lý sản phẩm tại Linear, Lambda School và On Deck.",
     image:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=60&w=150&auto=format&fit=crop",
     fallback: "SL",
@@ -60,8 +60,8 @@ const team = [
   {
     id: 4,
     name: "David Kim",
-    role: "Frontend Developer",
-    description: "Former frontend dev for Linear, Coinbase, and PostScript.",
+    role: "Lập trình viên giao diện",
+    description: "Từng phát triển giao diện tại Linear, Coinbase và PostScript.",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=60&w=150&auto=format&fit=crop",
     fallback: "DK",
@@ -74,8 +74,8 @@ const team = [
   {
     id: 5,
     name: "Emma Thompson",
-    role: "Backend Developer",
-    description: "Lead backend dev at Clearbit. Former Clearbit and Loom.",
+    role: "Lập trình viên máy chủ",
+    description: "Phụ trách phát triển hệ thống máy chủ tại Clearbit, từng làm việc tại Loom.",
     image:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=60&w=150&auto=format&fit=crop",
     fallback: "ET",
@@ -88,9 +88,9 @@ const team = [
   {
     id: 6,
     name: "Ryan Mitchell",
-    role: "Product Designer",
+    role: "Nhà thiết kế sản phẩm",
     description:
-      "Founding design team at Figma. Former Pleo, Stripe, and Tile.",
+      "Thành viên đội thiết kế ban đầu của Figma, từng làm việc tại Pleo, Stripe và Tile.",
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=60&w=150&auto=format&fit=crop",
     fallback: "RM",
@@ -105,7 +105,7 @@ const team = [
     name: "James Anderson",
     role: "UX Researcher",
     description:
-      "Lead user research for Slack. Contractor for Netflix and Udacity.",
+      "Phụ trách nghiên cứu người dùng cho Slack, cộng tác với Netflix và Udacity.",
     image:
       "https://images.unsplash.com/photo-1566492031773-4f4e44671d66?q=60&w=150&auto=format&fit=crop",
     fallback: "JA",
@@ -118,8 +118,8 @@ const team = [
   {
     id: 8,
     name: "Isabella Garcia",
-    role: "Customer Success",
-    description: "Lead CX at Wealthsimple. Former PagerDuty and Squreen.",
+    role: "Chuyên viên hỗ trợ khách hàng",
+    description: "Phụ trách trải nghiệm khách hàng tại Wealthsimple, từng làm việc tại PagerDuty và Squreen.",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=60&w=150&auto=format&fit=crop",
     fallback: "IG",
@@ -138,15 +138,13 @@ export function TeamSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-4xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            Our Team
+            Đội ngũ của chúng tôi
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
-            Meet our team
+            Gặp gỡ đội ngũ
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            We are a passionate team of innovators, builders, and
-            problem-solvers dedicated to creating exceptional digital
-            experiences that make a difference.
+            Chúng tôi là đội ngũ yêu thích sáng tạo và giải quyết vấn đề, luôn hướng đến những trải nghiệm số hữu ích.
           </p>
         </div>
 

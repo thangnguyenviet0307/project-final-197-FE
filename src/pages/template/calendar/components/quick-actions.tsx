@@ -32,7 +32,7 @@ export function QuickActions({
   const quickStats = [
     { label: "Today's Events", value: "3", color: "bg-blue-500" },
     { label: "This Week", value: "12", color: "bg-green-500" },
-    { label: "Pending", value: "2", color: "bg-orange-500" },
+    { label: "Chờ xử lý", value: "2", color: "bg-orange-500" },
   ]
 
   return (
@@ -40,7 +40,7 @@ export function QuickActions({
       {/* Quick Stats */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">Overview</CardTitle>
+          <CardTitle className="text-sm font-medium">Tổng quan</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {quickStats.map((stat, index) => (
@@ -117,7 +117,7 @@ export function QuickActions({
             onClick={onSettings}
           >
             <Settings data-icon="inline-start" />
-            Settings
+            Cài đặt
           </Button>
         </CardContent>
       </Card>

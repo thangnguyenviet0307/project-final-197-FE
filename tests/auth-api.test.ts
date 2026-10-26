@@ -11,7 +11,7 @@ const oldTokens = { accessToken: "old-access", refreshToken: "old-refresh" }
 const newTokens = { accessToken: "new-access", refreshToken: "new-refresh" }
 const response = (config: InternalAxiosRequestConfig, data: unknown, status = 200) => ({ data, status, statusText: "", headers: new AxiosHeaders(), config })
 function unauthorized(config: InternalAxiosRequestConfig, status = 401) {
-  return new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, undefined, response(config, { message: "Unauthorized" }, status))
+  return new AxiosError("Chưa xác thực", "ERR_BAD_REQUEST", config, undefined, response(config, { message: "Chưa xác thực" }, status))
 }
 const apiAdapter = api.defaults.adapter
 const authAdapter = authApi.defaults.adapter

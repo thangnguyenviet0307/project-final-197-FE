@@ -43,7 +43,7 @@ export function LoginForm3({
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">Mật khẩu</FieldLabel>
                   <a
                     href="/templates/dashboard/shadcn-dashboard-landing-template/auth/forgot-password-3"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
@@ -128,8 +128,8 @@ export function LoginForm3({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Điều khoản sử dụng</a>{" "}
+        and <a href="#">Chính sách bảo mật</a>.
       </div>
     </div>
   )

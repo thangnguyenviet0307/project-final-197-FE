@@ -15,27 +15,27 @@ import { Github } from "@/components/icons/brand-icons"
 const values = [
   {
     icon: Code,
-    title: "Developer First",
+    title: "Ưu tiên lập trình viên",
     description:
-      "Every component is built with the developer experience in mind, ensuring clean code and easy integration.",
+      "Mỗi thành phần được xây dựng để dễ sử dụng, có mã nguồn rõ ràng và dễ tích hợp.",
   },
   {
     icon: Palette,
-    title: "Design Excellence",
+    title: "Thiết kế chất lượng",
     description:
-      "We maintain the highest design standards, following shadcn/ui principles and modern UI patterns.",
+      "Chúng tôi duy trì tiêu chuẩn thiết kế cao, tuân theo nguyên tắc shadcn/ui và các mẫu giao diện hiện đại.",
   },
   {
     icon: Layout,
-    title: "Production Ready",
+    title: "Sẵn sàng triển khai",
     description:
-      "Battle-tested components used in real applications with proven performance and reliability across different environments.",
+      "Các thành phần đã được sử dụng trong ứng dụng thực tế, có hiệu năng và độ ổn định được kiểm chứng.",
   },
   {
     icon: Crown,
-    title: "Premium Quality",
+    title: "Chất lượng cao cấp",
     description:
-      "Hand-crafted with attention to detail and performance optimization, ensuring exceptional user experience and accessibility.",
+      "Chú trọng từng chi tiết và tối ưu hiệu năng, mang lại trải nghiệm tốt và khả năng tiếp cận cho mọi người dùng.",
   },
 ]
 
@@ -46,15 +46,13 @@ export function AboutSection() {
         {/* Section Header */}
         <div className="mx-auto max-w-4xl text-center mb-16">
           <Badge variant="outline" className="mb-4">
-            About ShadcnStore
+            Về ShadcnStore
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
-            Built for developers, by developers
+            Được lập trình viên xây dựng, dành cho lập trình viên
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            We're passionate about creating the best marketplace for shadcn/ui
-            components and templates. Our mission is to accelerate development
-            and help developers build beautiful admin interfaces faster.
+            Chúng tôi xây dựng thư viện thành phần và giao diện mẫu shadcn/ui để giúp lập trình viên phát triển giao diện quản trị đẹp mắt nhanh hơn.
           </p>
         </div>
 
@@ -81,7 +79,7 @@ export function AboutSection() {
         <div className="mt-16 text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="text-muted-foreground">
-              ❤️ Made with love for the developer community
+              ❤️ Được xây dựng với tâm huyết dành cho cộng đồng lập trình viên
             </span>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -98,7 +96,7 @@ export function AboutSection() {
               }
             >
               <Github data-icon="inline-start" />
-              Star on GitHub
+              Đánh dấu sao trên GitHub
             </Button>
             <Button
               size="lg"
@@ -113,7 +111,7 @@ export function AboutSection() {
                 />
               }
             >
-              Join Discord Community
+              Tham gia cộng đồng Discord
             </Button>
           </div>
         </div>

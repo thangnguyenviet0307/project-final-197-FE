@@ -12,9 +12,9 @@ import { api, clearAuth } from "@/services/api"
 
 vi.mock("@/layout/admin/command-search", () => ({
   CommandSearch: () => null,
-  SearchTrigger: () => <button>Search</button>,
+  SearchTrigger: () => <button>Tìm kiếm</button>,
 }))
-vi.mock("@/components/mode-toggle", () => ({ ModeToggle: () => <button>Theme</button> }))
+vi.mock("@/components/mode-toggle", () => ({ ModeToggle: () => <button>Chủ đề</button> }))
 
 const user = { id: "self", name: "Test User", firstName: "Test", lastName: "User", email: "test@example.com", role: "staff" as const, mustChangePassword: false }
 const originalAdapter = api.defaults.adapter
@@ -30,9 +30,9 @@ it("keeps profile/password/logout inside the account menu and uses avatar initia
   </SidebarProvider></MemoryRouter></QueryClientProvider>)
   expect(screen.getByText("TU")).toBeTruthy()
   fireEvent.click(screen.getByRole("button", { name: "Account menu Test User" }))
-  expect((await screen.findByRole("menuitem", { name: "User Profile" })).getAttribute("href")).toBe("/settings/user")
-  expect(screen.getByRole("menuitem", { name: "Change password" }).getAttribute("href")).toBe("/change-password")
-  expect(screen.getByRole("menuitem", { name: "Sign out" })).toBeTruthy()
+  expect((await screen.findByRole("menuitem", { name: "Hồ sơ người dùng" })).getAttribute("href")).toBe("/settings/user")
+  expect(screen.getByRole("menuitem", { name: "Đổi mật khẩu" }).getAttribute("href")).toBe("/change-password")
+  expect(screen.getByRole("menuitem", { name: "Đăng xuất" })).toBeTruthy()
   expect(screen.queryByRole("menuitem", { name: /billing/i })).toBeNull()
 })
 
@@ -43,7 +43,7 @@ it("account-menu logout calls the Backend, clears the session, and opens login",
     <Route path="/login" element={<p>Login page</p>} />
   </Routes></MemoryRouter></QueryClientProvider>)
   fireEvent.click(screen.getByRole("button", { name: "Account menu Test User" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Sign out" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Đăng xuất" }))
   expect(await screen.findByText("Login page")).toBeTruthy()
   expect(useAuthStore.getState().isAuthenticated).toBe(false)
   expect(api.defaults.adapter).toHaveBeenCalledWith(expect.objectContaining({ method: "post", url: "/auth/logout" }))
@@ -51,7 +51,7 @@ it("account-menu logout calls the Backend, clears the session, and opens login",
 
 it("does not show password or logout actions in the top header", () => {
   render(<MemoryRouter><SidebarProvider><SiteHeader /></SidebarProvider></MemoryRouter>)
-  expect(screen.queryByText("Change password")).toBeNull()
-  expect(screen.queryByRole("button", { name: "Sign out" })).toBeNull()
-  expect(screen.getByText("staff")).toBeTruthy()
+  expect(screen.queryByText("Đổi mật khẩu")).toBeNull()
+  expect(screen.queryByRole("button", { name: "Đăng xuất" })).toBeNull()
+  expect(screen.getByText("Nhân viên")).toBeTruthy()
 })

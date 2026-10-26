@@ -238,7 +238,7 @@ export function EventForm({
             <Field>
               <FieldLabel className="flex items-center gap-2">
                 <CalendarIcon className="size-4" />
-                Date
+                Ngày
               </FieldLabel>
               <Popover open={showCalendar} onOpenChange={setShowCalendar}>
                 <PopoverTrigger
@@ -319,7 +319,7 @@ export function EventForm({
             </Field>
 
             <FieldSet>
-              <FieldLegend variant="label">Options</FieldLegend>
+              <FieldLegend variant="label">Tùy chọn</FieldLegend>
               <FieldGroup className="flex-row items-center gap-4 h-10">
                 <Field orientation="horizontal">
                   <Switch
@@ -353,7 +353,7 @@ export function EventForm({
           <Field>
             <FieldLabel htmlFor="location" className="flex items-center gap-2">
               <MapPin className="size-4" />
-              Location
+              Địa điểm
             </FieldLabel>
             <Input
               id="location"
@@ -424,7 +424,7 @@ export function EventForm({
 
           {/* Description */}
           <Field>
-            <FieldLabel htmlFor="description">Description</FieldLabel>
+            <FieldLabel htmlFor="description">Mô tả</FieldLabel>
             <Textarea
               id="description"
               placeholder="Add description..."
@@ -450,7 +450,7 @@ export function EventForm({
                 variant="destructive"
                 className="cursor-pointer"
               >
-                Delete
+                Xóa
               </Button>
             )}
             <Button
@@ -458,7 +458,7 @@ export function EventForm({
               variant="outline"
               className="cursor-pointer"
             >
-              Cancel
+              Hủy
             </Button>
           </div>
         </FieldGroup>

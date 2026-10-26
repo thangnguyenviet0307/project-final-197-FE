@@ -15,13 +15,13 @@ export function ReassignOrderAction({ order, disabled }: { order: Order; disable
   const current = typeof order.userId === "string" ? order.userId : order.userId?._id
   if (role !== "admin" || ![1, 2].includes(order.orderStatus)) return null
   return <>
-    <Button size="sm" variant="outline" disabled={disabled || mutation.isPending} onClick={() => { mutation.reset(); setHandler(""); setOpen(true) }}>Reassign handler</Button>
+    <Button size="sm" variant="outline" disabled={disabled || mutation.isPending} onClick={() => { mutation.reset(); setHandler(""); setOpen(true) }}>Đổi người xử lý</Button>
     <Dialog open={open} onOpenChange={value => { if (!mutation.isPending) setOpen(value) }}>
       <DialogContent showCloseButton={!mutation.isPending}>
-        <DialogHeader><DialogTitle>Reassign order handler</DialogTitle><DialogDescription>Select an active staff member. Order status and inventory will stay the same.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Đổi nhân viên xử lý đơn hàng</DialogTitle><DialogDescription>Chọn nhân viên đang hoạt động. Trạng thái đơn hàng và tồn kho sẽ được giữ nguyên.</DialogDescription></DialogHeader>
         {open && <HandlerPicker selected={handler} onSelect={setHandler} disabled={mutation.isPending} />}
         {mutation.error && <p role="alert" className="text-destructive">{getApiError(mutation.error).message}</p>}
-        <DialogFooter><Button variant="outline" disabled={mutation.isPending} onClick={() => setOpen(false)}>Cancel</Button><Button disabled={disabled || mutation.isPending || !handler || handler === current || ![1, 2].includes(order.orderStatus)} onClick={() => mutation.mutate({ id: order._id, userId: handler }, { onSuccess: () => setOpen(false) })}>Confirm reassignment</Button></DialogFooter>
+        <DialogFooter><Button variant="outline" disabled={mutation.isPending} onClick={() => setOpen(false)}>Hủy</Button><Button disabled={disabled || mutation.isPending || !handler || handler === current || ![1, 2].includes(order.orderStatus)} onClick={() => mutation.mutate({ id: order._id, userId: handler }, { onSuccess: () => setOpen(false) })}>Xác nhận đổi nhân viên</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   </>

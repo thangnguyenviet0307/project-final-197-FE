@@ -10,7 +10,11 @@
 
 ## Accounts and navigation
 
-Admin provisions staff/admin accounts at `/users`. There is no public registration. Share temporary credentials privately. New accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
+Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. All sign-ins from this form return to `/`. Authenticated sessions opening customer sign-in/registration also return to `/`, regardless of role. Storefront account links stay on the storefront and sign-out returns to `/account/login`. `/login` remains the separate administration sign-in page.
+
+`/register` validates customer names (1–50 characters), email, password and confirmation, then sends only firstName, lastName, email and password to `POST /auth/register`. Successful registration opens `/account/login` with a confirmation message and empty password field; it does not sign in automatically. Successful customer sign-in opens the storefront homepage `/`. Customer account pages remain previews.
+
+Admin provisions staff/admin accounts at `/users`; public registration creates only customer accounts. Share temporary staff/admin credentials privately. Admin-provisioned accounts and password resets require a password change on first sign-in. Changing or resetting a password revokes previous sessions.
 
 Creation uses `Admin123` for admin accounts and `Staff123` for staff accounts. Password resets use the same role-based demo defaults; share them privately. The creation form updates the temporary password when the selected role changes. The Users Full name column shows only saved first/last names and remains blank when no name is recorded.
 
@@ -29,6 +33,7 @@ All paths below follow `/api/v1`. Responses use `{ success, statusCode, message,
 | Method | Path | Purpose |
 | --- | --- | --- |
 | POST | `/auth/login` | Email/password sign-in; browser returns user/access token and sets refresh cookie |
+| POST | `/auth/register` | Create customer account; return public user without signing in |
 | GET | `/auth/me` | Current user/profile and password-change requirement |
 | PATCH | `/auth/me` | Update own profile using multipart FormData |
 | POST | `/auth/refresh` | Browser: rotate using HttpOnly cookie + custom transport header; non-browser: `{ refreshToken }` |

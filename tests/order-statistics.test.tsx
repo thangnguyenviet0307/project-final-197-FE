@@ -16,7 +16,7 @@ it("counts all orders by status using metadata and refreshes after order invalid
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: config.params.orderStatus * multiplier } } }
   }
   render(<QueryClientProvider client={client}><OrderStatistics /></QueryClientProvider>)
-  const section = screen.getByRole("region", { name: "Order statistics" })
+  const section = screen.getByRole("region", { name: "Thống kê đơn hàng" })
   await within(section).findByText("100")
   expect(requests).toHaveLength(4)
   expect(requests).toEqual(expect.arrayContaining([1, 2, 3, 4].map(orderStatus => ({ page: 1, limit: 1, orderStatus }))))
@@ -37,7 +37,7 @@ it("does not display zero for failed statistics and supports retry", async () =>
   await screen.findByRole("alert")
   expect(screen.queryByText("0")).toBeNull()
   fail = false
-  fireEvent.click(screen.getByRole("button", { name: "Retry statistics" }))
+  fireEvent.click(screen.getByRole("button", { name: "Tải lại thống kê" }))
   await waitFor(() => expect(screen.getAllByText("0")).toHaveLength(5))
   client.clear()
 })

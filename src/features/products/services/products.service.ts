@@ -1,5 +1,5 @@
 import { api } from "@/services/api"
-import type { ApiResponse } from "@/features/auth/types/auth"
+import type { ApiResponse } from "@/types/api"
 import type { Product, ProductInput, UpdateProductInput, ProductsQuery, ProductsResult, ProductStatistics } from "@/features/products/types/products"
 
 export async function listProducts(params: ProductsQuery, signal?: AbortSignal): Promise<ProductsResult> {

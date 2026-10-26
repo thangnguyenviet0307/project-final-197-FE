@@ -199,7 +199,7 @@ export function LandingThemeCustomizer({
                 <Settings className="size-4" />
               </div>
               <SheetTitle className="text-lg font-semibold">
-                Theme Customizer
+                Tùy chỉnh giao diện
               </SheetTitle>
               <div className="ml-auto flex items-center gap-2">
                 <Button
@@ -221,14 +221,14 @@ export function LandingThemeCustomizer({
               </div>
             </div>
             <SheetDescription className="text-sm text-muted-foreground">
-              Customize the theme and colors of your landing page.
+              Tùy chỉnh chủ đề và màu sắc trang giới thiệu.
             </SheetDescription>
           </SheetHeader>
 
           <div className="flex flex-col flex-1 overflow-y-auto p-4 gap-6">
             {/* Mode Section */}
             <FieldSet>
-              <FieldLegend variant="label">Mode</FieldLegend>
+              <FieldLegend variant="label">Chế độ</FieldLegend>
               <ToggleGroup
                 variant="outline"
                 size="sm"
@@ -242,7 +242,7 @@ export function LandingThemeCustomizer({
                   className="cursor-pointer"
                 >
                   <Sun />
-                  Light
+                  Sáng
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="dark"
@@ -250,7 +250,7 @@ export function LandingThemeCustomizer({
                   className="cursor-pointer"
                 >
                   <Moon />
-                  Dark
+                  Tối
                 </ToggleGroupItem>
               </ToggleGroup>
             </FieldSet>
@@ -261,7 +261,7 @@ export function LandingThemeCustomizer({
             <Field>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="customizer-shadcn-ui-theme">
-                  Shadcn UI Theme Presets
+                  Chủ đề Shadcn UI có sẵn
                 </FieldLabel>
                 <Button
                   variant="outline"
@@ -270,7 +270,7 @@ export function LandingThemeCustomizer({
                   className="cursor-pointer"
                 >
                   <Dices data-icon="inline-start" />
-                  Random
+                  Ngẫu nhiên
                 </Button>
               </div>
 
@@ -290,7 +290,7 @@ export function LandingThemeCustomizer({
                   id="customizer-shadcn-ui-theme"
                   className="w-full cursor-pointer"
                 >
-                  <SelectValue placeholder="Choose Shadcn Theme" />
+                  <SelectValue placeholder="Chọn chủ đề Shadcn" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
                   <SelectGroup>
@@ -346,7 +346,7 @@ export function LandingThemeCustomizer({
             <Field>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="customizer-tweakcn-theme">
-                  Tweakcn Theme Presets
+                  Chủ đề Tweakcn có sẵn
                 </FieldLabel>
                 <Button
                   variant="outline"
@@ -355,7 +355,7 @@ export function LandingThemeCustomizer({
                   className="cursor-pointer"
                 >
                   <Dices data-icon="inline-start" />
-                  Random
+                  Ngẫu nhiên
                 </Button>
               </div>
 
@@ -380,7 +380,7 @@ export function LandingThemeCustomizer({
                   id="customizer-tweakcn-theme"
                   className="w-full cursor-pointer"
                 >
-                  <SelectValue placeholder="Choose Tweakcn Theme" />
+                  <SelectValue placeholder="Chọn chủ đề Tweakcn" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
                   <SelectGroup>
@@ -434,7 +434,7 @@ export function LandingThemeCustomizer({
 
             {/* Radius Selection */}
             <FieldSet>
-              <FieldLegend variant="label">Radius</FieldLegend>
+              <FieldLegend variant="label">Độ bo góc</FieldLegend>
               <ToggleGroup
                 variant="outline"
                 spacing={2}
@@ -467,7 +467,7 @@ export function LandingThemeCustomizer({
                 className="w-full cursor-pointer"
               >
                 <Upload data-icon="inline-start" />
-                Import Theme
+                Nhập chủ đề
               </Button>
             </div>
 
@@ -478,7 +478,7 @@ export function LandingThemeCustomizer({
                 className="border border-border rounded-lg overflow-hidden"
               >
                 <AccordionTrigger className="items-center px-4 py-3 hover:no-underline hover:bg-muted/50 transition-colors">
-                  <span className="text-sm font-medium">Brand Colors</span>
+                  <span className="text-sm font-medium">Màu thương hiệu</span>
                 </AccordionTrigger>
                 <AccordionContent className="flex flex-col px-4 pb-4 pt-2 gap-3 border-t border-border bg-muted/20">
                   {baseColors.map((color) => (
@@ -503,12 +503,11 @@ export function LandingThemeCustomizer({
               <div className="flex items-center gap-2">
                 <Palette className="size-4 text-primary" />
                 <span className="text-sm font-medium">
-                  Advanced Customization
+                  Tùy chỉnh nâng cao
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">
-                For advanced theme customization with real-time preview, visual
-                color picker, and hundreds of prebuilt themes, visit{" "}
+                Để tùy chỉnh nâng cao với bản xem trước trực tiếp, bảng chọn màu và hàng trăm chủ đề có sẵn, hãy truy cập{" "}
                 <a
                   href="https://tweakcn.com/editor/theme"
                   target="_blank"
@@ -527,7 +526,7 @@ export function LandingThemeCustomizer({
                 }
               >
                 <ExternalLink data-icon="inline-start" />
-                Open Tweakcn
+                Mở Tweakcn
               </Button>
             </div>
           </div>

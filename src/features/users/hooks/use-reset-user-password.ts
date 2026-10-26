@@ -7,7 +7,7 @@ export function useResetUserPassword(id: string, options: MutationCallbacks<void
   return useMutation({
     ...options,
     mutationFn: ({ password }: { password: string }) => resetUserPassword({ id, password }),
-    meta: { successMessage: "Password reset successfully." },
+    meta: { successMessage: "Đặt lại mật khẩu thành công." },
     onSuccess: (...args) => {
       void queryClient.invalidateQueries({ queryKey: ["users"] })
       return options.onSuccess?.(...args)
