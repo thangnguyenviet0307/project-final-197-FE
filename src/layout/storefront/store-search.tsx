@@ -1,12 +1,10 @@
 import { useState, type FormEvent } from "react"
 import { Search } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { StoreSearchCategory } from "./store-search-category"
 
 export function StoreSearch() {
   const [keyword, setKeyword] = useState("")
   const navigate = useNavigate()
-  const [category, setCategory] = useState("Tất cả danh mục")
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -23,10 +21,6 @@ export function StoreSearch() {
       role="search"
       className="flex w-full overflow-hidden rounded-full border border-gray-200 bg-white"
     >
-    <StoreSearchCategory
-    value={category}
-    onChange={setCategory}
-    />
       <input
         type="search"
         value={keyword}

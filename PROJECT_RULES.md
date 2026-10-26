@@ -25,8 +25,9 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 - /brands is readable by admin/staff. Hide add/edit/delete controls from staff; /brands/new remains admin-only. Sidebar and command search must match route guards.
 - Inventory is editable by admin/staff only through PATCH /products/:id/inventory. Send expectedVersion plus stock OR variant IDs/stocks; never send prices or catalog fields. Keep the input after 409 and require explicit reload/review before retrying with a new version. Products with variants derive aggregate stock from variants.
 - Customer is an authenticated account role with NO admin/staff permissions. Public registration accepts only firstName, lastName, email, password; the server fixes role=customer, active=true and hashes the password. Never accept role/activation/token fields from registration.
-- Customer login accounts in User are separate from Customer contact records used for administrative orders. Do not automatically link them by email or expose contact/order records without an explicit ownership design.
+- Registration creates a customer User and Customer contact atomically, linked by Customer.accountId. Phone/address remain blank until supplied. Do not link existing contacts by email or expose contact/order records to buyers without a separate ownership design. Earlier registrations are not backfilled automatically.
 - /users lists admin/staff accounts, excluding customer accounts. Customer registration must not grant access to staff API endpoints.
+- The admin Customers page displays only the contact list via GET /customers; new registrations appear in that list and its statistics. Use Customer IDs for contact actions, never User IDs. Users still excludes customer accounts. Removing a contact does not delete its login account.
 - Backend permissions always enforce access. Hiding a button or adding a client guard is not sufficient authorization.
 
 ## Order lifecycle
@@ -56,6 +57,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Authentication and customer account
 
+- Login redirects by the authenticated role, including from /account/login: customers go to storefront home /; admin/staff go to the admin dashboard. Public-only auth routes use the same role-based redirect. Mandatory password changes take precedence. Administrative login retains a valid requested admin destination when present.
+
 - Access tokens stay in memory; refresh tokens use HttpOnly cookies. Persist only a non-secret session marker. Never persist passwords/tokens in browser storage or expose them in responses/logs.
 - Reuse the shared refresh/session implementation and sessionVersion checks; clear query cache when identity changes or the user logs out.
 - /account and all its children require role=customer. Guests go to /account/login with their original location retained; admin/staff sessions receive 403. Admin routes reject customers.
@@ -66,6 +69,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 - Storefront header links customer names to /account/profile. The admin navigation item is Trang Bán hàng and links to / (storefront home), not /landing.
 
 ## Deliberately unfinished areas
+
+- Storefront category navigation reads GET /categories/public without authentication. Only active, non-deleted categories and public fields (_id, name, slug, icon, parent) are returned. Administrative endpoints remain protected; navigation to product lists is unfinished.
 
 - Storefront product search/catalog, cart and checkout are not implemented by this task. /shop is still not registered; do not report it as functional.
 - Customer account orders and addresses remain previews. Guard them, but do not fabricate successful API operations or claim they display live customer-owned records.

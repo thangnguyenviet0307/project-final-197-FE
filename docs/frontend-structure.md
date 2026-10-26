@@ -70,6 +70,8 @@ Không tạo `redux/` vì ứng dụng đang dùng Zustand. State cục bộ gi�
 
 `public/` chứa tài nguyên truy cập trực tiếp như `/favicon.png`; `src/assets/` chứa file được import từ code. `config/fonts.ts` khai báo cấu hình font, không phải file font nhị phân.
 
+Menu danh mục storefront dùng `features/categories/hooks/use-public-categories.ts` và GET `/categories/public` để hiển thị cây danh mục, ảnh, trạng thái tải/lỗi/trống. Chưa có điều hướng từ danh mục sang trang sản phẩm.
+
 ## Thêm website bán hàng
 
 1. Đặt trang cho khách tại `pages/storefront/`, ví dụ `products/index.tsx`, `products/detail.tsx`, `cart/index.tsx`, `checkout/index.tsx`.
@@ -101,6 +103,10 @@ import { useAuthStore } from "@/stores/auth.store"
 Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.ps1`, dùng `pnpm.cmd` tương ứng. Lần tổ chức thư mục này giữ nguyên URL, phân quyền và logic nghiệp vụ.
 
 ## Admin contract updates
+
+- Trang Khách hàng chỉ hiển thị hồ sơ liên hệ `/customers`; đăng ký mới tạo User và Customer trong cùng transaction, liên kết bằng `accountId`. Điện thoại/địa chỉ chưa cung cấp được để trống. `/users` chỉ liệt kê admin/staff; không tự ghép hồ sơ cũ theo email hoặc tự chuyển dữ liệu đã có.
+
+- Đăng nhập điều hướng theo role: customer về homepage `/`, admin/staff về dashboard, kể cả khi dùng form `/account/login`. Trường hợp bắt buộc đổi mật khẩu ưu tiên trang đổi mật khẩu của khu vực tương ứng.
 
 - Deploy the corresponding Backend changes together with the Frontend. Inventory/variant updates require `expectedVersion` from the product response `__v`; stale requests return 409 and preserve the editor input. Metadata-only partial updates still omit inventory.
 - New Order items snapshot product/variant names and selected options alongside price/discount/SKU. Legacy missing snapshots are displayed as Not recorded; no historical data is backfilled.

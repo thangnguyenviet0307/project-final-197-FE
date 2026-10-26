@@ -100,18 +100,24 @@ it("requires a password change before visiting the saved destination", async () 
   expect(await screen.findByText("Destination /change-password")).toBeTruthy()
 })
 
-it.each(["customer", "admin", "staff"])("keeps %s login through the customer form on the storefront", async role => {
+it.each([
+  ["customer", false, "/"], ["admin", false, "/admin/dashboard"], ["staff", false, "/admin/dashboard"],
+  ["customer", true, "/account/change-password"], ["admin", true, "/change-password"], ["staff", true, "/change-password"],
+] as const)("redirects %s login with password-change flag %s to %s", async (role, mustChangePassword, destination) => {
   authApi.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-    user: { id: "a", email: "test@example.com", role, mustChangePassword: true }, accessToken: "access",
+    user: { id: "a", email: "test@example.com", role, mustChangePassword }, accessToken: "access",
   } } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[{
     pathname: "/account/login", state: { from: { pathname: "/users" } },
   }]}><Routes>
     <Route path="/account/login" element={<CustomerAuthForm />} />
     <Route path="/" element={<Destination />} />
+    <Route path="/admin/dashboard" element={<Destination />} />
+    <Route path="/change-password" element={<Destination />} />
+    <Route path="/account/change-password" element={<Destination />} />
   </Routes></MemoryRouter></QueryClientProvider>)
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "test@example.com" } })
   fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "Password123" } })
   fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
-  expect(await screen.findByText("Destination /")).toBeTruthy()
+  expect(await screen.findByText(`Destination ${destination}`)).toBeTruthy()
 })

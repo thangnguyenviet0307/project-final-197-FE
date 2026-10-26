@@ -1,7 +1,7 @@
 
 import { useAuthStore } from "@/stores/auth.store"
 import { Link } from "react-router-dom"
-import { ShoppingCart, UserRound } from "lucide-react"
+import { Phone, ShoppingCart, UserRound } from "lucide-react"
 
 import { StoreSearch } from "./store-search"
 import { StoreTopBar } from "./store-top-bar"
@@ -10,9 +10,8 @@ export function StoreHeader() {
   const customer = useAuthStore(state => state.user?.role === "customer")
   return (
     <header className="w-full bg-white">
-      <StoreTopBar />
 
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-5 px-5 py-5 md:min-h-[120px] md:grid-cols-[260px_minmax(0,1fr)_170px] md:gap-8 md:py-0 lg:grid-cols-[300px_minmax(0,1fr)_200px]">
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-6 px-5 py-5 md:min-h-[120px] md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-8 xl:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] xl:gap-x-10 2xl:gap-x-12">
         <div className="flex items-center justify-between">
           <Link
             to="/"
@@ -36,7 +35,17 @@ export function StoreHeader() {
           <StoreSearch />
         </div>
 
-        <div className="flex items-center justify-end">
+        <Link to="/contact" className="flex items-center gap-3 text-gray-800 transition-colors hover:text-[#55b000]">
+          <Phone size={23} className="shrink-0" />
+          <div className="whitespace-nowrap leading-tight">
+            <p className="text-xs font-medium">Hỗ trợ khách hàng</p>
+            <p className="mt-1 text-sm font-semibold">Liên hệ</p>
+          </div>
+        </Link>
+
+        <StoreTopBar />
+
+        <div className="flex items-center md:justify-end">
           <div className="flex items-center gap-3 text-gray-800">
             <div
               className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200"
