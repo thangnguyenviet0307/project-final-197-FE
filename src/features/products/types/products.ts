@@ -14,10 +14,20 @@ export interface ProductVariant {
   attributes?: Record<string, AttributeValue>
 }
 export interface ProductInput {
+  sku?: string | null
+  barcode?: string | null
+  currency?: "VND"
+  tags?: string[]
+  weight?: number | null
+  dimensions?: { width: number; height: number; depth: number } | null
+  warrantyInformation?: string | null
+  shippingInformation?: string | null
+  returnPolicy?: string | null
+  minimumOrderQuantity?: number
   product_name: string
   category: string
   brand: string
-  model_year: number
+  model_year?: number | null
   price?: number
   discount?: number
   description?: string | null
@@ -28,6 +38,13 @@ export interface ProductInput {
   variants?: ProductVariant[]
 }
 export interface Product extends Omit<ProductInput, "category" | "brand"> {
+  source?: "dummyjson"
+  external_id?: string
+  sourceImages?: string[]
+  sourceCreatedAt?: string
+  sourceUpdatedAt?: string
+  sourceCurrency?: "USD"
+  importExchangeRate?: number
   _id: string
   __v?: number
   category: CatalogReference | string | null
@@ -36,6 +53,12 @@ export interface Product extends Omit<ProductInput, "category" | "brand"> {
   createdAt?: string
   updatedAt?: string
 }
+export interface ProductMetrics { rating: number; reviewCount: number; soldCount: number }
+export interface ProductReviewInput { rating: number; reviewerName: string; comment: string; date?: string }
+export interface ProductReview extends ProductReviewInput {
+  _id: string; product: string; source: "admin" | "dummyjson"; createdAt?: string; updatedAt?: string
+}
+export interface ProductReviewsResult { data: ProductReview[]; pagination: ProductsResult["pagination"] }
 export type UpdateProductInput = Partial<ProductInput> & { expectedVersion?: number }
 export interface ProductsQuery {
   page: number; limit: number; sku?: string; color?: string; size?: string

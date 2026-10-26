@@ -23,15 +23,36 @@ export const variantSchema = z.object({
   }),
 })
 export const productSchema = z.object({
+  sku: z.union([z.string().trim().toUpperCase().min(3, "SKU phải có ít nhất 3 ký tự.").max(64).regex(/^[A-Z0-9-]+$/, "SKU chỉ chứa chữ, số và dấu gạch ngang."), z.literal(""), z.null()]).optional(),
+  barcode: optionalText("Mã vạch", 64),
+  currency: z.literal("VND").optional(),
+  tags: z.array(z.object({ value: z.string().trim().min(1, "Nhãn không được để trống.").max(50, "Nhãn tối đa 50 ký tự.") })).max(30, "Tối đa 30 nhãn.").optional(),
+  weight: numeric("Khối lượng").nonnegative("Khối lượng không được âm.").nullable().optional(),
+  dimensions: z.object({
+    width: numeric("Chiều rộng").nonnegative("Chiều rộng không được âm.").optional(),
+    height: numeric("Chiều cao").nonnegative("Chiều cao không được âm.").optional(),
+    depth: numeric("Chiều sâu").nonnegative("Chiều sâu không được âm.").optional(),
+  }).superRefine((value, ctx) => {
+    if (Object.values(value).some(item => item !== undefined)) {
+      for (const key of ["width", "height", "depth"] as const) {
+        if (value[key] === undefined) ctx.addIssue({ code: "custom", path: [key], message: "Vui lòng nhập đủ ba kích thước hoặc để trống tất cả." })
+      }
+    }
+  }).optional(),
+  warrantyInformation: optionalText("Thông tin bảo hành", 2000),
+  shippingInformation: optionalText("Thông tin giao hàng", 2000),
+  returnPolicy: optionalText("Chính sách đổi trả", 2000),
+  minimumOrderQuantity: stock("Số lượng đặt tối thiểu").min(1, "Số lượng đặt tối thiểu phải từ 1.").optional(),
   product_name: z.string({ error: "Vui lòng nhập tên sản phẩm." }).trim().min(3, "Tên sản phẩm phải có ít nhất 3 ký tự.").max(255, "Tên sản phẩm không được vượt quá 255 ký tự."),
   category: z.string().regex(/^[a-f\d]{24}$/i, "Vui lòng chọn danh mục hợp lệ."), brand: z.string().regex(/^[a-f\d]{24}$/i, "Vui lòng chọn thương hiệu hợp lệ."),
-  model_year: numeric("Năm sản xuất").int("Năm sản xuất phải là số nguyên.").min(1900, "Năm sản xuất phải từ 1900 trở đi.").max(new Date().getFullYear() + 2, `Năm sản xuất không được sau ${new Date().getFullYear() + 2}.`),
+  model_year: numeric("Năm sản xuất").int("Năm sản xuất phải là số nguyên.").min(1900, "Năm sản xuất phải từ 1900 trở đi.").max(new Date().getFullYear() + 2, `Năm sản xuất không được sau ${new Date().getFullYear() + 2}.`).nullable().optional(),
   price: numeric("Giá").nonnegative("Giá không được âm.").optional(), discount: numeric("Giảm giá").min(0, "Mức giảm giá không được âm.").max(70, "Mức giảm giá không được vượt quá 70%."),
   description: optionalText("Mô tả", 2000), thumbnail: optionalText("Đường dẫn ảnh đại diện", 255),
   stock: stock("Tồn kho").optional(), is_active: z.boolean(), variants: z.array(variantSchema),
-}).superRefine(({ variants }, ctx) => {
+}).superRefine(({ variants, sku }, ctx) => {
   const skus = new Set<string>()
   variants.forEach((variant, index) => {
+    if (sku && variant.sku === sku) ctx.addIssue({ code: "custom", path: ["variants", index, "sku"], message: "SKU biến thể phải khác SKU sản phẩm." })
     if (skus.has(variant.sku)) ctx.addIssue({ code: "custom", path: ["variants", index, "sku"], message: "Mã SKU không được trùng nhau." })
     skus.add(variant.sku)
   })
@@ -48,6 +69,8 @@ export type ProductFormValues = z.infer<typeof productSchema>
 export function productErrorPath(field: string, values: ProductFormValues): string | null {
   let path = field.replace(/^body\./, "").replace(/\[(\d+)\]/g, ".$1")
   if (Object.hasOwn(values, path)) return path
+  if (/^dimensions\.(width|height|depth)$/.test(path)) return path
+  if (/^tags\.\d+$/.test(path)) return `${path}.value`
   path = path.replace(/^(variants\.\d+\.images\.\d+)$/, "$1.url")
   const attribute = /^variants\.(\d+)\.attributes\.(.+)$/.exec(path)
   if (attribute) {
@@ -60,8 +83,13 @@ export function productErrorPath(field: string, values: ProductFormValues): stri
 
 export function productDefaults(product?: Product): ProductFormValues {
   return {
+    sku: product?.sku ?? "", barcode: product?.barcode ?? "", currency: "VND",
+    tags: (product?.tags ?? []).map(value => ({ value })), weight: product?.weight ?? undefined,
+    dimensions: { width: product?.dimensions?.width, height: product?.dimensions?.height, depth: product?.dimensions?.depth },
+    warrantyInformation: product?.warrantyInformation ?? "", shippingInformation: product?.shippingInformation ?? "",
+    returnPolicy: product?.returnPolicy ?? "", minimumOrderQuantity: product?.minimumOrderQuantity ?? 1,
     product_name: product?.product_name ?? "", category: product ? catalogId(product.category) : "", brand: product ? catalogId(product.brand) : "",
-    model_year: product?.model_year ?? new Date().getFullYear(), price: product?.price,
+    model_year: product ? product.model_year ?? undefined : new Date().getFullYear(), price: product?.price,
     discount: product?.discount ?? 0, description: product?.description ?? "", thumbnail: product?.thumbnail ?? "",
     stock: product?.stock ?? 0, is_active: product?.is_active ?? true,
     variants: (product?.variants ?? []).map((variant) => ({ ...variant,
@@ -73,7 +101,12 @@ export function productDefaults(product?: Product): ProductFormValues {
   }
 }
 export function productPayload(values: ProductFormValues): ProductInput {
-  return { ...values, variants: values.variants.map(({ options, images, variant_name, ...variant }) => ({
+  const dimensions = values.dimensions
+  return { ...values, model_year: values.model_year ?? null, sku: values.sku || null, barcode: values.barcode?.trim() || null,
+    tags: values.tags?.map(({ value }) => value), weight: values.weight ?? null,
+    dimensions: dimensions?.width !== undefined && dimensions.height !== undefined && dimensions.depth !== undefined
+      ? { width: dimensions.width, height: dimensions.height, depth: dimensions.depth } : null,
+    variants: values.variants.map(({ options, images, variant_name, ...variant }) => ({
     ...variant, variant_name: variant_name || null, images: images.map(({ url }) => url), attributes: Object.fromEntries(options.map(({ name, value }) => [name, value])),
   })) }
 }

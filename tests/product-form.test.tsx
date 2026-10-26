@@ -18,6 +18,17 @@ beforeEach(() => {
 })
 afterEach(() => { api.defaults.adapter = original; queryClient.clear() })
 function wrap(children: ReactNode) { return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: "*", element: children }])} /></QueryClientProvider>) }
+it("edits shipping metadata, dimensions and tags without resending inventory or import provenance", async () => {
+  const save = vi.fn().mockResolvedValue(undefined)
+  wrap(<ProductForm product={{ ...product, sku: "CASE-NEW", tags: ["Case"], source: "dummyjson" }} save={save} pending={false} />)
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  for (const [label, value] of [["Khối lượng (kg)", "2"], ["Chiều rộng (cm)", "10"], ["Chiều cao (cm)", "20"], ["Chiều sâu (cm)", "3"], ["Thông tin bảo hành", "12 tháng"], ["Nhãn 1", "New case"]]) {
+    fireEvent.change(screen.getByLabelText(label), { target: { value } })
+  }
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await waitFor(() => expect(save).toHaveBeenCalledOnce())
+  expect(save.mock.calls[0][0]).toEqual({ weight: 2, dimensions: { width: 10, height: 20, depth: 3 }, warrantyInformation: "12 tháng", tags: ["New case"] })
+})
 it.each([
   ["Tồn kho biến thể", "-5", "Tồn kho biến thể không được âm."],
   ["Tồn kho biến thể", "1.5", "Tồn kho biến thể phải là số nguyên."],

@@ -13,6 +13,8 @@ import { useProductListLocation } from "@/features/products/hooks/use-product-li
 import { descriptionToHtml } from "@/features/products/utils/product-description"
 import "@/features/products/components/product-description.css"
 import { ProductGallery } from "@/features/products/components/product-gallery"
+import { ProductDetailsInfo } from "@/features/products/components/product-details-info"
+import { ProductReviews } from "@/features/products/components/product-reviews"
 
 export default function ProductDetailPage() {
   const { id = "" } = useParams()
@@ -34,6 +36,8 @@ export default function ProductDetailPage() {
           <div><dt className="text-muted-foreground">Trạng thái</dt><dd><Badge variant="secondary">{product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></dd></div></dl>
       </div>
       <InventoryEditor key={product._id} product={product} />
+      <ProductDetailsInfo product={product} />
+      <ProductReviews key={`reviews-${product._id}`} id={product._id} />
       {admin && <ProductGallery product={product} />}
       {product.description && <section><h2 className="mb-2 text-lg font-semibold">Mô tả</h2><div className="product-description-content" dangerouslySetInnerHTML={{ __html: descriptionToHtml(product.description) }} /></section>}
       <section className="space-y-4"><h2 className="text-lg font-semibold">Biến thể</h2>{!product.variants?.length && <p className="text-sm text-muted-foreground">Chưa có biến thể.</p>}

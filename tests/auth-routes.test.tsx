@@ -94,10 +94,10 @@ it.each(["/account/login", "/register", "/login"])("returns signed-in customers 
 it.each([
   ["admin", "/account/login"], ["admin", "/register"],
   ["staff", "/account/login"], ["staff", "/register"],
-] as const)("returns %s sessions to the dashboard when opening %s", async (role, path) => {
+] as const)("keeps %s sessions in storefront and shows an error when opening %s", async (role, path) => {
   session(role)
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
-  expect(await screen.findByText("Trang /dashboard")).toBeTruthy()
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản này không dùng để đăng nhập cửa hàng. Vui lòng sử dụng tài khoản khách hàng.")
 })
 
 it.each(["/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {

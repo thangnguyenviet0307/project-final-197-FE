@@ -4,6 +4,26 @@ import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
 const values = () => ({ ...productDefaults(), product_name: "Phone case", category: id, brand: id })
+it("validates new metadata and maps form fields into backend product details", () => {
+  const input = productSchema.parse({ ...values(), sku: " case-new ", tags: [{ value: " Case " }], weight: 0,
+    dimensions: { width: 0, height: 2, depth: 3 }, barcode: "1234", minimumOrderQuantity: 2 })
+  expect(productPayload(input)).toMatchObject({ sku: "CASE-NEW", tags: ["Case"], weight: 0, dimensions: { width: 0, height: 2, depth: 3 }, barcode: "1234", minimumOrderQuantity: 2 })
+  for (const invalid of [{ weight: -1 }, { minimumOrderQuantity: 0 }, { minimumOrderQuantity: 1.5 }, { tags: [{ value: " " }] },
+    { dimensions: { width: 2 } }, { warrantyInformation: "x".repeat(2001) }, { sku: "bad sku" }]) {
+    expect(productSchema.safeParse({ ...values(), ...invalid }).success).toBe(false)
+  }
+})
+it("retains imported fields, allows a missing model year, and explicitly clears nullable metadata", () => {
+  const product: Product = { ...productPayload(values()), _id: id, model_year: null, sku: "CASE-NEW", tags: ["Case"], weight: 1,
+    dimensions: { width: 1, height: 2, depth: 3 }, source: "dummyjson", external_id: "5" }
+  const defaults = productDefaults(product)
+  expect(productSchema.safeParse(defaults).success).toBe(true)
+  expect(productPayload(productSchema.parse(defaults))).toMatchObject({ model_year: null, tags: ["Case"], weight: 1 })
+  expect(productUpdatePayload({ ...defaults, sku: "", barcode: "", weight: undefined, dimensions: {}, tags: [] },
+    { sku: true, barcode: true, weight: true, dimensions: { width: true, height: true, depth: true }, tags: true }, product))
+    .toEqual({ sku: null, barcode: null, weight: null, dimensions: null, tags: [] })
+  expect(productUpdatePayload(defaults, { description: true }, product)).not.toHaveProperty("source")
+})
 it("maps backend image and attribute errors to the matching form inputs", () => {
   const input = { ...values(), variants: [{ sku: "CASE-1", price: 1, images: [{ url: "image.png" }], options: [{ name: "material", value: "Silicone" }] }] }
   expect(productErrorPath("body.variants[0].images[0]", input)).toBe("variants.0.images.0.url")
@@ -33,13 +53,13 @@ it("reports duplicate options and SKUs together at their original field paths", 
   ])
 })
 it("preserves variant IDs, typed attributes and image paths when editing", () => {
-  const product: Product = { ...values(), _id: id, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 10, images: ["/case.png"], attributes: { warranty: 12, wireless: false, empty: null, color: "red" } }] }
+  const product: Product = { ...productPayload(values()), _id: id, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 10, images: ["/case.png"], attributes: { warranty: 12, wireless: false, empty: null, color: "red" } }] }
   const result = productPayload(productSchema.parse(productDefaults(product)))
   expect(result.variants?.[0]).toMatchObject(product.variants![0])
   expect(result.variants?.[0]).not.toHaveProperty("options")
 })
 
-const original: Product = { ...values(), _id: id, slug: "custom-campaign-case", price: 150, stock: 10,
+const original: Product = { ...productPayload(values()), _id: id, slug: "custom-campaign-case", price: 150, stock: 10,
   variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 10, attributes: { wireless: false } }] }
 it("omits untouched inventory, catalog, name and active state from a description update", () => {
   const input = { ...productDefaults(original), description: "New description" }

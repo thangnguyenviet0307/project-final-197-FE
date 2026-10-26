@@ -7,7 +7,7 @@ export function useLogin(onError?: (error: Error) => void, storefront = false) {
   const navigate = useNavigate()
   const location = useLocation()
   return useMutation({
-    mutationFn: login,
+    mutationFn: (credentials: Parameters<typeof login>[0]) => login(credentials, storefront),
     meta: { successMessage: "Đăng nhập thành công.", suppressGlobalErrorToast: true },
     onSuccess: (user) => {
       if (storefront || user.role === "customer" || user.mustChangePassword) {

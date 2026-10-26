@@ -18,6 +18,7 @@ import { useUnsavedProductChanges } from "@/features/products/hooks/use-unsaved-
 import { useProductListLocation } from "@/features/products/hooks/use-product-list-location"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ContentSkeleton } from "@/components/page-skeleton"
+import { ProductDetailsFields } from "@/features/products/components/product-details-fields"
 
 type ProductFormProps = { pending: boolean } & (
   | { product?: undefined; save: (input: ProductInput) => Promise<unknown> }
@@ -85,7 +86,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
     <fieldset hidden={catalogLoading} disabled={busy || catalogLoading || !!catalogError} className="space-y-6 disabled:opacity-70">
       <div className="grid gap-4 sm:grid-cols-2">
         <ProductInputField form={form} name="product_name" label="Tên sản phẩm" />
-        <ProductInputField form={form} name="model_year" label="Năm sản xuất" numeric />
+        <ProductInputField form={form} name="model_year" label="Năm sản xuất" numeric optional />
         {catalogField("category", "Danh mục", categoryChoices)}{catalogField("brand", "Thương hiệu", brandChoices)}
         <ProductInputField form={form} name="price" label="Giá (không bắt buộc; mặc định là giá biến thể thấp nhất)" numeric optional />
         <ProductInputField form={form} name="discount" label="Giảm giá (%)" numeric />
@@ -101,6 +102,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
         <FieldError id="description-error" errors={[fieldState.error]} />
       </Field>} />
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_active")} />Sản phẩm đang hoạt động</label>
+      <ProductDetailsFields form={form} />
       <ProductVariantsFields form={form} />
     </fieldset>
     {form.formState.errors.root && <p role="alert" className="text-destructive">{form.formState.errors.root.message}</p>}

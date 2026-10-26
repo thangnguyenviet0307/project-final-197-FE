@@ -8,6 +8,7 @@ import { CustomerAuthForm } from "@/features/auth/components/customer-auth-form"
 import { ForgotPasswordForm1 } from "@/pages/auth/forgot-password/components/forgot-password-form-1"
 import { ProtectedRoute } from "@/router/protected-route"
 import { PublicOnlyRoute } from "@/router/public-only-route"
+import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import { authApi, clearAuth } from "@/services/api"
 
@@ -101,8 +102,8 @@ it("requires a password change before visiting the saved destination", async () 
 })
 
 it.each([
-  ["customer", false, "/"], ["admin", false, "/admin/dashboard"], ["staff", false, "/admin/dashboard"],
-  ["customer", true, "/account/change-password"], ["admin", true, "/change-password"], ["staff", true, "/change-password"],
+  ["customer", false, "/"],
+  ["customer", true, "/account/change-password"],
 ] as const)("redirects %s login with password-change flag %s to %s", async (role, mustChangePassword, destination) => {
   authApi.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
     user: { id: "a", email: "test@example.com", role, mustChangePassword }, accessToken: "access",
@@ -120,4 +121,27 @@ it.each([
   fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "Password123" } })
   fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
   expect(await screen.findByText(`Destination ${destination}`)).toBeTruthy()
+})
+
+it.each(["admin", "staff"] as const)("rejects %s at storefront login without publishing a session", async role => {
+  const requests: string[] = []
+  authApi.defaults.adapter = async config => {
+    requests.push(config.url!)
+    if (config.url === "/auth/logout") {
+      expect(config.headers.get("Authorization")).toBe("Bearer access")
+      expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
+      user: { id: "a", email: "test@example.com", role, mustChangePassword: true }, accessToken: "access",
+    } } }
+  }
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/account/login"]}><Routes>
+    <Route element={<PublicOnlyRoute storefront />}><Route path="/account/login" element={<CustomerAuthForm />} /></Route>
+    <Route path="*" element={<Destination />} />
+  </Routes></MemoryRouter></QueryClientProvider>)
+  submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản này không dùng để đăng nhập cửa hàng. Vui lòng sử dụng tài khoản khách hàng.")
+  expect(requests).toEqual(["/auth/login", "/auth/logout"])
+  expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null, hasSession: false })
+  expect(screen.queryByText(/Destination/)).toBeNull()
 })
