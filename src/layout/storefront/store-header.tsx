@@ -1,4 +1,5 @@
 
+import { useAuthStore } from "@/stores/auth.store"
 import { Link } from "react-router-dom"
 import { ShoppingCart, UserRound } from "lucide-react"
 
@@ -6,6 +7,7 @@ import { StoreSearch } from "./store-search"
 import { StoreTopBar } from "./store-top-bar"
 
 export function StoreHeader() {
+  const customer = useAuthStore(state => state.user?.role === "customer")
   return (
     <header className="w-full bg-white">
       <StoreTopBar />
@@ -22,7 +24,7 @@ export function StoreHeader() {
           </Link>
 
           <Link
-            to="/account/login"
+            to={customer ? "/account/profile" : "/account/login"}
             aria-label="Tài khoản"
             className="flex items-center justify-center rounded-full border border-gray-200 p-2 text-gray-800 transition-colors hover:border-[#55b000] hover:text-[#55b000] md:hidden"
           >

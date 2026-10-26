@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-muted-foreground">{label}</dt><dd className="break-words font-medium">{value ?? "—"}</dd></div>)}
           <div><dt className="text-muted-foreground">Trạng thái</dt><dd><Badge variant="secondary">{product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></dd></div></dl>
       </div>
-      <InventoryEditor key={`${product._id}-${product.__v}`} product={product} />
+      <InventoryEditor key={product._id} product={product} />
       {admin && <ProductGallery product={product} />}
       {product.description && <section><h2 className="mb-2 text-lg font-semibold">Mô tả</h2><div className="product-description-content" dangerouslySetInnerHTML={{ __html: descriptionToHtml(product.description) }} /></section>}
       <section className="space-y-4"><h2 className="text-lg font-semibold">Biến thể</h2>{!product.variants?.length && <p className="text-sm text-muted-foreground">Chưa có biến thể.</p>}

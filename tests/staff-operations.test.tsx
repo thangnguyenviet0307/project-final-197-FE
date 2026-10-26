@@ -40,8 +40,8 @@ function mockApi() {
 it("staff saves stock without including product price or metadata", async () => {
   const writes = mockApi()
   setup(<InventoryEditor product={{ _id: id, __v: 2, product_name: "Phone", category: null, brand: null, model_year: 2026, stock: 5, price: 100 }} />)
-  fireEvent.change(screen.getByLabelText("Product stock"), { target: { value: "9" } })
-  fireEvent.click(screen.getByRole("button", { name: "Save stock" }))
+  fireEvent.change(screen.getByLabelText("Tồn kho Sản phẩm"), { target: { value: "9" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu tồn kho" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("patch", `/products/${id}/inventory`, { expectedVersion: 2, stock: 9 }))
 })
 it.each([1, 2, 3, 4] as const)("staff only sees status edits for own open orders in status %s", orderStatus => {

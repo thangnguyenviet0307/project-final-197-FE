@@ -18,7 +18,7 @@ export function StoreTopBar() {
             aria-hidden="true"
           />
 
-          <Link to={user ? "/" : "/register"} className="inline-flex items-center gap-1 px-3 hover:text-[#55b000]">
+          <Link to={user?.role === "customer" ? "/account/profile" : user ? "/" : "/register"} className="inline-flex items-center gap-1 px-3 hover:text-[#55b000]">
             <UserRound size={13} />
             {user ? user.name : "Đăng ký"}
           </Link>

@@ -1,29 +1,40 @@
+import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { api, getApiError } from "@/services/api"
-import type { Product } from "@/features/products/types/products"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { getProduct, updateInventory } from "@/features/products/services/products.service"
+import type { Product } from "@/features/products/types/products"
+import { getApiError } from "@/services/api"
+import { useAuthStore } from "@/stores/auth.store"
 
 export function InventoryEditor({ product }: { product: Product }) {
+  const role = useAuthStore(state => state.user?.role)
   const client = useQueryClient()
-  const variants = product.variants ?? []
-  const mutation = useMutation({
-    mutationFn: (input: { expectedVersion: number; stock?: number; variants?: { _id: string; stock: number }[] }) => api.patch(`/products/${encodeURIComponent(product._id)}/inventory`, input),
-    meta: { successMessage: "Stock updated." },
-    onSuccess: () => client.invalidateQueries({ queryKey: ["products"] }),
-    onError: () => { void client.invalidateQueries({ queryKey: ["products"] }) },
-  })
-  return <form className="space-y-3 rounded-lg border p-4" onSubmit={event => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const input = variants.length
-      ? { variants: variants.map(variant => ({ _id: variant._id!, stock: Number(data.get(variant._id!)) })) }
-      : { stock: Number(data.get("stock")) }
-    mutation.mutate({ expectedVersion: product.__v ?? 0, ...input })
-  }}>
-    <h2 className="font-semibold">Update inventory</h2>
-    <div className="grid gap-3 sm:grid-cols-2">{(variants.length ? variants.map(variant => ({ id: variant._id!, label: variant.sku, stock: variant.stock })) : [{ id: "stock", label: "Product stock", stock: product.stock }]).map(item => <label key={item.id} className="grid gap-2 text-sm">{item.label}<Input name={item.id} type="number" min={0} max={Number.MAX_SAFE_INTEGER} step={1} required defaultValue={item.stock ?? 0} disabled={mutation.isPending} /></label>)}</div>
-    {mutation.isError && <p role="alert" className="text-sm text-destructive">{getApiError(mutation.error).message}</p>}
-    <Button type="submit" disabled={mutation.isPending}>Save stock</Button>
-  </form>
+  const [original, setOriginal] = useState(product)
+  const stocksFor = (value: Product) => (value.variants?.length ? value.variants.map(variant => String(variant.stock ?? 0)) : [String(value.stock ?? 0)])
+  const [stocks, setStocks] = useState(() => stocksFor(product))
+  const [reloadError, setReloadError] = useState("")
+  const [reloading, setReloading] = useState(false)
+  const mutation = useMutation({ mutationFn: updateInventory, meta: { successMessage: "Đã cập nhật tồn kho." }, onSuccess: async saved => {
+    setOriginal(saved); setStocks(stocksFor(saved))
+    await Promise.all([client.invalidateQueries({ queryKey: ["products"] }), client.invalidateQueries({ queryKey: ["orders"] })])
+  } })
+  if (role !== "admin" && role !== "staff") return null
+  const valid = stocks.every(stock => stock.trim() !== "" && Number.isSafeInteger(Number(stock)) && Number(stock) >= 0)
+  const busy = mutation.isPending || reloading
+  return <section className="space-y-3 rounded-lg border p-4" aria-label="Cập nhật tồn kho">
+    <h2 className="font-semibold">Cập nhật tồn kho</h2>
+    <p className="text-sm text-muted-foreground">Chỉ cập nhật số lượng; giá và thông tin sản phẩm được giữ nguyên.</p>
+    {(original.variants?.length ? original.variants.map(variant => variant.sku) : ["Sản phẩm"]).map((label, index) => <label key={label} className="grid gap-2 text-sm">Tồn kho {label}<input className="rounded-md border bg-background p-2" type="number" min="0" step="1" max={Number.MAX_SAFE_INTEGER} value={stocks[index]} disabled={busy} onChange={event => setStocks(previous => previous.map((value, i) => i === index ? event.target.value : value))} /></label>)}
+    {!valid && <p role="alert">Tồn kho phải là số nguyên không âm.</p>}
+    {mutation.error && <p role="alert">{getApiError(mutation.error).message} Bản nhập được giữ nguyên. Nếu dữ liệu đã thay đổi, hãy tải dữ liệu mới rồi nhập lại.</p>}
+    {reloadError && <p role="alert">{reloadError}</p>}
+    <div className="flex flex-wrap gap-2"><Button disabled={!valid || busy || original.__v === undefined} onClick={() => mutation.mutate({ id: original._id, input: { expectedVersion: original.__v!, ...(original.variants?.length ? { variants: original.variants.map((variant, index) => ({ _id: variant._id!, stock: Number(stocks[index]) })) } : { stock: Number(stocks[0]) }) } })}>Lưu tồn kho</Button>
+    <Button variant="outline" disabled={busy} onClick={async () => {
+      setReloading(true); setReloadError("")
+      try { const latest = await getProduct(original._id); setOriginal(latest); setStocks(stocksFor(latest)); mutation.reset() }
+      catch (error) { setReloadError(getApiError(error).message) }
+      finally { setReloading(false) }
+    }}>Tải dữ liệu mới và đặt lại bản nhập</Button></div>
+    {original.__v === undefined && <p role="alert">Thiếu phiên bản sản phẩm. Hãy tải dữ liệu mới trước khi lưu.</p>}
+  </section>
 }

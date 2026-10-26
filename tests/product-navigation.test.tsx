@@ -1,17 +1,11 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { expect, it, vi } from "vitest";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
-import { ProductForm } from "@/features/products/components/product-form";
-import type { Product } from "@/features/products/types/products";
-import ProductDetailPage from "@/pages/admin/products/detail";
-import ProductCreatePage from "@/pages/admin/products/create";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { expect, it, vi } from "vitest"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { createMemoryRouter, RouterProvider } from "react-router-dom"
+import { ProductForm } from "@/features/products/components/product-form"
+import type { Product } from "@/features/products/types/products"
+import ProductDetailPage from "@/pages/admin/products/detail"
+import ProductCreatePage from "@/pages/admin/products/create"
 
 const id = "a".repeat(24);
 vi.mock("@/features/products/hooks/use-create-product", () => ({
@@ -73,30 +67,13 @@ const product: Product = {
   stock: 1,
 };
 function setup(save = vi.fn().mockResolvedValue(undefined)) {
-  const router = createMemoryRouter(
-    [
-      {
-        path: "/products/:id/edit",
-        element: <ProductForm product={product} save={save} pending={false} />,
-      },
-      { path: "/products/:id", element: <p>Chi tiết sản phẩm</p> },
-      { path: "/products", element: <p>Product list</p> },
-    ],
-    {
-      initialEntries: [
-        {
-          pathname: `/products/${id}/edit`,
-          state: { returnTo: "/products?page=3&limit=20&color=blue" },
-        },
-      ],
-    },
-  );
-  render(
-    <QueryClientProvider client={new QueryClient()}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  );
-  return { router, save };
+  const router = createMemoryRouter([
+    { path: "/products/:id/edit", element: <ProductForm product={product} save={save} pending={false} /> },
+    { path: "/products/:id", element: <p>Chi tiết sản phẩm</p> },
+    { path: "/products", element: <p>Product list</p> },
+  ], { initialEntries: [{ pathname: `/products/${id}/edit`, state: { returnTo: "/products?page=3&limit=20&color=blue" } }] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  return { router, save }
 }
 it("blocks Cancel, keeps the draft, and leaves only after discard confirmation", async () => {
   setup();
@@ -173,38 +150,26 @@ it("retains the draft and guard after a save fails", async () => {
   expect(await screen.findByRole("dialog")).toBeTruthy();
 });
 it("returns from detail to the exact list URL", async () => {
-  const returnTo = "/products?page=3&limit=20&color=blue";
-  const router = createMemoryRouter(
-    [
-      { path: "/products/:id", element: <ProductDetailPage /> },
-      { path: "/products", element: <p>Restored list</p> },
-    ],
-    { initialEntries: [{ pathname: `/products/${id}`, state: { returnTo } }] },
-  );
-  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>);
-  fireEvent.click(screen.getByRole("link", { name: "Quay lại" }));
-  expect(await screen.findByText("Restored list")).toBeTruthy();
-  expect(router.state.location.pathname + router.state.location.search).toBe(
-    returnTo,
-  );
-});
+  const returnTo = "/products?page=3&limit=20&color=blue"
+  const router = createMemoryRouter([
+    { path: "/products/:id", element: <ProductDetailPage /> },
+    { path: "/products", element: <p>Restored list</p> },
+  ], { initialEntries: [{ pathname: `/products/${id}`, state: { returnTo } }] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  fireEvent.click(screen.getByRole("link", { name: "Quay lại" }))
+  expect(await screen.findByText("Restored list")).toBeTruthy()
+  expect(router.state.location.pathname + router.state.location.search).toBe(returnTo)
+})
 it("guards a new product draft and preserves its list URL on cancellation", async () => {
-  const returnTo = "/products?page=2&size=XL";
-  const router = createMemoryRouter(
-    [
-      { path: "/products/new", element: <ProductCreatePage /> },
-      { path: "/products", element: <p>Restored list</p> },
-    ],
-    { initialEntries: [{ pathname: "/products/new", state: { returnTo } }] },
-  );
-  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>);
-  fireEvent.change(screen.getByLabelText("Tên sản phẩm"), {
-    target: { value: "New case" },
-  });
-  fireEvent.click(screen.getByRole("link", { name: "Về danh sách sản phẩm" }));
-  fireEvent.click(await screen.findByRole("button", { name: "Bỏ thay đổi" }));
-  expect(await screen.findByText("Restored list")).toBeTruthy();
-  expect(router.state.location.pathname + router.state.location.search).toBe(
-    returnTo,
-  );
-});
+  const returnTo = "/products?page=2&size=XL"
+  const router = createMemoryRouter([
+    { path: "/products/new", element: <ProductCreatePage /> },
+    { path: "/products", element: <p>Restored list</p> },
+  ], { initialEntries: [{ pathname: "/products/new", state: { returnTo } }] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "New case" } })
+  fireEvent.click(screen.getByRole("link", { name: "Về danh sách sản phẩm" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Bỏ thay đổi" }))
+  expect(await screen.findByText("Restored list")).toBeTruthy()
+  expect(router.state.location.pathname + router.state.location.search).toBe(returnTo)
+})

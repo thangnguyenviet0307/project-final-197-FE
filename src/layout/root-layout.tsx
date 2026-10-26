@@ -1,5 +1,6 @@
 import { Outlet, useNavigation } from "react-router-dom"
 
+import { StoreSkeleton } from "@/layout/storefront/store-skeleton"
 import { PageSkeleton } from "@/components/page-skeleton"
 
 /** Thin top bar shown while the next route's code is loading. */
@@ -26,6 +27,6 @@ export function RootLayout() {
 }
 
 /** Shown on the very first load, before any route has rendered. */
-export function RootFallback() {
-  return <PageSkeleton />
+export function RootFallback({ storefront = true }: { storefront?: boolean }) {
+  return storefront ? <StoreSkeleton /> : <PageSkeleton />
 }

@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import { createMemoryRouter, MemoryRouter, Route, RouterProvider, Routes, useLocation, type RouteObject } from "react-router-dom"
 import { routes } from "@/router/routes"
-import { ProtectedRoute, PublicOnlyRoute } from "@/router/protected-route"
+import { ProtectedRoute } from "@/router/protected-route"
+import { PublicOnlyRoute } from "@/router/public-only-route"
 import { useAuthStore } from "@/stores/auth.store"
 import type { Role } from "@/features/auth/types/auth"
 
@@ -124,8 +125,24 @@ it.each(["/customers", "/orders/new", "/brands"])("allows staff to use operation
   expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
 })
 
-it("allows staff to view customer management", async () => {
+it("allows staff to view brands", async () => {
   session("staff")
-  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/customers"] })} />)
-  expect(await screen.findByText("Trang /customers")).toBeTruthy()
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/brands"] })} />)
+  expect(await screen.findByText("Trang /brands")).toBeTruthy()
+})
+it.each(["/account/profile", "/account/orders", "/account/addresses", "/account/change-password"])("guards customer page %s", async path => {
+  const router = createMemoryRouter(replacePages(routes), { initialEntries: [path] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  expect(await screen.findByText("Trang /account/login")).toBeTruthy()
+  expect(router.state.location.state.from.pathname).toBe(path)
+})
+it.each(["admin", "staff"] as const)("denies %s access to customer account", async role => {
+  session(role)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/account/profile"] })} /></QueryClientProvider>)
+  expect(await screen.findByText("Trang /403")).toBeTruthy()
+})
+it("allows customers to open their profile", async () => {
+  session("customer")
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/account/profile"] })} /></QueryClientProvider>)
+  expect(await screen.findByText("Trang profile")).toBeTruthy()
 })

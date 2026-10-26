@@ -36,3 +36,9 @@ export async function deleteProductImage({ id, publicId }: { id: string; publicI
   const { data } = await api.delete<ApiResponse<Product> & { cleanupPending: boolean }>(`/products/${encodeURIComponent(id)}/images/${encodeURIComponent(publicId)}`)
   return { cleanupPending: data.cleanupPending }
 }
+
+export interface InventoryInput { expectedVersion: number; stock?: number; variants?: { _id: string; stock: number }[] }
+export async function updateInventory({ id, input }: { id: string; input: InventoryInput }): Promise<Product> {
+  const { data } = await api.patch<ApiResponse<Product>>(`/products/${encodeURIComponent(id)}/inventory`, input)
+  return data.data
+}

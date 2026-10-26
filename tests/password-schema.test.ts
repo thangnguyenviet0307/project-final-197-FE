@@ -5,7 +5,7 @@ it.each(["Ab1!xy", "NewPassword123!"])("accepts a strong new password: %s", newP
   expect(changePasswordSchema.safeParse({ currentPassword: "Admin123", newPassword, confirmPassword: newPassword }).success).toBe(true)
 })
 
-it.each(["Ab1!x", "abcdef1!", "Abcdef!", "Abcdef1", "Abcd1 "])("rejects a new password missing required strength: %s", newPassword => {
+it.each(["abcdef", "Ab1!x", "abcdef1!", "Abcdef!", "Abcdef1", "Abcd1 "])("rejects a new password missing required strength: %s", newPassword => {
   const result = changePasswordSchema.safeParse({ currentPassword: "Admin123", newPassword, confirmPassword: newPassword })
   expect(result.success).toBe(false)
   if (!result.success) expect(result.error.issues[0].path).toEqual(["newPassword"])

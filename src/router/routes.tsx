@@ -5,10 +5,8 @@ import { Navigate, type RouteObject } from "react-router-dom"
 import { StoreLayout } from "@/layout/storefront/store-layout"
 import { AccountLayout } from "@/layout/storefront/account-layout"
 
-import {
-  ProtectedRoute,
-  PublicOnlyRoute,
-} from "@/router/protected-route"
+import { ProtectedRoute } from "@/router/protected-route"
+import { PublicOnlyRoute } from "@/router/public-only-route"
 
 function page(load: () => Promise<{ default: ComponentType }>) {
   return async () => ({
@@ -22,6 +20,7 @@ export const routes: RouteObject[] = [
   // ==========================================
   {
     element: <StoreLayout />,
+    handle: { area: "storefront" },
     children: [
       {
         path: "/",
@@ -50,38 +49,43 @@ export const routes: RouteObject[] = [
           { path: "/register", lazy: page(() => import("@/pages/storefront/auth/register")) },
         ],
       },
-      // CUSTOMER ACCOUNT - UI PREVIEW
+      // Customer account requires a customer session.
       {
-        path: "/account",
-        element: <AccountLayout />,
+        element: <ProtectedRoute allowedRoles={["customer"]} storefront />,
         children: [
           {
-            index: true,
-            element: <Navigate to="profile" replace />,
-          },
-          {
-            path: "profile",
-            lazy: page(() =>
-              import("@/pages/storefront/account/profile")
-            ),
-          },
-          {
-            path: "orders",
-            lazy: page(() =>
-              import("@/pages/storefront/account/orders")
-            ),
-          },
-          {
-            path: "addresses",
-            lazy: page(() =>
-              import("@/pages/storefront/account/addresses")
-            ),
-          },
-          {
-            path: "change-password",
-            lazy: page(() =>
-              import("@/pages/storefront/account/change-password")
-            ),
+            path: "/account",
+            element: <AccountLayout />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="profile" replace />,
+              },
+              {
+                path: "profile",
+                lazy: page(() =>
+                  import("@/pages/storefront/account/profile")
+                ),
+              },
+              {
+                path: "orders",
+                lazy: page(() =>
+                  import("@/pages/storefront/account/orders")
+                ),
+              },
+              {
+                path: "addresses",
+                lazy: page(() =>
+                  import("@/pages/storefront/account/addresses")
+                ),
+              },
+              {
+                path: "change-password",
+                lazy: page(() =>
+                  import("@/pages/storefront/account/change-password")
+                ),
+              },
+            ],
           },
         ],
       },
@@ -93,6 +97,7 @@ export const routes: RouteObject[] = [
   // ==========================================
   {
     element: <PublicOnlyRoute />,
+    handle: { area: "admin" },
     children: [
       {
         path: "/login",
@@ -137,6 +142,7 @@ export const routes: RouteObject[] = [
   // ==========================================
   {
     element: <ProtectedRoute allowedRoles={["admin", "staff"]} />,
+    handle: { area: "admin" },
     children: [
       { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
       // MAIN DASHBOARD

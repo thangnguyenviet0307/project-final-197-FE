@@ -1,5 +1,7 @@
 # AGENTS.md
 
+Read [PROJECT_RULES.md](PROJECT_RULES.md) before making changes. It records the implemented business rules and pnpm verification commands.
+
 ## 1. Project Overview
 
 - This repository is the frontend, built with React, Vite and TypeScript.

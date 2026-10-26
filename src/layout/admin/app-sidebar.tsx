@@ -79,8 +79,8 @@ const data = {
       label: "Các trang",
       items: [
         {
-          title: "Trang giới thiệu",
-          url: "/landing",
+          title: "Trang Bán hàng",
+          url: "/",
           target: "_blank",
           icon: LayoutTemplate,
         },

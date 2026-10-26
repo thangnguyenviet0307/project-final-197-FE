@@ -17,16 +17,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { getApiError } from "@/services/api"
 import { useAuthStore } from "@/stores/auth.store"
 import { profileSchema, type ProfileValues } from "@/features/profile/schemas/profile-schema"
-import type { User } from "@/features/auth/types/auth"
+import { valuesFromUser } from "@/features/profile/utils/profile-values"
 import { ContentSkeleton } from "@/components/page-skeleton"
-
-function valuesFromUser(user: User | null): ProfileValues {
-  return {
-    firstName: user?.firstName ?? "", lastName: user?.lastName ?? "",
-    personalEmail: user?.personalEmail ?? "", phone: user?.phone ?? "",
-    location: user?.location ?? "", bio: user?.bio ?? "",
-  }
-}
 
 function displayValue(value: string | undefined, fallback = "Chưa cung cấp") {
   return value?.trim() || fallback
