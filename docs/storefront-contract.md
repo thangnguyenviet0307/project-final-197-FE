@@ -9,7 +9,7 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 | Đăng nhập | `/auth/register`, `/auth/login`, `/auth/me`, refresh/logout | Đã có tài khoản role customer; đăng ký → đăng nhập → homepage. Khách không có quyền quản trị |
 | Customers | CRUD `/customers`, phân trang/search | Hồ sơ liên hệ, không chứa thông tin xác thực hoặc quan hệ với session người mua |
 | Catalog | `/products`, `/categories`, `/brands` | Yêu cầu xác thực và quyền nội bộ; không gọi bằng tài khoản admin nhúng trong Frontend |
-| Tạo đơn | `POST /orders` với `customerId`, địa chỉ, paymentType, product/variant ID và quantity | Chỉ admin có quyền tạo; chưa có checkout dành cho khách |
+| Tạo đơn | `POST /orders` với `customerId`, địa chỉ, paymentType, product/variant ID và quantity | Admin/staff có quyền tạo đơn nội bộ; chưa có checkout dành cho khách |
 | Đọc đơn | `/orders`, `/orders/:id` | Scope theo quyền nhân viên, chưa phải quyền sở hữu đơn của người mua |
 
 ## Các quyết định cần chốt
@@ -27,3 +27,7 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 Catalog khách và chi tiết sản phẩm → giỏ hàng → checkout/tạo đơn → xác thực/tài khoản khách và lịch sử đơn theo chính sách đã chốt. Nếu checkout yêu cầu đăng nhập, triển khai xác thực trước checkout.
 
 Trang đặt tại `src/pages/storefront`, layout tại `src/layout/storefront`; nghiệp vụ mới nằm trong `src/features`. Chỉ tái sử dụng service/hook quản trị sau khi kiểm tra quyền, response và side effect điều hướng.
+
+## Account đã triển khai
+
+`/account` yêu cầu role customer. Hồ sơ dùng GET/PATCH `/auth/me`, email đăng nhập và role không sửa được; đổi mật khẩu dùng POST `/auth/change-password` và kết thúc phiên. Đăng ký công khai không nhận role/active và không tự đăng nhập. Orders/addresses vẫn là preview, chưa có API sở hữu đơn hàng dành cho người mua. Quy tắc đầy đủ: [PROJECT_RULES.md](../PROJECT_RULES.md).

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { expect, it, vi } from "vitest"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
@@ -20,7 +21,7 @@ function setup(save = vi.fn().mockResolvedValue(undefined)) {
     { path: "/products/:id", element: <p>Chi tiết sản phẩm</p> },
     { path: "/products", element: <p>Product list</p> },
   ], { initialEntries: [{ pathname: `/products/${id}/edit`, state: { returnTo: "/products?page=3&limit=20&color=blue" } }] })
-  render(<RouterProvider router={router} />)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   return { router, save }
 }
 it("blocks Cancel, keeps the draft, and leaves only after discard confirmation", async () => {
@@ -80,7 +81,7 @@ it("returns from detail to the exact list URL", async () => {
     { path: "/products/:id", element: <ProductDetailPage /> },
     { path: "/products", element: <p>Restored list</p> },
   ], { initialEntries: [{ pathname: `/products/${id}`, state: { returnTo } }] })
-  render(<RouterProvider router={router} />)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   fireEvent.click(screen.getByRole("link", { name: "Quay lại" }))
   expect(await screen.findByText("Restored list")).toBeTruthy()
   expect(router.state.location.pathname + router.state.location.search).toBe(returnTo)
@@ -91,7 +92,7 @@ it("guards a new product draft and preserves its list URL on cancellation", asyn
     { path: "/products/new", element: <ProductCreatePage /> },
     { path: "/products", element: <p>Restored list</p> },
   ], { initialEntries: [{ pathname: "/products/new", state: { returnTo } }] })
-  render(<RouterProvider router={router} />)
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "New case" } })
   fireEvent.click(screen.getByRole("link", { name: "Về danh sách sản phẩm" }))
   fireEvent.click(await screen.findByRole("button", { name: "Bỏ thay đổi" }))

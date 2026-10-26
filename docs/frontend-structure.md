@@ -80,11 +80,11 @@ Không tạo `redux/` vì ứng dụng đang dùng Zustand. State cục bộ gi�
 
 Component riêng một trang có thể nằm trong `components/` con cạnh trang đó. CSS riêng nằm cạnh trang/component; global styles giữ ở `src/index.css`. Trang mẫu được giữ để tham khảo trong `pages/template/`; mẫu Users và dữ liệu minh họa nằm ở `pages/template/users/`, không được đăng ký route.
 
-Storefront có homepage `/`, `/contact`, đăng ký `/register` và đăng nhập khách hàng `/account/login`; `/landing` nằm trong `pages/public/landing/`. Đăng ký gọi `/auth/register`, thành công chuyển sang đăng nhập; đăng nhập thành công về homepage. Các trang hồ sơ/đơn hàng/địa chỉ trong account vẫn là bản xem trước, chưa lưu API. Catalog công khai, giỏ hàng và checkout chưa được đăng ký trong router. Thư mục trang mới không tự tạo URL.
+Storefront có homepage `/`, `/contact`, đăng ký `/register` và đăng nhập khách hàng `/account/login`; `/landing` nằm trong `pages/public/landing/`. Đăng ký gọi `/auth/register`, thành công chuyển sang đăng nhập; đăng nhập thành công về homepage. Các trang /account được bảo vệ bằng role customer. Hồ sơ dùng GET/PATCH /auth/me; đổi mật khẩu dùng POST /auth/change-password và đưa khách về /account/login. Đơn hàng và địa chỉ vẫn là bản xem trước. Catalog công khai, giỏ hàng và checkout chưa được đăng ký trong router. Thư mục trang mới không tự tạo URL.
 
 Pages giữ giao diện, điều hướng và trạng thái URL; hook nghiệp vụ giữ query, mutation và cập nhật cache. Service không chứa schema form. `types/api.ts` cung cấp envelope, response, error và pagination dùng chung; endpoint có khác biệt metadata phải giữ đúng hợp đồng thay vì giả định mọi response giống nhau.
 
-Sau khi merge code, đưa trang Brands/Customers vào `pages/admin/<nghiệp-vụ>/index.tsx`, component vào `features/<nghiệp-vụ>/components/`, API vào `services/` và kiểu dữ liệu vào `types/` của feature tương ứng. Không tạo lại `src/app/` hoặc import từ đường dẫn layout cũ. Brands và Customers dùng route `/brands`, `/customers`, được bảo vệ bằng quyền admin như menu quản trị. Cache danh sách thương hiệu cho trang quản trị dùng `["brands", "management"]`; danh sách dùng trong form sản phẩm giữ `["brands"]` vì hai bên có định dạng dữ liệu khác nhau. Sau mutation, invalidate prefix `["brands"]` cập nhật cả hai.
+Sau khi merge code, đưa trang Brands/Customers vào `pages/admin/<nghiệp-vụ>/index.tsx`, component vào `features/<nghiệp-vụ>/components/`, API vào `services/` và kiểu dữ liệu vào `types/` của feature tương ứng. Không tạo lại `src/app/` hoặc import từ đường dẫn layout cũ. Brands và Customers dùng route `/brands`, `/customers`, cho admin/staff xem. Chỉ admin được sửa/xóa; staff được tạo hồ sơ khách hàng. Xem PROJECT_RULES.md để biết phân quyền chi tiết. Cache danh sách thương hiệu cho trang quản trị dùng `["brands", "management"]`; danh sách dùng trong form sản phẩm giữ `["brands"]` vì hai bên có định dạng dữ liệu khác nhau. Sau mutation, invalidate prefix `["brands"]` cập nhật cả hai.
 
 Import dùng alias `@/`. Ví dụ:
 
@@ -109,3 +109,5 @@ Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.
 - Product deletion queues managed gallery public IDs in the same transaction. The Backend worker retries Cloudinary cleanup from a durable outbox; it does not delete external thumbnail URLs.
 - Category, Brand and User create forms share dirty-navigation/Cancel protection. Brand status is editable; descriptions retain the API contract without silently truncating existing values.
 - Browser auth uses HttpOnly refresh cookies and in-memory access tokens; see [AUTH.md](../AUTH.md) for origin/HTTPS/same-site deployment requirements. Demo passwords remain unchanged by explicit user decision.
+
+Quy tắc nghiệp vụ và lệnh pnpm hiện hành: [PROJECT_RULES.md](../PROJECT_RULES.md). Admin có liên kết “Trang Bán hàng” tới `/`.

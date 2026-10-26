@@ -79,8 +79,8 @@ const data = {
       label: "Các trang",
       items: [
         {
-          title: "Trang giới thiệu",
-          url: "/landing",
+          title: "Trang Bán hàng",
+          url: "/",
           target: "_blank",
           icon: LayoutTemplate,
         },
@@ -196,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/users", "/brands"].includes(item.url) ||
+      (!["/users"].includes(item.url) ||
        user?.role === "admin")
     ),
   }))

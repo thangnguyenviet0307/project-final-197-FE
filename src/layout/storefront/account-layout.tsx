@@ -55,7 +55,7 @@ export function AccountLayout() {
                 Tài khoản của tôi
               </h2>
               <p className="mt-1 text-xs text-gray-300">
-                Bản xem trước khu vực khách hàng
+                Quản lý tài khoản khách hàng
               </p>
             </div>
 

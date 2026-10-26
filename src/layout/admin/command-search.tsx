@@ -165,7 +165,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/users", "/brands"].includes(item.url) || role === "admin")
+    (!["/users"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

@@ -36,6 +36,13 @@ export const productSchema = z.object({
     skus.add(variant.sku)
   })
 })
+// Existing missing references must not block unrelated partial metadata updates.
+export function productEditSchema(product: Product) {
+  return productSchema.safeExtend({
+    category: catalogId(product.category) ? objectId : z.union([objectId, z.literal("")]),
+    brand: catalogId(product.brand) ? objectId : z.union([objectId, z.literal("")]),
+  })
+}
 export type ProductFormValues = z.infer<typeof productSchema>
 
 export function productErrorPath(field: string, values: ProductFormValues): string | null {
@@ -81,6 +88,9 @@ export function productUpdatePayload(
     typeof field === "object" && field !== null && Object.values(field).some(hasChanges)
   )
   const update = Object.fromEntries(Object.entries(payload).filter(([key, value]) => value !== undefined && hasChanges(changedFields[key as keyof ProductFormValues]))) as Partial<ProductInput>
+  for (const name of ["category", "brand"] as const) {
+    if (update[name] === "" && !catalogId(original[name])) delete update[name]
+  }
   // JSON drops undefined; clearing an existing nullable value must be explicit.
   if (update.variants) update.variants = update.variants.map(variant => {
     const previous = variant._id ? original.variants?.find(item => item._id === variant._id) : undefined

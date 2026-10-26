@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { productDefaults, productPayload, productUpdatePayload, productSchema, productErrorPath } from "@/features/products/schemas/product-schema"
+import { productEditSchema, productDefaults, productPayload, productUpdatePayload, productSchema, productErrorPath } from "@/features/products/schemas/product-schema"
 import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
@@ -77,4 +77,13 @@ it("preserves untouched compare-at prices and sends null for a cleared price eve
   const update = productUpdatePayload(input, { variants: [{ stock: true, compare_at_price: true }], price: true }, previous)
   expect(JSON.parse(JSON.stringify(update)).variants[0].compare_at_price).toBeNull()
   expect(update).not.toHaveProperty("price")
+})
+
+it("allows unrelated edits with missing legacy catalog references without sending empty IDs", () => {
+  const original: Product = { _id: id, product_name: "Phone case", model_year: 2026, category: null, brand: null }
+  const input = { ...productDefaults(original), description: "Updated" }
+  expect(productSchema.safeParse(input).success).toBe(false)
+  const result = productEditSchema(original).parse(input)
+  expect(productUpdatePayload(result, { description: true }, original)).toEqual({ description: "Updated" })
+  expect(productEditSchema(original).safeParse({ ...input, category: "invalid" }).success).toBe(false)
 })

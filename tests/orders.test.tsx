@@ -149,7 +149,7 @@ it("staff claims an unassigned pending order through the restricted start endpoi
   expect(screen.queryByRole("dialog")).toBeNull()
   await waitFor(() => expect(writes).toEqual([{ url: `/orders/${id}/start`, body: {} }]))
   await waitFor(() => expect(screen.queryByRole("button", { name: "Nhận đơn & bắt đầu" })).toBeNull())
-  expect(screen.queryByRole("button", { name: /Cập nhật trạng thái/ })).toBeNull()
+  expect(screen.getByRole("button", { name: /Cập nhật trạng thái/ })).toBeTruthy()
 })
 it("admin selects an active staff handler and starts the order", async () => {
   const handlerId = "c".repeat(24)

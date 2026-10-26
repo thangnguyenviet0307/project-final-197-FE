@@ -2,7 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ThemeProvider } from "@/context/theme-provider"
 import { SidebarConfigProvider } from "@/context/sidebar-context"
 import { Toaster } from "@/components/ui/toast"
-import { RootFallback, RootLayout } from "@/layout/root-layout"
+import { RootLayout } from "@/layout/root-layout"
+import { RouteFallback, isStorefrontRoute } from "@/router/route-fallback"
 import { routes } from "@/router/routes"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClient } from "@/services/query-client"
@@ -17,7 +18,7 @@ const router = createBrowserRouter(
   [
     {
       element: <RootLayout />,
-      HydrateFallback: RootFallback,
+      HydrateFallback: RouteFallback,
       children: routes,
     },
   ],
@@ -39,7 +40,7 @@ function App() {
         <SidebarConfigProvider>
           <Toaster>
             <QueryClientProvider client={queryClient}>
-              <AuthBootstrap><RouterProvider router={router} /></AuthBootstrap>
+              <AuthBootstrap storefront={isStorefrontRoute(router.state.location.pathname, basename || "/")}><RouterProvider router={router} /></AuthBootstrap>
             </QueryClientProvider>
           </Toaster>
         </SidebarConfigProvider>

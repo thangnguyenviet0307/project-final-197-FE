@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { LoaderCircle } from "lucide-react"
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import { useBrands } from "@/features/brands/hooks/use-brands"
-import { productDefaults, productPayload, productUpdatePayload, productSchema, productErrorPath, type ProductFormValues } from "@/features/products/schemas/product-schema"
+import { productDefaults, productPayload, productUpdatePayload, productSchema, productEditSchema, productErrorPath, type ProductFormValues } from "@/features/products/schemas/product-schema"
 import type { CatalogReference, Product, ProductInput } from "@/features/products/types/products"
 import { getApiError } from "@/services/api"
 import { Button } from "@/components/ui/button"
@@ -29,7 +29,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   const categories = useCategories()
   const brands = useBrands()
   const [original] = useState(product)
-  const form = useForm<ProductFormValues>({ resolver: zodResolver(productSchema), defaultValues: productDefaults(original) })
+  const form = useForm<ProductFormValues>({ resolver: zodResolver(original ? productEditSchema(original) : productSchema), defaultValues: productDefaults(original) })
   const { dirtyFields, isDirty } = form.formState
   const { blocker, allowSavedNavigation } = useUnsavedProductChanges(isDirty)
   const returnTo = useProductListLocation()
