@@ -4,8 +4,6 @@ import { Link } from "react-router-dom"
 import { CatalogImage } from "@/components/catalog-image"
 import { usePublicCategories } from "@/features/categories/hooks/use-public-categories"
 import type { PublicCategory } from "@/features/categories/types/categories"
-import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
-import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
 import "./store-departments-menu.css"
 
 function CategoryBranch({
@@ -103,10 +101,7 @@ function CategoryBranch({
 }
 
 export function StoreDepartmentsMenu() {
-  const productsQuery = useStoreProducts({ page: 1, limit: 12 })
-  const storefrontProducts = (productsQuery.data?.data ?? []).map(mapCatalogProduct)
   const [open, setOpen] = useState(false)
-  const [showAllProducts, setShowAllProducts] = useState(false)
   const { data: categories = [], isPending, isError, refetch, isFetching } =
     usePublicCategories(open)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -119,7 +114,6 @@ export function StoreDepartmentsMenu() {
   useEffect(() => {
     const closeMenu = () => {
       setOpen(false)
-      setShowAllProducts(false)
     }
     const handleOutsideClick = (event: MouseEvent) => {
       if (
@@ -141,19 +135,11 @@ export function StoreDepartmentsMenu() {
     }
   }, [])
 
-  function closeMenu() {
-    setOpen(false)
-    setShowAllProducts(false)
-  }
-
   return (
     <div ref={containerRef} className="relative z-50 w-full lg:w-[280px] xl:w-[320px]">
       <button
         type="button"
-        onClick={() => {
-          setOpen((value) => !value)
-          setShowAllProducts(false)
-        }}
+        onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={panelId}
         className="flex h-14 w-full items-center justify-between rounded-t-lg bg-black px-5 text-white transition-colors hover:bg-[#171717]"
@@ -169,60 +155,6 @@ export function StoreDepartmentsMenu() {
           id={panelId}
           className="absolute left-0 top-full z-50 mt-7 max-h-[70vh] w-full overflow-y-auto bg-white shadow-[0_3px_18px_rgba(0,0,0,0.08)] lg:max-h-none lg:overflow-visible"
         >
-          <button
-            type="button"
-            aria-expanded={showAllProducts}
-            aria-controls={`${panelId}-all-products`}
-            onClick={() => setShowAllProducts((value) => !value)}
-            className="flex min-h-[52px] w-full items-center justify-between border-b border-[#e8e8e8] px-5 py-3 text-left text-base font-medium text-[#666] transition-colors hover:bg-gray-50 hover:text-[#55b000]"
-          >
-            <span>Tất cả sản phẩm ({productsQuery.data?.pagination.total ?? 0})</span>
-            <ChevronRight
-              size={16}
-              className={`transition-transform ${showAllProducts ? "rotate-90" : ""}`}
-            />
-          </button>
-
-          {showAllProducts && (
-            <section
-              id={`${panelId}-all-products`}
-              aria-label="Tất cả sản phẩm"
-              className="store-category-submenu border-b border-[#e8e8e8] bg-white p-3 lg:absolute lg:left-full lg:top-0 lg:z-20 lg:w-[min(720px,calc(100vw-360px))] lg:border lg:p-4 lg:shadow-xl"
-            >
-              <div className="max-h-[65vh] overflow-y-auto pr-1">
-                <Link to="/shop" onClick={closeMenu} className="mb-3 block text-sm font-semibold text-green-700">Xem tất cả sản phẩm</Link>
-                {productsQuery.isPending && <p role="status">Đang tải sản phẩm…</p>}
-                {productsQuery.isError && <p role="alert">Không thể tải sản phẩm. Vui lòng thử lại ở trang sản phẩm.</p>}
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {storefrontProducts.map((product) => (
-                    <Link
-                      key={product.id}
-                      to={`/shop/${product.slug}`}
-                      onClick={closeMenu}
-                      className="flex min-w-0 items-center gap-3 rounded-lg border border-[#e8e8e8] bg-white p-2 transition-colors hover:border-[#b9d9a0] hover:bg-[#f8fbf5]"
-                    >
-                      <img
-                        src={product.image}
-                        alt=""
-                        loading="lazy"
-                        className="size-12 shrink-0 rounded-md object-cover"
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[11px] font-medium text-[#57952b]">
-                          {product.category}
-                        </span>
-                        <span className="mt-0.5 block truncate text-xs font-semibold text-gray-800">
-                          {product.name}
-                        </span>
-                      </span>
-                      <ChevronRight size={14} className="shrink-0 text-gray-400" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
           {isPending ? (
             <p role="status" className="px-5 py-4 text-sm text-gray-600">
               Đang tải danh mục…

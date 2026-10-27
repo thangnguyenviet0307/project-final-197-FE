@@ -1,5 +1,6 @@
 import type { CatalogReference } from "@/features/products/types/products"
 export interface Brand extends CatalogReference { slug: string; description?: string; logoUrl?: string }
+export interface PublicBrand { _id: string; name: string; slug: string; logoUrl?: string }
 
 export interface IBrand extends Brand {
   _id: string

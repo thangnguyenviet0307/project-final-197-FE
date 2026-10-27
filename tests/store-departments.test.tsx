@@ -10,7 +10,6 @@ const query = vi.hoisted(() => ({ data: [
   { _id: "3", name: "Phụ kiện", slug: "phu-kien", parent: "missing" },
 ], isPending: false, isError: false, isFetching: false, refetch: vi.fn() }))
 vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => query }))
-vi.mock("@/features/storefront/hooks/use-store-products", () => ({ useStoreProducts: () => ({ data: { data: [], pagination: { total: 0 } }, isPending: false, isError: false }) }))
 
 it("opens the child mega menu on desktop hover and closes it when leaving the whole branch", () => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })))
@@ -31,6 +30,7 @@ it("opens the child mega menu on desktop hover and closes it when leaving the wh
 it("renders API hierarchy and unavailable-parent children; handles empty, loading and retry states", () => {
   const { rerender } = render(<StoreDepartmentsMenu />)
   fireEvent.click(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }))
+  expect(screen.queryByText(/Tất cả sản phẩm/)).toBeNull()
   expect(screen.getByText("Phụ kiện")).toBeTruthy()
   expect(screen.queryByText("Bàn phím")).toBeNull()
   fireEvent.click(screen.getByRole("button", { name: /Linh kiện/ }))
