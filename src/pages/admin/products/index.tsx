@@ -86,7 +86,10 @@ export default function AdminProductsPage() {
           const salePrice = product.price === undefined ? null : discountedPrice(product.price, product.discount)
           return <TableRow key={product._id}>
           <TableCell><div className="flex min-w-56 max-w-96 items-center gap-3"><ProductImage src={product.thumbnail} alt="" className="size-12 shrink-0 object-cover" />
-            <Link className="truncate font-medium hover:underline" to={`/products/${product._id}`} state={linkState} title={product.product_name}>{product.product_name}</Link></div></TableCell>
+            <div className="min-w-0"><Link className="block truncate font-medium hover:underline" to={`/products/${product._id}`} state={linkState} title={product.product_name}>{product.product_name}</Link>
+              <p className="truncate text-xs text-muted-foreground">SKU: {product.sku || "Chưa có SKU sản phẩm"}</p>
+              {!!product.tags?.length && <p className="truncate text-xs text-muted-foreground" title={product.tags.join(", ")}>{product.tags.join(" · ")}</p>}
+            </div></div></TableCell>
           <TableCell>{catalogName(product.category)}</TableCell><TableCell>{catalogName(product.brand)}</TableCell>
           <TableCell className="whitespace-nowrap">{product.price === undefined ? "—" : formatPrice(product.price)}</TableCell>
           <TableCell>{product.discount === undefined ? "—" : `${product.discount}%`}</TableCell>

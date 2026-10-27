@@ -10,4 +10,3 @@ export const categorySchema = z.object({
 });
 
 export type CategoryFormInput = z.infer<typeof categorySchema>;
-

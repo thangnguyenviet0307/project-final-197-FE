@@ -10,15 +10,15 @@ export function StoreTopBar() {
   return (
     <div className="flex items-center gap-3 text-gray-800">
       <UserRoundPlus size={30} strokeWidth={1.8} className="shrink-0" aria-hidden="true" />
-      <div className="flex flex-col items-start gap-1 whitespace-nowrap text-base font-semibold">
+      <div className="flex flex-col items-start gap-1 min-w-0 text-sm font-semibold">
         <Link
           to={user?.role === "customer" ? "/account/profile" : user ? "/" : "/register"}
-          className="transition-colors hover:text-[#55b000]"
+          className="max-w-40 truncate transition-colors hover:text-[#55b000]"
         >
           {user ? user.name : "Đăng ký"}
         </Link>
         {user ? <LogoutButton redirectTo="/account/login" /> : (
-          <Link to="/account/login" className="transition-colors hover:text-[#55b000]">
+          <Link to="/account/login" className="max-w-40 truncate transition-colors hover:text-[#55b000]">
             Đăng nhập
           </Link>
         )}

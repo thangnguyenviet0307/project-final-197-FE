@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { Menu, X } from "lucide-react"
 
 import { StoreDepartmentsMenu } from "./store-departments-menu"
+import { StoreTopBar } from "./store-top-bar"
 
 export function StoreNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -18,38 +19,38 @@ export function StoreNavbar() {
       aria-label="Điều hướng cửa hàng"
     >
       <div className="mx-auto max-w-[1440px] px-4 sm:px-5">
-        <div className="flex min-h-14 items-center gap-5">
+        <div className="flex min-h-14 items-center">
           {/* ALL DEPARTMENTS */}
           <div className="hidden shrink-0 lg:block">
             <StoreDepartmentsMenu />
           </div>
 
           {/* DESKTOP LINKS */}
-          <div className="hidden h-14 min-w-0 flex-1 items-center justify-between gap-3 px-4 lg:flex xl:px-6">
+          <div className="hidden h-14 min-w-0 flex-1 grid-cols-[1fr_1px_1fr_1px_1fr_1px_1fr] items-center lg:grid">
             <Link
               to="/"
-              className="flex h-full shrink-0 items-center text-sm font-semibold text-white transition-colors hover:text-black"
+              className="flex h-full flex-1 items-center justify-center text-center text-sm font-semibold text-white transition-colors hover:text-black"
             >
               TRANG CHỦ
             </Link>
 
-            <span className="text-sm text-white/40">|</span>
+            <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
+            <span className="flex h-full flex-1 items-center justify-center text-center text-sm font-semibold text-white/90">
               KHÁM PHÁ
             </span>
 
-            <span className="text-sm text-white/40">|</span>
+            <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
+            <span className="flex h-full flex-1 items-center justify-center text-center text-sm font-semibold text-white/90">
               TIN TỨC
             </span>
 
-            <span className="text-sm text-white/40">|</span>
+            <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
             <Link
               to="/contact"
-              className="flex h-full shrink-0 items-center text-sm font-semibold text-white transition-colors hover:text-black"
+              className="flex h-full flex-1 items-center justify-center text-center text-sm font-semibold text-white transition-colors hover:text-black"
             >
               LIÊN HỆ
             </Link>
@@ -78,11 +79,14 @@ export function StoreNavbar() {
         {/* MOBILE MENU */}
         {mobileOpen && (
           <div className="border-t border-white/20 pb-4 lg:hidden">
+            <div className="mt-3 rounded-lg bg-white p-4">
+              <StoreTopBar />
+            </div>
             <div className="space-y-1 py-3">
               <Link
                 to="/"
                 onClick={closeMobileMenu}
-                className="block rounded-md px-4 py-3 text-sm font-semibold text-white hover:bg-white/15"
+                className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/15"
               >
                 TRANG CHỦ
               </Link>

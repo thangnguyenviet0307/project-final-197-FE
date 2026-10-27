@@ -5,6 +5,7 @@ import { CustomerProfileDialog } from "@/features/customers/components/customer-
 
 
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { Search, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -255,6 +256,7 @@ export function CustomerTable({
                   {/* Chỉnh sửa và xóa */}
                   <TableCell>
                     <div className="flex items-center gap-2">
+                      <Link className="text-sm underline" to={`/orders?customerId=${customer._id}`}>Lịch sử đơn hàng</Link>
                       <CustomerProfileDialog customer={customer} />
 
                       {admin && <DeleteCustomerDialog

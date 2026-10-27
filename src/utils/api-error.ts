@@ -135,6 +135,18 @@ export function getApiError(error: unknown): ApiError {
   if (axios.isAxiosError<ApiError>(error)) {
     const statusCode = error.response?.status ?? 0
     const responseMessage = error.response?.data?.message
+    if (statusCode === 429 && /^Too many authentication requests; retry later$/i.test(responseMessage ?? "")) {
+      const seconds = Number(error.response?.headers["retry-after"])
+      const wait = Number.isFinite(seconds) && seconds > 0
+        ? seconds < 60 ? `${Math.ceil(seconds)} giây` : `${Math.ceil(seconds / 60)} phút`
+        : null
+      return {
+        statusCode,
+        message: wait
+          ? `Bạn đã gửi quá nhiều yêu cầu xác thực. Vui lòng thử lại sau ${wait}.`
+          : "Bạn đã gửi quá nhiều yêu cầu xác thực. Vui lòng chờ vài phút rồi thử lại.",
+      }
+    }
     const errors = error.response?.data?.errors?.map((issue) => ({
       ...issue,
       message: validationMessage(issue.message, validationLabel(issue.field, error.config?.url)),

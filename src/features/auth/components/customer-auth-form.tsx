@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { Link, useLocation } from "react-router-dom"
 import { Eye, EyeOff, LoaderCircle } from "lucide-react"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { LoginCredentialInput } from "@/features/auth/components/login-credential-input"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { useLogin } from "@/features/auth/hooks/use-login"
 import { useRegisterCustomer } from "@/features/auth/hooks/use-register-customer"
@@ -52,7 +53,7 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
       <h2 className="text-2xl font-bold">{registration ? "Chào mừng đến DEMO STORE" : "Chào mừng bạn trở lại"}</h2>
       <p className="mt-2 mb-6 text-sm text-gray-500">{registration ? "Tạo tài khoản để mua sắm thuận tiện hơn." : "Nhập thông tin tài khoản để tiếp tục mua sắm."}</p>
       {!registration && typeof location.state?.message === "string" && <p role="status" className="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{location.state.message}</p>}
-      <form noValidate className="space-y-4" onSubmit={form.handleSubmit((values) => {
+      <form name={registration ? "customer-sign-up" : "customer-sign-in"} autoComplete="off" noValidate className="space-y-4" onSubmit={form.handleSubmit((values) => {
         form.clearErrors("root")
         if (registration) {
           registerMutation.mutate({ email: values.email, password: values.password, firstName: values.firstName, lastName: values.lastName })
@@ -68,7 +69,7 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
             return <Field key={name} data-invalid={!!form.formState.errors[name]}>
             <FieldLabel htmlFor={`customer-${name}`}>{label}</FieldLabel>
             <div className="relative">
-              <Input id={`customer-${name}`} type={type === "password" && passwordVisible ? "text" : type} autoComplete={autoComplete} aria-invalid={!!form.formState.errors[name]} aria-describedby={describedBy} className={type === "password" ? "customer-auth-password" : undefined} {...form.register(name)} />
+              {!registration && (name === "email" || name === "password") ? <Controller control={form.control} name={name} render={({ field }) => <LoginCredentialInput {...field} area="customer" credential={name} id={`customer-${name}`} type={type === "password" && passwordVisible ? "text" : type} aria-invalid={!!form.formState.errors[name]} aria-describedby={describedBy} className={type === "password" ? "customer-auth-password" : undefined} />} /> : <Input id={`customer-${name}`} type={type === "password" && passwordVisible ? "text" : type} autoComplete={autoComplete} aria-invalid={!!form.formState.errors[name]} aria-describedby={describedBy} className={type === "password" ? "customer-auth-password" : undefined} {...form.register(name)} />}
               {type === "password" && <button type="button" className="absolute inset-y-0 right-0 rounded-r-lg px-3 text-gray-500 hover:text-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#459000]" aria-label={`${passwordVisible ? "Ẩn" : "Hiện"} ${name === "confirmPassword" ? "mật khẩu xác nhận" : "mật khẩu"}`} aria-pressed={passwordVisible} onClick={() => name === "confirmPassword" ? setShowConfirmPassword(previous => !previous) : setShowPassword(previous => !previous)}>{passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}</button>}
             </div>
             {descriptionId && <p id={descriptionId} className="text-xs leading-5 text-gray-500">

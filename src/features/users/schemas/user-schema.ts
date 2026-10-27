@@ -8,4 +8,3 @@ export const createUserSchema = z.object({
   password: passwordSchema,
   role: z.enum(["admin", "staff"], { error: "Chọn Quản trị viên hoặc Nhân viên." }),
 });
-

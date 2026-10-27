@@ -20,6 +20,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Roles and authorization
 
+- GET /products/statistics returns total, active, outOfStock and stockUnits across the catalog for ProductView roles. GET /orders/personal-sales returns completedOrders and revenue for completed orders assigned to the authenticated actor only. Register these named endpoints before /:id; retain ObjectId validation for actual detail routes.
+
 - Admin manages staff accounts, catalog metadata, prices, images, brands/categories and destructive operations.
 - Staff can read products/categories/brands/customers and all order history. Staff may create customer contact records, accept eligible orders and manage only their assigned open orders. Staff cannot edit prices/catalog metadata, delete orders/customers, reassign handlers or manage users.
 - /brands is readable by admin/staff. Hide add/edit/delete controls from staff; /brands/new remains admin-only. Sidebar and command search must match route guards.
@@ -42,6 +44,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Product editing and pagination
 
+- Product administration supports product-level SKU/barcode, VND currency, tags (up to 30, each 1–50 characters), weight in kg, complete width/height/depth in cm, warranty/shipping/return text (up to 2000 characters) and minimum order quantity. Missing model years remain optional; nullable fields can be cleared explicitly. Import provenance and source images are read-only.
+- Product detail reads GET /products/:id/metrics and paginated GET /products/:id/reviews separately. Rating/reviewCount are computed from reviews; soldCount counts units in completed orders. Admin may add/delete reviews; staff may only read. Review creation uses rating 1–5, reviewerName and comment, with source assigned by Backend. Review mutations invalidate both review pages and metrics. Preserve review drafts on failure and confirm deletion.
 - New products require valid active category/brand references. Legacy products may have missing references. Allow unrelated partial metadata edits without forcing replacement references or sending empty IDs; validate any newly selected reference.
 - Submit only changed metadata. Preserve existing slug when updating a name unless a slug change is explicitly intended.
 - Inventory/variant mutations require the version read with the original data. Do not silently upgrade the version of a stale draft to bypass optimistic concurrency.
@@ -58,16 +62,18 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Authentication and customer account
 
-- Login redirects by the authenticated role, including from /account/login: customers go to storefront home /; admin/staff go to the admin dashboard. Public-only auth routes use the same role-based redirect. Mandatory password changes take precedence. Administrative login retains a valid requested admin destination when present.
+- Storefront /account/login accepts only customers; dashboard /login accepts only admin/staff. Send X-Login-Area: storefront or admin to /auth/login. Backend rejects wrong-area credentials with 401 and "Tài khoản không tồn tại !" before issuing tokens/cookies or changing existing sessions. Frontend also refuses unexpected roles before publishing a session. Existing sessions opening the wrong area's auth pages see the same error. Customer login returns to /; admin/staff retain valid requested admin destinations. Mandatory password changes take precedence.
 
 - Access tokens stay in memory; refresh tokens use HttpOnly cookies. Persist only a non-secret session marker. Never persist passwords/tokens in browser storage or expose them in responses/logs.
+- Admin and storefront sessions are isolated: markers use admin-auth/customer-auth (version 2), cookies use adminRefreshToken/customerRefreshToken, and refresh locks/storage events are scoped by area. Configure the area from matched route metadata before bootstrap. Crossing areas in the same tab reloads the document before rendering the destination, so tokens and private caches cannot carry across. Login forms start empty with autocomplete disabled; browser/password-manager extensions may override that hint. Legacy shared cookies/markers are not restored into scoped sessions; sign in again once after upgrading.
+- Login credential inputs use distinct admin/customer HTML names and controlled form values. They remain readonly until direct pointer or typing interaction, then relock on window blur/document hiding while preserving drafts. Focus alone must not unlock them. Keep registration fields separate and retain keyboard, paste and password-visibility behavior.
 - Reuse the shared refresh/session implementation and sessionVersion checks; clear query cache when identity changes or the user logs out.
 - /account and all its children require role=customer. Guests go to /account/login with their original location retained; admin/staff sessions receive 403. Admin routes reject customers.
 - Customer profile uses GET/PATCH /auth/me with the same strict profile schema as backend. Account email and role are read-only. personalEmail is an optional contact email, not the login email. Profile save refreshes the shared session user and profile cache.
 - New passwords require 6-1024 characters, an uppercase letter, a digit and a non-whitespace special character; confirmation must match and new/current passwords must differ. Existing login/demo passwords remain valid under the login schema.
 - Successful password changes revoke sessions. Clear frontend auth/cache and return customers to /account/login, admin/staff to /login.
 - mustChangePassword routes customers to /account/change-password and staff/admin to /change-password.
-- Storefront header links customer names to /account/profile. The admin navigation item is Trang Bán hàng and links to / (storefront home), not /landing.
+- Storefront header links customer names to /account/profile. The admin navigation item is Trang Bán hàng and opens / (storefront home) in a new tab with noopener noreferrer.
 
 ## Deliberately unfinished areas
 

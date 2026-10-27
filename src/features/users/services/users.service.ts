@@ -6,11 +6,9 @@ export function getDefaultUserPassword(role: "admin" | "staff") {
   return role === "admin" ? "Admin123" : "Staff123"
 }
 
-// Password resets generate a separate cryptographically random password.
+// Demo password resets use the same role-based defaults as account creation.
 export function getTemporaryPassword(role: "admin" | "staff") {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789-_"
-  const bytes = crypto.getRandomValues(new Uint8Array(20))
-  return `${role === "admin" ? "A" : "S"}a7!${Array.from(bytes, byte => alphabet[byte % alphabet.length]).join("")}`
+  return getDefaultUserPassword(role)
 }
 
 export async function listUsers(

@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useAuthStore } from "@/stores/auth.store"
+import { authStorageKey, useAuthStore } from "@/stores/auth.store"
 import { clearAuth } from "@/services/api"
 import { initializeSession } from "@/features/auth/services/auth.service"
 
@@ -9,7 +9,7 @@ export function useAuthSession() {
   useEffect(() => { void initializeSession() }, [])
   useEffect(() => {
     const sync = (event: StorageEvent) => {
-      if (event.key === "admin-auth" || event.key === null) window.location.reload()
+      if (event.key === authStorageKey() || event.key === null) window.location.reload()
     }
     window.addEventListener("storage", sync)
     return () => window.removeEventListener("storage", sync)

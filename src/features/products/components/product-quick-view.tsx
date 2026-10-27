@@ -15,6 +15,7 @@ function ProductPreview({ id }: { id: string }) {
   return <div className="space-y-3">
     <div className="flex items-center gap-3"><ProductImage src={product.thumbnail} alt={product.product_name} className="size-16 shrink-0 border" /><p className="min-w-0 break-words font-medium">{product.product_name}</p></div>
     <dl className="grid grid-cols-2 gap-3 text-sm">{[
+      ["SKU sản phẩm", product.sku || "Chưa có thông tin"], ["Mã vạch", product.barcode || "Chưa có thông tin"],
       ["Danh mục", catalogName(product.category)], ["Thương hiệu", catalogName(product.brand)],
       ["Giá", product.price === undefined ? "Không có thông tin" : formatPrice(product.price)],
       ["Tồn kho", product.stock ?? "Chưa xác định"], ["Trạng thái", product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"],

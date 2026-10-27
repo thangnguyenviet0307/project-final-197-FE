@@ -104,9 +104,17 @@ Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.
 
 ## Admin contract updates
 
+- Dashboard dùng `/products/statistics` và `/orders/personal-sales`; các route tĩnh phải đứng trước `/:id` tại Backend. Doanh số cá nhân chỉ tính đơn hoàn tất của người đang đăng nhập; không nhận handler ID tùy ý từ client.
+
+- Phiên admin và storefront độc lập: khóa `admin-auth`/`customer-auth`, cookie `adminRefreshToken`/`customerRefreshToken`. Chọn khu vực theo route trước bootstrap; chuyển khu vực trong cùng tab tải lại trang để không mang token/cache sang khu vực khác. Đăng nhập/đăng xuất một khu vực không tải lại tab của khu vực còn lại.
+
+- Form `/account/login` chỉ nhận customer; `/login` chỉ nhận admin/staff. Gửi `X-Login-Area` để Backend chặn sai loại tài khoản trước khi cấp phiên, báo `Tài khoản không tồn tại !`.
+
+- Products: form tạo/sửa hỗ trợ SKU sản phẩm, mã vạch, nhãn, khối lượng (kg), ba kích thước (cm), chính sách bảo hành/giao hàng/đổi trả và số lượng đặt tối thiểu. Năm sản xuất không bắt buộc; chỉ gửi metadata thay đổi. Thông tin nguồn import và ảnh nguồn chỉ hiển thị ở chi tiết, không gửi trong payload chỉnh sửa.
+- Chi tiết Products ghép `ProductDetailsInfo` và `ProductReviews`. Hook `use-product-reviews` lấy metrics/reviews qua service riêng, quản lý mutation và invalidate cache `products/metrics` cùng `products/reviews`. Admin được thêm/xóa review, staff chỉ xem; điểm trung bình và số lượng đã bán do BE tính. Không gọi API metrics riêng cho từng dòng danh sách.
 - Trang Khách hàng chỉ hiển thị hồ sơ liên hệ `/customers`; đăng ký mới tạo User và Customer trong cùng transaction, liên kết bằng `accountId`. Điện thoại/địa chỉ chưa cung cấp được để trống. `/users` chỉ liệt kê admin/staff; không tự ghép hồ sơ cũ theo email hoặc tự chuyển dữ liệu đã có.
 
-- Đăng nhập điều hướng theo role: customer về homepage `/`, admin/staff về dashboard, kể cả khi dùng form `/account/login`. Trường hợp bắt buộc đổi mật khẩu ưu tiên trang đổi mật khẩu của khu vực tương ứng.
+- Đăng nhập store tại `/account/login` chỉ chấp nhận customer; admin/staff nhận lỗi, không lưu phiên frontend và thu hồi phiên cookie vừa cấp. Phiên admin/staff có sẵn mở trang đăng nhập/đăng ký store cũng nhận lỗi, không tự chuyển dashboard. Đăng nhập quản trị tại `/login` giữ điều hướng theo role và URL quản trị đã yêu cầu; bắt buộc đổi mật khẩu được ưu tiên cho tài khoản hợp lệ.
 
 - Deploy the corresponding Backend changes together with the Frontend. Inventory/variant updates require `expectedVersion` from the product response `__v`; stale requests return 409 and preserve the editor input. Metadata-only partial updates still omit inventory.
 - New Order items snapshot product/variant names and selected options alongside price/discount/SKU. Legacy missing snapshots are displayed as Not recorded; no historical data is backfilled.
@@ -116,4 +124,4 @@ Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.
 - Category, Brand and User create forms share dirty-navigation/Cancel protection. Brand status is editable; descriptions retain the API contract without silently truncating existing values.
 - Browser auth uses HttpOnly refresh cookies and in-memory access tokens; see [AUTH.md](../AUTH.md) for origin/HTTPS/same-site deployment requirements. Demo passwords remain unchanged by explicit user decision.
 
-Quy tắc nghiệp vụ và lệnh pnpm hiện hành: [PROJECT_RULES.md](../PROJECT_RULES.md). Admin có liên kết “Trang Bán hàng” tới `/`.
+Quy tắc nghiệp vụ và lệnh pnpm hiện hành: [PROJECT_RULES.md](../PROJECT_RULES.md). Admin có liên kết “Trang Bán hàng” mở `/` trong tab mới.

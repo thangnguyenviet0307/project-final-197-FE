@@ -19,4 +19,3 @@ export interface ManagedUser {
 }
 
 export interface UsersFilters { role?: ManagedUser["role"]; active?: boolean; sortBy?: "username"; sortOrder?: "asc" | "desc" }
-

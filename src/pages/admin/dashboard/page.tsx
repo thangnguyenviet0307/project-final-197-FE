@@ -1,3 +1,4 @@
+import { PersonalSales } from "@/features/orders/components/personal-sales"
 import { Link } from "react-router-dom"
 import { useIsFetching, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, Boxes, CheckCircle2, Package, PackageX, RefreshCw } from "lucide-react"
@@ -78,9 +79,10 @@ export default function DashboardPage() {
   return <BaseLayout title="Bảng điều khiển" description="Tổng quan nhanh về đơn hàng, sản phẩm và tồn kho.">
     <div className="space-y-6 px-4 lg:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">{admin ? "Thống kê bao gồm tất cả đơn hàng." : "Thống kê bao gồm đơn hàng được giao cho bạn và đơn hàng chưa được phân công."} Thống kê sản phẩm bao gồm toàn bộ danh mục.</p>
+        <p className="text-sm text-muted-foreground">{admin ? "Thống kê bao gồm tất cả đơn hàng." : "Bạn có thể xem toàn bộ lịch sử đơn hàng và quản lý đơn được giao, với tối đa 5 đơn đang xử lý."} Thống kê sản phẩm bao gồm toàn bộ danh mục.</p>
         <Button variant="outline" disabled={refreshing} onClick={() => void Promise.all([client.invalidateQueries({ queryKey: ["orders"] }), client.invalidateQueries({ queryKey: ["products"] })])}><RefreshCw className={refreshing ? "animate-spin" : undefined} />Làm mới</Button>
       </div>
+      {!admin && <PersonalSales />}
       <section aria-labelledby="dashboard-orders"><h2 id="dashboard-orders" className="mb-3 text-lg font-semibold">Tổng quan đơn hàng</h2><OrderStatistics /></section>
       <section aria-labelledby="dashboard-products"><h2 id="dashboard-products" className="mb-3 text-lg font-semibold">Sản phẩm và tồn kho</h2><ProductOverview /></section>
       <div className="grid gap-6 lg:grid-cols-3"><RecentOrders /><LowStockProducts /></div>

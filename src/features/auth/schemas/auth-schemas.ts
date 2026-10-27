@@ -1,7 +1,11 @@
-import { z } from "zod"
+import { z } from "zod";
 
-const passwordField = (label: string) => z.string({ error: `Vui lòng nhập ${label.toLowerCase()}.` }).min(6, `${label} phải có ít nhất 6 ký tự.`).max(1024, `${label} không được vượt quá 1024 ký tự.`)
-export const passwordSchema = passwordField("Mật khẩu")
+const passwordField = (label: string) =>
+  z
+    .string({ error: `Vui lòng nhập ${label.toLowerCase()}.` })
+    .min(6, `${label} phải có ít nhất 6 ký tự.`)
+    .max(1024, `${label} không được vượt quá 1024 ký tự.`);
+export const passwordSchema = passwordField("Mật khẩu");
 export const loginSchema = z.object({
   email: z.string().trim().email("Địa chỉ email không hợp lệ.").toLowerCase(),
   password: passwordSchema,

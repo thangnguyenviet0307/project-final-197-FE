@@ -10,7 +10,11 @@
 
 ## Accounts and navigation
 
-Customer sign-in is available at `/account/login` inside the storefront and uses the existing cookie-based `/auth/login` API. Sign-in redirects by role: customer to `/`, admin/staff to the admin dashboard. Authenticated sessions opening sign-in/registration follow the same rule. A required password change takes precedence: customers go to `/account/change-password`, admin/staff to `/change-password`. Storefront sign-out returns to `/account/login`. `/login` remains the separate administration sign-in page.
+Admin and storefront login sessions are independent, including in two tabs of the same browser. Each area has its own non-secret persisted marker, HttpOnly refresh cookie, refresh lock and storage-event listener. The active area is selected from route metadata before bootstrap. Crossing areas in the same tab reloads the document and restores only the destination area's session. Both login forms disable autocomplete and start with empty fields; browser password managers can override autocomplete settings. The upgrade discards old shared session markers; users sign in once per area again.
+
+To reduce cross-form password-manager autofill, credential HTML names are scoped to admin/customer and values are controlled by each form. Fields remain readonly until direct pointer or typing interaction; switching tabs locks them again without clearing typed drafts. Focus alone does not unlock a field. Registration keeps its own normal form controls. Browser extensions with direct DOM access can still override webpage controls.
+
+Customer sign-in at `/account/login` accepts only customers and returns them to `/`. Administration sign-in at `/login` accepts only admin/staff. Both use `/auth/login` with cookie transport and `X-Login-Area: storefront` or `admin`. Wrong-area accounts are rejected before issuing sessions with `Tài khoản không tồn tại !`; existing sessions opening the wrong area's sign-in page see the same error. Mandatory password changes take precedence. Storefront sign-out returns to `/account/login`.
 
 `/register` validates customer names (1–50 characters), email, password and confirmation, then sends only firstName, lastName, email and password to `POST /auth/register`. Successful registration opens `/account/login` with a confirmation message and empty password field; it does not sign in automatically. Successful customer sign-in opens the storefront homepage `/`. Customer account pages remain previews.
 
@@ -84,3 +88,13 @@ The Admin frontend sends `X-Auth-Transport: cookie` for login/refresh and enable
 Backend `FRONTEND_ORIGINS` is a comma-separated exact origin allowlist (default local origins: http://localhost:5173 and http://127.0.0.1:5173). Production requires an explicit allowlist and HTTPS. Keep FE/API on the same site for SameSite=Strict, or deploy an API reverse proxy; cross-site deployments need a separate cookie/CSRF design. Browser refresh requires the custom header and trusted Origin. Non-browser REST clients can retain the JSON token contract without Origin. No .env files are changed automatically.
 
 Demo creation passwords remain Admin123/Staff123 by explicit decision; mandatory first-password change remains enabled. These shared defaults are an accepted demo limitation and must be reconsidered before production.
+
+## Admin and Staff permissions
+
+Admin retains all existing management permissions. Staff may view all order history and details at every status, including other handlers' orders, and create manual orders assigned to themselves. Staff may accept eligible unassigned Pending orders, update status and cancellation reasons, and edit notes/delivery schedules on their own open orders. Orders assigned to another handler remain read-only; reassignment and permanent deletion remain Admin-only. Each Staff may hold up to five active (Pending or Processing) orders, enforced transactionally on create, acceptance, status assignment and Admin reassignment. Completed and Rejected orders free capacity. Cancellation uses the existing Rejected status, preserves the order, and restores inventory transactionally. Only Admin may permanently delete rejected orders or reassign handlers.
+
+Staff may view products and update inventory through `PATCH /products/:id/inventory`. This strict endpoint accepts only an expected product version and product stock or variant IDs/stocks; prices, discounts, product creation/deletion and image management remain Admin-only. Existing product SKU lookup remains available.
+
+Staff may view/create customers and inspect their accessible order history using the customer filter. Customer editing/deletion and account management remain Admin-only. No customer export endpoint or Staff export control is provided. This restricts built-in export, not the ability to copy information a user can already view.
+
+The Staff Dashboard shows personal all-time completed sales through `GET /orders/personal-sales`, scoped on the server to the authenticated account, plus operational order and inventory counts. Personal sales exclude unassigned orders and other handlers' orders. The system has no shift tracking, cost/profit or cash-flow module; shift revenue is not inferred. Order statuses remain Pending, Processing, Rejected and Completed.

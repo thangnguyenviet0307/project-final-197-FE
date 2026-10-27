@@ -8,23 +8,40 @@ function apiError({
   url = "/users",
   code,
   errors,
+  retryAfter,
 }: {
   status?: number
   message?: string
   url?: string
   code?: string
   errors?: { field: string; message: string }[]
+  retryAfter?: string
 }) {
   const config = { headers: new AxiosHeaders(), url }
   const response = status === undefined ? undefined : {
     status,
     statusText: "",
-    headers: new AxiosHeaders(),
+    headers: new AxiosHeaders(retryAfter ? { "retry-after": retryAfter } : {}),
     config,
     data: { message, errors },
   }
   return new AxiosError(message, code, config, undefined, response)
 }
+
+it.each([
+  ["900", "15 phút"], ["35", "35 giây"],
+])("explains authentication throttling and Retry-After %s in Vietnamese", (retryAfter, wait) => {
+  const failure = getApiError(apiError({ status: 429, message: "Too many authentication requests; retry later", url: "/auth/login", retryAfter }))
+  expect(failure.statusCode).toBe(429)
+  expect(failure.message).toBe(`Bạn đã gửi quá nhiều yêu cầu xác thực. Vui lòng thử lại sau ${wait}.`)
+})
+
+it("does not invent a wait duration when the rate-limit header is absent or invalid", () => {
+  for (const retryAfter of [undefined, "invalid", "-3"]) {
+    expect(getApiError(apiError({ status: 429, message: "Too many authentication requests; retry later", retryAfter })).message)
+      .toBe("Bạn đã gửi quá nhiều yêu cầu xác thực. Vui lòng chờ vài phút rồi thử lại.")
+  }
+})
 
 it("distinguishes incorrect or disabled sign-in from an expired authenticated session", () => {
   expect(getApiError(apiError({ status: 401, url: "/auth/login" })).message)

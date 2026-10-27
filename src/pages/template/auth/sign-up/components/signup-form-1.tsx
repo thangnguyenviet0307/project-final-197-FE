@@ -33,7 +33,7 @@ const signupFormSchema = z
       .refine((val) => val === true, "You must agree to the terms"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    error: "Passwords don't match",
     path: ["confirmPassword"],
   })
 

@@ -18,6 +18,7 @@ const allowed = new Set([
   "validations/common.validation.ts", "validations/customers.validation.ts",
   "validations/users.validation.ts", "validations/brands.validation.ts",
   "validations/categories.validation.ts",
+  "validations/products.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -97,11 +98,60 @@ await categoryService.createCategory({ name: "Phones", description: "Devices", p
 await categoryService.updateCategory({ id, input: { name: "Cases", icon: "https://example.com/category.png" } })
 await categoryService.deleteCategory(id)
 const temporary = userService.getTemporaryPassword("staff")
-assert.ok(temporary.length >= 20)
+assert.equal(temporary, "Staff123")
+assert.equal(userService.getTemporaryPassword("admin"), "Admin123")
 await userService.createUser({ firstName: "New", lastName: "Staff", email: "staff@example.com", role: "staff", password: temporary })
 await userService.resetUserPassword({ id, password: userService.getTemporaryPassword("admin") })
 assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "" }).success, true)
 assert.equal(brands.updateBrandSchema.safeParse({ logoUrl: "" }).success, true)
 assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "javascript:alert(1)" }).success, false)
 assert.equal(brands.updateBrandSchema.safeParse({ logoUrl: "data:image/svg+xml,test" }).success, false)
+const products = loadValidation("validations/products.validation.ts")
+const common = loadValidation("validations/common.validation.ts")
+const productForm = evaluate(path.join(root, "src/features/products/schemas/product-schema.ts"), specifier => {
+  if (specifier === "zod") return require("zod")
+  if (specifier === "@/features/products/types/products") return evaluate(path.join(root, "src/features/products/types/products.ts"), require)
+  throw new Error(`Unsupported product schema import: ${specifier}`)
+})
+const reviewForm = evaluate(path.join(root, "src/features/products/schemas/product-review-schema.ts"), require)
+const productApi = {
+  async post(url, body) {
+    const schema = url.endsWith("/reviews") ? products.reviewInputSchema : products.createProductSchema
+    const parsed = schema.parse(body)
+    assert.ok(Object.keys(body).every(key => Object.hasOwn(parsed, key)), `Backend would discard unsupported product fields for ${url}`)
+    requests.push({ method: "POST", url, body })
+    return { data: { data: { _id: id, ...body } } }
+  },
+  async put(url, body) {
+    products.updateProductSchema.parse(body)
+    requests.push({ method: "PUT", url, body })
+    return { data: { data: { _id: id, ...body } } }
+  },
+  async get(url, config) {
+    if (url.endsWith("/reviews")) common.paginationSchema.parse(config.params)
+    requests.push({ method: "GET", url, query: config.params })
+    return { data: url.endsWith("/metrics") ? { data: { rating: 0, reviewCount: 0, soldCount: 0 } }
+      : { data: [], pagination: { page: config.params.page, limit: 5, total: 0, totalPages: 0 } } }
+  },
+  async delete(url) { requests.push({ method: "DELETE", url }); return { data: { success: true } } },
+}
+function loadProductService(file) {
+  return evaluate(path.join(root, "src/features/products/services", file), specifier => {
+    if (specifier === "@/services/api") return { api: productApi }
+    throw new Error(`Unsupported product service import: ${specifier}`)
+  })
+}
+const productService = loadProductService("products.service.ts")
+const reviewService = loadProductService("product-reviews.service.ts")
+const productValues = productForm.productSchema.parse({ ...productForm.productDefaults(), product_name: "Imported case", category: id, brand: id,
+  sku: "case-001", barcode: "12345", tags: [{ value: "Case" }], weight: 0.5, dimensions: { width: 10, height: 20, depth: 2 },
+  warrantyInformation: "12 months", shippingInformation: "3 days", returnPolicy: "30 days", minimumOrderQuantity: 2 })
+const productBody = productForm.productPayload(productValues)
+await productService.createProduct(productBody)
+await productService.updateProduct({ id, input: productForm.productUpdatePayload({ ...productValues, weight: undefined, dimensions: {}, tags: [], sku: "", model_year: undefined },
+  { weight: true, dimensions: true, tags: true, sku: true, model_year: true }, { _id: id, ...productBody }) })
+await reviewService.createProductReview({ id, input: reviewForm.productReviewSchema.parse({ reviewerName: "Admin", rating: 5, comment: "Good product" }) })
+assert.deepEqual(await reviewService.getProductMetrics(id), { rating: 0, reviewCount: 0, soldCount: 0 })
+assert.equal((await reviewService.listProductReviews(id, 2)).pagination.page, 2)
+await reviewService.deleteProductReview({ id, reviewId: id })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

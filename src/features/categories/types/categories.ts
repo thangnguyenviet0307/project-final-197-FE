@@ -40,4 +40,3 @@ export interface UpdateCategoryInput {
   parent?: string | null;
   isActive?: boolean;
 }
-

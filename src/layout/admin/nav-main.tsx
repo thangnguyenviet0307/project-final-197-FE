@@ -27,6 +27,7 @@ export function NavMain({
   items: {
     title: string
     url: string
+    target?: string
     icon?: LucideIcon
     isActive?: boolean
     items?: {
@@ -108,7 +109,7 @@ export function NavMain({
                 tooltip={item.title}
                 className="cursor-pointer"
                 isActive={location.pathname === item.url}
-                render={<Link to={item.url} />}
+                render={<Link to={item.url} target={item.target} rel={item.target === "_blank" ? "noopener noreferrer" : undefined} />}
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>

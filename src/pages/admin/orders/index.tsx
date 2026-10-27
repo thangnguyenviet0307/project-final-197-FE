@@ -24,12 +24,14 @@ export default function AdminOrdersPage() {
   const to = params.get("dateTo") ?? ""
   const search = (params.get("search") ?? "").trim().slice(0, 100)
   const validRange = (!from || validOrderDate(from)) && (!to || validOrderDate(to)) && (!from || !to || from <= to)
-  const query = useOrders({ page, limit, ...(search ? { search } : {}), ...(isOrderStatus(status) ? { orderStatus: status } : {}), ...(validRange && from ? { dateFrom: orderDateBoundary(from) } : {}), ...(validRange && to ? { dateTo: orderDateBoundary(to, true) } : {}) })
+  const customerId = params.get("customerId") ?? ""
+  const query = useOrders({ page, limit, ...(/^[a-f\d]{24}$/i.test(customerId) ? { customerId } : {}), ...(search ? { search } : {}), ...(isOrderStatus(status) ? { orderStatus: status } : {}), ...(validRange && from ? { dateFrom: orderDateBoundary(from) } : {}), ...(validRange && to ? { dateTo: orderDateBoundary(to, true) } : {}) })
   const pagination = query.data?.pagination
   const totalPages = Math.max(1, pagination?.totalPages ?? 1)
   const orders = query.data?.data ?? []
   function change(name: string, value: string) { setParams(previous => { const updated = new URLSearchParams(previous); if (value) updated.set(name, value); else updated.delete(name); if (name !== "page") updated.set("page", "1"); return updated }) }
   return <BaseLayout title="Đơn hàng"><div className="space-y-5 px-4 lg:px-6">
+    <Button nativeButton={false} render={<Link to="/orders/new" />}>Create order</Button>
     <OrderStatistics />
     <div><h1 className="text-2xl font-semibold">Đơn hàng</h1><p className="text-sm text-muted-foreground">Xem lịch sử và quản lý xử lý đơn hàng. Đơn mới nhất hiển thị trước.</p></div>
     <OrderSearch key={search} initial={search} onSearch={value => change("search", value)} />

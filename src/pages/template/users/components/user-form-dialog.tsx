@@ -33,22 +33,22 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 const userFormSchema = z.object({
   name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+    error: "Name must be at least 2 characters.",
   }),
   email: z.string().email({
     message: "Vui lòng nhập địa chỉ email hợp lệ.",
   }),
   role: z.string().min(1, {
-    message: "Please select a role.",
+    error: "Please select a role.",
   }),
   plan: z.string().min(1, {
-    message: "Please select a plan.",
+    error: "Please select a plan.",
   }),
   billing: z.string().min(1, {
-    message: "Please select a billing method.",
+    error: "Please select a billing method.",
   }),
   status: z.string().min(1, {
-    message: "Please select a status.",
+    error: "Please select a status.",
   }),
 })
 

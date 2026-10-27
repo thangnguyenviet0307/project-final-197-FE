@@ -24,7 +24,7 @@ export async function getCategoryById(id: string, signal?: AbortSignal): Promise
 export async function createCategory(input: CreateCategoryInput): Promise<Category> {
   const payload = {
     name: input.name,
-    ...(input.icon !== undefined ? { icon: input.icon } : {}),
+    ...(input.icon !== undefined ? { icon: input.icon.trim() } : {}),
     description: input.description || "",
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
@@ -41,9 +41,9 @@ export async function updateCategory({
   input: UpdateCategoryInput;
 }): Promise<Category> {
   const payload: Record<string, unknown> = {};
-  if (input.icon !== undefined) payload.icon = input.icon;
   if (input.name !== undefined) payload.name = input.name;
   if (input.description !== undefined) payload.description = input.description;
+  if (input.icon !== undefined) payload.icon = input.icon.trim();
   if (input.parent !== undefined) payload.parent = input.parent ? input.parent : null;
   if (input.isActive !== undefined) payload.isActive = input.isActive;
 

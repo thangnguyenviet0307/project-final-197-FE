@@ -29,11 +29,24 @@ export async function registerCustomer(input: RegisterCustomerInput) {
   await authApi.post<ApiResponse<unknown>>("/auth/register", { email, password, firstName, lastName })
 }
 
-export async function login(credentials: LoginCredentials) {
+export async function login(credentials: LoginCredentials, storefront = false) {
   const version = useAuthStore.getState().sessionVersion
-  const { data } = await authApi.post<ApiResponse<TokenPair & { user: unknown }>>("/auth/login", credentials, { headers: { "X-Auth-Transport": "cookie" } })
+  const { data } = await authApi.post<ApiResponse<TokenPair & { user: unknown }>>("/auth/login", credentials, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": storefront ? "storefront" : "admin" } })
   if (useAuthStore.getState().sessionVersion !== version) throw new Error("Session changed")
   const user = userSchema.parse(data.data.user)
+  if (storefront ? user.role !== "customer" : user.role === "customer") {
+    // Revoke the cookie session without publishing an admin session to route guards.
+    try {
+      await authApi.post("/auth/logout", {}, {
+        headers: { Authorization: `Bearer ${data.data.accessToken}`, "X-Auth-Transport": "cookie", "X-Login-Area": storefront ? "storefront" : "admin" },
+      })
+    } catch {
+      // Still refuse the local session if an outdated Backend cannot revoke it.
+    } finally {
+      if (useAuthStore.getState().sessionVersion === version) clearAuth()
+    }
+    throw new Error("Tài khoản không tồn tại !")
+  }
   queryClient.clear()
   useAuthStore.getState().setSession(user, data.data)
   return user

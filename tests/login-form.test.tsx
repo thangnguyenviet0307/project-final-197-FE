@@ -8,6 +8,7 @@ import { CustomerAuthForm } from "@/features/auth/components/customer-auth-form"
 import { ForgotPasswordForm1 } from "@/pages/auth/forgot-password/components/forgot-password-form-1"
 import { ProtectedRoute } from "@/router/protected-route"
 import { PublicOnlyRoute } from "@/router/public-only-route"
+import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import { authApi, clearAuth } from "@/services/api"
 
@@ -101,8 +102,8 @@ it("requires a password change before visiting the saved destination", async () 
 })
 
 it.each([
-  ["customer", false, "/"], ["admin", false, "/admin/dashboard"], ["staff", false, "/admin/dashboard"],
-  ["customer", true, "/account/change-password"], ["admin", true, "/change-password"], ["staff", true, "/change-password"],
+  ["customer", false, "/"],
+  ["customer", true, "/account/change-password"],
 ] as const)("redirects %s login with password-change flag %s to %s", async (role, mustChangePassword, destination) => {
   authApi.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
     user: { id: "a", email: "test@example.com", role, mustChangePassword }, accessToken: "access",
@@ -120,4 +121,54 @@ it.each([
   fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "Password123" } })
   fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
   expect(await screen.findByText(`Destination ${destination}`)).toBeTruthy()
+})
+
+it.each(["admin", "staff"] as const)("rejects %s at storefront login without publishing a session", async role => {
+  const requests: string[] = []
+  authApi.defaults.adapter = async config => {
+    requests.push(config.url!)
+    if (config.url === "/auth/logout") {
+      expect(config.headers.get("Authorization")).toBe("Bearer access")
+      expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
+      user: { id: "a", email: "test@example.com", role, mustChangePassword: true }, accessToken: "access",
+    } } }
+  }
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/account/login"]}><Routes>
+    <Route element={<PublicOnlyRoute storefront />}><Route path="/account/login" element={<CustomerAuthForm />} /></Route>
+    <Route path="*" element={<Destination />} />
+  </Routes></MemoryRouter></QueryClientProvider>)
+  submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+  expect(requests).toEqual(["/auth/login", "/auth/logout"])
+  expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null, hasSession: false })
+  expect(screen.queryByText(/Destination/)).toBeNull()
+})
+
+it("rejects customer credentials at dashboard login without publishing a session", async () => {
+  authApi.defaults.adapter = async config => {
+    if (config.url === "/auth/login") expect(config.headers.get("X-Login-Area")).toBe("admin")
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
+      user: { id: "buyer", email: "test@example.com", role: "customer" }, accessToken: "access",
+    } } }
+  }
+  setup(); submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+  expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null })
+  expect(screen.queryByText(/Destination/)).toBeNull()
+})
+
+it.each([false, true])("displays backend wrong-area errors without creating a session (storefront=%s)", async storefront => {
+  authApi.defaults.adapter = async config => {
+    expect(config.headers.get("X-Login-Area")).toBe(storefront ? "storefront" : "admin")
+    throw new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, undefined, {
+      status: 401, statusText: "", headers: new AxiosHeaders(), config, data: { message: "Tài khoản không tồn tại !" },
+    })
+  }
+  if (storefront) render(<QueryClientProvider client={queryClient}><MemoryRouter><CustomerAuthForm /></MemoryRouter></QueryClientProvider>)
+  else setup()
+  submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+  expect(useAuthStore.getState().isAuthenticated).toBe(false)
 })
