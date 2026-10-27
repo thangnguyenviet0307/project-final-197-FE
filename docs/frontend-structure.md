@@ -1,5 +1,7 @@
 # Cấu trúc Frontend
 
+Khi deploy Vite SPA lên Vercel, `vercel.json` ở gốc repository FE rewrite URL về `/index.html` để React Router xử lý truy cập trực tiếp và tải lại các route như `/auth/login`, `/auth/products`, `/shop/:slug` và `/account/profile`. Vercel tiếp tục ưu tiên file tĩnh có thật. Chọn Framework Preset Vite, Output Directory `dist`, Build Command `pnpm build`; để `VITE_BASENAME` trống khi ứng dụng chạy ở `/`. Sau khi deploy, kiểm tra mở trực tiếp và F5 các URL này; route được bảo vệ vẫn yêu cầu đăng nhập và route không tồn tại vẫn dùng trang 404 của ứng dụng.
+
 Khu vực `/account` dùng hồ sơ customer (họ, tên, ngày sinh, giới tính, một email đăng nhập chỉ đọc, điện thoại), địa chỉ giao hàng riêng và lịch sử đơn hàng qua `/customer-auth/me`, `/customer-auth/shipping-address`, `/customer-auth/orders`. Schema nằm trong `features/profile/schemas/customer-account-schema.ts`; API/query đơn hàng khách nằm trong `features/orders/`. Chưa triển khai checkout/tạo đơn mua hàng từ storefront. Trang 404 storefront giữ `StoreLayout`; `/auth/*` có giao diện 404 quản trị riêng.
 
 Bảng quản trị `/auth/customers` đọc `/customers`, giữ `birthDate`, `gender` và `shippingAddress` trong service mapping. Bảng và dialog ưu tiên địa chỉ giao hàng mới; `address` cũ chỉ dùng khi chưa có `shippingAddress`. Hiển thị riêng email tài khoản và email nhận hàng. Tín hiệu cập nhật giữa các tab làm mới cache `customers`; có nút làm mới danh sách thủ công.
