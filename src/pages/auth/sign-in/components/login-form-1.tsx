@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { useLogin } from "@/features/auth/hooks/use-login"
 import { Link, useLocation } from "react-router-dom"
 import { LoaderCircle } from "lucide-react"
@@ -10,7 +10,7 @@ import type { LoginCredentials } from "@/features/auth/types/auth"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { LoginCredentialInput } from "@/features/auth/components/login-credential-input"
 
 export function LoginForm1({ className, ...props }: React.ComponentProps<"div">) {
   const location = useLocation()
@@ -28,15 +28,15 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
       <CardDescription>Sử dụng tài khoản do quản trị viên cung cấp.</CardDescription>
     </CardHeader><CardContent>
       {typeof location.state?.message === "string" && <p role="status" className="mb-4 text-sm">{location.state.message}</p>}
-      <form className="space-y-4" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+      <form name="admin-sign-in" autoComplete="off" className="space-y-4" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <Field data-invalid={!!form.formState.errors.email}>
           <FieldLabel htmlFor="login-email">Email</FieldLabel>
-          <Input id="login-email" type="email" autoComplete="username" placeholder="you@example.com" aria-invalid={!!form.formState.errors.email} {...form.register("email")} />
+          <Controller control={form.control} name="email" render={({ field }) => <LoginCredentialInput {...field} area="admin" credential="email" id="login-email" type="email" placeholder="you@example.com" aria-invalid={!!form.formState.errors.email} />} />
           <FieldError errors={[form.formState.errors.email]} />
         </Field>
         <Field data-invalid={!!form.formState.errors.password}>
           <FieldLabel htmlFor="login-password">Mật khẩu</FieldLabel>
-          <Input id="login-password" type="password" autoComplete="current-password" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
+          <Controller control={form.control} name="password" render={({ field }) => <LoginCredentialInput {...field} area="admin" credential="password" id="login-password" type="password" aria-invalid={!!form.formState.errors.password} />} />
           <FieldError errors={[form.formState.errors.password]} />
         </Field>
         {form.formState.errors.root && <p role="alert" className="text-sm text-destructive">{form.formState.errors.root.message}</p>}

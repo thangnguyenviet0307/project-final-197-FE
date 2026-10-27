@@ -140,8 +140,35 @@ it.each(["admin", "staff"] as const)("rejects %s at storefront login without pub
     <Route path="*" element={<Destination />} />
   </Routes></MemoryRouter></QueryClientProvider>)
   submit("test@example.com")
-  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản này không dùng để đăng nhập cửa hàng. Vui lòng sử dụng tài khoản khách hàng.")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
   expect(requests).toEqual(["/auth/login", "/auth/logout"])
   expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null, hasSession: false })
   expect(screen.queryByText(/Destination/)).toBeNull()
+})
+
+it("rejects customer credentials at dashboard login without publishing a session", async () => {
+  authApi.defaults.adapter = async config => {
+    if (config.url === "/auth/login") expect(config.headers.get("X-Login-Area")).toBe("admin")
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
+      user: { id: "buyer", email: "test@example.com", role: "customer" }, accessToken: "access",
+    } } }
+  }
+  setup(); submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+  expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null })
+  expect(screen.queryByText(/Destination/)).toBeNull()
+})
+
+it.each([false, true])("displays backend wrong-area errors without creating a session (storefront=%s)", async storefront => {
+  authApi.defaults.adapter = async config => {
+    expect(config.headers.get("X-Login-Area")).toBe(storefront ? "storefront" : "admin")
+    throw new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, undefined, {
+      status: 401, statusText: "", headers: new AxiosHeaders(), config, data: { message: "Tài khoản không tồn tại !" },
+    })
+  }
+  if (storefront) render(<QueryClientProvider client={queryClient}><MemoryRouter><CustomerAuthForm /></MemoryRouter></QueryClientProvider>)
+  else setup()
+  submit("test@example.com")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+  expect(useAuthStore.getState().isAuthenticated).toBe(false)
 })

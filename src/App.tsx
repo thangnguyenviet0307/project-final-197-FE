@@ -8,6 +8,8 @@ import { routes } from "@/router/routes"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClient } from "@/services/query-client"
 import { AuthBootstrap } from "@/router/auth-bootstrap"
+import { configureAuthArea } from "@/stores/auth.store"
+import { AuthAreaBoundary } from "@/router/auth-area-boundary"
 import { useEffect } from "react"
 import { initGTM } from "@/utils/analytics"
 
@@ -17,13 +19,15 @@ const basename = import.meta.env.VITE_BASENAME || ""
 const router = createBrowserRouter(
   [
     {
-      element: <RootLayout />,
+      element: <AuthAreaBoundary><RootLayout /></AuthAreaBoundary>,
       HydrateFallback: RouteFallback,
       children: routes,
     },
   ],
   { basename }
 )
+
+configureAuthArea(isStorefrontRoute(router.state.location.pathname, basename || "/") ? "storefront" : "admin")
 
 function App() {
   // Initialize GTM on app load

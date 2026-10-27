@@ -2,6 +2,11 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { TokenPair, User } from "@/features/auth/types/auth"
 
+export type AuthArea = "admin" | "storefront"
+let authArea: AuthArea = "admin"
+export const getAuthArea = () => authArea
+export const authStorageKey = (area = authArea) => area === "admin" ? "admin-auth" : "customer-auth"
+
 interface AuthState {
   sessionId: string | null
   hasSession: boolean
@@ -40,7 +45,31 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
   })),
 }), {
   name: "admin-auth",
-  version: 1,
+  version: 2,
   migrate: () => ({ hasSession: false, sessionId: null }),
   partialize: ({ hasSession, sessionId }) => ({ hasSession, sessionId }),
 }))
+
+// Called before session bootstrap. Crossing areas reloads the document, so access
+// tokens and query caches are never reused between the two applications.
+export function configureAuthArea(area: AuthArea) {
+  if (area === authArea) return
+  let hasSession = false
+  let sessionId: string | null = null
+  try {
+    const saved = JSON.parse(localStorage.getItem(authStorageKey(area)) ?? "null")
+    if (saved?.version === 2 && saved.state?.hasSession === true && typeof saved.state.sessionId === "string") {
+      hasSession = true
+      sessionId = saved.state.sessionId
+    }
+  } catch {
+    // A missing/malformed marker must never restore credentials or identity.
+  }
+  authArea = area
+  useAuthStore.persist.setOptions({ name: authStorageKey(area) })
+  useAuthStore.setState(state => ({
+    sessionId, hasSession, user: null, accessToken: null, refreshToken: null,
+    isAuthenticated: false, isLoading: true, initializationError: null,
+    sessionVersion: state.sessionVersion + 1,
+  }))
+}

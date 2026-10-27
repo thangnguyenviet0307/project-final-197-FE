@@ -11,12 +11,12 @@ export function StoreHeader() {
   return (
     <header className="w-full bg-white">
 
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-6 px-5 py-5 md:min-h-[120px] md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-8 xl:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] xl:gap-x-10 2xl:gap-x-12">
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto_auto] lg:gap-x-6 lg:py-5 xl:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto]">
         <div className="flex items-center justify-between">
           <Link
             to="/"
             aria-label="DEMO STORE - Trang chủ"
-            className="inline-flex items-center text-[30px] font-black tracking-[-1.5px] text-gray-950 transition-opacity hover:opacity-80 sm:text-[34px]"
+            className="inline-flex items-center text-[24px] font-black tracking-[-1.5px] text-gray-950 transition-opacity hover:opacity-80 sm:text-[30px]"
           >
             DEMO
             <span className="text-[#55b000]">STORE</span>
@@ -25,17 +25,17 @@ export function StoreHeader() {
           <Link
             to={customer ? "/account/profile" : "/account/login"}
             aria-label="Tài khoản"
-            className="flex items-center justify-center rounded-full border border-gray-200 p-2 text-gray-800 transition-colors hover:border-[#55b000] hover:text-[#55b000] md:hidden"
+            className="flex items-center justify-center rounded-full border border-gray-200 p-3 text-gray-800 transition-colors hover:border-[#55b000] hover:text-[#55b000] lg:hidden"
           >
             <UserRound size={20} />
           </Link>
         </div>
 
-        <div className="w-full min-w-0">
+        <div className="col-span-2 row-start-2 w-full min-w-0 lg:col-span-1 lg:row-start-auto">
           <StoreSearch />
         </div>
 
-        <Link to="/contact" className="flex items-center gap-3 text-gray-800 transition-colors hover:text-[#55b000]">
+        <Link to="/contact" className="hidden items-center gap-3 text-gray-800 transition-colors hover:text-[#55b000] xl:flex">
           <Phone size={23} className="shrink-0" />
           <div className="whitespace-nowrap leading-tight">
             <p className="text-xs font-medium">Hỗ trợ khách hàng</p>
@@ -43,12 +43,12 @@ export function StoreHeader() {
           </div>
         </Link>
 
-        <StoreTopBar />
+        <div className="hidden min-w-0 lg:block"><StoreTopBar /></div>
 
-        <div className="flex items-center md:justify-end">
+        <div className="col-start-2 row-start-1 flex items-center justify-end lg:col-start-auto lg:row-start-auto">
           <div className="flex items-center gap-3 text-gray-800">
             <div
-              className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200"
               aria-label="Giỏ hàng"
             >
               <ShoppingCart size={23} strokeWidth={1.8} />
@@ -58,7 +58,7 @@ export function StoreHeader() {
               </span>
             </div>
 
-            <div className="flex flex-col justify-center">
+            <div className="hidden flex-col justify-center xl:flex">
               <span className="text-xs font-medium text-gray-500">
                 Giỏ hàng
               </span>

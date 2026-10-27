@@ -1,6 +1,6 @@
 import axios from "axios"
 import type { InternalAxiosRequestConfig } from "axios"
-import { useAuthStore } from "@/stores/auth.store"
+import { getAuthArea, useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import type { ApiResponse } from "@/types/api"
 import type { TokenPair } from "@/features/auth/types/auth"
@@ -29,8 +29,9 @@ export function refreshAccessToken(): Promise<string> {
     clearAuth()
     return Promise.reject(new Error("Your session has expired."))
   }
-  const request = () => authApi.post<ApiResponse<TokenPair>>("/auth/refresh", {}, { headers: { "X-Auth-Transport": "cookie" } })
-  const promise = (typeof navigator !== "undefined" && navigator.locks ? navigator.locks.request("admin-auth-refresh", request) : request())
+  const area = getAuthArea()
+  const request = () => authApi.post<ApiResponse<TokenPair>>("/auth/refresh", {}, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": area } })
+  const promise = (typeof navigator !== "undefined" && navigator.locks ? navigator.locks.request(`${area}-auth-refresh`, request) : request())
     .then(({ data }) => {
       if (useAuthStore.getState().sessionVersion !== sessionVersion) throw new Error("Session changed")
       if (!data.data.accessToken) throw new Error("Invalid token response")
@@ -55,6 +56,7 @@ api.interceptors.request.use((config: AuthRequest) => {
     throw new axios.CanceledError("Session changed")
   }
   config.sessionVersion = sessionVersion
+  config.headers.set("X-Login-Area", getAuthArea())
   if (accessToken) config.headers.set("Authorization", `Bearer ${accessToken}`)
   else config.headers.delete("Authorization")
   return config

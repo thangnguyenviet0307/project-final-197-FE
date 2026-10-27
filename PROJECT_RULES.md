@@ -20,12 +20,15 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Roles and authorization
 
+- GET /products/statistics returns total, active, outOfStock and stockUnits across the catalog for ProductView roles. GET /orders/personal-sales returns completedOrders and revenue for completed orders assigned to the authenticated actor only. Register these named endpoints before /:id; retain ObjectId validation for actual detail routes.
+
 - Admin manages staff accounts, catalog metadata, prices, images, brands/categories and destructive operations.
 - Staff can read products/categories/brands/customers and all order history. Staff may create customer contact records, accept eligible orders and manage only their assigned open orders. Staff cannot edit prices/catalog metadata, delete orders/customers, reassign handlers or manage users.
 - /brands is readable by admin/staff. Hide add/edit/delete controls from staff; /brands/new remains admin-only. Sidebar and command search must match route guards.
 - Inventory is editable by admin/staff only through PATCH /products/:id/inventory. Send expectedVersion plus stock OR variant IDs/stocks; never send prices or catalog fields. Keep the input after 409 and require explicit reload/review before retrying with a new version. Products with variants derive aggregate stock from variants.
 - Customer is an authenticated account role with NO admin/staff permissions. Public registration accepts only firstName, lastName, email, password; the server fixes role=customer, active=true and hashes the password. Never accept role/activation/token fields from registration.
 - Registration creates a customer User and Customer contact atomically, linked by Customer.accountId. Phone/address remain blank until supplied. Do not link existing contacts by email or expose contact/order records to buyers without a separate ownership design. Earlier registrations are not backfilled automatically.
+- The customers.phone index is non-unique, allowing multiple contacts without a phone. Legacy unique phone indexes require the explicit Backend repair script (inspect first); do not run broad syncIndexes or delete customer data to fix registration.
 - /users lists admin/staff accounts, excluding customer accounts. Customer registration must not grant access to staff API endpoints.
 - The admin Customers page displays only the contact list via GET /customers; new registrations appear in that list and its statistics. Use Customer IDs for contact actions, never User IDs. Users still excludes customer accounts. Removing a contact does not delete its login account.
 - Backend permissions always enforce access. Hiding a button or adding a client guard is not sufficient authorization.
@@ -59,9 +62,11 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Authentication and customer account
 
-- Storefront login /account/login accepts only customers; admin/staff receive an error without publishing a frontend session, and the issued cookie session is revoked. Existing admin/staff sessions opening storefront auth pages see an error and never redirect to admin automatically. Customer login returns to /, with mandatory password changes taking precedence. Administrative /login retains role-based redirects and a valid requested admin destination when present.
+- Storefront /account/login accepts only customers; dashboard /login accepts only admin/staff. Send X-Login-Area: storefront or admin to /auth/login. Backend rejects wrong-area credentials with 401 and "Tài khoản không tồn tại !" before issuing tokens/cookies or changing existing sessions. Frontend also refuses unexpected roles before publishing a session. Existing sessions opening the wrong area's auth pages see the same error. Customer login returns to /; admin/staff retain valid requested admin destinations. Mandatory password changes take precedence.
 
 - Access tokens stay in memory; refresh tokens use HttpOnly cookies. Persist only a non-secret session marker. Never persist passwords/tokens in browser storage or expose them in responses/logs.
+- Admin and storefront sessions are isolated: markers use admin-auth/customer-auth (version 2), cookies use adminRefreshToken/customerRefreshToken, and refresh locks/storage events are scoped by area. Configure the area from matched route metadata before bootstrap. Crossing areas in the same tab reloads the document before rendering the destination, so tokens and private caches cannot carry across. Login forms start empty with autocomplete disabled; browser/password-manager extensions may override that hint. Legacy shared cookies/markers are not restored into scoped sessions; sign in again once after upgrading.
+- Login credential inputs use distinct admin/customer HTML names and controlled form values. They remain readonly until direct pointer or typing interaction, then relock on window blur/document hiding while preserving drafts. Focus alone must not unlock them. Keep registration fields separate and retain keyboard, paste and password-visibility behavior.
 - Reuse the shared refresh/session implementation and sessionVersion checks; clear query cache when identity changes or the user logs out.
 - /account and all its children require role=customer. Guests go to /account/login with their original location retained; admin/staff sessions receive 403. Admin routes reject customers.
 - Customer profile uses GET/PATCH /auth/me with the same strict profile schema as backend. Account email and role are read-only. personalEmail is an optional contact email, not the login email. Profile save refreshes the shared session user and profile cache.

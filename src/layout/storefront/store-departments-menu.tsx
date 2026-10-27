@@ -76,9 +76,9 @@ export function StoreDepartmentsMenu() {
   return (
     <div ref={containerRef} className="relative z-50 w-full lg:w-[280px] xl:w-[320px]">
       <button type="button" onClick={() => setOpen(value => !value)} aria-expanded={open} aria-controls={panelId}
-        className="flex h-14 w-full items-center justify-between rounded-t-lg bg-black px-5 text-white transition-colors hover:bg-[#171717]">
-        <span className="text-sm font-bold uppercase tracking-wider">DANH MỤC SẢN PHẨM</span>
-        <Menu size={23} />
+        className="relative flex h-14 w-full items-center justify-center rounded-t-lg bg-black px-11 text-white transition-colors hover:bg-[#171717]">
+        <span className="-translate-x-3 text-center text-sm font-bold uppercase tracking-wider">DANH MỤC SẢN PHẨM</span>
+        <Menu size={23} className="absolute right-5 top-1/2 -translate-y-1/2" />
       </button>
       {open && (
         <div id={panelId} className="absolute left-0 top-full z-50 mt-7 max-h-[70vh] w-full overflow-y-auto bg-white shadow-[0_3px_18px_rgba(0,0,0,0.08)] lg:max-h-none lg:overflow-visible">

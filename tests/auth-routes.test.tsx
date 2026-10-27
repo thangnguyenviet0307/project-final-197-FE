@@ -85,7 +85,7 @@ it.each(["/account/login", "/register"])("opens customer auth route %s for guest
   expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
 })
 
-it.each(["/account/login", "/register", "/login"])("returns signed-in customers home from %s", async path => {
+it.each(["/account/login", "/register"])("returns signed-in customers home from %s", async path => {
   session("customer")
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
   expect(await screen.findByText("Trang /")).toBeTruthy()
@@ -97,7 +97,13 @@ it.each([
 ] as const)("keeps %s sessions in storefront and shows an error when opening %s", async (role, path) => {
   session(role)
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
-  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản này không dùng để đăng nhập cửa hàng. Vui lòng sử dụng tài khoản khách hàng.")
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
+})
+
+it("blocks a signed-in customer from the dashboard login page", async () => {
+  session("customer")
+  render(<RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/login"] })} />)
+  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
 })
 
 it.each(["/brands/new", "/categories/new", "/users/new"])("denies staff access to merged admin route %s", async path => {

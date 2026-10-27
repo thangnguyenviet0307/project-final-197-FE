@@ -1,4 +1,4 @@
-﻿# Cấu trúc Frontend
+# Cấu trúc Frontend
 
 Dự án dùng React, Vite, TypeScript, React Router, Zustand và TanStack Query. Cấu trúc áp dụng cách phân chia trách nhiệm trong hình mẫu, kết hợp module nghiệp vụ trong `features`.
 
@@ -103,6 +103,12 @@ import { useAuthStore } from "@/stores/auth.store"
 Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.ps1`, dùng `pnpm.cmd` tương ứng. Lần tổ chức thư mục này giữ nguyên URL, phân quyền và logic nghiệp vụ.
 
 ## Admin contract updates
+
+- Dashboard dùng `/products/statistics` và `/orders/personal-sales`; các route tĩnh phải đứng trước `/:id` tại Backend. Doanh số cá nhân chỉ tính đơn hoàn tất của người đang đăng nhập; không nhận handler ID tùy ý từ client.
+
+- Phiên admin và storefront độc lập: khóa `admin-auth`/`customer-auth`, cookie `adminRefreshToken`/`customerRefreshToken`. Chọn khu vực theo route trước bootstrap; chuyển khu vực trong cùng tab tải lại trang để không mang token/cache sang khu vực khác. Đăng nhập/đăng xuất một khu vực không tải lại tab của khu vực còn lại.
+
+- Form `/account/login` chỉ nhận customer; `/login` chỉ nhận admin/staff. Gửi `X-Login-Area` để Backend chặn sai loại tài khoản trước khi cấp phiên, báo `Tài khoản không tồn tại !`.
 
 - Products: form tạo/sửa hỗ trợ SKU sản phẩm, mã vạch, nhãn, khối lượng (kg), ba kích thước (cm), chính sách bảo hành/giao hàng/đổi trả và số lượng đặt tối thiểu. Năm sản xuất không bắt buộc; chỉ gửi metadata thay đổi. Thông tin nguồn import và ảnh nguồn chỉ hiển thị ở chi tiết, không gửi trong payload chỉnh sửa.
 - Chi tiết Products ghép `ProductDetailsInfo` và `ProductReviews`. Hook `use-product-reviews` lấy metrics/reviews qua service riêng, quản lý mutation và invalidate cache `products/metrics` cùng `products/reviews`. Admin được thêm/xóa review, staff chỉ xem; điểm trung bình và số lượng đã bán do BE tính. Không gọi API metrics riêng cho từng dòng danh sách.
