@@ -8,7 +8,6 @@ export function StorefrontNewsSection() {
     <section id="tin-tuc" aria-label="Tin tức và cẩm nang phụ kiện" className="bg-[#f5f6f4] py-12 sm:py-16">
       <div className="store-container ">
         <SectionHeading
-          eyebrow="Tin tức & cẩm nang"
           title="Thông tin hữu ích cho phụ kiện bạn chọn"
           description="Mẹo chọn mua và sử dụng phụ kiện, giúp bạn tìm hiểu kỹ hơn trước khi khám phá sản phẩm."
         />

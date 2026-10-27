@@ -263,3 +263,7 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .route-progress-bar { animation: none; width: 100%; opacity: 0.6; }
 }
+
+.store-home-sections > div:nth-child(odd) { background-color: #fff; }
+.store-home-sections > div:nth-child(even) { background-color: #f5f6f7; }
+.store-home-sections > div > section { background-color: transparent; }

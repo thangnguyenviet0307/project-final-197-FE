@@ -11,6 +11,12 @@ const state = vi.hoisted(() => ({
   product: { _id: "a".repeat(24), slug: "ceramic-chicken", product_name: "Ceramic Chicken", is_active: true, category: null, brand: null, price: 100000, discount: 10, stock: 4, description: "<p>Mô tả thật</p><script>alert(1)</script>", variants: [{ _id: "b".repeat(24), sku: "BLUE", variant_name: "Màu xanh", price: 200000, stock: 2 }] } as Product,
   pending: false, error: false, relatedCount: 1, refetch: vi.fn(), list: vi.fn(),
 }))
+vi.mock("@/features/storefront/hooks/use-store-product-carousel", () => ({
+  useStoreProductCarousel: (params: unknown) => {
+    state.list(params)
+    return { data: { pages: [{ data: [state.product], pagination: { total: 1 } }] }, isPending: state.pending, isError: state.error, refetch: state.refetch }
+  },
+}))
 vi.mock("@/features/storefront/hooks/use-store-products", () => ({
   useStoreProducts: (params: unknown) => { state.list(params); return { data: { data: [state.product], pagination: { total: 1, totalPages: 1 } }, isPending: state.pending, isError: state.error, refetch: state.refetch } },
   useStoreProduct: () => ({ data: state.product, isPending: state.pending, isError: state.error, error: { statusCode: 404, message: "Not found" }, refetch: state.refetch }),
@@ -100,4 +106,26 @@ it("limits the related product section to five cards", () => {
     expect(within(related).getAllByRole("article")).toHaveLength(5)
     expect(within(related).queryByText("Sản phẩm liên quan 5")).toBeNull()
   } finally { state.relatedCount = 1 }
+})
+
+it("shows discounted price, struck-through original and actual discount on product cards", () => {
+  render(<MemoryRouter><FeaturedParts /></MemoryRouter>)
+  const card = screen.getByRole("article")
+  expect(within(card).getByLabelText("Giá bán").textContent).toContain("180.000")
+  const original = within(card).getByLabelText("Giá gốc")
+  expect(original.tagName).toBe("DEL")
+  expect(original.textContent).toContain("200.000")
+  expect(within(card).getByText("-10%")).toBeTruthy()
+  expect(screen.queryByText("Khám phá cửa hàng")).toBeNull()
+  expect(screen.queryByRole("button", { name: "Tất cả" })).toBeNull()
+  expect(screen.queryByRole("link", { name: "Đến danh sách sản phẩm" })).toBeNull()
+})
+it("does not invent an original price or discount badge for non-discounted products", () => {
+  const original = state.product
+  state.product = { ...original, discount: 0 }
+  try {
+    render(<MemoryRouter><FeaturedParts /></MemoryRouter>)
+    expect(screen.queryByLabelText("Giá gốc")).toBeNull()
+    expect(screen.queryByText("-0%")).toBeNull()
+  } finally { state.product = original }
 })

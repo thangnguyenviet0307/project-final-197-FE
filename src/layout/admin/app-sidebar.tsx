@@ -196,9 +196,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/auth/users"].includes(item.url) ||
+      (!["/auth/users", "/auth/hero-slides"].includes(item.url) ||
        user?.role === "admin")
-    ),
+    ).map(item => item.url === "/auth/categories" && user?.role === "admin" ? {
+      ...item,
+      items: [
+        { title: "Danh sách danh mục", url: "/auth/categories" },
+        { title: "Hero trang chủ", url: "/auth/hero-slides" },
+      ],
+    } : item),
   }))
 
   return (

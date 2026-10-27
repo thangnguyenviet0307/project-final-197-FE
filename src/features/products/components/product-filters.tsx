@@ -5,7 +5,10 @@ import { Field, FieldLabel } from "@/components/ui/field"
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import { useBrands } from "@/features/brands/hooks/use-brands"
 
-export interface ProductFiltersValue { search: string; category: string; brand: string; stockStatus: string }
+import { productFlags } from "@/features/products/types/product-flags"
+import type { ProductFlag } from "@/features/products/types/products"
+
+export interface ProductFiltersValue extends Partial<Record<ProductFlag, string>> { search: string; category: string; brand: string; stockStatus: string }
 export function ProductFilters({ initial, onChange, onReset }: {
   initial: ProductFiltersValue; onChange: (value: ProductFiltersValue) => void; onReset: () => void
 }) {
@@ -35,6 +38,14 @@ export function ProductFilters({ initial, onChange, onReset }: {
           <option value="">Tất cả tồn kho</option><option value="in_stock">Còn hàng (&gt; 0)</option><option value="low_stock">Sắp hết hàng (1–5)</option><option value="out_of_stock">Hết hàng (0)</option>
         </select>
       </Field>
+      {productFlags.map(([name, label]) => <Field key={name}>
+        <FieldLabel htmlFor={`filter-${name}`}>{label}</FieldLabel>
+        <select id={`filter-${name}`} className="h-8 rounded-md border bg-background px-2 text-sm" value={draft[name] ?? ""} onChange={event => setDraft(previous => ({ ...previous, [name]: event.target.value }))}>
+          <option value="">Tất cả</option>
+          <option value="true">{name === "on_sale" ? "Đang bán" : "Có"}</option>
+          <option value="false">{name === "on_sale" ? "Không bán" : "Không"}</option>
+        </select>
+      </Field>)}
       <Button type="button" variant="outline" className="sm:col-span-2 lg:col-span-4 lg:justify-self-end" onClick={() => { setDraft({ search: "", category: "", brand: "", stockStatus: "" }); onReset() }}>Đặt lại bộ lọc</Button>
     </div>
   </section>

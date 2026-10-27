@@ -12,6 +12,8 @@ export interface StorefrontProduct {
   category: string
   brand: string
   price: number
+  originalPrice?: number
+  discount?: number
   cashPrice?: number
   image: string
   gallery: string[]
@@ -29,6 +31,8 @@ export interface StorefrontSourceListing {
   name: string
   category: string
   price: number
+  originalPrice?: number
+  discount?: number
   cashPrice?: number
   image: string
   sourceUrl: string

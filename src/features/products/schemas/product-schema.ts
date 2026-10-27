@@ -48,7 +48,7 @@ export const productSchema = z.object({
   model_year: numeric("Năm sản xuất").int("Năm sản xuất phải là số nguyên.").min(1900, "Năm sản xuất phải từ 1900 trở đi.").max(new Date().getFullYear() + 2, `Năm sản xuất không được sau ${new Date().getFullYear() + 2}.`).nullable().optional(),
   price: numeric("Giá").nonnegative("Giá không được âm.").optional(), discount: numeric("Giảm giá").min(0, "Mức giảm giá không được âm.").max(70, "Mức giảm giá không được vượt quá 70%."),
   description: optionalText("Mô tả", 2000), thumbnail: optionalText("Đường dẫn ảnh đại diện", 255),
-  stock: stock("Tồn kho").optional(), is_active: z.boolean(), variants: z.array(variantSchema),
+  stock: stock("Tồn kho").optional(), on_sale: z.boolean().optional(), is_best_seller: z.boolean().optional(), is_new: z.boolean().optional(), is_hot: z.boolean().optional(), is_home: z.boolean().optional(), is_active: z.boolean(), variants: z.array(variantSchema),
 }).superRefine(({ variants, sku }, ctx) => {
   const skus = new Set<string>()
   variants.forEach((variant, index) => {
@@ -91,6 +91,11 @@ export function productDefaults(product?: Product): ProductFormValues {
     product_name: product?.product_name ?? "", category: product ? catalogId(product.category) : "", brand: product ? catalogId(product.brand) : "",
     model_year: product ? product.model_year ?? undefined : new Date().getFullYear(), price: product?.price,
     discount: product?.discount ?? 0, description: product?.description ?? "", thumbnail: product?.thumbnail ?? "",
+    on_sale: product?.on_sale ?? true,
+    is_best_seller: product?.is_best_seller ?? false,
+    is_new: product?.is_new ?? false,
+    is_hot: product?.is_hot ?? false,
+    is_home: product?.is_home ?? false,
     stock: product?.stock ?? 0, is_active: product?.is_active ?? true,
     variants: (product?.variants ?? []).map((variant) => ({ ...variant,
       variant_name: variant.variant_name ?? "", color: variant.color ?? "", size: variant.size ?? "",

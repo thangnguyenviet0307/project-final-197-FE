@@ -30,3 +30,8 @@ export async function createStoreReview({ slug, input }: { slug: string; input: 
   const { data } = await authApi.post<ApiResponse<StoreReview>>(`/products/public/${encodeURIComponent(slug)}/reviews`, input)
   return data.data
 }
+
+export async function recordProductView(slug: string): Promise<{ count_view: number }> {
+  const { data } = await authApi.post<ApiResponse<{ count_view: number }>>(`/products/public/${encodeURIComponent(slug)}/views`, {})
+  return data.data
+}

@@ -1,3 +1,4 @@
+export type ProductFlag = "on_sale" | "is_best_seller" | "is_new" | "is_hot" | "is_home"
 export type AttributeValue = string | number | boolean | null
 export interface CatalogReference { _id: string; name: string; isActive?: boolean; isDeleted?: boolean }
 export interface ProductVariant {
@@ -14,6 +15,12 @@ export interface ProductVariant {
   attributes?: Record<string, AttributeValue>
 }
 export interface ProductInput {
+  on_sale?: boolean
+  is_best_seller?: boolean
+  is_new?: boolean
+  is_hot?: boolean
+  is_home?: boolean
+
   sku?: string | null
   barcode?: string | null
   currency?: "VND"
@@ -38,6 +45,7 @@ export interface ProductInput {
   variants?: ProductVariant[]
 }
 export interface Product extends Omit<ProductInput, "category" | "brand"> {
+  count_view?: number
   source?: "dummyjson"
   external_id?: string
   sourceImages?: string[]
@@ -61,6 +69,12 @@ export interface ProductReview extends ProductReviewInput {
 export interface ProductReviewsResult { data: ProductReview[]; pagination: ProductsResult["pagination"] }
 export type UpdateProductInput = Partial<ProductInput> & { expectedVersion?: number }
 export interface ProductsQuery {
+  on_sale?: boolean
+  is_best_seller?: boolean
+  is_new?: boolean
+  is_hot?: boolean
+  is_home?: boolean
+
   page: number; limit: number; sku?: string; color?: string; size?: string
   search?: string; category?: string; brand?: string; minPrice?: number; maxPrice?: number
   sortBy?: "product_name" | "price" | "createdAt"; sortOrder?: "asc" | "desc"

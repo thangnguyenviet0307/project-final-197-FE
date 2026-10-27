@@ -1,6 +1,6 @@
 import { api } from "@/services/api"
 import type { ApiResponse } from "@/types/api"
-import type { Product, ProductInput, UpdateProductInput, ProductsQuery, ProductsResult, ProductStatistics } from "@/features/products/types/products"
+import type { ProductFlag, Product, ProductInput, UpdateProductInput, ProductsQuery, ProductsResult, ProductStatistics } from "@/features/products/types/products"
 
 export async function listProducts(params: ProductsQuery, signal?: AbortSignal): Promise<ProductsResult> {
   const { data } = await api.get<ApiResponse<Product[]> & Pick<ProductsResult, "pagination">>("/products", { params, signal })
@@ -16,6 +16,10 @@ export async function createProduct(input: ProductInput): Promise<Product> {
 }
 export async function updateProduct({ id, input }: { id: string; input: UpdateProductInput }): Promise<Product> {
   const { data } = await api.put<ApiResponse<Product>>(`/products/${encodeURIComponent(id)}`, input)
+  return data.data
+}
+export async function updateProductFlags({ id, input }: { id: string; input: Partial<Record<ProductFlag, boolean>> & { expectedVersion: number } }): Promise<Product> {
+  const { data } = await api.patch<ApiResponse<Product>>(`/products/${encodeURIComponent(id)}/flags`, input)
   return data.data
 }
 export async function deleteProduct(id: string): Promise<void> { await api.delete(`/products/${encodeURIComponent(id)}`) }

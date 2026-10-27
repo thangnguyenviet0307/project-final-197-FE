@@ -193,3 +193,74 @@ it("refreshes the list only after deletion succeeds", async () => {
   expect(await screen.findByText("Không tìm thấy sản phẩm.")).toBeTruthy()
   expect(screen.queryByRole("dialog")).toBeNull()
 })
+
+
+it("updates a flag from its column and refreshes the product list", async () => {
+  let best = false
+  let version = 2
+  const writes: unknown[] = []
+  api.defaults.adapter = async config => {
+    if (config.method === "patch") {
+      writes.push(JSON.parse(config.data))
+      best = true
+      version++
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.method === "patch" ? { ...product, is_new: best, __v: version } : [{ ...product, is_new: best, __v: version }], pagination: { total: 1, totalPages: 1 } } }
+  }
+  setup()
+  const button = await screen.findByRole("button", { name: "New: Phone case" })
+  expect(button.getAttribute("aria-pressed")).toBe("false")
+  fireEvent.click(button)
+  await waitFor(() => expect(writes).toEqual([{ is_new: true, expectedVersion: 2 }]))
+  await waitFor(() => expect(screen.getByRole("button", { name: "New: Phone case" }).getAttribute("aria-pressed")).toBe("true"))
+})
+
+it("blocks further flag writes after a conflict until explicit reload", async () => {
+  let writes = 0
+  api.defaults.adapter = async config => {
+    if (config.method === "patch") {
+      writes++
+      throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, { config, status: 409, statusText: "Conflict", headers: new AxiosHeaders(), data: { message: "Product changed. Reload before saving." } })
+    }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ ...product, __v: 2 }], pagination: { total: 1, totalPages: 1 } } }
+  }
+  setup()
+  fireEvent.click(await screen.findByRole("button", { name: "New: Phone case" }))
+  await screen.findByText("Product changed. Reload before saving.")
+  expect((screen.getByRole("button", { name: "New: Phone case" }) as HTMLButtonElement).disabled).toBe(true)
+  expect(writes).toBe(1)
+  fireEvent.click(screen.getByRole("button", { name: "Tải lại để kiểm tra" }))
+  await waitFor(() => expect((screen.getByRole("button", { name: "New: Phone case" }) as HTMLButtonElement).disabled).toBe(false))
+})
+
+it("staff can read merchandising flags without quick-update controls", async () => {
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ ...product, __v: 2, is_new: true }], pagination: { total: 1, totalPages: 1 } } })
+  setup("staff")
+  await screen.findByText("Phone case")
+  expect(screen.queryByRole("button", { name: "New: Phone case" })).toBeNull()
+  expect(screen.getByLabelText("New: true")).toBeTruthy()
+})
+
+
+it("combines merchandising filters on the server, preserves false and clears them on reset", async () => {
+  const requests: Record<string, unknown>[] = []
+  api.defaults.adapter = async config => {
+    requests.push(config.params)
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: 0, totalPages: 0 } } }
+  }
+  setup("admin", "/auth/products?page=3&limit=20&is_hot=true&is_best_seller=false&is_new=invalid&is_home=true&on_sale=false")
+  await screen.findByText("Không tìm thấy sản phẩm.")
+  expect(requests[0]).toMatchObject({ page: 3, limit: 20, is_hot: true, is_best_seller: false, is_home: true, on_sale: false })
+  expect(requests[0].is_new).toBeUndefined()
+  expect((screen.getByLabelText("Best Seller") as HTMLSelectElement).value).toBe("false")
+  fireEvent.change(screen.getByLabelText("New"), { target: { value: "true" } })
+  await waitFor(() => expect(requests.at(-1)).toMatchObject({ page: 1, is_new: true, is_best_seller: false, is_hot: true, on_sale: false }))
+  expect(screen.getByTestId("product-location").textContent).toContain("is_new=true")
+  fireEvent.change(screen.getByLabelText("Hot"), { target: { value: "" } })
+  await waitFor(() => expect(requests.at(-1)?.is_hot).toBeUndefined())
+  fireEvent.click(screen.getByRole("button", { name: "Đặt lại bộ lọc" }))
+  await waitFor(() => {
+    for (const key of ["on_sale", "is_new", "is_hot", "is_home", "is_best_seller"]) expect(requests.at(-1)?.[key]).toBeUndefined()
+  })
+  expect(screen.getByTestId("product-location").textContent).toBe("?page=1&limit=20")
+})

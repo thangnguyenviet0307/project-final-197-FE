@@ -18,7 +18,7 @@ const allowed = new Set([
   "validations/common.validation.ts", "validations/customers.validation.ts",
   "validations/users.validation.ts", "validations/brands.validation.ts",
   "validations/categories.validation.ts",
-  "validations/products.validation.ts",
+  "validations/products.validation.ts", "validations/hero-slides.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -154,4 +154,25 @@ await reviewService.createProductReview({ id, input: reviewForm.productReviewSch
 assert.deepEqual(await reviewService.getProductMetrics(id), { rating: 0, reviewCount: 0, soldCount: 0 })
 assert.equal((await reviewService.listProductReviews(id, 2)).pagination.page, 2)
 await reviewService.deleteProductReview({ id, reviewId: id })
+const heroValidation = loadValidation("validations/hero-slides.validation.ts")
+const heroApi = {
+  async get(url) { requests.push({ method: "GET", url }); return { data: { data: [] } } },
+  async post(url, body) { heroValidation.createHeroSlideSchema.parse(body); requests.push({ method: "POST", url, body }); return { data: { data: { _id: id, ...body } } } },
+  async patch(url, body) { heroValidation.updateHeroSlideSchema.parse(body); requests.push({ method: "PATCH", url, body }); return { data: { data: { _id: id, ...body } } } },
+  async delete(url, config) { heroValidation.heroSlideVersionSchema.parse(config.data); requests.push({ method: "DELETE", url, body: config.data }); return { data: { success: true } } },
+}
+const heroService = evaluate(path.join(root, "src/features/hero-slides/services/hero-slides.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: heroApi, authApi: heroApi }
+  throw new Error(`Unsupported hero service import: ${specifier}`)
+})
+const heroForm = evaluate(path.join(root, "src/features/hero-slides/schemas/hero-slide-schema.ts"), specifier => {
+  if (specifier === "zod") return require("zod")
+  throw new Error(`Unsupported hero form import: ${specifier}`)
+})
+const heroInput = heroForm.heroSlideSchema.parse({ category: id, title: "Custom title", description: "Custom description", imageUrl: "", sortOrder: 2, isActive: true })
+await heroService.listHeroSlides()
+await heroService.listPublicHeroSlides()
+await heroService.createHeroSlide(heroInput)
+await heroService.updateHeroSlide({ id, input: { expectedVersion: 0, description: "Updated description", imageUrl: null } })
+await heroService.deleteHeroSlide({ id, expectedVersion: 1 })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

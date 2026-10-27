@@ -4,5 +4,6 @@ export function invalidateCatalog(client: QueryClient, catalog: "categories" | "
   return Promise.all([
     client.invalidateQueries({ queryKey: [catalog] }),
     client.invalidateQueries({ queryKey: ["products"] }),
+    ...(catalog === "categories" ? [client.invalidateQueries({ queryKey: ["hero-slides"] })] : []),
   ])
 }

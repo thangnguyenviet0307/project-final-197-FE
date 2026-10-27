@@ -80,7 +80,7 @@ export default function StorefrontProductDetailPage() {
   const state: unknown = location.state
   const candidate = state && typeof state === "object" && "returnTo" in state ? state.returnTo : undefined
   const returnTo = typeof candidate === "string" && /^\/shop(?:\?|$)/.test(candidate) ? candidate : "/shop"
-  const query = useStoreProduct(slug)
+  const query = useStoreProduct(slug, location.key)
   return <div className="bg-[#fbfcfa] text-gray-950"><div className="store-container space-y-6 py-8">
     <nav aria-label="Breadcrumb" className="text-sm text-gray-500"><ol className="flex flex-wrap items-center gap-2"><li><Link to="/" className="hover:text-[#4d9210]">Trang chủ</Link></li>{query.data && !query.isError && <><li aria-hidden="true">/</li><li>{catalogId(query.data.category) ? <Link to={`/shop?category=${catalogId(query.data.category)}`} className="hover:text-[#4d9210]">{catalogName(query.data.category)}</Link> : <span>Chưa có danh mục</span>}</li><li aria-hidden="true">/</li><li aria-current="page" className="break-words font-medium text-gray-800">{query.data.product_name}</li></>}</ol></nav>
     <Link to={returnTo} className="inline-flex text-sm font-medium text-[#4d9210] hover:underline">Quay lại danh sách</Link>

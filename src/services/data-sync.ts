@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 
 const storageKey = "admin-data-updated"
-const businessKeys = ["products", "orders", "categories", "brands", "users", "customers"] as const
+const businessKeys = ["products", "orders", "categories", "brands", "users", "customers", "hero-slides"] as const
 
 interface HotUpdates {
   on: (event: "vite:afterUpdate", callback: () => void) => void

@@ -1,0 +1,31 @@
+.product-carousel {
+  container-type: inline-size;
+  min-width: 0;
+}
+.product-carousel-viewport {
+  --column-width: calc((100cqw - 1rem) / 2);
+  --card-height: calc(var(--column-width) * 0.75 + 14rem);
+  position: relative;
+  height: calc(var(--card-height) * 2 + 1rem);
+  overflow: hidden;
+}
+.product-carousel-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--column-width);
+  grid-template-rows: repeat(2, var(--card-height));
+  gap: 1rem;
+  width: 100%;
+  transform: translate3d(calc(var(--column-offset) * (var(--column-width) + 1rem) * -1), 0, 0);
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.product-carousel-item { min-width: 0; height: var(--card-height); }
+.product-carousel-item > article { height: 100%; }
+.product-carousel-placeholder { height: 100%; border: 1px solid #f3f4f6; border-radius: 1rem; background: #fafafa; }
+.product-carousel-message { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; background: rgb(255 255 255 / 85%); }
+@media (min-width: 1024px) {
+  .product-carousel-viewport { --column-width: calc((100cqw - 3rem) / 4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-carousel-track { transition: none; }
+}

@@ -9,7 +9,7 @@ export function SectionHeading({
   linkLabel = "Khám phá",
   light = false,
 }: {
-  eyebrow: string
+  eyebrow?: string
   title: string
   description?: string
   to?: string
@@ -19,9 +19,9 @@ export function SectionHeading({
   return (
     <div className="mb-7 flex flex-col justify-between gap-4 sm:mb-9 sm:flex-row sm:items-end">
       <div>
-        <p className={`mb-2 text-xs font-bold uppercase tracking-[0.2em] ${light ? "text-lime-300" : "text-[#57952b]"}`}>
+        {eyebrow && <p className={`mb-2 text-xs font-bold uppercase tracking-[0.2em] ${light ? "text-lime-300" : "text-[#57952b]"}`}>
           {eyebrow}
-        </p>
+        </p>}
         <h2 className={`text-2xl font-bold tracking-tight sm:text-3xl ${light ? "text-white" : "text-gray-950"}`}>
           {title}
         </h2>

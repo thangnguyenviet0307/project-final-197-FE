@@ -9,6 +9,7 @@ export function mapCatalogProduct(product: Product): StorefrontProduct {
     id: product._id, slug: product.slug ?? "", name: product.product_name,
     category: catalogName(product.category), brand: catalogName(product.brand),
     price: discountedPrice(price, product.discount) ?? 0,
+    originalPrice: price, discount: product.discount ?? 0,
     image: gallery[0] ?? "", gallery, description: product.description ?? "", features: [],
     variants: (product.variants?.length ? product.variants : [{ sku: product.sku ?? "", variant_name: "Tiêu chuẩn", price: product.price ?? 0, stock: product.stock }]).map(variant => ({
       name: variant.variant_name || variant.sku, color: "#6b7280", image: variant.image || gallery[0] || "", stock: variant.stock,

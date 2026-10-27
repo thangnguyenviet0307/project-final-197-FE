@@ -55,6 +55,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     },
 
     // Apps
+    { title: "Danh mục: Hero trang chủ", url: "/auth/hero-slides", group: "Ứng dụng", icon: Package },
     { title: "Sản phẩm", url: "/auth/products", group: "Ứng dụng", icon: Package },
     { title: "Đơn hàng", url: "/auth/orders", group: "Ứng dụng", icon: Package },
     { title: "Danh mục", url: "/auth/categories", group: "Ứng dụng", icon: Package },
@@ -165,7 +166,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/auth/users"].includes(item.url) || role === "admin")
+    (!["/auth/users", "/auth/hero-slides"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

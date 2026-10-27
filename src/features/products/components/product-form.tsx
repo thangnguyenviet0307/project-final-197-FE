@@ -102,6 +102,13 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
         <FieldError id="description-error" errors={[fieldState.error]} />
       </Field>} />
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_active")} />Sản phẩm đang hoạt động</label>
+      <fieldset className="flex flex-wrap gap-4"><legend>Hiển thị sản phẩm</legend>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("on_sale")} />On sale - Đang bán</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_new")} />New - Mới</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_hot")} />Hot - Nổi bật</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_home")} />Home - Trang chủ</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_best_seller")} />Best Seller - Bán chạy</label>
+      </fieldset>
       <ProductDetailsFields form={form} />
       <ProductVariantsFields form={form} />
     </fieldset>

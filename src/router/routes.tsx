@@ -260,6 +260,7 @@ export const routes: RouteObject[] = [
       {
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
+          { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
           // CATEGORIES
           {
             path: "/auth/categories/new",
