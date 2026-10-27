@@ -1,100 +1,103 @@
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { expect, it, vi } from "vitest"
-import StorefrontHomePage from "@/pages/storefront/home"
+import type { Product } from "@/features/products/types/products"
 import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
-import { storefrontCategories, storefrontProducts } from "@/features/storefront/data/products"
-import { sourceProductListings } from "@/features/storefront/data/source-product-listings"
-import { StoreDepartmentsMenu } from "@/layout/storefront/store-departments-menu"
+import { FeaturedParts } from "@/features/storefront/components/featured-parts"
+vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [], isPending: false }) }))
 
-const publicCategoriesQuery = vi.hoisted(() => ({
-  data: [],
-  isPending: false,
-  isError: false,
-  isFetching: false,
-  refetch: vi.fn(),
+const state = vi.hoisted(() => ({
+  product: { _id: "a".repeat(24), slug: "ceramic-chicken", product_name: "Ceramic Chicken", is_active: true, category: null, brand: null, price: 100000, discount: 10, stock: 4, description: "<p>Mô tả thật</p><script>alert(1)</script>", variants: [{ _id: "b".repeat(24), sku: "BLUE", variant_name: "Màu xanh", price: 200000, stock: 2 }] } as Product,
+  pending: false, error: false, relatedCount: 1, refetch: vi.fn(), list: vi.fn(),
 }))
-vi.mock("@/features/categories/hooks/use-public-categories", () => ({
-  usePublicCategories: () => publicCategoriesQuery,
+vi.mock("@/features/storefront/hooks/use-store-products", () => ({
+  useStoreProducts: (params: unknown) => { state.list(params); return { data: { data: [state.product], pagination: { total: 1, totalPages: 1 } }, isPending: state.pending, isError: state.error, refetch: state.refetch } },
+  useStoreProduct: () => ({ data: state.product, isPending: state.pending, isError: state.error, error: { statusCode: 404, message: "Not found" }, refetch: state.refetch }),
+  useStoreMetrics: () => ({ data: { rating: 4.5, reviewCount: 6, soldCount: 12 }, isPending: false, isError: false }),
+  useCreateStoreReview: () => ({ isPending: false, mutateAsync: vi.fn() }),
+  useStoreReviews: (_slug: string, page: number) => ({ data: { data: [{ rating: 5, reviewerName: "Khách hàng", comment: `Đánh giá trang ${page}`, source: "admin" }], pagination: { totalPages: 2 } }, isPending: false, isError: false }),
+  useRelatedProducts: () => ({ data: Array.from({ length: state.relatedCount }, (_, index) => ({ ...state.product, _id: `related-${index}`, slug: index ? `related-${index}` : "related-product", product_name: index ? `Sản phẩm liên quan ${index}` : "Sản phẩm cùng danh mục" })), isPending: false, isError: false }),
 }))
-
-it("renders the storefront homepage sections", () => {
-  render(<MemoryRouter><StorefrontHomePage /></MemoryRouter>)
-
-  expect(screen.getAllByRole("heading", { name: /Dây cáp sạc/ }).length).toBeGreaterThan(0)
-  expect(screen.getByRole("navigation", { name: "Danh mục nhanh" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Chọn phụ kiện theo nhu cầu" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Cách chọn đúng phụ kiện" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Thông tin hữu ích cho phụ kiện bạn chọn" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Tai nghe có dây hay Bluetooth: đâu là lựa chọn của bạn?" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Ba điều cần kiểm tra trước khi mua kính cường lực" })).toBeTruthy()
-  for (const category of storefrontCategories) {
-    expect(screen.getByRole("heading", { name: category.name })).toBeTruthy()
-    expect(screen.getAllByText(category.description).length).toBeGreaterThan(0)
-  }
-  expect(screen.getAllByRole("link", { name: /Bộ sưu tập/ })).toHaveLength(storefrontCategories.length)
-  fireEvent.click(screen.getByRole("button", { name: "Banner tiếp theo" }))
-  expect(screen.getAllByRole("heading", { name: /Tai nghe/ }).length).toBeGreaterThan(0)
+it("renders Backend catalog data and passes URL search/sort/page to the API hook", () => {
+  render(<MemoryRouter initialEntries={["/shop?search=Chicken&sort=price-asc&page=2"]}><StorefrontProductsPage /></MemoryRouter>)
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2, search: "Chicken", sortBy: "price", sortOrder: "asc" }))
+  expect(screen.getByRole("link", { name: "Xem Ceramic Chicken" }).getAttribute("href")).toBe("/shop/ceramic-chicken")
+  expect(screen.getByText("180.000 ₫")).toBeTruthy()
 })
-
-it("filters and sorts the product listing from URL parameters", () => {
-  render(
-    <MemoryRouter initialEntries={[`/shop?category=${encodeURIComponent("Loa Bluetooth")}&sort=price-asc`]}>
-      <Routes><Route path="/shop" element={<StorefrontProductsPage />} /></Routes>
-    </MemoryRouter>,
-  )
-
-  const speakerCount = storefrontProducts.filter((product) => product.category === "Loa Bluetooth").length
-  expect(screen.getByRole("heading", { name: "Loa Bluetooth" })).toBeTruthy()
-  expect(screen.getByText(String(speakerCount))).toBeTruthy()
-  expect(screen.getByRole("link", { name: "Loa Bluetooth Hoco HC46" })).toBeTruthy()
-  expect(screen.queryByRole("link", { name: "Tai Nghe Bluetooth TWS Hoco EW94" })).toBeNull()
+it("renders Backend detail, updates selected variant price, and sanitizes descriptions", () => {
+  const view = render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+  expect(screen.getByRole("heading", { name: "Ceramic Chicken" })).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Màu xanh" }))
+  expect(screen.getByLabelText("Giá bán hiện tại").textContent).toBe("180.000 ₫")
+  expect(screen.getByText("Còn 2 sản phẩm")).toBeTruthy()
+  expect(view.container.querySelector("script")).toBeNull()
 })
-
-it("uses only source images and has at least 10 and at most 15 products in each category", () => {
-  expect(sourceProductListings).toHaveLength(60)
-  expect(storefrontCategories.map((category) => category.name)).toEqual([
-    "Dây cáp sạc", "Tai nghe", "Pin sạc dự phòng", "Phụ kiện máy tính", "Loa Bluetooth", "Kính cường lực",
-  ])
-  for (const category of storefrontCategories) {
-    const products = storefrontProducts.filter((product) => product.category === category.name)
-    expect(products.length).toBeGreaterThanOrEqual(10)
-    expect(products.length).toBeLessThanOrEqual(15)
-    expect(products.every((product) => product.sourceUrl?.startsWith("https://phukiengiaxuong.com.vn/"))).toBe(true)
-    expect(products.every((product) => product.image.startsWith("https://phukiengiaxuong.com.vn/cdn/images/"))).toBe(true)
-  }
-  expect(storefrontProducts.every((product) => product.price > 0)).toBe(true)
-  expect(storefrontProducts.every((product) => !("rating" in product) && !("reviewCount" in product))).toBe(true)
+it("shows loading and request failures without falling back to fixture products", () => {
+  state.pending = true
+  const view = render(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
+  expect(screen.getByRole("status")).toBeTruthy()
+  state.pending = false; state.error = true
+  view.rerender(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
+  expect(screen.getByRole("alert")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Thử lại" }))
+  expect(state.refetch).toHaveBeenCalled()
+  state.error = false
 })
-
-it("shows real storefront categories and products inside the all-categories menu", () => {
-  render(<MemoryRouter><StoreDepartmentsMenu /></MemoryRouter>)
-
-  fireEvent.click(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }))
-
-  fireEvent.click(screen.getByRole("button", { name: `Tất cả sản phẩm (${storefrontProducts.length})` }))
-  const allProductsPanel = screen.getByRole("region", { name: "Tất cả sản phẩm" })
-  expect(within(allProductsPanel).getAllByRole("link")).toHaveLength(storefrontProducts.length)
-  expect(within(allProductsPanel).getByRole("link", { name: new RegExp(storefrontProducts[0].name) })).toBeTruthy()
-  expect(allProductsPanel.querySelectorAll("img")).toHaveLength(storefrontProducts.length)
-  expect(within(allProductsPanel).queryByText(/Giá sỉ|Giá CK|tham khảo/i)).toBeNull()
+it("uses Backend products for the homepage featured section", () => {
+  render(<MemoryRouter><FeaturedParts /></MemoryRouter>)
+  expect(screen.getByRole("link", { name: "Xem Ceramic Chicken" })).toBeTruthy()
 })
-
-it("shows product gallery, selectable variants, content tabs, and related products", () => {
-  render(
-    <MemoryRouter initialEntries={["/shop/tai-nghe-bluetooth-tws-hoco-ew94"]}>
-      <Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes>
-    </MemoryRouter>,
-  )
-
-  expect(screen.getByRole("heading", { name: "Tai Nghe Bluetooth TWS Hoco EW94" })).toBeTruthy()
-  expect(screen.queryByRole("link", { name: /Kiểm tra giá và thông tin mới nhất/ })).toBeNull()
-  const standardVariant = screen.getByRole("button", { name: /Mẫu tiêu chuẩn/ })
-  fireEvent.click(standardVariant)
-  expect(standardVariant.getAttribute("aria-pressed")).toBe("true")
-  fireEvent.click(screen.getByRole("button", { name: "Thông tin nổi bật" }))
-  expect(screen.getByText("Bluetooth 6.0, chip JL AC7103")).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Sản phẩm liên quan" })).toBeTruthy()
+it("keeps catalog search and pagination when returning from a product detail", () => {
+  render(<MemoryRouter initialEntries={["/shop?search=Chicken&page=2"]}><Routes><Route path="/shop" element={<StorefrontProductsPage />} /><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+  fireEvent.click(screen.getByRole("link", { name: "Xem Ceramic Chicken" }))
+  expect(screen.getByRole("link", { name: "Quay lại danh sách" }).getAttribute("href")).toBe("/shop?search=Chicken&page=2")
+})
+it("shows real rating/reviews, paginates reviews and links related products", () => {
+  render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+  expect(screen.getAllByText("4.5").length).toBeGreaterThan(0)
+  expect(screen.getAllByText("Đã bán 12").length).toBeGreaterThan(0)
+  expect(screen.getByText("Đánh giá trang 1")).toBeTruthy()
+  fireEvent.click(screen.getByRole("button", { name: "Trang 2" }))
+  expect(screen.getByText("Đánh giá trang 2")).toBeTruthy()
+  expect(screen.getByRole("heading", { name: "Các sản phẩm liên quan" })).toBeTruthy()
+  expect(screen.getByRole("link", { name: "Xem Sản phẩm cùng danh mục" }).getAttribute("href")).toBe("/shop/related-product")
+  fireEvent.click(screen.getByRole("tab", { name: "Thông tin chi tiết" }))
+  expect(screen.getByRole("tab", { name: "Thông tin chi tiết" }).getAttribute("aria-selected")).toBe("true")
+})
+it("groups category labels and policies inside the overview, without duplicated policy rows or a news sidebar", () => {
+  const original = state.product
+  state.product = { ...original, category: { _id: "d".repeat(24), name: "Tai nghe" }, tags: ["Bluetooth"], shippingInformation: "Giao trong 3 ngày", variants: original.variants?.map(variant => ({ ...variant, attributes: { material: "Cotton" } })) }
+  try {
+    render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+    const categories = screen.getByRole("navigation", { name: "Danh mục sản phẩm" })
+    expect(within(categories).queryByText("Bluetooth")).toBeNull()
+    expect(within(screen.getByRole("tabpanel", { name: "Mô tả sản phẩm" })).getByText("Bluetooth")).toBeTruthy()
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" })
+    expect(within(breadcrumb).getByRole("link", { name: "Trang chủ" })).toBeTruthy()
+    expect(within(breadcrumb).getByRole("link", { name: "Tai nghe" }).getAttribute("href")).toBe(`/shop?category=${"d".repeat(24)}`)
+    expect(within(breadcrumb).getByText("Ceramic Chicken").getAttribute("aria-current")).toBe("page")
+    expect(within(categories).getByRole("link", { name: "Tai nghe" }).getAttribute("href")).toBe(`/shop?category=${"d".repeat(24)}`)
+    const overview = screen.getByRole("region", { name: "Tổng quan sản phẩm" })
+    expect(within(overview).getByRole("navigation", { name: "Danh mục sản phẩm" })).toBe(categories)
+    expect(within(overview).getByText("Giao trong 3 ngày")).toBeTruthy()
+    expect(within(overview).getByText("Bảo hành")).toBeTruthy()
+    expect(within(overview).getByText("Đổi trả")).toBeTruthy()
+    fireEvent.click(screen.getByRole("tab", { name: "Thông tin chi tiết" }))
+    const table = screen.getByRole("table", { name: "Thông tin chi tiết sản phẩm" })
+    expect(within(table).getByRole("rowheader", { name: "SKU" })).toBeTruthy()
+    expect(within(table).getByRole("cell", { name: "BLUE" })).toBeTruthy()
+    expect(within(table).getByRole("rowheader", { name: "Material" })).toBeTruthy()
+    for (const name of ["Giao hàng", "Bảo hành", "Đổi trả"]) expect(within(table).queryByRole("rowheader", { name })).toBeNull()
+    expect(screen.queryByRole("complementary", { name: "Tin tức liên quan" })).toBeNull()
+  } finally { state.product = original }
+})
+it("limits the related product section to five cards", () => {
+  state.relatedCount = 7
+  try {
+    render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+    const related = screen.getByRole("region", { name: "Các sản phẩm liên quan" })
+    expect(within(related).getAllByRole("article")).toHaveLength(5)
+    expect(within(related).queryByText("Sản phẩm liên quan 5")).toBeNull()
+  } finally { state.relatedCount = 1 }
 })

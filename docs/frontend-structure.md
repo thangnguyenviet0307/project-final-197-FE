@@ -1,4 +1,4 @@
-﻿# Cấu trúc Frontend
+# Cấu trúc Frontend
 
 Dự án dùng React, Vite, TypeScript, React Router, Zustand và TanStack Query. Cấu trúc áp dụng cách phân chia trách nhiệm trong hình mẫu, kết hợp module nghiệp vụ trong `features`.
 
@@ -103,6 +103,16 @@ import { useAuthStore } from "@/stores/auth.store"
 Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.ps1`, dùng `pnpm.cmd` tương ứng. Lần tổ chức thư mục này giữ nguyên URL, phân quyền và logic nghiệp vụ.
 
 ## Admin contract updates
+
+- Khối review store dùng `StoreRatingBreakdown` hiển thị điểm trung bình, tổng review và tỷ lệ 5–1 sao từ `ratingDistribution` trong public metrics (tính trên toàn bộ review). Số đánh giá tích cực là số review 4–5 sao, không phải số người mua đã xác thực. API public giới hạn tối đa 5 review/trang; nút “Viết đánh giá” nằm sau danh sách bình luận và phân trang, vẫn mở modal hai bước.
+
+- Đánh giá storefront có nút “Viết đánh giá” ở giữa section và modal hai bước trong `WriteProductReview`: chọn sao, rồi nhập họ tên/nội dung bắt buộc, email/điện thoại tùy chọn; không upload ảnh. Schema ở `features/storefront/schemas/store-review-schema.ts`, service gửi POST `/products/public/:slug/reviews`, hook mutation invalidate prefix `products` để tải lại điểm và danh sách. BE gán nguồn `storefront`; UI ghi “Người dùng gửi”, không gắn nhãn đã mua hàng. Thông tin liên hệ lưu riêng, không trả ra public; lỗi giữ bản nháp và thành công trở về trang review đầu tiên.
+
+- Store Product Details đặt đúng danh mục được gán (gốc hoặc con) ngay dưới tên sản phẩm, tiếp theo là thương hiệu; tags chỉ nằm cuối mô tả. Breadcrumb theo thứ tự Trang chủ / Danh mục được gán / Tên sản phẩm; danh mục liên kết đến bộ lọc tương ứng, liên kết quay lại danh sách riêng giữ URL trước đó. Gallery, chọn biến thể, giá, số lượng xem trước và các ô giao hàng/bảo hành/đổi trả nằm chung khung. Tab thông tin dùng table dọc, không lặp lại ba mục chính sách; tên thuộc tính như Material viết hoa chữ cái đầu. Không có sidebar tin tức. `StoreRatingSummary`/`StoreProductReviews` đọc metrics và review phân trang công khai (có luồng gửi đánh giá qua modal). `RelatedProducts` ở cuối trang đọc `/products/public/:slug/related`, hiển thị tối đa 5 sản phẩm cùng category, loại chính sản phẩm đang xem và các sản phẩm/catalog không hoạt động. Service/hook thuộc `features/storefront`, cùng cache prefix `products`; các khối có trạng thái tải, lỗi/thử lại và trống độc lập.
+
+- `AdminStoreProductLink` ở danh sách/chi tiết Products quản trị mở `/shop/:slug` của sản phẩm BE đang hoạt động trong tab mới. Store dùng `features/storefront/services/catalog.service.ts` và hooks `use-store-products` để đọc `/products/public` và `/products/public/:slug` không cần đăng nhập; danh sách, chi tiết, sản phẩm mới trên trang chủ và menu không còn dùng sản phẩm fixture. Query dùng prefix `products` để dùng chung invalidation/sync với quản trị. Mô tả HTML được sanitize, biến thể hiển thị đúng giá sau giảm; đặt hàng vẫn chưa triển khai.
+
+- Trang `/products/:id` dùng `ProductDetailGallery` để chọn ảnh thumbnail, ảnh quản lý, ảnh nguồn và ảnh biến thể; tự quay về ảnh đầu khi ảnh đang chọn không còn trong dữ liệu mới. Tổng quan hiển thị giá VND sau giảm theo utility dùng chung, trạng thái, tồn kho và thời gian theo định dạng Việt Nam. Giữ URL danh sách khi quay lại hoặc chuyển sang chỉnh sửa.
 
 - Products: form tạo/sửa hỗ trợ SKU sản phẩm, mã vạch, nhãn, khối lượng (kg), ba kích thước (cm), chính sách bảo hành/giao hàng/đổi trả và số lượng đặt tối thiểu. Năm sản xuất không bắt buộc; chỉ gửi metadata thay đổi. Thông tin nguồn import và ảnh nguồn chỉ hiển thị ở chi tiết, không gửi trong payload chỉnh sửa.
 - Chi tiết Products ghép `ProductDetailsInfo` và `ProductReviews`. Hook `use-product-reviews` lấy metrics/reviews qua service riêng, quản lý mutation và invalidate cache `products/metrics` cùng `products/reviews`. Admin được thêm/xóa review, staff chỉ xem; điểm trung bình và số lượng đã bán do BE tính. Không gọi API metrics riêng cho từng dòng danh sách.

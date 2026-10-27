@@ -4,7 +4,8 @@ import { Link } from "react-router-dom"
 import { CatalogImage } from "@/components/catalog-image"
 import { usePublicCategories } from "@/features/categories/hooks/use-public-categories"
 import type { PublicCategory } from "@/features/categories/types/categories"
-import { storefrontProducts } from "@/features/storefront/data/products"
+import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
+import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
 import "./store-departments-menu.css"
 
 function CategoryBranch({
@@ -74,9 +75,9 @@ function CategoryBranch({
           />
         </button>
       ) : (
-        <div className="flex min-h-[52px] items-center gap-2.5 bg-white px-5 py-3 text-base font-normal leading-6 text-[#666]">
+        <Link to={`/shop?category=${category._id}`} className="flex min-h-[52px] items-center gap-2.5 bg-white px-5 py-3 text-base font-normal leading-6 text-[#666]">
           {content}
-        </div>
+        </Link>
       )}
       {expanded && children.length > 0 && (
         <ul
@@ -102,6 +103,8 @@ function CategoryBranch({
 }
 
 export function StoreDepartmentsMenu() {
+  const productsQuery = useStoreProducts({ page: 1, limit: 12 })
+  const storefrontProducts = (productsQuery.data?.data ?? []).map(mapCatalogProduct)
   const [open, setOpen] = useState(false)
   const [showAllProducts, setShowAllProducts] = useState(false)
   const { data: categories = [], isPending, isError, refetch, isFetching } =
@@ -173,7 +176,7 @@ export function StoreDepartmentsMenu() {
             onClick={() => setShowAllProducts((value) => !value)}
             className="flex min-h-[52px] w-full items-center justify-between border-b border-[#e8e8e8] px-5 py-3 text-left text-base font-medium text-[#666] transition-colors hover:bg-gray-50 hover:text-[#55b000]"
           >
-            <span>Tất cả sản phẩm ({storefrontProducts.length})</span>
+            <span>Tất cả sản phẩm ({productsQuery.data?.pagination.total ?? 0})</span>
             <ChevronRight
               size={16}
               className={`transition-transform ${showAllProducts ? "rotate-90" : ""}`}
@@ -187,6 +190,9 @@ export function StoreDepartmentsMenu() {
               className="store-category-submenu border-b border-[#e8e8e8] bg-white p-3 lg:absolute lg:left-full lg:top-0 lg:z-20 lg:w-[min(720px,calc(100vw-360px))] lg:border lg:p-4 lg:shadow-xl"
             >
               <div className="max-h-[65vh] overflow-y-auto pr-1">
+                <Link to="/shop" onClick={closeMenu} className="mb-3 block text-sm font-semibold text-green-700">Xem tất cả sản phẩm</Link>
+                {productsQuery.isPending && <p role="status">Đang tải sản phẩm…</p>}
+                {productsQuery.isError && <p role="alert">Không thể tải sản phẩm. Vui lòng thử lại ở trang sản phẩm.</p>}
                 <div className="grid gap-2 sm:grid-cols-2">
                   {storefrontProducts.map((product) => (
                     <Link

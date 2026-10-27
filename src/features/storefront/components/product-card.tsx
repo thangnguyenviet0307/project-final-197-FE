@@ -1,20 +1,23 @@
 import { ArrowUpRight } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import type { StorefrontProduct } from "@/features/storefront/types/storefront"
 import { formatStorePrice } from "@/features/storefront/utils/format-price"
+import { ProductImage } from "@/features/products/components/product-image"
 
 export function ProductCard({ product }: { product: StorefrontProduct }) {
+  const location = useLocation()
+  const linkState = { returnTo: location.pathname === "/shop" ? location.pathname + location.search : "/shop" }
   return (
     <article className="group min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white transition duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl">
       <Link
-        to={`/shop/${product.slug}`}
+        to={`/shop/${encodeURIComponent(product.slug)}`}
+        state={linkState}
         className="relative block overflow-hidden bg-[#f4f5f2]"
         aria-label={`Xem ${product.name}`}
       >
-        <img
+        <ProductImage
           src={product.image}
           alt={product.name}
-          loading="lazy"
           className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
         />
         {product.badge && (
@@ -31,14 +34,15 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
           {product.brand} <span className="px-1 text-gray-300">/</span> {product.category}
         </p>
         <Link
-          to={`/shop/${product.slug}`}
+          to={`/shop/${encodeURIComponent(product.slug)}`}
+          state={linkState}
           className="line-clamp-2 min-h-12 font-semibold leading-6 text-gray-900 hover:text-[#4d9210]"
         >
           {product.name}
         </Link>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-1">
           <span>
-            <span className="block text-[10px] font-medium text-gray-400">Giá sỉ</span>
+            <span className="block text-[10px] font-medium text-gray-400">Giá bán</span>
             <span className="font-bold text-gray-950">{formatStorePrice(product.price)}</span>
           </span>
           {product.cashPrice !== undefined && (
