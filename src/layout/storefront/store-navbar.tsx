@@ -35,15 +35,15 @@ export function StoreNavbar() {
 
             <span className="text-sm text-white/40">|</span>
 
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
+            <Link to="/#bo-suu-tap" className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90 hover:text-black">
               KHÁM PHÁ
-            </span>
+            </Link>
 
             <span className="text-sm text-white/40">|</span>
 
-            <span className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90">
+            <Link to="/#tin-tuc" className="flex h-full shrink-0 items-center text-sm font-semibold text-white/90 hover:text-black">
               TIN TỨC
-            </span>
+            </Link>
 
             <span className="text-sm text-white/40">|</span>
 
@@ -58,7 +58,7 @@ export function StoreNavbar() {
           {/* MOBILE NAVBAR */}
           <div className="flex h-14 w-full items-center justify-between lg:hidden">
             <span className="text-sm font-bold tracking-wider text-white">
-              DEMO STORE
+              PHỤ KIỆN GIÁ XƯỞNG
             </span>
 
             <button
@@ -91,13 +91,13 @@ export function StoreNavbar() {
                 <StoreDepartmentsMenu />
               </div>
 
-              <p className="px-4 py-3 text-sm font-semibold text-white/80">
+              <Link to="/#bo-suu-tap" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/15">
                 KHÁM PHÁ
-              </p>
+              </Link>
 
-              <p className="px-4 py-3 text-sm font-semibold text-white/80">
+              <Link to="/#tin-tuc" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/15">
                 TIN TỨC
-              </p>
+              </Link>
 
               <Link
                 to="/contact"

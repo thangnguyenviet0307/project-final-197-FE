@@ -1,144 +1,44 @@
+import { Image, PackageCheck, Search, Shapes } from "lucide-react"
+import { CollectionGallery } from "@/features/storefront/components/collection-gallery"
+import { FeaturedParts } from "@/features/storefront/components/featured-parts"
+import { HomeCategoryLinks } from "@/features/storefront/components/home-category-links"
+import { HomeHeroSlider } from "@/features/storefront/components/home-hero-slider"
+import { StorefrontBuyingGuide } from "@/features/storefront/components/storefront-buying-guide"
+import { StorefrontNewsSection } from "@/features/storefront/components/storefront-news-section"
 
-import { Link } from "react-router-dom"
-import {
-  ArrowRight,
-  Headphones,
-  ShieldCheck,
-  Truck,
-  RefreshCcw,
-  ShoppingBag,
-} from "lucide-react"
+const storeBenefits = [
+  { Icon: Search, title: "Tìm theo nhu cầu", description: "Khám phá từng nhóm phụ kiện" },
+  { Icon: Image, title: "Xem hình sản phẩm", description: "Tham khảo hình ảnh trực quan" },
+  { Icon: Shapes, title: "Nhiều danh mục", description: "Từ cáp sạc đến phụ kiện máy tính" },
+  { Icon: PackageCheck, title: "Chi tiết sản phẩm", description: "Xem thông tin trước khi chọn mua" },
+]
 
-export default function StoreHomePage() {
+export default function StorefrontHomePage() {
   return (
-    <div className="min-h-screen bg-white">
-      <section className="bg-[#f4f7f1]">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
-          <div>
-            <span className="inline-flex rounded-full bg-[#55b000]/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#459000]">
-              Chào mừng đến với Demo Store
-            </span>
+    <div className="bg-white">
+      <HomeHeroSlider />
+      <HomeCategoryLinks />
 
-            <h1 className="mt-7 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl lg:text-6xl">
-              Khám phá những
-              <span className="block text-[#55b000]">
-                sản phẩm yêu thích
+      <section aria-label="Khám phá cửa hàng" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10">
+        <div className="grid divide-y divide-gray-100 border-y border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+          {storeBenefits.map(({ Icon, title, description }) => (
+            <div key={title} className="flex items-center gap-4 px-4 py-5 sm:px-5 sm:py-6">
+              <span className="flex size-10 shrink-0 items-center justify-center text-[#57952b]">
+                <Icon size={22} strokeWidth={1.6} />
               </span>
-            </h1>
-
-            <p className="mt-6 max-w-lg text-base leading-8 text-gray-600">
-              Khám phá bộ sưu tập mới nhất, sản phẩm được yêu thích và đồ dùng thiết yếu tại Demo Store.
-            </p>
-
-            <Link
-              to="/contact"
-              className="mt-8 inline-flex items-center gap-3 rounded-md bg-[#55b000] px-7 py-4 text-sm font-bold text-white transition-colors hover:bg-[#459000]"
-            >
-              LIÊN HỆ
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          <div className="relative flex min-h-[320px] items-center justify-center rounded-3xl bg-[#223328] p-10 text-white lg:min-h-[430px]">
-            <div className="absolute left-7 top-7 h-24 w-24 rounded-full border-[14px] border-[#55b000]/20" />
-
-            <div className="absolute bottom-7 right-7 h-32 w-32 rounded-full border-[18px] border-[#55b000]/20" />
-
-            <div className="relative flex flex-col items-center gap-5 text-center">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#55b000]/20">
-                <ShoppingBag
-                  size={62}
-                  className="text-[#a4e665]"
-                />
-              </div>
-
-              <h2 className="text-3xl font-extrabold tracking-wider">
-                DEMO STORE
-              </h2>
-
-              <p className="max-w-xs text-sm leading-7 text-gray-300">
-                Điểm đến mua sắm trực tuyến của bạn
-              </p>
+              <span>
+                <span className="block text-sm font-bold text-gray-900">{title}</span>
+                <span className="mt-1 block text-xs text-gray-500">{description}</span>
+              </span>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1440px] gap-6 px-5 py-12 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          {
-            icon: Truck,
-            title: "Giao hàng nhanh",
-            description: "Thông tin dịch vụ giao hàng",
-          },
-          {
-            icon: ShieldCheck,
-            title: "Mua sắm an toàn",
-            description: "Trải nghiệm mua sắm tiện lợi",
-          },
-          {
-            icon: RefreshCcw,
-            title: "Đổi trả dễ dàng",
-            description: "Thông tin chính sách đổi trả",
-          },
-          {
-            icon: Headphones,
-            title: "Hỗ trợ khách hàng",
-            description: "Chúng tôi luôn sẵn sàng hỗ trợ",
-          },
-        ].map((item) => {
-          const Icon = item.icon
-
-          return (
-            <div
-              key={item.title}
-              className="flex items-center gap-4 rounded-xl border border-gray-200 p-6"
-            >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#55b000]/10 text-[#55b000]">
-                <Icon size={23} />
-              </div>
-
-              <div>
-                <h3 className="font-bold text-gray-900">
-                  {item.title}
-                </h3>
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </section>
-
-      <section className="bg-gray-50 py-20">
-        <div className="mx-auto max-w-[1440px] px-5 text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Khám phá bộ sưu tập
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-gray-500">
-            Các bộ sưu tập sản phẩm sẽ sớm được cập nhật tại đây.
-          </p>
-
-          <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-3">
-            {[
-              "Sản phẩm mới",
-              "Sản phẩm bán chạy",
-              "Sản phẩm nổi bật",
-            ].map((name) => (
-              <div
-                key={name}
-                className="flex min-h-44 items-center justify-center rounded-xl border border-gray-200 bg-white p-6"
-              >
-                <h3 className="text-lg font-semibold">
-                  {name}
-                </h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CollectionGallery />
+      <FeaturedParts />
+      <StorefrontBuyingGuide />
+      <StorefrontNewsSection />
     </div>
   )
 }

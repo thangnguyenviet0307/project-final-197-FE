@@ -15,11 +15,11 @@ export function StoreHeader() {
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            aria-label="DEMO STORE - Trang chủ"
+            aria-label="Phụ Kiện Giá Xưởng - Trang chủ"
             className="inline-flex items-center text-[30px] font-black tracking-[-1.5px] text-gray-950 transition-opacity hover:opacity-80 sm:text-[34px]"
           >
-            DEMO
-            <span className="text-[#55b000]">STORE</span>
+            PHỤ KIỆN{" "}
+            <span className="text-[#55b000]">GIÁ XƯỞNG</span>
           </Link>
 
           <Link
