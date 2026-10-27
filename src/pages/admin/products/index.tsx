@@ -19,6 +19,7 @@ import { useProductStatistics } from "@/features/products/hooks/use-product-stat
 import { ListPagination } from "@/components/list-pagination"
 import { ContentSkeleton } from "@/components/page-skeleton"
 import { discountedPrice } from "@/features/products/utils/product-price"
+import { AdminStoreProductLink } from "@/features/storefront/components/admin-store-product-link"
 
 function ActionTooltip({ label, children }: { label: string; children: ReactElement }) {
   return <Tooltip><TooltipTrigger role={label === "Xóa sản phẩm" ? "button" : "link"} render={children} /><TooltipContent>{label}</TooltipContent></Tooltip>
@@ -102,7 +103,7 @@ export default function AdminProductsPage() {
             </Badge>
           </div></TableCell>
           <TableCell><Badge variant={product.is_active ? "default" : "secondary"}>{product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></TableCell>
-          <TableCell><div className="flex gap-1"><ActionTooltip label="Xem sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`View ${product.product_name}`} render={<Link to={`/products/${product._id}`} state={linkState} />}><Eye /></Button></ActionTooltip>
+          <TableCell><div className="flex gap-1"><AdminStoreProductLink product={product} compact /><ActionTooltip label="Xem sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`View ${product.product_name}`} render={<Link to={`/products/${product._id}`} state={linkState} />}><Eye /></Button></ActionTooltip>
             {admin && <><ActionTooltip label="Chỉnh sửa sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`Edit ${product.product_name}`} render={<Link to={`/products/${product._id}/edit`} state={linkState} />}><Pencil /></Button></ActionTooltip>
               <ActionTooltip label="Xóa sản phẩm"><Button size="icon" variant="ghost" disabled={query.isPlaceholderData} aria-label={`Delete ${product.product_name}`} onClick={() => setDeleting(product)}><Trash2 className="text-destructive" /></Button></ActionTooltip></>}</div></TableCell>
         </TableRow>})}</TableBody></Table></div>}

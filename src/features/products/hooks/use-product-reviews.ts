@@ -9,6 +9,7 @@ export function useProductReviews(id: string, page: number) {
   const invalidate = () => Promise.all([
     client.invalidateQueries({ queryKey: ["products", "metrics", id] }),
     client.invalidateQueries({ queryKey: ["products", "reviews", id] }),
+    client.invalidateQueries({ queryKey: ["products", "public"] }),
   ])
   const create = useMutation({ mutationFn: createProductReview, onSuccess: invalidate, meta: { successMessage: "Đã thêm đánh giá.", suppressGlobalErrorToast: true } })
   const remove = useMutation({ mutationFn: deleteProductReview, onSuccess: invalidate, meta: { successMessage: "Đã xóa đánh giá.", suppressGlobalErrorToast: true } })

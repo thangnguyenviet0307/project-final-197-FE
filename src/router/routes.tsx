@@ -24,22 +24,23 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: "/",
-        lazy: page(() =>
-          import("@/pages/storefront/home/index")
-        ),
+        lazy: page(() => import("@/pages/storefront/home/index")),
       },
       {
         path: "/landing",
-        lazy: page(() =>
-          import("@/pages/public/landing/page")
-        ),
+        lazy: page(() => import("@/pages/public/landing/page")),
       },
-
+      {
+        path: "/shop",
+        lazy: page(() => import("@/pages/storefront/products/index")),
+      },
+      {
+        path: "/shop/:slug",
+        lazy: page(() => import("@/pages/storefront/products/detail")),
+      },
       {
         path: "/contact",
-        lazy: page(() =>
-          import("@/pages/storefront/contact/index")
-        ),
+        lazy: page(() => import("@/pages/storefront/contact/index")),
       },
 
       {

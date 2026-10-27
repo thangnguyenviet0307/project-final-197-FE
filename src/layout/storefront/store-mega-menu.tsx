@@ -1,5 +1,6 @@
 
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { ChevronDown, ChevronRight } from "lucide-react"
 
 type MenuColumn = {
@@ -93,19 +94,27 @@ export function StoreMegaMenu() {
 
               <div className="space-y-3">
                 {column.items.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="group flex w-full items-center justify-between text-left text-sm text-gray-600 transition-colors hover:text-green-600"
-                  >
-                    {item}
-
-                    <ChevronRight
-                      size={13}
-                      className="opacity-0 transition-opacity group-hover:opacity-100"
-                    />
-                  </button>
+                  item === "Tin tức" ? (
+                    <Link
+                      key={item}
+                      to="/#tin-tuc"
+                      onClick={() => setOpen(false)}
+                      className="group flex w-full items-center justify-between text-left text-sm text-gray-600 transition-colors hover:text-green-600"
+                    >
+                      {item}
+                      <ChevronRight size={13} className="opacity-0 transition-opacity group-hover:opacity-100" />
+                    </Link>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      className="group flex w-full items-center justify-between text-left text-sm text-gray-600 transition-colors hover:text-green-600"
+                    >
+                      {item}
+                      <ChevronRight size={13} className="opacity-0 transition-opacity group-hover:opacity-100" />
+                    </button>
+                  )
                 ))}
               </div>
             </div>

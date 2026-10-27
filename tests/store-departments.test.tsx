@@ -1,6 +1,8 @@
 import { expect, it, vi } from "vitest"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render as renderUI, screen } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
 import { StoreDepartmentsMenu } from "@/layout/storefront/store-departments-menu"
+function render(ui: import("react").ReactElement) { return renderUI(ui, { wrapper: MemoryRouter }) }
 
 const query = vi.hoisted(() => ({ data: [
   { _id: "1", name: "Linh kiện", slug: "linh-kien" },
@@ -8,6 +10,7 @@ const query = vi.hoisted(() => ({ data: [
   { _id: "3", name: "Phụ kiện", slug: "phu-kien", parent: "missing" },
 ], isPending: false, isError: false, isFetching: false, refetch: vi.fn() }))
 vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => query }))
+vi.mock("@/features/storefront/hooks/use-store-products", () => ({ useStoreProducts: () => ({ data: { data: [], pagination: { total: 0 } }, isPending: false, isError: false }) }))
 
 it("opens the child mega menu on desktop hover and closes it when leaving the whole branch", () => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })))

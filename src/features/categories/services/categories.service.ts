@@ -1,5 +1,9 @@
 import { api } from "@/services/api";
-import type { Category, CreateCategoryInput, UpdateCategoryInput } from "@/features/categories/types/categories";
+import type {
+  Category,
+  CreateCategoryInput,
+  UpdateCategoryInput,
+} from "@/features/categories/types/categories";
 import type { ApiResult } from "@/types/api";
 import type { PublicCategory } from "@/features/categories/types/categories";
 

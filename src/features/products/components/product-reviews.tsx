@@ -30,7 +30,7 @@ export function ProductReviews({ id }: { id: string }) {
       {!reviews.data?.data.length && <p className="text-sm text-muted-foreground">Chưa có đánh giá ở trang này.</p>}
       {reviews.data?.data.map(review => <article key={review._id} className="space-y-2 border-b pb-4">
         <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="break-words font-medium">{review.reviewerName}</h3><span aria-label={`${review.rating} trên 5 sao`} className="text-sm font-medium">★ {review.rating}/5</span></div>
-        <p className="text-xs text-muted-foreground">{review.date ? new Date(review.date).toLocaleString("vi-VN") : "Chưa có ngày"} · {review.source === "dummyjson" ? "Nhập từ DummyJSON" : "Quản trị viên thêm"}</p>
+        <p className="text-xs text-muted-foreground">{review.date ? new Date(review.date).toLocaleString("vi-VN") : "Chưa có ngày"} · {review.source === "storefront" ? "Người dùng gửi" : review.source === "dummyjson" ? "Nhập từ DummyJSON" : "Quản trị viên thêm"}</p>
         <p className="whitespace-pre-wrap break-words text-sm">{review.comment}</p>
         {admin && <Button variant="outline" disabled={remove.isPending} onClick={() => { remove.reset(); setDeleting(review._id) }} aria-label={`Xóa đánh giá của ${review.reviewerName}`}>Xóa đánh giá</Button>}
       </article>)}

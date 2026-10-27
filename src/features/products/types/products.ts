@@ -53,10 +53,10 @@ export interface Product extends Omit<ProductInput, "category" | "brand"> {
   createdAt?: string
   updatedAt?: string
 }
-export interface ProductMetrics { rating: number; reviewCount: number; soldCount: number }
+export interface ProductMetrics { rating: number; reviewCount: number; soldCount: number; ratingDistribution?: Record<1 | 2 | 3 | 4 | 5, number> }
 export interface ProductReviewInput { rating: number; reviewerName: string; comment: string; date?: string }
 export interface ProductReview extends ProductReviewInput {
-  _id: string; product: string; source: "admin" | "dummyjson"; createdAt?: string; updatedAt?: string
+  _id: string; product: string; source: "admin" | "dummyjson" | "storefront"; createdAt?: string; updatedAt?: string
 }
 export interface ProductReviewsResult { data: ProductReview[]; pagination: ProductsResult["pagination"] }
 export type UpdateProductInput = Partial<ProductInput> & { expectedVersion?: number }
