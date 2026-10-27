@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/stores/auth.store"
 import { CustomerProfileDialog } from "@/features/customers/components/customer-profile-dialog"
+import { customerAddress, customerBirthDate, customerGender } from "@/features/customers/utils/customer-profile"
 
 
 import { useState } from "react"
@@ -34,11 +35,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-import { CustomerFormDialog } from "@/features/customers/components/customer-form-dialog"
+
 
 import type {
   ICustomer,
-  CreateCustomerInput,
   CustomerStatus,
 } from "@/features/customers/types/customers"
 
@@ -54,9 +54,7 @@ interface CustomerTableProps {
   onResetFilters?: () => void
   onSearch: (value: string) => void
   onDelete: (id: string) => Promise<void> | void
-  onAdd: (
-    values: CreateCustomerInput
-  ) => Promise<void> | void
+
 }
 
 // Dialog xác nhận xóa Customer
@@ -166,7 +164,6 @@ export function CustomerTable({
   status = "all", onStatusChange, onResetFilters,
   onSearch,
   onDelete,
-  onAdd,
 }: CustomerTableProps) {
   const admin = useAuthStore(state => state.user?.role === "admin")
   const [searchValue, setSearchValue] =
@@ -187,7 +184,6 @@ export function CustomerTable({
     <div className="w-full space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Tổng cộng: {total} khách hàng</p>
-        <CustomerFormDialog onSubmit={onAdd} submitLabel="Tạo khách hàng" />
       </div>
       <form aria-label="Bộ lọc khách hàng" className="grid items-end gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={event => { event.preventDefault(); onSearch(searchValue) }}>
         <Field className="lg:col-span-2"><FieldLabel htmlFor="customer-search">Tên, email hoặc số điện thoại</FieldLabel><Input id="customer-search" aria-label="Tìm khách hàng" placeholder="Tìm khách hàng..." value={searchValue} onChange={event => { setSearchValue(event.target.value); if (!event.target.value.trim() && searchQuery) onSearch("") }} /></Field>
@@ -201,8 +197,14 @@ export function CustomerTable({
             <TableRow>
 
               <TableHead>Khách hàng</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Điện thoại</TableHead>
-              <TableHead>Địa chỉ</TableHead>
+              <TableHead>Ngày sinh</TableHead>
+              <TableHead>Giới tính</TableHead>
+              <TableHead>Người nhận hàng</TableHead>
+              <TableHead>Email nhận hàng</TableHead>
+              <TableHead>Địa chỉ giao hàng</TableHead>
+              <TableHead>Thời gian giao hàng</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead>Thao tác</TableHead>
             </TableRow>
@@ -221,34 +223,24 @@ export function CustomerTable({
                         {customer.last_name}
                       </span>
 
-                      <span className="text-sm text-muted-foreground">
-                        {customer.email}
-                      </span>
                     </div>
                   </TableCell>
+
+                  <TableCell>{customer.email}</TableCell>
 
                   {/* Số điện thoại */}
                   <TableCell>
                     {customer.phone || "Chưa cung cấp"}
                   </TableCell>
 
-                  {/* Địa chỉ */}
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span>
-                        {customer.street || (!customer.city && !customer.state ? "Chưa cung cấp" : "")}
-                      </span>
+                  <TableCell className="whitespace-nowrap">{customerBirthDate(customer.birthDate)}</TableCell>
+                  <TableCell>{customerGender(customer.gender)}</TableCell>
+                  <TableCell>{customer.shippingAddress?.recipientName || "Chưa cung cấp"}</TableCell>
+                  <TableCell>{customer.shippingAddress?.email || "Chưa cung cấp"}</TableCell>
 
-                      <span className="text-sm text-muted-foreground">
-                        {[
-                          customer.city,
-                          customer.state,
-                        ]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </span>
-                    </div>
-                  </TableCell>
+                  {/* Địa chỉ */}
+                  <TableCell className="min-w-64 max-w-80 whitespace-normal wrap-break-word">{customerAddress(customer)}</TableCell>
+                  <TableCell className="min-w-40 max-w-64 whitespace-normal wrap-break-word">{customer.shippingAddress?.deliveryTime || "Chưa cung cấp"}</TableCell>
 
                   <TableCell><Badge variant={customer.isActive === false ? "destructive" : "secondary"}>{customer.isActive === undefined ? "Chưa xác định" : customer.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></TableCell>
 
@@ -256,7 +248,7 @@ export function CustomerTable({
                   {/* Chỉnh sửa và xóa */}
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Link className="text-sm underline" to={`/orders?customerId=${customer._id}`}>Lịch sử đơn hàng</Link>
+                      <Link className="text-sm underline" to={`/auth/orders?customerId=${customer._id}`}>Lịch sử đơn hàng</Link>
                       <CustomerProfileDialog customer={customer} />
 
                       {admin && <DeleteCustomerDialog
@@ -270,7 +262,7 @@ export function CustomerTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={11}
                   className="h-24 text-center"
                 >
                   Không tìm thấy khách hàng.

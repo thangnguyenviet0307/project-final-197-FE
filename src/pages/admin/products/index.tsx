@@ -70,7 +70,7 @@ export default function AdminProductsPage() {
     </section>
     {statistics.isError && <p role="alert" className="text-sm text-destructive">Không thể tải thống kê danh mục sản phẩm. <Button variant="outline" onClick={() => void statistics.refetch()}>Tải lại thống kê</Button></p>}
     <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{pagination ? `${pagination.total} products` : "Danh sách sản phẩm"}</p>
-      {admin && <Button nativeButton={false} role="link" render={<Link to="/products/new" state={linkState} />}><Plus />Thêm sản phẩm</Button>}</div>
+      {admin && <Button nativeButton={false} role="link" render={<Link to="/auth/products/new" state={linkState} />}><Plus />Thêm sản phẩm</Button>}</div>
     <ProductFilters key={params.toString()} initial={filters} onChange={applyFilters} onReset={() => setParams(previous => {
       const updated = new URLSearchParams(previous)
       for (const name of ["sku", "color", "size", "search", "category", "brand", "minPrice", "maxPrice", "sortBy", "sortOrder", "stockStatus"]) updated.delete(name)
@@ -87,7 +87,7 @@ export default function AdminProductsPage() {
           const salePrice = product.price === undefined ? null : discountedPrice(product.price, product.discount)
           return <TableRow key={product._id}>
           <TableCell><div className="flex min-w-56 max-w-96 items-center gap-3"><ProductImage src={product.thumbnail} alt="" className="size-12 shrink-0 object-cover" />
-            <div className="min-w-0"><Link className="block truncate font-medium hover:underline" to={`/products/${product._id}`} state={linkState} title={product.product_name}>{product.product_name}</Link>
+            <div className="min-w-0"><Link className="block truncate font-medium hover:underline" to={`/auth/products/${product._id}`} state={linkState} title={product.product_name}>{product.product_name}</Link>
               <p className="truncate text-xs text-muted-foreground">SKU: {product.sku || "Chưa có SKU sản phẩm"}</p>
               {!!product.tags?.length && <p className="truncate text-xs text-muted-foreground" title={product.tags.join(", ")}>{product.tags.join(" · ")}</p>}
             </div></div></TableCell>
@@ -103,8 +103,8 @@ export default function AdminProductsPage() {
             </Badge>
           </div></TableCell>
           <TableCell><Badge variant={product.is_active ? "default" : "secondary"}>{product.is_active ? "Đang hoạt động" : "Ngừng hoạt động"}</Badge></TableCell>
-          <TableCell><div className="flex gap-1"><AdminStoreProductLink product={product} compact /><ActionTooltip label="Xem sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`View ${product.product_name}`} render={<Link to={`/products/${product._id}`} state={linkState} />}><Eye /></Button></ActionTooltip>
-            {admin && <><ActionTooltip label="Chỉnh sửa sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`Edit ${product.product_name}`} render={<Link to={`/products/${product._id}/edit`} state={linkState} />}><Pencil /></Button></ActionTooltip>
+          <TableCell><div className="flex gap-1"><AdminStoreProductLink product={product} compact /><ActionTooltip label="Xem sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`View ${product.product_name}`} render={<Link to={`/auth/products/${product._id}`} state={linkState} />}><Eye /></Button></ActionTooltip>
+            {admin && <><ActionTooltip label="Chỉnh sửa sản phẩm"><Button nativeButton={false} size="icon" variant="ghost" aria-label={`Edit ${product.product_name}`} render={<Link to={`/auth/products/${product._id}/edit`} state={linkState} />}><Pencil /></Button></ActionTooltip>
               <ActionTooltip label="Xóa sản phẩm"><Button size="icon" variant="ghost" disabled={query.isPlaceholderData} aria-label={`Delete ${product.product_name}`} onClick={() => setDeleting(product)}><Trash2 className="text-destructive" /></Button></ActionTooltip></>}</div></TableCell>
         </TableRow>})}</TableBody></Table></div>}
       <ListPagination label="Phân trang sản phẩm" page={page} totalPages={totalPages} disabled={query.isFetching} onPageChange={changePage} />

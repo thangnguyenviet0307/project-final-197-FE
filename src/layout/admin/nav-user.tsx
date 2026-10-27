@@ -82,19 +82,19 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer" render={<Link to="/settings/user" />}>
+              <DropdownMenuItem className="cursor-pointer" render={<Link to="/auth/settings/user" />}>
                 <CircleUser />Hồ sơ người dùng
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                render={<Link to="/change-password" />}
+                render={<Link to="/auth/change-password" />}
               >
                 <KeyRound />
                 Đổi mật khẩu
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                render={<Link to="/settings/notifications" />}
+                render={<Link to="/auth/settings/notifications" />}
               >
                 <BellDot />
                 Thông báo

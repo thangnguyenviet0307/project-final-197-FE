@@ -100,7 +100,7 @@ export default function AdminCategoriesPage() {
         </section>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">{filteredCategories.length} danh mục</p>
-          {canManage && <Button nativeButton={false} role="link" render={<Link to="/categories/new" />}><FolderPlus />Thêm danh mục</Button>}
+          {canManage && <Button nativeButton={false} role="link" render={<Link to="/auth/categories/new" />}><FolderPlus />Thêm danh mục</Button>}
         </div>
         <section aria-label="Bộ lọc danh mục" className="space-y-3 rounded-lg border p-4">
           <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">

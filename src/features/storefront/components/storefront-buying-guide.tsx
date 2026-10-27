@@ -22,7 +22,7 @@ const guides = [
 export function StorefrontBuyingGuide() {
   return (
     <section className="bg-[#f5f6f4] py-12 sm:py-16" aria-label="Hướng dẫn khám phá sản phẩm">
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="store-container ">
         <SectionHeading
           eyebrow="Mua sắm dễ dàng"
           title="Cách chọn đúng phụ kiện"

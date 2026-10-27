@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LoginCredentialInput } from "@/features/auth/components/login-credential-input"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { useLogin } from "@/features/auth/hooks/use-login"
+import { useCustomerLogin } from "@/features/auth/hooks/use-customer-login"
 import { useRegisterCustomer } from "@/features/auth/hooks/use-register-customer"
 import { customerRegistrationSchema, loginSchema } from "@/features/auth/schemas/auth-schemas"
 import { PageLayout } from "@/layout/storefront/page-layout"
@@ -34,7 +34,7 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
       if (field === "email" || field === "password" || field === "firstName" || field === "lastName") form.setError(field, { message })
     })
   }
-  const loginMutation = useLogin(handleError, true)
+  const loginMutation = useCustomerLogin(handleError)
   const registerMutation = useRegisterCustomer(handleError)
   const isPending = loginMutation.isPending || registerMutation.isPending
   const title = registration ? "Đăng ký tài khoản" : "Đăng nhập"
@@ -83,7 +83,7 @@ export function CustomerAuthForm({ registration = false }: { registration?: bool
           {isPending && <LoaderCircle className="animate-spin" />}{isPending ? registration ? "Đang đăng ký…" : "Đang đăng nhập…" : registration ? "Đăng ký" : "Đăng nhập"}
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-gray-600">{registration ? "Đã có tài khoản? " : "Chưa có tài khoản? "}<Link className="font-semibold text-[#459000] hover:underline" to={registration ? "/account/login" : "/register"}>{registration ? "Đăng nhập" : "Đăng ký"}</Link></p>
+      <p className="mt-6 text-center text-sm text-gray-600">{registration ? "Đã có tài khoản? " : "Chưa có tài khoản? "}<Link className="font-semibold text-[#459000] hover:underline" to={registration ? "/thanh-vien?act=login" : "/thanh-vien?act=register"}>{registration ? "Đăng nhập" : "Đăng ký"}</Link></p>
       <Link to="/contact" className="mt-4 block text-center text-sm text-gray-500 hover:underline">Liên hệ hỗ trợ</Link>
     </section>
   </PageLayout>

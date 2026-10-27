@@ -7,6 +7,7 @@ import { AccountLayout } from "@/layout/storefront/account-layout"
 
 import { ProtectedRoute } from "@/router/protected-route"
 import { PublicOnlyRoute } from "@/router/public-only-route"
+import { LegacyAdminRedirect } from "@/router/legacy-admin-redirect"
 
 function page(load: () => Promise<{ default: ComponentType }>) {
   return async () => ({
@@ -46,13 +47,14 @@ export const routes: RouteObject[] = [
       {
         element: <PublicOnlyRoute storefront />,
         children: [
-          { path: "/account/login", lazy: page(() => import("@/pages/storefront/auth/login")) },
-          { path: "/register", lazy: page(() => import("@/pages/storefront/auth/register")) },
+          { path: "/thanh-vien", lazy: page(() => import("@/pages/storefront/auth/member")) },
+          { path: "/account/login", element: <Navigate to="/thanh-vien?act=login" replace /> },
+          { path: "/register", element: <Navigate to="/thanh-vien?act=register" replace /> },
         ],
       },
       // Customer account requires a customer session.
       {
-        element: <ProtectedRoute allowedRoles={["customer"]} storefront />,
+        element: <ProtectedRoute storefront />,
         children: [
           {
             path: "/account",
@@ -101,13 +103,13 @@ export const routes: RouteObject[] = [
     handle: { area: "admin" },
     children: [
       {
-        path: "/login",
+        path: "/auth/login",
         lazy: page(() =>
           import("@/pages/auth/sign-in/page")
         ),
       },
       {
-        path: "/forgot-password",
+        path: "/auth/forgot-password",
         lazy: page(() =>
           import("@/pages/auth/forgot-password/page")
         ),
@@ -126,16 +128,15 @@ export const routes: RouteObject[] = [
     "/auth/sign-up-3",
   ].map((path) => ({
     path,
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/auth/login" replace />,
   })),
 
   ...[
-    "/auth/forgot-password",
     "/auth/forgot-password-2",
     "/auth/forgot-password-3",
   ].map((path) => ({
     path,
-    element: <Navigate to="/forgot-password" replace />,
+    element: <Navigate to="/auth/forgot-password" replace />,
   })),
 
   // ==========================================
@@ -145,75 +146,67 @@ export const routes: RouteObject[] = [
     element: <ProtectedRoute allowedRoles={["admin", "staff"]} />,
     handle: { area: "admin" },
     children: [
-      { path: "/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
+      { path: "/auth/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
       // MAIN DASHBOARD
       {
-        path: "/dashboard",
+        path: "/auth/dashboard",
         lazy: page(() =>
           import("@/pages/admin/dashboard/page")
         ),
       },
 
       // OLD DASHBOARD URL
-      {
-        path: "/admin/dashboard",
-        element: <Navigate to="/dashboard" replace />,
-      },
 
       {
-        path: "/dashboard-2",
-        element: <Navigate to="/dashboard" replace />,
+        path: "/auth/dashboard-2",
+        element: <Navigate to="/auth/dashboard" replace />,
       },
 
       // TEMPLATE PAGES
       {
-        path: "/faqs",
+        path: "/auth/faqs",
         lazy: page(() =>
           import("@/pages/template/faqs/page")
         ),
       },
       {
-        path: "/pricing",
-        element: <Navigate to="/dashboard" replace />,
+        path: "/auth/pricing",
+        element: <Navigate to="/auth/dashboard" replace />,
       },
 
       // CATEGORIES
       {
-        path: "/categories",
+        path: "/auth/categories",
         lazy: page(() =>
           import("@/pages/admin/categories/index")
         ),
       },
-      {
-        path: "/admin/categories",
-        element: <Navigate to="/categories" replace />,
-      },
 
       // PRODUCTS
       {
-        path: "/products",
+        path: "/auth/products",
         lazy: page(() =>
           import("@/pages/admin/products/index")
         ),
       },
       {
-        path: "/products/:id",
+        path: "/auth/products/:id",
         lazy: page(() =>
           import("@/pages/admin/products/detail")
         ),
       },
 
-      { path: "/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
+      { path: "/auth/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
       // ORDERS
-      { path: "/orders/new", lazy: page(() => import("@/pages/admin/orders/create")) },
+      { path: "/auth/orders/new", lazy: page(() => import("@/pages/admin/orders/create")) },
       {
-        path: "/orders",
+        path: "/auth/orders",
         lazy: page(() =>
           import("@/pages/admin/orders/index")
         ),
       },
       {
-        path: "/orders/:id",
+        path: "/auth/orders/:id",
         lazy: page(() =>
           import("@/pages/admin/orders/detail")
         ),
@@ -221,7 +214,7 @@ export const routes: RouteObject[] = [
 
       // CHANGE PASSWORD - ADMIN / STAFF
       {
-        path: "/change-password",
+        path: "/auth/change-password",
         lazy: page(() =>
           import("@/pages/auth/change-password")
         ),
@@ -229,33 +222,33 @@ export const routes: RouteObject[] = [
 
       // SETTINGS
       {
-        path: "/settings/user",
+        path: "/auth/settings/user",
         lazy: page(() =>
           import("@/pages/admin/settings/user/page")
         ),
       },
       {
-        path: "/settings/account",
-        element: <Navigate to="/settings/user" replace />,
+        path: "/auth/settings/account",
+        element: <Navigate to="/auth/settings/user" replace />,
       },
       {
-        path: "/settings/billing",
-        element: <Navigate to="/settings/user" replace />,
+        path: "/auth/settings/billing",
+        element: <Navigate to="/auth/settings/user" replace />,
       },
       {
-        path: "/settings/appearance",
+        path: "/auth/settings/appearance",
         lazy: page(() =>
           import("@/pages/admin/settings/appearance/page")
         ),
       },
       {
-        path: "/settings/notifications",
+        path: "/auth/settings/notifications",
         lazy: page(() =>
           import("@/pages/admin/settings/notifications/page")
         ),
       },
       {
-        path: "/settings/connections",
+        path: "/auth/settings/connections",
         lazy: page(() =>
           import("@/pages/admin/settings/connections/page")
         ),
@@ -269,7 +262,7 @@ export const routes: RouteObject[] = [
         children: [
           // CATEGORIES
           {
-            path: "/categories/new",
+            path: "/auth/categories/new",
             lazy: page(() =>
               import("@/pages/admin/categories/create")
             ),
@@ -277,7 +270,7 @@ export const routes: RouteObject[] = [
 
           // BRANDS
           {
-            path: "/brands/new",
+            path: "/auth/brands/new",
             lazy: page(() =>
               import("@/pages/admin/brands/create")
             ),
@@ -288,31 +281,27 @@ export const routes: RouteObject[] = [
 
           // USERS
           {
-            path: "/users",
+            path: "/auth/users",
             lazy: page(() =>
               import("@/pages/admin/users/page")
             ),
           },
           {
-            path: "/users/new",
+            path: "/auth/users/new",
             lazy: page(() =>
               import("@/pages/admin/users/create")
             ),
           },
-          {
-            path: "/admin/users",
-            element: <Navigate to="/users" replace />,
-          },
 
           // PRODUCTS MANAGEMENT
           {
-            path: "/products/new",
+            path: "/auth/products/new",
             lazy: page(() =>
               import("@/pages/admin/products/create")
             ),
           },
           {
-            path: "/products/:id/edit",
+            path: "/auth/products/:id/edit",
             lazy: page(() =>
               import("@/pages/admin/products/edit")
             ),
@@ -342,12 +331,6 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/errors/not-found",
-    lazy: page(() =>
-      import("@/pages/errors/not-found/page")
-    ),
-  },
-  {
     path: "/errors/internal-server-error",
     lazy: page(() =>
       import("@/pages/errors/internal-server-error/page")
@@ -360,11 +343,25 @@ export const routes: RouteObject[] = [
     ),
   },
 
-  // 404 FALLBACK
+  // Old bookmarks resolve to the canonical admin URL before any protected page renders.
+  ...["dashboard", "dashboard-2", "products", "categories", "brands", "orders", "users", "customers", "settings", "login", "forgot-password", "change-password", "faqs", "pricing"].map(segment => ({ path: `/${segment}/*`, handle: { area: "admin" }, element: <LegacyAdminRedirect /> })),
+  { path: "/admin/*", handle: { area: "admin" }, element: <LegacyAdminRedirect /> },
+  { path: "/auth", handle: { area: "admin" }, element: <Navigate to="/auth/dashboard" replace /> },
+  { path: "/auth/*", handle: { area: "admin" }, lazy: page(() => import("@/pages/errors/not-found/page")) },
+
   {
-    path: "*",
-    lazy: page(() =>
-      import("@/pages/errors/not-found/page")
-    ),
+    path: "/auth/403",
+    handle: { area: "admin" },
+    lazy: page(() => import("@/pages/errors/forbidden/page")),
+  },
+
+  // Storefront fallback keeps the store shell and route-area metadata.
+  {
+    element: <StoreLayout />,
+    handle: { area: "storefront" },
+    children: [
+      { path: "/errors/not-found", lazy: page(() => import("@/pages/storefront/not-found")) },
+      { path: "*", lazy: page(() => import("@/pages/storefront/not-found")) },
+    ],
   },
 ]

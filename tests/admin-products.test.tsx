@@ -17,7 +17,7 @@ const product = { _id: "a".repeat(24), product_name: "Phone case", price: 100, s
 beforeEach(() => { queryClient.clear(); clearAuth() })
 afterEach(() => { api.defaults.adapter = original; clearAuth() })
 function LocationDebug() { const location = useLocation(); return <output data-testid="product-location">{location.search}</output> }
-function setup(role: "admin" | "staff" = "admin", path = "/products") {
+function setup(role: "admin" | "staff" = "admin", path = "/auth/products") {
   useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "admin@example.com", role, mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
   render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><ProductsPage /><LocationDebug /></MemoryRouter></QueryClientProvider>)
 }
@@ -27,7 +27,7 @@ it("debounces server filters, resets the page, and persists page size and reset 
     requests.push(config.params)
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [product], pagination: { total: 60, totalPages: 3 } } }
   }
-  setup("admin", "/products?page=3&limit=20")
+  setup("admin", "/auth/products?page=3&limit=20")
   await screen.findByText("Phone case")
   expect(requests[0]).toMatchObject({ page: 3, limit: 20 })
   fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "Case" } })
@@ -44,7 +44,7 @@ it("debounces server filters, resets the page, and persists page size and reset 
 it("keeps only name and catalog filters visible and ignores old advanced URL filters", async () => {
   const requests: Record<string, unknown>[] = []
   api.defaults.adapter = async config => { requests.push(config.params); return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: 0, totalPages: 0 } } } }
-  setup("staff", "/products?page=-2&limit=999&search=Case&brand=" + "b".repeat(24) + "&color=red&size=XL&minPrice=100&sortBy=price")
+  setup("staff", "/auth/products?page=-2&limit=999&search=Case&brand=" + "b".repeat(24) + "&color=red&size=XL&minPrice=100&sortBy=price")
   await screen.findByText("Không tìm thấy sản phẩm.")
   expect(requests[0]).toEqual({ page: 1, limit: 10, search: "Case", category: undefined, brand: "b".repeat(24) })
   for (const label of ["SKU (exact match)", "Màu sắc", "Kích thước", "Minimum price", "Maximum price", "Sort by", "Sort order"]) expect(screen.queryByLabelText(label)).toBeNull()
@@ -65,7 +65,7 @@ it("shows the discounted price and treats a missing discount as zero", async () 
 it("filters stock on the server, resets pagination and clears stock on reset", async () => {
   const requests: Record<string, unknown>[] = []
   api.defaults.adapter = async config => { requests.push(config.params); return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { total: 0, totalPages: 0 } } } }
-  setup("admin", "/products?page=3&search=Case")
+  setup("admin", "/auth/products?page=3&search=Case")
   await screen.findByText("Không tìm thấy sản phẩm.")
   fireEvent.change(screen.getByLabelText("Tồn kho"), { target: { value: "out_of_stock" } })
   await waitFor(() => expect(requests.at(-1)).toMatchObject({ page: 1, search: "Case", stockStatus: "out_of_stock" }))

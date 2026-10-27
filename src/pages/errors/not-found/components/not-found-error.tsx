@@ -1,40 +1,18 @@
-"use client"
-
+import { Link } from "react-router-dom"
+import { FileQuestion, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
 
 export function NotFoundError() {
-  const navigate = useNavigate()
-
-  return (
-    <div className="mx-auto flex min-h-dvh flex-col items-center justify-center gap-8 p-8 md:gap-12 md:p-16">
-      <img
-        src="https://ui.shadcn.com/placeholder.svg"
-        alt="Ảnh minh họa"
-        className="aspect-video w-240 rounded-xl object-cover dark:brightness-[0.95] dark:invert"
-      />
-      <div className="text-center">
-        <h1 className="mb-4 text-3xl font-bold">404</h1>
-        <h2 className="mb-3 text-2xl font-semibold">Không tìm thấy trang</h2>
-        <p>
-          Trang bạn đang tìm không tồn tại hoặc đã được chuyển đến địa chỉ khác.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
-          <Button
-            className="cursor-pointer"
-            onClick={() => navigate("/dashboard")}
-          >
-            Về trang chính
-          </Button>
-          <Button
-            variant="outline"
-            className="flex cursor-pointer items-center gap-1"
-            onClick={() => navigate("#")}
-          >
-            Liên hệ
-          </Button>
-        </div>
+  return <div className="flex min-h-dvh items-center justify-center bg-background p-6 text-foreground">
+    <section className="w-full max-w-xl rounded-2xl border bg-card p-8 text-center shadow-sm sm:p-12">
+      <FileQuestion className="mx-auto mb-6 size-12 text-muted-foreground" aria-hidden="true" />
+      <p className="text-7xl font-bold tracking-tight text-primary">404</p>
+      <h1 className="mt-5 text-2xl font-semibold">Không tìm thấy trang quản trị</h1>
+      <p className="mt-4 text-sm leading-7 text-muted-foreground">Đường dẫn không tồn tại hoặc đã thay đổi. Vui lòng kiểm tra lại địa chỉ hoặc quay về bảng điều khiển.</p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Button nativeButton={false} role="link" render={<Link to="/auth/dashboard" />}><LayoutDashboard />Về bảng điều khiển</Button>
+        <Button nativeButton={false} role="link" variant="outline" render={<Link to="/auth/login" />}>Đăng nhập quản trị</Button>
       </div>
-    </div>
-  )
+    </section>
+  </div>
 }

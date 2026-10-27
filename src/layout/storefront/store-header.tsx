@@ -7,23 +7,22 @@ import { StoreSearch } from "./store-search"
 import { StoreTopBar } from "./store-top-bar"
 
 export function StoreHeader() {
-  const customer = useAuthStore(state => state.user?.role === "customer")
+  const customer = useAuthStore(state => state.user?.accountType === "customer")
   return (
     <header className="w-full bg-white">
 
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto_auto] lg:gap-x-6 lg:py-5 xl:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto]">
+      <div className="store-container grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto_auto] lg:gap-x-6 lg:py-5 xl:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto]">
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            aria-label="Phụ Kiện Giá Xưởng - Trang chủ"
+            aria-label="DemoStore - Trang chủ"
             className="inline-flex items-center text-[30px] font-black tracking-[-1.5px] text-gray-950 transition-opacity hover:opacity-80 sm:text-[34px]"
           >
-            PHỤ KIỆN{" "}
-            <span className="text-[#55b000]">GIÁ XƯỞNG</span>
+            Demo<span className="text-[#55b000]">Store</span>
           </Link>
 
           <Link
-            to={customer ? "/account/profile" : "/account/login"}
+            to={customer ? "/account/profile" : "/thanh-vien?act=login"}
             aria-label="Tài khoản"
             className="flex items-center justify-center rounded-full border border-gray-200 p-3 text-gray-800 transition-colors hover:border-[#55b000] hover:text-[#55b000] lg:hidden"
           >

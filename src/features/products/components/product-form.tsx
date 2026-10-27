@@ -68,7 +68,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
         await save(productPayload(values))
       }
       allowSavedNavigation()
-      navigate(product ? `/products/${product._id}` : returnTo, { state: { returnTo } })
+      navigate(product ? `/auth/products/${product._id}` : returnTo, { state: { returnTo } })
     } catch (error: unknown) {
       const failure = getApiError(error)
       form.setError("root", { message: failure.message })
@@ -107,7 +107,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
     </fieldset>
     {form.formState.errors.root && <p role="alert" className="text-destructive">{form.formState.errors.root.message}</p>}
     <div className="flex flex-wrap gap-2"><Button type="submit" disabled={busy || catalogLoading || !!catalogError || (!product && (!categoryChoices.length || !brandChoices.length))}>{busy && <LoaderCircle className="animate-spin" />}{product ? "Lưu thay đổi" : "Tạo sản phẩm"}</Button>
-      <Button type="button" variant="outline" disabled={busy} onClick={() => navigate(product ? `/products/${product._id}` : returnTo, { state: { returnTo } })}>Hủy</Button></div>
+      <Button type="button" variant="outline" disabled={busy} onClick={() => navigate(product ? `/auth/products/${product._id}` : returnTo, { state: { returnTo } })}>Hủy</Button></div>
     <Dialog open={blocker.state === "blocked"} onOpenChange={open => { if (!open && blocker.state === "blocked") blocker.reset() }}>
       <DialogContent><DialogHeader><DialogTitle>Bỏ các thay đổi chưa lưu?</DialogTitle><DialogDescription>Thay đổi sản phẩm chưa được lưu. Rời trang sẽ làm mất các thay đổi này.</DialogDescription></DialogHeader>
         <DialogFooter><Button type="button" variant="outline" onClick={() => { if (blocker.state === "blocked") blocker.reset() }}>Tiếp tục chỉnh sửa</Button>

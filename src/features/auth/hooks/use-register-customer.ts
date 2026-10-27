@@ -7,7 +7,7 @@ export function useRegisterCustomer(onError: (error: Error) => void) {
   return useMutation({
     mutationFn: registerCustomer,
     meta: { suppressGlobalErrorToast: true },
-    onSuccess: () => navigate("/account/login", {
+    onSuccess: () => navigate("/thanh-vien?act=login", {
       replace: true,
       state: { message: "Đăng ký thành công. Vui lòng đăng nhập để tiếp tục mua sắm." },
     }),

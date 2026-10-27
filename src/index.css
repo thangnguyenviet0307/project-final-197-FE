@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@utility store-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
 @theme inline {
   --font-sans: var(--font-inter);
   --radius-sm: calc(var(--radius) - 4px);

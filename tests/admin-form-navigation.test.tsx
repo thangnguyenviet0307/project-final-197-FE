@@ -20,11 +20,11 @@ afterEach(() => { api.defaults.adapter = adapter; queryClient.clear() })
 
 function setup(resource: "categories" | "brands" | "users") {
   const router = createMemoryRouter([
-    { path: "/categories/new", element: <CategoryCreate /> },
-    { path: "/brands/new", element: <BrandCreate /> },
-    { path: "/users/new", element: <UserCreate /> },
-    { path: `/${resource}`, element: <p>Returned to list</p> },
-  ], { initialEntries: [`/${resource}/new`] })
+    { path: "/auth/categories/new", element: <CategoryCreate /> },
+    { path: "/auth/brands/new", element: <BrandCreate /> },
+    { path: "/auth/users/new", element: <UserCreate /> },
+    { path: `/auth/${resource}`, element: <p>Returned to list</p> },
+  ], { initialEntries: [`/auth/${resource}/new`] })
   render(<QueryClientProvider client={queryClient}><RouterProvider router={router} /></QueryClientProvider>)
 }
 

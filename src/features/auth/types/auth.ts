@@ -1,4 +1,6 @@
-export type Role = "admin" | "staff" | "customer"
+import type { ShippingAddressValues } from "@/features/profile/schemas/customer-account-schema"
+
+export type Role = "admin" | "staff"
 
 export interface User {
   id: string
@@ -6,12 +8,17 @@ export interface User {
   firstName: string
   lastName: string
   email: string
-  role: Role
+  birthDate?: string
+  gender?: "" | "male" | "female" | "other"
+  shippingAddress?: ShippingAddressValues
+  accountType?: "user" | "customer"
+  role?: Role
   mustChangePassword: boolean
   personalEmail?: string
   phone?: string
   location?: string
   bio?: string
+  address?: { street: string; city: string; state: string }
   avatar?: string
 }
 

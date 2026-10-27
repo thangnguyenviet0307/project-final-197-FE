@@ -133,7 +133,7 @@ it("uses server-wide counts and bounded recent/low-stock lists instead of demo d
     await screen.findByRole("link", { name: "ORD-ABC234" }),
   ).toHaveProperty(
     "href",
-    expect.stringContaining(`/orders/${"c".repeat(24)}`),
+    expect.stringContaining(`/auth/orders/${"c".repeat(24)}`),
   );
   expect(screen.getByText("Jane Smith")).toBeTruthy();
   expect(

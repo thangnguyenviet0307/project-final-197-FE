@@ -68,7 +68,7 @@ export default function ContactPage() {
   return (
     <div className="w-full bg-white text-gray-900">
       {/* BREADCRUMB */}
-      <div className="mx-auto max-w-[1440px] px-5">
+      <div className="store-container ">
         <nav
           aria-label="Đường dẫn điều hướng"
           className="flex items-center gap-2 py-4 text-xs text-gray-500"
@@ -88,7 +88,7 @@ export default function ContactPage() {
 
       {/* HERO SECTION - NO IMAGE */}
       <section className="relative overflow-hidden bg-[#223328] text-white">
-        <div className="relative mx-auto max-w-[1440px] px-5 py-8 sm:py-10">
+        <div className="store-container relative py-8 sm:py-10">
           <span className="text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
             HỖ TRỢ TỪ DEMO STORE
           </span>
@@ -106,7 +106,7 @@ export default function ContactPage() {
       </section>
 
       {/* MAIN CONTENT */}
-      <section className="mx-auto w-full max-w-[1440px] px-5 py-8 sm:py-10">
+      <section className="store-container w-full py-8 sm:py-10">
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-8">
           {/* CONTACT FORM */}
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-7">

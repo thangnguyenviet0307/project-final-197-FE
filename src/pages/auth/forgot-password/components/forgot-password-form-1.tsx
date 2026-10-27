@@ -11,7 +11,7 @@ export function ForgotPasswordForm1({ className, ...props }: React.ComponentProp
       <CardDescription>Tài khoản của bạn do quản trị viên quản lý.</CardDescription>
     </CardHeader><CardContent className="space-y-5 text-sm">
       <p>Liên hệ quản trị viên và cung cấp email tài khoản để nhận mật khẩu tạm thời. Bạn cần đổi mật khẩu sau khi đăng nhập.</p>
-      <Link to="/login" className="block text-center underline underline-offset-4">Quay lại đăng nhập</Link>
+      <Link to="/auth/login" className="block text-center underline underline-offset-4">Quay lại đăng nhập</Link>
     </CardContent></Card>
   </div>
 }

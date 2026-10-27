@@ -4,7 +4,7 @@ import { storefrontCategories } from "@/features/storefront/data/products"
 
 export function CollectionGallery() {
   return (
-    <section id="bo-suu-tap" className="mx-auto max-w-7xl px-4 py-7 sm:py-10">
+    <section id="bo-suu-tap" className="store-container py-7 sm:py-10">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {storefrontCategories.map((collection) => (
             <Link

@@ -30,7 +30,7 @@ export default function CreateOrderPage() {
   }, meta: { successMessage: "Order created." }, onSuccess: async order => {
     navigation.allowSavedNavigation()
     await Promise.all([client.invalidateQueries({ queryKey: ["orders"] }), client.invalidateQueries({ queryKey: ["products"] })])
-    navigate(`/orders/${order._id}`)
+    navigate(`/auth/orders/${order._id}`)
   } })
   return <BaseLayout title="Create order"><form className="space-y-5 px-4 lg:px-6" onChange={() => setDirty(true)} onSubmit={event => {
     event.preventDefault()
@@ -38,7 +38,7 @@ export default function CreateOrderPage() {
     const form = new FormData(event.currentTarget)
     mutation.mutate({ customerId, street: String(form.get("street")), city: String(form.get("city")), state: String(form.get("state")), orderNote: String(form.get("orderNote")), paymentType: 1, orderItems: items.map(({ productId, variantId, quantity }) => ({ productId, ...(variantId ? { variantId } : {}), quantity })) })
   }}>
-    <Button nativeButton={false} variant="outline" render={<Link to="/orders" />}>Back to orders</Button>
+    <Button nativeButton={false} variant="outline" render={<Link to="/auth/orders" />}>Back to orders</Button>
     <fieldset className="space-y-3 rounded-lg border p-4" disabled={mutation.isPending}><legend>Customer</legend>
       <Input aria-label="Search customers" placeholder="Search customers" value={customerSearch} onChange={event => { setCustomerSearch(event.target.value); setCustomerPage(1) }} />
       {customerId && <p>Selected customer: {customerLabel}</p>}
@@ -46,7 +46,7 @@ export default function CreateOrderPage() {
         <div className="flex flex-wrap gap-2">{customers.data.data.map(customer => <Button type="button" key={customer._id} variant={customerId === customer._id ? "default" : "outline"} onClick={() => { setCustomerId(customer._id); setCustomerLabel(`${customer.first_name} ${customer.last_name}`); setDirty(true) }}>{customer.first_name} {customer.last_name} · {customer.phone}</Button>)}</div>
         <Button type="button" variant="outline" disabled={customerPage <= 1} onClick={() => setCustomerPage(page => page - 1)}>Previous customers</Button><Button type="button" variant="outline" disabled={customerPage >= customers.data.pagination.totalPages} onClick={() => setCustomerPage(page => page + 1)}>Next customers</Button>
       </>}
-      <Link className="text-sm underline" to="/customers">Manage or add customers</Link>
+      <Link className="text-sm underline" to="/auth/customers">View registered customers</Link>
     </fieldset>
     <fieldset className="space-y-3 rounded-lg border p-4" disabled={mutation.isPending}><legend>Products</legend>
       <Input aria-label="Search products" placeholder="Search products" value={productSearch} onChange={event => { setProductSearch(event.target.value); setProductPage(1) }} />

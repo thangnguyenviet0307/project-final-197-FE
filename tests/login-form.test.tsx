@@ -22,16 +22,16 @@ function Destination() {
 }
 function setup() {
   render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[{
-    pathname: "/login", state: { from: { pathname: "/users", search: "?tab=all", hash: "" } },
+    pathname: "/auth/login", state: { from: { pathname: "/auth/users", search: "?tab=all", hash: "" } },
   }]}><Routes>
     <Route element={<PublicOnlyRoute />}>
-      <Route path="/login" element={<LoginForm1 />} />
-      <Route path="/forgot-password" element={<ForgotPasswordForm1 />} />
+      <Route path="/auth/login" element={<LoginForm1 />} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordForm1 />} />
     </Route>
     <Route element={<ProtectedRoute allowedRoles={["admin", "staff"]} />}>
-      <Route path="/users" element={<Destination />} />
-      <Route path="/admin/dashboard" element={<Destination />} />
-      <Route path="/change-password" element={<Destination />} />
+      <Route path="/auth/users" element={<Destination />} />
+      <Route path="/auth/dashboard" element={<Destination />} />
+      <Route path="/auth/change-password" element={<Destination />} />
     </Route>
   </Routes></MemoryRouter></QueryClientProvider>)
 }
@@ -76,7 +76,7 @@ it("shows login errors and offers admin password recovery without public registr
   }) }
   setup(); submit()
   expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Invalid email or password")
-  expect(screen.getByRole("link", { name: "Quên mật khẩu?" }).getAttribute("href")).toBe("/forgot-password")
+  expect(screen.getByRole("link", { name: "Quên mật khẩu?" }).getAttribute("href")).toBe("/auth/forgot-password")
   expect(screen.queryByRole("link", { name: /sign up/i })).toBeNull()
 })
 
@@ -89,7 +89,7 @@ it("normalizes email and returns to the originally requested admin page after lo
     } } }
   }
   setup(); submit()
-  await waitFor(() => expect(screen.getByText("Destination /users?tab=all")).toBeTruthy())
+  await waitFor(() => expect(screen.getByText("Destination /auth/users?tab=all")).toBeTruthy())
 })
 
 it("requires a password change before visiting the saved destination", async () => {
@@ -98,7 +98,7 @@ it("requires a password change before visiting the saved destination", async () 
     accessToken: "access", refreshToken: "refresh",
   } } })
   setup(); submit()
-  expect(await screen.findByText("Destination /change-password")).toBeTruthy()
+  expect(await screen.findByText("Destination /auth/change-password")).toBeTruthy()
 })
 
 it.each([
@@ -106,15 +106,15 @@ it.each([
   ["customer", true, "/account/change-password"],
 ] as const)("redirects %s login with password-change flag %s to %s", async (role, mustChangePassword, destination) => {
   authApi.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-    user: { id: "a", email: "test@example.com", role, mustChangePassword }, accessToken: "access",
+    user: { id: "a", email: "test@example.com", ...(role === "customer" ? { accountType: "customer" } : { role }), mustChangePassword }, accessToken: "access",
   } } })
   render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[{
-    pathname: "/account/login", state: { from: { pathname: "/users" } },
+    pathname: "/thanh-vien", search: "?act=login", state: { from: { pathname: "/auth/users" } },
   }]}><Routes>
-    <Route path="/account/login" element={<CustomerAuthForm />} />
+    <Route path="/thanh-vien" element={<CustomerAuthForm />} />
     <Route path="/" element={<Destination />} />
-    <Route path="/admin/dashboard" element={<Destination />} />
-    <Route path="/change-password" element={<Destination />} />
+    <Route path="/auth/dashboard" element={<Destination />} />
+    <Route path="/auth/change-password" element={<Destination />} />
     <Route path="/account/change-password" element={<Destination />} />
   </Routes></MemoryRouter></QueryClientProvider>)
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "test@example.com" } })
@@ -135,13 +135,13 @@ it.each(["admin", "staff"] as const)("rejects %s at storefront login without pub
       user: { id: "a", email: "test@example.com", role, mustChangePassword: true }, accessToken: "access",
     } } }
   }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/account/login"]}><Routes>
-    <Route element={<PublicOnlyRoute storefront />}><Route path="/account/login" element={<CustomerAuthForm />} /></Route>
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/thanh-vien?act=login"]}><Routes>
+    <Route element={<PublicOnlyRoute storefront />}><Route path="/thanh-vien" element={<CustomerAuthForm />} /></Route>
     <Route path="*" element={<Destination />} />
   </Routes></MemoryRouter></QueryClientProvider>)
   submit("test@example.com")
   expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Tài khoản không tồn tại !")
-  expect(requests).toEqual(["/auth/login", "/auth/logout"])
+  expect(requests).toEqual(["/customer-auth/login"])
   expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, user: null, accessToken: null, hasSession: false })
   expect(screen.queryByText(/Destination/)).toBeNull()
 })
@@ -150,7 +150,7 @@ it("rejects customer credentials at dashboard login without publishing a session
   authApi.defaults.adapter = async config => {
     if (config.url === "/auth/login") expect(config.headers.get("X-Login-Area")).toBe("admin")
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-      user: { id: "buyer", email: "test@example.com", role: "customer" }, accessToken: "access",
+      user: { id: "buyer", email: "test@example.com", accountType: "customer" as const, role: undefined }, accessToken: "access",
     } } }
   }
   setup(); submit("test@example.com")

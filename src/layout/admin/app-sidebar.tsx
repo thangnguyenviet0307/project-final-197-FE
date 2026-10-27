@@ -43,7 +43,7 @@ const data = {
       items: [
         {
           title: "Bảng điều khiển",
-          url: "/admin/dashboard",
+          url: "/auth/dashboard",
           icon: LayoutDashboard,
         },
       ],
@@ -53,24 +53,24 @@ const data = {
       items: [
         {
           title: "Danh mục",
-          url: "/categories",
+          url: "/auth/categories",
           icon: FolderTree,
         },
-        { title: "Sản phẩm", url: "/products", icon: Package },
-        { title: "Đơn hàng", url: "/orders", icon: ShoppingBag },
+        { title: "Sản phẩm", url: "/auth/products", icon: Package },
+        { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
         {
           title: "Người dùng",
-          url: "/users",
+          url: "/auth/users",
           icon: Users,
         },
         {
           title: "Thương hiệu",
-          url: "/brands",
+          url: "/auth/brands",
           icon: Tags,
         },
         {
           title: "Khách hàng",
-          url: "/customers",
+          url: "/auth/customers",
           icon: UserRound,
         },
       ],
@@ -161,25 +161,25 @@ const data = {
           items: [
             {
               title: "Hồ sơ người dùng",
-              url: "/settings/user",
+              url: "/auth/settings/user",
             },
             {
               title: "Giao diện",
-              url: "/settings/appearance",
+              url: "/auth/settings/appearance",
             },
             {
               title: "Thông báo",
-              url: "/settings/notifications",
+              url: "/auth/settings/notifications",
             },
             {
               title: "Kết nối",
-              url: "/settings/connections",
+              url: "/auth/settings/connections",
             },
           ],
         },
         {
           title: "Câu hỏi thường gặp",
-          url: "/faqs",
+          url: "/auth/faqs",
           icon: HelpCircle,
         },
       ],
@@ -196,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/users"].includes(item.url) ||
+      (!["/auth/users"].includes(item.url) ||
        user?.role === "admin")
     ),
   }))
@@ -206,7 +206,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
+            <SidebarMenuButton size="lg" render={<Link to="/auth/dashboard" />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Logo size={24} className="text-current" />
               </div>

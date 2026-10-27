@@ -15,6 +15,7 @@ export function useUpdateProfile(options: MutationCallbacks<Awaited<ReturnType<t
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["users"] }),
         queryClient.invalidateQueries({ queryKey: ["orders"] }),
+        queryClient.invalidateQueries({ queryKey: ["customers"] }),
       ])
       await options.onSuccess?.(...args)
     },

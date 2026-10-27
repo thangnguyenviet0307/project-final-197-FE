@@ -1,8 +1,8 @@
 import type { User } from "@/features/auth/types/auth"
 
-export function authRedirect(user: Pick<User, "role" | "mustChangePassword">): string {
+export function authRedirect(user: Pick<User, "role" | "mustChangePassword" | "accountType">): string {
   if (user.mustChangePassword) {
-    return user.role === "customer" ? "/account/change-password" : "/change-password"
+    return user.accountType === "customer" ? "/account/change-password" : "/auth/change-password"
   }
-  return user.role === "customer" ? "/" : "/admin/dashboard"
+  return user.accountType === "customer" ? "/" : "/auth/dashboard"
 }

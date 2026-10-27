@@ -13,6 +13,9 @@ interface BackendCustomer {
   firstName: string
   lastName: string
   email: string
+  birthDate?: ICustomer["birthDate"]
+  gender?: ICustomer["gender"]
+  shippingAddress?: ICustomer["shippingAddress"]
   phone: string
   address: {
     street: string
@@ -38,6 +41,9 @@ function mapCustomer(customer: BackendCustomer): ICustomer {
     last_name: customer.lastName,
     email: customer.email,
     phone: customer.phone,
+    birthDate: customer.birthDate,
+    gender: customer.gender,
+    shippingAddress: customer.shippingAddress,
     isActive: customer.isActive,
     street: customer.address?.street ?? "",
     city: customer.address?.city ?? "",
@@ -112,20 +118,6 @@ export const customersService = {
   },
 
   // POST tạo Customer
-  createCustomer: async (
-    input: CreateCustomerInput
-  ): Promise<CustomerResponse<ICustomer>> => {
-    const response = await api.post<
-      CustomerResponse<BackendCustomer>
-    >("/customers", toBackendCustomer(input))
-
-    return {
-      ...response.data,
-      data: mapCustomer(response.data.data),
-    }
-  },
-
-  // PUT cập nhật Customer
   updateCustomer: async (
     id: string,
     input: UpdateCustomerInput

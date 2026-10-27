@@ -36,24 +36,24 @@ it("retains the admin skeleton when explicitly requested by an admin guard", () 
   expect(container.querySelector("aside")).toBeTruthy()
 })
 
-it.each(["/dashboard", "/admin/dashboard", "/products", "/products/new", "/orders", "/login", "/brands", "/settings/user"])("uses admin loading for initial route %s", pathname => {
+it.each(["/auth/dashboard", "/auth/dashboard", "/auth/products", "/auth/products/new", "/auth/orders", "/auth/login", "/auth/brands", "/auth/settings/user"])("uses admin loading for initial route %s", pathname => {
   expect(isStorefrontRoute(pathname)).toBe(false)
 })
-it.each(["/", "/contact", "/landing", "/register", "/account/login", "/account/profile"])("uses storefront loading for initial route %s", pathname => {
+it.each(["/", "/contact", "/landing", "/thanh-vien?act=register", "/thanh-vien?act=login", "/account/profile"])("uses storefront loading for initial route %s", pathname => {
   expect(isStorefrontRoute(pathname)).toBe(true)
 })
 it("respects deployment basename during auth bootstrap", () => {
   expect(isStorefrontRoute("/store/dashboard", "/store")).toBe(false)
   expect(isStorefrontRoute("/store/account/profile", "/store")).toBe(true)
 })
-it.each(["/dashboard", "/"])("shows the correct hydration skeleton before lazy page %s resolves", async path => {
+it.each(["/auth/dashboard", "/"])("shows the correct hydration skeleton before lazy page %s resolves", async path => {
   let finish: (() => void) | undefined
   const router = createMemoryRouter([{ path, HydrateFallback: RouteFallback, lazy: async () => {
     await new Promise<void>(resolve => { finish = resolve })
     return { Component: () => <p>Ready</p> }
   } }], { initialEntries: [path] })
   const { container } = render(<RouterProvider router={router} />)
-  expect(!!container.querySelector("aside")).toBe(path === "/dashboard")
+  expect(!!container.querySelector("aside")).toBe(path === "/auth/dashboard")
   expect(!!screen.queryByRole("status", { name: "Đang tải trang bán hàng" })).toBe(path === "/")
   await act(async () => { finish!() })
   expect(await screen.findByText("Ready")).toBeTruthy()

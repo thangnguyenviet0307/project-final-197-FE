@@ -153,7 +153,7 @@ export function LandingNavbar() {
             nativeButton={false}
             render={
               <a
-                href={getAppUrl("/dashboard")}
+                href={getAppUrl("/auth/dashboard")}
                 target="_blank"
                 rel="noopener noreferrer"
               />
@@ -330,7 +330,7 @@ export function LandingNavbar() {
                     size="lg"
                     className="w-full cursor-pointer"
                     nativeButton={false}
-                    render={<a href={getAppUrl("/dashboard")} />}
+                    render={<a href={getAppUrl("/auth/dashboard")} />}
                   >
                     <LayoutDashboard data-icon="inline-start" />
                     Bảng điều khiển

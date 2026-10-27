@@ -19,7 +19,7 @@ export default function OrderDetailPage() {
   const navigate = useNavigate()
   const state: unknown = location.state
   const candidate = state && typeof state === "object" && "returnTo" in state ? state.returnTo : undefined
-  const returnTo = typeof candidate === "string" && /^\/orders(?:\?|$)/.test(candidate) ? candidate : "/orders"
+  const returnTo = typeof candidate === "string" && /^\/auth\/orders(?:\?|$)/.test(candidate) ? candidate : "/auth/orders"
   const order = query.data
   const customer = order ? orderCustomer(order) : null
   return <BaseLayout title="Chi tiết đơn hàng"><div className="space-y-6 px-4 lg:px-6">

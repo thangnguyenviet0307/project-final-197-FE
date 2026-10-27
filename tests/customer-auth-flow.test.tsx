@@ -3,7 +3,7 @@ import { AxiosError, AxiosHeaders, type AxiosAdapter } from "axios"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
-import { CustomerAuthForm } from "@/features/auth/components/customer-auth-form"
+import MemberPage from "@/pages/storefront/auth/member"
 import { PublicOnlyRoute } from "@/router/public-only-route"
 import { queryClient } from "@/services/query-client"
 import { authApi, clearAuth } from "@/services/api"
@@ -14,10 +14,9 @@ beforeEach(clearAuth)
 afterEach(() => { authApi.defaults.adapter = originalAdapter; clearAuth() })
 
 function setup() {
-  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/register"]}><Routes>
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={["/thanh-vien?act=register"]}><Routes>
     <Route element={<PublicOnlyRoute storefront />}>
-      <Route path="/register" element={<CustomerAuthForm key="register" registration />} />
-      <Route path="/account/login" element={<CustomerAuthForm key="login" />} />
+      <Route path="/thanh-vien" element={<MemberPage />} />
     </Route>
     <Route path="/" element={<p>Store homepage</p>} />
   </Routes></MemoryRouter></QueryClientProvider>)
@@ -35,26 +34,26 @@ it("registers, asks the customer to sign in, then opens the storefront homepage"
   const requests: string[] = []
   authApi.defaults.adapter = async config => {
     requests.push(config.url ?? "")
-    if (config.url === "/auth/register") {
+    if (config.url === "/customer-auth/register") {
       expect(JSON.parse(config.data)).toEqual({ email: "buyer@example.com", password: "Customer123", firstName: "An", lastName: "Nguyễn" })
-      return { config, headers: new AxiosHeaders(), status: 201, statusText: "", data: { success: true, data: { role: "customer" } } }
+      return { config, headers: new AxiosHeaders(), status: 201, statusText: "", data: { success: true, data: { accountType: "customer" as const, role: undefined } } }
     }
-    expect(config.url).toBe("/auth/login")
+    expect(config.url).toBe("/customer-auth/login")
     expect(JSON.parse(config.data)).toEqual({ email: "buyer@example.com", password: "Customer123" })
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: {
-      user: { id: "buyer", email: "buyer@example.com", firstName: "An", lastName: "Nguyễn", role: "customer" }, accessToken: "access",
+      user: { id: "buyer", email: "buyer@example.com", firstName: "An", lastName: "Nguyễn", accountType: "customer" as const, role: undefined }, accessToken: "access",
     } } }
   }
   setup(); submitRegistration()
   expect(await screen.findByRole("status")).toHaveProperty("textContent", "Đăng ký thành công. Vui lòng đăng nhập để tiếp tục mua sắm.")
-  expect(requests).toEqual(["/auth/register"])
+  expect(requests).toEqual(["/customer-auth/register"])
   expect(useAuthStore.getState().isAuthenticated).toBe(false)
   expect(screen.getByLabelText("Mật khẩu")).toHaveProperty("value", "")
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "buyer@example.com" } })
   fireEvent.change(screen.getByLabelText("Mật khẩu"), { target: { value: "Customer123" } })
   fireEvent.click(screen.getByRole("button", { name: "Đăng nhập" }))
   expect(await screen.findByText("Store homepage")).toBeTruthy()
-  expect(requests).toEqual(["/auth/register", "/auth/login"])
+  expect(requests).toEqual(["/customer-auth/register", "/customer-auth/login"])
 })
 
 it("rejects mismatched confirmation without calling the API", async () => {

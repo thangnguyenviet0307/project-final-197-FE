@@ -68,10 +68,10 @@ const product: Product = {
 };
 function setup(save = vi.fn().mockResolvedValue(undefined)) {
   const router = createMemoryRouter([
-    { path: "/products/:id/edit", element: <ProductForm product={product} save={save} pending={false} /> },
-    { path: "/products/:id", element: <p>Chi tiết sản phẩm</p> },
-    { path: "/products", element: <p>Product list</p> },
-  ], { initialEntries: [{ pathname: `/products/${id}/edit`, state: { returnTo: "/products?page=3&limit=20&color=blue" } }] })
+    { path: "/auth/products/:id/edit", element: <ProductForm product={product} save={save} pending={false} /> },
+    { path: "/auth/products/:id", element: <p>Chi tiết sản phẩm</p> },
+    { path: "/auth/products", element: <p>Product list</p> },
+  ], { initialEntries: [{ pathname: `/auth/products/${id}/edit`, state: { returnTo: "/auth/products?page=3&limit=20&color=blue" } }] })
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   return { router, save }
 }
@@ -99,7 +99,7 @@ it("blocks other route navigation and protects closing or reloading a dirty tab"
   window.dispatchEvent(event);
   expect(event.defaultPrevented).toBe(true);
   await act(async () => {
-    await router.navigate("/products?page=3&color=blue");
+    await router.navigate("/auth/products?page=3&color=blue");
   });
   expect(await screen.findByRole("dialog")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Bỏ thay đổi" }));
@@ -121,7 +121,7 @@ it("does not block clean forms or navigation after a successful save", async () 
     product,
   );
   expect(router.state.location.state).toEqual({
-    returnTo: "/products?page=3&limit=20&color=blue",
+    returnTo: "/auth/products?page=3&limit=20&color=blue",
   });
 });
 it("allows navigation after the user reverts edits", async () => {
@@ -150,22 +150,22 @@ it("retains the draft and guard after a save fails", async () => {
   expect(await screen.findByRole("dialog")).toBeTruthy();
 });
 it("returns from detail to the exact list URL", async () => {
-  const returnTo = "/products?page=3&limit=20&color=blue"
+  const returnTo = "/auth/products?page=3&limit=20&color=blue"
   const router = createMemoryRouter([
-    { path: "/products/:id", element: <ProductDetailPage /> },
-    { path: "/products", element: <p>Restored list</p> },
-  ], { initialEntries: [{ pathname: `/products/${id}`, state: { returnTo } }] })
+    { path: "/auth/products/:id", element: <ProductDetailPage /> },
+    { path: "/auth/products", element: <p>Restored list</p> },
+  ], { initialEntries: [{ pathname: `/auth/products/${id}`, state: { returnTo } }] })
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   fireEvent.click(screen.getByRole("link", { name: "Quay lại" }))
   expect(await screen.findByText("Restored list")).toBeTruthy()
   expect(router.state.location.pathname + router.state.location.search).toBe(returnTo)
 })
 it("guards a new product draft and preserves its list URL on cancellation", async () => {
-  const returnTo = "/products?page=2&size=XL"
+  const returnTo = "/auth/products?page=2&size=XL"
   const router = createMemoryRouter([
-    { path: "/products/new", element: <ProductCreatePage /> },
-    { path: "/products", element: <p>Restored list</p> },
-  ], { initialEntries: [{ pathname: "/products/new", state: { returnTo } }] })
+    { path: "/auth/products/new", element: <ProductCreatePage /> },
+    { path: "/auth/products", element: <p>Restored list</p> },
+  ], { initialEntries: [{ pathname: "/auth/products/new", state: { returnTo } }] })
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
   fireEvent.change(screen.getByLabelText("Tên sản phẩm"), { target: { value: "New case" } })
   fireEvent.click(screen.getByRole("link", { name: "Về danh sách sản phẩm" }))

@@ -34,7 +34,7 @@ function translateMessage(message: string): string {
 }
 
 function isLoginRequest(url: string | undefined): boolean {
-  return Boolean(url && /(?:^|\/)auth\/login(?:[?#]|$)/i.test(url))
+  return Boolean(url && /(?:^|\/)(?:customer-)?auth\/login(?:[?#]|$)/i.test(url))
 }
 
 function statusMessage(status: number, loginRequest: boolean): string {

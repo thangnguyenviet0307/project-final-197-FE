@@ -16,14 +16,6 @@ export function useCustomerStatistics() {
   })) })
 }
 
-export function useCreateCustomer() {
-  const client = useQueryClient()
-  return useMutation({
-    mutationFn: customersService.createCustomer,
-    onSuccess: () => client.invalidateQueries({ queryKey: ["customers"] }),
-  })
-}
-
 export function useUpdateCustomer() {
   const client = useQueryClient()
   return useMutation({

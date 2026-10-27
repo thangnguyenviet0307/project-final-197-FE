@@ -28,7 +28,7 @@ beforeEach(() => {
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
 function LocationDebug() { return <output data-testid="location">{useLocation().search}</output> }
 function setup(page: ReactNode, path = "/") {
-  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/brands/new" element={<BrandCreatePage />} /><Route path="/categories/new" element={<CategoryCreatePage />} /><Route path="*" element={page} /></Routes><LocationDebug /></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/auth/brands/new" element={<BrandCreatePage />} /><Route path="/auth/categories/new" element={<CategoryCreatePage />} /><Route path="*" element={page} /></Routes><LocationDebug /></MemoryRouter></QueryClientProvider>)
 }
 function mockApi(resource: "customers" | "brands" | "categories", rejectDelete = false) {
   const writes = vi.fn()
@@ -45,14 +45,8 @@ function mockApi(resource: "customers" | "brands" | "categories", rejectDelete =
   return { writes, gets }
 }
 
-it("maps customer names in both directions and sends only supported contact fields", async () => {
-  const { writes } = mockApi("customers")
-  const input = { first_name: "An", last_name: "Nguyen", email: "an@example.com", phone: "0901234567", street: "One", city: "Tỉnh/thành phố", state: "Bang/khu vực" }
-  const result = await customersService.createCustomer(input)
-  expect(result.data).toMatchObject(input)
-  expect(writes).toHaveBeenCalledWith("post", "/customers", { firstName: "An", lastName: "Nguyen", email: input.email, phone: input.phone, address: customer.address })
-  await customersService.updateCustomer(customer._id, { first_name: "Binh" })
-  expect(writes).toHaveBeenLastCalledWith("put", `/customers/${customer._id}`, { firstName: "Binh" })
+it("exposes no administrative customer creation method", () => {
+  expect(Object.hasOwn(customersService, "createCustomer")).toBe(false)
 })
 
 it("shows newly registered contacts in the single contact list without an account section", async () => {
@@ -65,16 +59,16 @@ it("shows newly registered contacts in the single contact list without an accoun
       pagination: { page: 1, limit: 10, total: 1, totalPages: 1 },
     } }
   }
-  setup(<CustomersPage />, "/customers")
+  setup(<CustomersPage />, "/auth/customers")
   expect(await screen.findByText("registered@example.com")).toBeTruthy()
   expect(screen.queryByText("Tài khoản đăng ký")).toBeNull()
-  expect(screen.getAllByText("Chưa cung cấp")).toHaveLength(2)
+  expect(screen.getAllByText("Chưa cung cấp")).toHaveLength(7)
   expect(requests).not.toContain("/customers/accounts")
 })
 
 it("loads later customer pages on the server, retains totals and resets page on search", async () => {
   const { gets } = mockApi("customers")
-  setup(<CustomersPage />, "/customers?page=10")
+  setup(<CustomersPage />, "/auth/customers?page=10")
   await screen.findByText("an@example.com")
   expect(gets).toHaveBeenCalledWith({ page: 10, limit: 10 })
   expect(screen.getByText("Tổng cộng: 101 khách hàng")).toBeTruthy()
@@ -87,6 +81,34 @@ it("loads later customer pages on the server, retains totals and resets page on 
   expect(screen.getByTestId("location").textContent).toContain("page=1")
 })
 
+it("maps current customer profile and shipping data into the administrative table and details", async () => {
+  api.defaults.adapter = async config => {
+    expect(config.url).toBe("/customers")
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: [{ ...customer, birthDate: "2000-02-29", gender: "female", shippingAddress: { recipientName: "Người nhận mới", email: "shipping@example.com", province: "Đà Nẵng", ward: "Thanh Khê", street: "K19A/25 Hà Huy Tập", deliveryTime: "Sáng mỗi ngày" } }], pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
+  }
+  setup(<CustomersPage />, "/auth/customers")
+  const table = await screen.findByRole("table", { name: "Hồ sơ khách hàng" })
+  for (const value of ["29/02/2000", "Nữ", "0901234567", "Người nhận mới", "shipping@example.com", "K19A/25 Hà Huy Tập, Thanh Khê, Đà Nẵng", "Sáng mỗi ngày"]) expect(within(table).getByText(value)).toBeTruthy()
+  expect(within(table).queryByText("One, Tỉnh/thành phố, Bang/khu vực")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Xem An Nguyen" }))
+  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ khách hàng" })
+  expect(within(dialog).getByText("Nữ")).toBeTruthy()
+  expect(within(dialog).getByText("shipping@example.com")).toBeTruthy()
+  expect(within(dialog).getByText("K19A/25 Hà Huy Tập, Thanh Khê, Đà Nẵng")).toBeTruthy()
+})
+
+it("refreshes the administrative row after a storefront business-change signal", async () => {
+  let changed = false
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: [{ ...customer, phone: changed ? "0911111111" : customer.phone, gender: changed ? "male" : "", shippingAddress: changed ? { recipientName: "Người nhận", email: "shipping@example.com", province: "Đà Nẵng", ward: "Thanh Khê", street: "Địa chỉ mới", deliveryTime: "Buổi sáng" } : undefined }], pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } })
+  setup(<CustomersPage />, "/auth/customers")
+  await screen.findByText(customer.phone)
+  changed = true
+  window.dispatchEvent(new StorageEvent("storage", { key: "admin-data-updated", newValue: JSON.stringify({ type: "business-data-changed", id: "profile-saved" }) }))
+  expect(await screen.findByText("0911111111")).toBeTruthy()
+  expect(screen.getByText("Nam")).toBeTruthy()
+  expect(screen.getByText("Địa chỉ mới, Thanh Khê, Đà Nẵng")).toBeTruthy()
+})
+
 it("shows global customer status counts and applies status filters on the server", async () => {
   const requests = vi.fn()
   api.defaults.adapter = async config => {
@@ -94,7 +116,7 @@ it("shows global customer status counts and applies status filters on the server
     const total = config.params?.isActive === true ? 80 : config.params?.isActive === false ? 21 : 101
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: [{ ...customer, isActive: config.params?.isActive !== false }], pagination: { page: config.params?.page ?? 1, limit: config.params?.limit ?? 10, total, totalPages: Math.ceil(total / (config.params?.limit ?? 10)) } } }
   }
-  setup(<CustomersPage />, "/customers?page=3&search=An")
+  setup(<CustomersPage />, "/auth/customers?page=3&search=An")
   await screen.findByText("an@example.com")
   const statistics = screen.getByRole("region", { name: "Thống kê khách hàng" })
   await waitFor(() => expect(within(statistics).getByText("101")).toBeTruthy())
@@ -110,17 +132,11 @@ it("shows global customer status counts and applies status filters on the server
   expect(screen.getByTestId("location").textContent).not.toContain("search=")
 })
 
-it("creates and deletes customer contacts without an admin edit form", async () => {
+it("has no create action and permits existing customer deletion only after confirmation", async () => {
   const { writes } = mockApi("customers")
   setup(<CustomersPage />)
   await screen.findByText("an@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Thêm khách hàng" }))
-  const dialog = await screen.findByRole("dialog", { name: "Thêm khách hàng mới" })
-  expect(within(dialog).queryByLabelText(/Birthday|Password/)).toBeNull()
-  for (const [label, value] of [["Tên", "An"], ["Họ", "Nguyen"], ["Email", "an@example.com"], ["Điện thoại", "0901234567"], ["Đường", "One"], ["Tỉnh/thành phố", "Tỉnh/thành phố"], ["Bang/khu vực", "Bang/khu vực"]]) fireEvent.change(within(dialog).getByLabelText(label), { target: { value } })
-  fireEvent.click(within(dialog).getByRole("button", { name: "Tạo khách hàng" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/customers", expect.objectContaining({ firstName: "An", lastName: "Nguyen" })))
-  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  expect(screen.queryByRole("button", { name: /Thêm khách hàng/ })).toBeNull()
   fireEvent.click(screen.getByRole("button", { name: "Xóa An Nguyen" }))
   fireEvent.click(await screen.findByRole("button", { name: "Xóa khách hàng" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/customers/${customer._id}`, undefined))
@@ -138,7 +154,7 @@ it.each(["admin", "staff"] as const)("%s can inspect customer details without ch
   fireEvent.click(screen.getByRole("button", { name: "Xem An Nguyen" }))
   const dialog = await screen.findByRole("dialog", { name: "Hồ sơ khách hàng" })
   expect(within(dialog).getByText("0901234567")).toBeTruthy()
-  expect(within(dialog).getByText("One")).toBeTruthy()
+  expect(within(dialog).getByText("One, Tỉnh/thành phố, Bang/khu vực")).toBeTruthy()
   expect(within(dialog).getByText(customer._id)).toBeTruthy()
   expect(within(dialog).queryByRole("textbox")).toBeNull()
   expect(writes).not.toHaveBeenCalled()
@@ -230,7 +246,7 @@ it("allows retrying a failed customer list request without losing the URL", asyn
     if (fail) throw new AxiosError("Network unavailable", "ERR_NETWORK", config)
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [customer], pagination: { page: 2, limit: 10, total: 101, totalPages: 11 } } }
   }
-  setup(<CustomersPage />, "/customers?page=2&search=An")
+  setup(<CustomersPage />, "/auth/customers?page=2&search=An")
   fireEvent.click(await screen.findByRole("button", { name: "Tải lại khách hàng" }).then(button => { fail = false; return button }))
   expect(await screen.findByText("an@example.com")).toBeTruthy()
   expect(screen.getByTestId("location").textContent).toBe("?page=2&search=An")

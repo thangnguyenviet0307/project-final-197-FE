@@ -49,19 +49,19 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     // Overview
     {
       title: "Bảng điều khiển",
-      url: "/admin/dashboard",
+      url: "/auth/dashboard",
       group: "Tổng quan",
       icon: LayoutDashboard,
     },
 
     // Apps
-    { title: "Sản phẩm", url: "/products", group: "Ứng dụng", icon: Package },
-    { title: "Đơn hàng", url: "/orders", group: "Ứng dụng", icon: Package },
-    { title: "Danh mục", url: "/categories", group: "Ứng dụng", icon: Package },
-    { title: "Thương hiệu", url: "/brands", group: "Ứng dụng", icon: Package },
-    { title: "Khách hàng", url: "/customers", group: "Ứng dụng", icon: Users },
-    { title: "Quản lý người dùng", url: "/users", group: "Ứng dụng", icon: Users },
-    { title: "Đổi mật khẩu", url: "/change-password", group: "Cài đặt", icon: Shield },
+    { title: "Sản phẩm", url: "/auth/products", group: "Ứng dụng", icon: Package },
+    { title: "Đơn hàng", url: "/auth/orders", group: "Ứng dụng", icon: Package },
+    { title: "Danh mục", url: "/auth/categories", group: "Ứng dụng", icon: Package },
+    { title: "Thương hiệu", url: "/auth/brands", group: "Ứng dụng", icon: Package },
+    { title: "Khách hàng", url: "/auth/customers", group: "Ứng dụng", icon: Users },
+    { title: "Quản lý người dùng", url: "/auth/users", group: "Ứng dụng", icon: Users },
+    { title: "Đổi mật khẩu", url: "/auth/change-password", group: "Cài đặt", icon: Shield },
 
     // Auth Pages
     {
@@ -136,36 +136,36 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     // Settings
     {
       title: "Hồ sơ người dùng",
-      url: "/settings/user",
+      url: "/auth/settings/user",
       group: "Cài đặt",
       icon: User,
     },
     {
       title: "Giao diện",
-      url: "/settings/appearance",
+      url: "/auth/settings/appearance",
       group: "Cài đặt",
       icon: Palette,
     },
     {
       title: "Thông báo",
-      url: "/settings/notifications",
+      url: "/auth/settings/notifications",
       group: "Cài đặt",
       icon: Bell,
     },
     {
       title: "Kết nối",
-      url: "/settings/connections",
+      url: "/auth/settings/connections",
       group: "Cài đặt",
       icon: Link2,
     },
 
     // Pages
-    { title: "Câu hỏi thường gặp", url: "/faqs", group: "Các trang", icon: HelpCircle },
+    { title: "Câu hỏi thường gặp", url: "/auth/faqs", group: "Các trang", icon: HelpCircle },
   ]
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/users"].includes(item.url) || role === "admin")
+    (!["/auth/users"].includes(item.url) || role === "admin")
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

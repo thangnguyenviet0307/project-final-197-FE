@@ -217,7 +217,7 @@ export default function UsersPage() {
         </section>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">{users.data ? `${users.data.pagination.total} tài khoản` : "Tài khoản người dùng"}</p>
-          <Button nativeButton={false} role="link" render={<Link to="/users/new" />}><UserRoundPlus />Thêm người dùng</Button>
+          <Button nativeButton={false} role="link" render={<Link to="/auth/users/new" />}><UserRoundPlus />Thêm người dùng</Button>
         </div>
         <div role="search" aria-label="Lọc người dùng" className="space-y-3 rounded-lg border p-4">
           <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -45,7 +45,7 @@ export function LoginForm1({ className, ...props }: React.ComponentProps<"div">)
         </Button>
       </form>
       <div className="mt-4 text-right">
-        <Link to="/forgot-password" className="text-sm underline-offset-4 hover:underline">Quên mật khẩu?</Link>
+        <Link to="/auth/forgot-password" className="text-sm underline-offset-4 hover:underline">Quên mật khẩu?</Link>
       </div>
     </CardContent></Card>
   </div>

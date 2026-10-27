@@ -1,5 +1,7 @@
 "use client"
 
+import { getAuthArea } from "@/stores/auth.store"
+
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 
@@ -22,7 +24,7 @@ export function InternalServerError() {
         <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
           <Button
             className="cursor-pointer"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate(getAuthArea() === "admin" ? "/auth/dashboard" : "/")}
           >
             Về trang chính
           </Button>

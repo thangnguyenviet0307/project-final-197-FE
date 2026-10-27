@@ -36,4 +36,4 @@ Trang đặt tại `src/pages/storefront`, layout tại `src/layout/storefront`;
 
 ## Account đã triển khai
 
-`/account` yêu cầu role customer. Hồ sơ dùng GET/PATCH `/auth/me`, email đăng nhập và role không sửa được; đổi mật khẩu dùng POST `/auth/change-password` và kết thúc phiên. Đăng ký công khai không nhận role/active và không tự đăng nhập. Orders/addresses vẫn là preview, chưa có API sở hữu đơn hàng dành cho người mua. Quy tắc đầy đủ: [PROJECT_RULES.md](../PROJECT_RULES.md).
+`/account` yêu cầu `accountType=customer`. Hồ sơ dùng GET/PATCH `/customer-auth/me`, chỉ hiển thị họ, tên, ngày sinh, giới tính, email đăng nhập chỉ đọc và điện thoại. Địa chỉ giao hàng dùng PATCH `/customer-auth/shipping-address` (người nhận, email, tỉnh/thành, phường/xã, địa chỉ, thời gian giao thuận tiện; không điện thoại/CCCD). GET `/customer-auth/orders` phân trang và chỉ trả đơn có Customer ID của phiên đăng nhập, không nhận ID khách tùy ý. Đổi mật khẩu dùng POST `/customer-auth/change-password` và kết thúc phiên. Giỏ hàng/checkout chưa triển khai; lịch sử chỉ hiển thị đơn thật đã được tạo. Quy tắc đầy đủ: [PROJECT_RULES.md](../PROJECT_RULES.md).

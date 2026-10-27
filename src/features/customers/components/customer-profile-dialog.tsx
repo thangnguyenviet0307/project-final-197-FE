@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { UserAvatar } from "@/components/user-avatar"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { ICustomer } from "@/features/customers/types/customers"
+import { customerAddress, customerBirthDate, customerGender } from "@/features/customers/utils/customer-profile"
 
 function displayDate(value?: string) {
   if (!value) return "Chưa cung cấp"
@@ -18,8 +19,11 @@ export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
   const details = [
     ["Mã khách hàng", customer._id], ["Họ và tên", name],
     ["Email", customer.email], ["Số điện thoại", customer.phone],
-    ["Đường", customer.street], ["Tỉnh/thành phố", customer.city],
-    ["Bang/khu vực", customer.state],
+    ["Ngày sinh", customerBirthDate(customer.birthDate)], ["Giới tính", customerGender(customer.gender)],
+    ["Người nhận hàng", customer.shippingAddress?.recipientName],
+    ["Email nhận hàng", customer.shippingAddress?.email],
+    ["Địa chỉ giao hàng", customerAddress(customer)],
+    ["Thời gian giao hàng", customer.shippingAddress?.deliveryTime],
     ["Ngày tạo", displayDate(customer.createdAt)], ["Cập nhật lần cuối", displayDate(customer.updatedAt)],
   ]
   return <Dialog open={open} onOpenChange={setOpen}>

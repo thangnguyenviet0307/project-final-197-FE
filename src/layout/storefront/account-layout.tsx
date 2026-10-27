@@ -7,6 +7,7 @@ import {
   LockKeyhole,
   ChevronRight,
 } from "lucide-react"
+import "@/layout/storefront/account-layout.css"
 
 const accountMenus = [
   {
@@ -33,8 +34,8 @@ const accountMenus = [
 
 export function AccountLayout() {
   return (
-    <div className="min-h-[65vh] bg-[#fafafa]">
-      <div className="mx-auto max-w-[1440px] px-5 py-8 sm:py-12">
+    <div className="store-account min-h-[65vh] bg-[#fafafa] text-gray-900">
+      <div className="store-container py-8 sm:py-12">
         <div className="mb-8">
           <p className="text-xs text-gray-500">
             Trang chủ / Tài khoản của tôi
@@ -84,9 +85,9 @@ export function AccountLayout() {
             </nav>
           </aside>
 
-          <main className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+          <section className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-8" aria-label="Nội dung tài khoản">
             <Outlet />
-          </main>
+          </section>
         </div>
       </div>
     </div>

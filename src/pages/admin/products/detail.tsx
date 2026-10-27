@@ -34,7 +34,7 @@ export default function ProductDetailPage() {
   return <BaseLayout title={product?.product_name ?? "Chi tiết sản phẩm"}><div className="space-y-6 px-4 lg:px-6">
     <div className="flex flex-wrap items-center gap-2"><Button nativeButton={false} role="link" variant="outline" render={<Link to={returnTo} />}><ArrowLeft />Quay lại</Button>
       {product && <AdminStoreProductLink product={product} />}
-      {admin && product && <Button nativeButton={false} role="link" render={<Link to={`/products/${id}/edit`} state={{ returnTo }} />}><Pencil />Chỉnh sửa</Button>}</div>
+      {admin && product && <Button nativeButton={false} role="link" render={<Link to={`/auth/products/${id}/edit`} state={{ returnTo }} />}><Pencil />Chỉnh sửa</Button>}</div>
     {query.isError || !product ? <ProductQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
       {query.isFetching && <p role="status" className="text-sm text-muted-foreground">Đang cập nhật sản phẩm…</p>}
       <div className="grid gap-6 rounded-xl border bg-card p-4 md:grid-cols-2 lg:gap-8 lg:p-6">

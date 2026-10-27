@@ -54,7 +54,7 @@ it.each([1, 2, 3, 4] as const)("staff only sees status edits for own open orders
 })
 it("staff can create a manual order with server-controlled prices", async () => {
   const writes = mockApi()
-  setup(<Routes><Route path="/" element={<CreateOrder />} /><Route path="/orders/:id" element={<p>Created order detail</p>} /></Routes>)
+  setup(<Routes><Route path="/" element={<CreateOrder />} /><Route path="/auth/orders/:id" element={<p>Created order detail</p>} /></Routes>)
   fireEvent.click(await screen.findByRole("button", { name: /Jane Doe/ }))
   fireEvent.click(await screen.findByRole("button", { name: /Phone · 100/ }))
   for (const [label, value] of [["street", "Street"], ["city", "City"], ["state", "State"]]) fireEvent.change(screen.getByLabelText(label), { target: { value } })
@@ -82,7 +82,7 @@ it("staff can add customers and inspect history without edit, delete or export c
   mockApi()
   setup(<CustomersPage />)
   await screen.findByText("jane@example.com")
-  expect(screen.getByRole("link", { name: "Lịch sử đơn hàng" }).getAttribute("href")).toBe(`/orders?customerId=${customerId}`)
+  expect(screen.getByRole("link", { name: "Lịch sử đơn hàng" }).getAttribute("href")).toBe(`/auth/orders?customerId=${customerId}`)
   expect(screen.queryByRole("button", { name: /Delete Jane/ })).toBeNull()
   expect(screen.queryByRole("button", { name: /Edit/ })).toBeNull()
   expect(screen.queryByRole("button", { name: /Export/ })).toBeNull()

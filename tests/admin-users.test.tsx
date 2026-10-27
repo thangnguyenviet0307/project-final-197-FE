@@ -20,7 +20,7 @@ beforeEach(() => {
   useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
 })
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
-function UserTestRoutes() { return <Routes><Route path="/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
+function UserTestRoutes() { return <Routes><Route path="/auth/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
 function setup(role: "admin" | "staff" = "staff") {
   const writes = vi.fn()
   api.defaults.adapter = async (config) => {

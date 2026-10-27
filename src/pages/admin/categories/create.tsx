@@ -6,7 +6,7 @@ import { useCreateCategory } from "@/features/categories/hooks/use-create-catego
 export default function CategoryCreatePage() {
   const navigate = useNavigate()
   const create = useCreateCategory()
-  return <CreatePageLayout title="Thêm danh mục" backTo="/categories" backLabel="Về danh sách danh mục">
-    <CategoryForm onSaved={() => navigate("/categories")} onCancel={() => navigate("/categories")} onSubmit={async values => { await create.mutateAsync(values) }} />
+  return <CreatePageLayout title="Thêm danh mục" backTo="/auth/categories" backLabel="Về danh sách danh mục">
+    <CategoryForm onSaved={() => navigate("/auth/categories")} onCancel={() => navigate("/auth/categories")} onSubmit={async values => { await create.mutateAsync(values) }} />
   </CreatePageLayout>
 }

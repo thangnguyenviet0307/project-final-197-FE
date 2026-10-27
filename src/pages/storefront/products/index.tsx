@@ -22,7 +22,7 @@ export default function StorefrontProductsPage() {
   function update(key: string, value: string) {
     setParams(previous => { const next = new URLSearchParams(previous); if (value) next.set(key, value); else next.delete(key); next.delete("page"); return next })
   }
-  return <div className="min-h-[60vh] bg-[#fbfcfa] text-gray-950"><div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+  return <div className="min-h-[60vh] bg-[#fbfcfa] text-gray-950"><div className="store-container space-y-6 py-8">
     <nav className="text-sm"><Link to="/">Trang chủ</Link> / Sản phẩm</nav>
     <h1 className="text-3xl font-bold">Sản phẩm</h1>
     <div className="flex flex-wrap gap-3">

@@ -1,5 +1,11 @@
 # Cấu trúc Frontend
 
+Khu vực `/account` dùng hồ sơ customer (họ, tên, ngày sinh, giới tính, một email đăng nhập chỉ đọc, điện thoại), địa chỉ giao hàng riêng và lịch sử đơn hàng qua `/customer-auth/me`, `/customer-auth/shipping-address`, `/customer-auth/orders`. Schema nằm trong `features/profile/schemas/customer-account-schema.ts`; API/query đơn hàng khách nằm trong `features/orders/`. Chưa triển khai checkout/tạo đơn mua hàng từ storefront. Trang 404 storefront giữ `StoreLayout`; `/auth/*` có giao diện 404 quản trị riêng.
+
+Bảng quản trị `/auth/customers` đọc `/customers`, giữ `birthDate`, `gender` và `shippingAddress` trong service mapping. Bảng và dialog ưu tiên địa chỉ giao hàng mới; `address` cũ chỉ dùng khi chưa có `shippingAddress`. Hiển thị riêng email tài khoản và email nhận hàng. Tín hiệu cập nhật giữa các tab làm mới cache `customers`; có nút làm mới danh sách thủ công.
+
+Storefront dùng utility `store-container` trong `src/index.css`: rộng tối đa 1440px, căn giữa và padding ngang 20px. Header, navbar, footer, nội dung trang và skeleton dùng chung utility này để thẳng hàng; các form hoặc khối nội dung nhỏ vẫn có thể giới hạn chiều rộng bên trong.
+
 Dự án dùng React, Vite, TypeScript, React Router, Zustand và TanStack Query. Cấu trúc áp dụng cách phân chia trách nhiệm trong hình mẫu, kết hợp module nghiệp vụ trong `features`.
 
 ```text
@@ -82,7 +88,7 @@ Menu danh mục storefront dùng `features/categories/hooks/use-public-categorie
 
 Component riêng một trang có thể nằm trong `components/` con cạnh trang đó. CSS riêng nằm cạnh trang/component; global styles giữ ở `src/index.css`. Trang mẫu được giữ để tham khảo trong `pages/template/`; mẫu Users và dữ liệu minh họa nằm ở `pages/template/users/`, không được đăng ký route.
 
-Storefront có homepage `/`, `/contact`, đăng ký `/register` và đăng nhập khách hàng `/account/login`; `/landing` nằm trong `pages/public/landing/`. Đăng ký gọi `/auth/register`, thành công chuyển sang đăng nhập; đăng nhập thành công về homepage. Các trang /account được bảo vệ bằng role customer. Hồ sơ dùng GET/PATCH /auth/me; đổi mật khẩu dùng POST /auth/change-password và đưa khách về /account/login. Đơn hàng và địa chỉ vẫn là bản xem trước. Catalog công khai, giỏ hàng và checkout chưa được đăng ký trong router. Thư mục trang mới không tự tạo URL.
+Storefront có homepage `/`, `/contact`, `/shop`, `/shop/:slug` và trang thành viên `/thanh-vien?act=login|register`; `/account/login` và `/register` là URL tương thích. `/landing` nằm trong `pages/public/landing/`. Xác thực khách dùng `/customer-auth`; account yêu cầu `accountType=customer`. Hồ sơ, địa chỉ giao hàng và lịch sử đơn hàng dùng API riêng của khách như mô tả đầu tài liệu. Giỏ hàng và checkout chưa được triển khai. Thư mục trang mới không tự tạo URL.
 
 Pages giữ giao diện, điều hướng và trạng thái URL; hook nghiệp vụ giữ query, mutation và cập nhật cache. Service không chứa schema form. `types/api.ts` cung cấp envelope, response, error và pagination dùng chung; endpoint có khác biệt metadata phải giữ đúng hợp đồng thay vì giả định mọi response giống nhau.
 
@@ -129,3 +135,12 @@ Chạy `pnpm build`, `pnpm lint`, `pnpm test`. Trên PowerShell chặn script `.
 - Browser auth uses HttpOnly refresh cookies and in-memory access tokens; see [AUTH.md](../AUTH.md) for origin/HTTPS/same-site deployment requirements. Demo passwords remain unchanged by explicit user decision.
 
 Quy tắc nghiệp vụ và lệnh pnpm hiện hành: [PROJECT_RULES.md](../PROJECT_RULES.md). Admin có liên kết “Trang Bán hàng” mở `/` trong tab mới.
+
+
+## Browser routes and independent authentication
+
+Admin browser routes use `/auth/...`; only admin/staff roles are accepted. User login/profile/refresh/logout/password APIs remain `/auth/...`. Store membership uses `/thanh-vien?act=login|register`; its APIs use `/customer-auth/...` and return `accountType: "customer"` without an administrative role. Frontend session parsing, guards, header, profile, password changes and refresh choose the matching area. Tokens and refresh cookies are isolated by account type; passwords/tokens are never persisted in browser storage.
+
+Customer registration creates only one account in the Backend customers collection. Users contains only administrative accounts. Email, passwords and profiles are independent across collections, even when fields match. Customer self-profile includes contact address; administrative profiles retain their existing avatar flow. The administrative Customer creation form/hook/service/action is removed. The backend denies administrative creation, and management lists only registered customers. Existing manual contacts remain stored for order history.
+
+See [CUSTOMER_ACCOUNT_MIGRATION.md](CUSTOMER_ACCOUNT_MIGRATION.md) for the coordinated Backend/Frontend cutover, current inspection report and database approval boundary.

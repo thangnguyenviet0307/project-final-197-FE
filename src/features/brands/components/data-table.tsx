@@ -163,7 +163,7 @@ export function BrandTable({ brands, searchQuery, onSearch, onDelete, onEdit }: 
   return <div className="space-y-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-muted-foreground">{filtered.length} thương hiệu</p>
-      {admin && <Button nativeButton={false} role="link" render={<Link to="/brands/new" />}><Plus />Thêm thương hiệu</Button>}
+      {admin && <Button nativeButton={false} role="link" render={<Link to="/auth/brands/new" />}><Plus />Thêm thương hiệu</Button>}
     </div>
     <section aria-label="Bộ lọc thương hiệu" className="space-y-3 rounded-lg border p-4">
       <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">

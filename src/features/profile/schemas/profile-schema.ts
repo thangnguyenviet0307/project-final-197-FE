@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 export const profileSchema = z.object({
+  address: z.object({ street: z.string().trim().max(255), city: z.string().trim().max(50), state: z.string().trim().max(50) }).optional(),
   firstName: z.string().trim().min(1, "Vui lòng nhập tên.").max(50, "Tên không được vượt quá 50 ký tự."),
   lastName: z.string().trim().min(1, "Vui lòng nhập họ.").max(50, "Họ không được vượt quá 50 ký tự."),
   personalEmail: z.union([z.string().trim().email("Địa chỉ email cá nhân không hợp lệ.").toLowerCase(), z.literal("")], { error: "Nhập địa chỉ email cá nhân hợp lệ, hoặc để trống." }),

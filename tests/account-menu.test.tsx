@@ -30,8 +30,8 @@ it("keeps profile/password/logout inside the account menu and uses avatar initia
   </SidebarProvider></MemoryRouter></QueryClientProvider>)
   expect(screen.getByText("TU")).toBeTruthy()
   fireEvent.click(screen.getByRole("button", { name: "Account menu Test User" }))
-  expect((await screen.findByRole("menuitem", { name: "Hồ sơ người dùng" })).getAttribute("href")).toBe("/settings/user")
-  expect(screen.getByRole("menuitem", { name: "Đổi mật khẩu" }).getAttribute("href")).toBe("/change-password")
+  expect((await screen.findByRole("menuitem", { name: "Hồ sơ người dùng" })).getAttribute("href")).toBe("/auth/settings/user")
+  expect(screen.getByRole("menuitem", { name: "Đổi mật khẩu" }).getAttribute("href")).toBe("/auth/change-password")
   expect(screen.getByRole("menuitem", { name: "Đăng xuất" })).toBeTruthy()
   expect(screen.queryByRole("menuitem", { name: /billing/i })).toBeNull()
 })
@@ -40,7 +40,7 @@ it("account-menu logout calls the Backend, clears the session, and opens login",
   api.defaults.adapter = vi.fn(async (config) => ({ config, data: {}, status: 200, statusText: "", headers: new AxiosHeaders() }))
   render(<QueryClientProvider client={queryClient}><MemoryRouter><Routes>
     <Route path="/" element={<SidebarProvider><NavUser user={{ ...user, avatar: "" }} /></SidebarProvider>} />
-    <Route path="/login" element={<p>Login page</p>} />
+    <Route path="/auth/login" element={<p>Login page</p>} />
   </Routes></MemoryRouter></QueryClientProvider>)
   fireEvent.click(screen.getByRole("button", { name: "Account menu Test User" }))
   fireEvent.click(await screen.findByRole("menuitem", { name: "Đăng xuất" }))

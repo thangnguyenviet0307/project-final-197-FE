@@ -19,7 +19,7 @@ export default function StorefrontHomePage() {
       <HomeHeroSlider />
       <HomeCategoryLinks />
 
-      <section aria-label="Khám phá cửa hàng" className="mx-auto max-w-7xl px-4 pt-8 sm:pt-10">
+      <section aria-label="Khám phá cửa hàng" className="store-container pt-8 sm:pt-10">
         <div className="grid divide-y divide-gray-100 border-y border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {storeBenefits.map(({ Icon, title, description }) => (
             <div key={title} className="flex items-center gap-4 px-4 py-5 sm:px-5 sm:py-6">

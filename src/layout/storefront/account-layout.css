@@ -1,0 +1,48 @@
+.store-account {
+  color-scheme: light;
+  --input: #d1d5db;
+  --ring: #55b000;
+  --destructive: #b91c1c;
+  --muted-foreground: #6b7280;
+  --background: #fff;
+  --foreground: #111827;
+  --card: #fff;
+  --card-foreground: #111827;
+  --muted: #f3f4f6;
+  --border: #e5e7eb;
+  --primary: #459000;
+  --primary-foreground: #fff;
+}
+
+.store-account [data-slot="input"],
+.store-account select,
+.store-account textarea {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  padding: 10px 12px;
+}
+
+.store-account [data-slot="input"]:focus-visible,
+.store-account select:focus-visible,
+.store-account textarea:focus-visible {
+  outline: 2px solid #55b000;
+  outline-offset: 2px;
+  border-color: #459000;
+}
+
+.store-account [aria-invalid="true"] {
+  border-color: #b91c1c;
+}
+
+.store-account [data-slot="input"]:read-only,
+.store-account [data-slot="input"]:disabled {
+  background: #f9fafb;
+}
+
+.store-account input[type="password"]::-ms-reveal {
+  display: none;
+}

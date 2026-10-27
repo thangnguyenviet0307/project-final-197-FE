@@ -39,7 +39,7 @@ export function HomeHeroSlider() {
           />
         ))}
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#12170f]/95 via-[#12170f]/75 to-[#12170f]/10" />
-        <div className="mx-auto flex min-h-[420px] max-w-7xl items-center px-5 py-12 sm:min-h-[500px] sm:px-8 lg:px-12">
+        <div className="store-container flex min-h-[420px] items-center py-12 sm:min-h-[500px]">
           <div key={activeSlide} className="max-w-2xl animate-in fade-in slide-in-from-bottom-2 duration-500">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#c5ee80]">{slide.eyebrow}</p>
             <h1 className="mt-5 whitespace-pre-line text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-6xl">

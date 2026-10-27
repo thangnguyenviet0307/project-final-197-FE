@@ -6,7 +6,7 @@ import { SectionHeading } from "@/features/storefront/components/section-heading
 export function StorefrontNewsSection() {
   return (
     <section id="tin-tuc" aria-label="Tin tức và cẩm nang phụ kiện" className="bg-[#f5f6f4] py-12 sm:py-16">
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="store-container ">
         <SectionHeading
           eyebrow="Tin tức & cẩm nang"
           title="Thông tin hữu ích cho phụ kiện bạn chọn"

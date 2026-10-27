@@ -7,9 +7,9 @@ export function ProtectedRoute({ allowedRoles, storefront = false }: { allowedRo
   const { user, isLoading, isAuthenticated } = useAuthStore()
   const location = useLocation()
   if (isLoading) return <RootFallback storefront={storefront} />
-  if (!isAuthenticated || !user) return <Navigate to={storefront ? "/account/login" : "/login"} state={{ from: location }} replace />
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/403" replace />
-  const passwordPath = storefront ? "/account/change-password" : "/change-password"
+  if (!isAuthenticated || !user) return <Navigate to={storefront ? "/thanh-vien?act=login" : "/auth/login"} state={{ from: location }} replace />
+  if ((storefront && user.accountType !== "customer") || (!storefront && user.accountType === "customer") || (allowedRoles && (!user.role || !allowedRoles.includes(user.role)))) return <Navigate to={storefront ? "/403" : "/auth/403"} replace />
+  const passwordPath = storefront ? "/account/change-password" : "/auth/change-password"
   if (user.mustChangePassword && location.pathname !== passwordPath) {
     return <Navigate to={passwordPath} replace />
   }

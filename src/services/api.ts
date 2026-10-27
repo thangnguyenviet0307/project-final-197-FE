@@ -30,7 +30,7 @@ export function refreshAccessToken(): Promise<string> {
     return Promise.reject(new Error("Your session has expired."))
   }
   const area = getAuthArea()
-  const request = () => authApi.post<ApiResponse<TokenPair>>("/auth/refresh", {}, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": area } })
+  const request = () => authApi.post<ApiResponse<TokenPair>>(`${area === "storefront" ? "/customer-auth" : "/auth"}/refresh`, {}, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": area } })
   const promise = (typeof navigator !== "undefined" && navigator.locks ? navigator.locks.request(`${area}-auth-refresh`, request) : request())
     .then(({ data }) => {
       if (useAuthStore.getState().sessionVersion !== sessionVersion) throw new Error("Session changed")

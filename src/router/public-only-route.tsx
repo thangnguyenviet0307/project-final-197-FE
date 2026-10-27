@@ -6,7 +6,7 @@ import { authRedirect } from "@/features/auth/utils/auth-redirect"
 export function PublicOnlyRoute({ storefront = false }: { storefront?: boolean }) {
   const { user, isLoading, isAuthenticated } = useAuthStore()
   if (isLoading) return <RootFallback storefront={storefront} />
-  if (isAuthenticated && user && (storefront ? user.role !== "customer" : user.role === "customer")) {
+  if (isAuthenticated && user && (storefront ? user.accountType !== "customer" : user.accountType === "customer")) {
     return <p role="alert" className="p-6 text-center">Tài khoản không tồn tại !</p>
   }
   if (isAuthenticated && user) return <Navigate to={authRedirect(user)} replace />

@@ -29,9 +29,9 @@ function setup(latest: Product) {
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data } }
   }
   render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([
-    { path: "/products/:id/edit", element: <ProductEditPage /> },
-    { path: "/products/:id", element: <p>Saved product detail</p> },
-  ], { initialEntries: [`/products/${id}/edit`] })} /></QueryClientProvider>)
+    { path: "/auth/products/:id/edit", element: <ProductEditPage /> },
+    { path: "/auth/products/:id", element: <p>Saved product detail</p> },
+  ], { initialEntries: [`/auth/products/${id}/edit`] })} /></QueryClientProvider>)
   return writes
 }
 

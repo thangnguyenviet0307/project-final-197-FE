@@ -88,7 +88,7 @@ const contacts = await customerService.getCustomers({ page: 11, limit: 10, searc
 assert.equal(contacts.pagination.total, 101)
 assert.equal(contacts.data[0].first_name, "An")
 assert.equal(contacts.data[0].last_name, "Nguyen")
-await customerService.createCustomer({ first_name: "An", last_name: "Nguyen", email: customer.email, phone: customer.phone, ...customer.address })
+assert.equal(Object.hasOwn(customerService, "createCustomer"), false)
 await customerService.updateCustomer(id, { first_name: "Binh" })
 await customerService.deleteCustomer(id)
 await brandService.createBrand({ name: "Acme", description: "Devices", isActive: true, logoUrl: "https://example.com/brand.png" })

@@ -21,9 +21,9 @@ const id = "a".repeat(24)
 const order: Order = { _id: id, customerId: null, customerSnapshot: { firstName: "Historical", lastName: "Customer", email: "old@example.com" }, orderStatus: 1, orderDate: "2026-10-01T10:00:00Z", street: "123 Street", city: "Tỉnh/thành phố", state: "Bang/khu vực", paymentType: 1, totalAmount: 777, orderItems: [{ _id: "item", productId: null, quantity: 2, price: 100, discount: 10, sku: "OLD-SKU" }] }
 beforeEach(() => { queryClient.clear(); clearAuth() })
 afterEach(() => { api.defaults.adapter = original; clearAuth() })
-function setup(role: "admin" | "staff" = "admin", path = "/orders") {
+function setup(role: "admin" | "staff" = "admin", path = "/auth/orders") {
   useAuthStore.getState().setSession({ id: "b".repeat(24), name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "admin@example.com", role, mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/orders" element={<OrdersPage />} /><Route path="/orders/:id" element={<OrderDetail />} /></Routes></MemoryRouter></QueryClientProvider>)
+  render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/auth/orders" element={<OrdersPage />} /><Route path="/auth/orders/:id" element={<OrderDetail />} /></Routes></MemoryRouter></QueryClientProvider>)
 }
 function mockOrder(value: Order = order) {
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders" ? [value] : value, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } })
@@ -40,7 +40,7 @@ it("staff can view and open details but cannot mutate pending or rejected orders
 })
 it("details use snapshots and the server total even when a product is deleted", async () => {
   mockOrder()
-  setup("staff", `/orders/${id}`)
+  setup("staff", `/auth/orders/${id}`)
   await screen.findByText("OLD-SKU")
   expect(screen.getByText("Historical Customer")).toBeTruthy()
   expect(screen.getByText("Sản phẩm không khả dụng")).toBeTruthy()
@@ -72,7 +72,7 @@ it("admin deletes rejected orders after confirmation and returns to the list", a
     if (config.method === "delete") deleted.push(config.url!)
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders" ? [] : { ...order, orderStatus: 3 }, pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } }
   }
-  setup("admin", `/orders/${id}`)
+  setup("admin", `/auth/orders/${id}`)
   fireEvent.click(await screen.findByRole("button", { name: `Xóa đơn hàng ${id}` }))
   expect(deleted).toEqual([])
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận" }))
@@ -82,7 +82,7 @@ it("admin deletes rejected orders after confirmation and returns to the list", a
 it("status filtering resets pagination and sends only supported query parameters", async () => {
   const calls: unknown[] = []
   api.defaults.adapter = async config => { calls.push(config.params); return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } } } }
-  setup("staff", "/orders?page=3&limit=20&search=ignored")
+  setup("staff", "/auth/orders?page=3&limit=20&search=ignored")
   await screen.findByText("Không tìm thấy đơn hàng.")
   expect(calls[0]).toEqual({ page: 3, limit: 20, search: "ignored" })
   fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "4" } })
@@ -103,7 +103,7 @@ it("shows API errors and allows retry", async () => {
 it("rejects invalid detail IDs without sending a request", async () => {
   const adapter = vi.fn()
   api.defaults.adapter = adapter
-  setup("admin", "/orders/invalid")
+  setup("admin", "/auth/orders/invalid")
   expect(screen.getByText("Mã định danh đơn hàng không hợp lệ.")).toBeTruthy()
   expect(adapter).not.toHaveBeenCalled()
 })
@@ -167,7 +167,7 @@ it("admin selects an active staff handler and starts the order", async () => {
 it("date filters send full local-day bounds and reset pagination", async () => {
   const requests: unknown[] = []
   api.defaults.adapter = async config => { requests.push(config.params); return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } } }
-  setup("staff", "/orders?page=3&dateFrom=2026-10-01&dateTo=2026-10-02")
+  setup("staff", "/auth/orders?page=3&dateFrom=2026-10-01&dateTo=2026-10-02")
   await screen.findByText("Không tìm thấy đơn hàng.")
   fireEvent.click(screen.getByRole("button", { name: "Áp dụng khoảng ngày" }))
   await waitFor(() => expect(requests.at(-1)).toEqual({ page: 1, limit: 10, dateFrom: orderDateBoundary("2026-10-01"), dateTo: orderDateBoundary("2026-10-02", true) }))
@@ -188,14 +188,14 @@ it("shows the readable code while retaining MongoDB IDs for links and requests",
   mockOrder({ ...order, orderCode: "ORD-A7K9M2" })
   setup("staff")
   const link = await screen.findByRole("link", { name: "ORD-A7K9M2" })
-  expect(link.getAttribute("href")).toBe(`/orders/${id}`)
+  expect(link.getAttribute("href")).toBe(`/auth/orders/${id}`)
   fireEvent.click(link)
   await screen.findByRole("heading", { name: "Đơn hàng ORD-A7K9M2" })
 })
 it("searches by code or phone, resets page and preserves other filters", async () => {
   const requests: unknown[] = []
   api.defaults.adapter = async config => { requests.push(config.params); return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } } }
-  setup("staff", "/orders?page=3&orderStatus=1")
+  setup("staff", "/auth/orders?page=3&orderStatus=1")
   await screen.findByText("Không tìm thấy đơn hàng.")
   fireEvent.change(screen.getByLabelText("Mã đơn hàng hoặc số điện thoại khách hàng"), { target: { value: " ORD-A7K9M2 " } })
   fireEvent.click(screen.getByRole("button", { name: "Tìm kiếm" }))
@@ -213,7 +213,7 @@ it("assigned staff can update scheduling without changing order status or snapsh
     if (config.method === "patch") { writes.push({ url: config.url, input: JSON.parse(config.data) }); current = { ...current, requireDate: undefined } }
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: current } }
   }
-  setup("staff", `/orders/${id}`)
+  setup("staff", `/auth/orders/${id}`)
   fireEvent.click(await screen.findByRole("button", { name: "Chỉnh sửa ngày" }))
   fireEvent.click(screen.getByRole("button", { name: "Xóa ngày yêu cầu" }))
   fireEvent.click(screen.getByRole("button", { name: "Lưu ngày" }))
@@ -221,14 +221,14 @@ it("assigned staff can update scheduling without changing order status or snapsh
 })
 it("unassigned staff cannot edit order dates", async () => {
   mockOrder()
-  setup("staff", `/orders/${id}`)
+  setup("staff", `/auth/orders/${id}`)
   await screen.findByText("OLD-SKU")
   expect(screen.queryByRole("button", { name: "Chỉnh sửa ngày" })).toBeNull()
 })
 
 it("shows purchase names and options independently of current product names", async () => {
   mockOrder({ ...order, orderItems: [{ ...order.orderItems[0], productName: "Purchased name", variantName: "Purchased variant", selectedOptions: { color: "Black" }, productId: { _id: id, product_name: "Renamed now" } }] })
-  setup("staff", `/orders/${id}`)
+  setup("staff", `/auth/orders/${id}`)
   expect(await screen.findByText("Purchased name")).toBeTruthy()
   expect(screen.getByText("Purchased variant")).toBeTruthy()
   expect(screen.getByText("color: Black")).toBeTruthy()
@@ -244,7 +244,7 @@ it("reassigns a Processing order without changing its status", async () => {
     const data = config.url === "/users" ? [{ _id: nextHandler, firstName: "New", lastName: "Handler", email: "handler@example.com", active: true, role: "staff" }] : current
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
   }
-  setup("admin", `/orders/${id}`)
+  setup("admin", `/auth/orders/${id}`)
   fireEvent.click(await screen.findByRole("button", { name: "Đổi người xử lý" }))
   fireEvent.click(await screen.findByRole("radio", { name: "New Handler (handler@example.com)" }))
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận đổi nhân viên" }))

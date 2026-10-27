@@ -6,7 +6,7 @@ import { useCreateBrand } from "@/features/brands/hooks/use-brand-management"
 export default function BrandCreatePage() {
   const navigate = useNavigate()
   const create = useCreateBrand()
-  return <CreatePageLayout title="Thêm thương hiệu" backTo="/brands" backLabel="Về danh sách thương hiệu">
-    <BrandForm onSaved={() => navigate("/brands")} onCancel={() => navigate("/brands")} onSubmit={async values => { await create.mutateAsync(values) }} />
+  return <CreatePageLayout title="Thêm thương hiệu" backTo="/auth/brands" backLabel="Về danh sách thương hiệu">
+    <BrandForm onSaved={() => navigate("/auth/brands")} onCancel={() => navigate("/auth/brands")} onSubmit={async values => { await create.mutateAsync(values) }} />
   </CreatePageLayout>
 }
