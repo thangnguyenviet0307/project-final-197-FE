@@ -1,15 +1,15 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { expect, it, vi } from "vitest"
 import type { Product } from "@/features/products/types/products"
 import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
-vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [{ _id: "d".repeat(24), name: "Tai nghe", slug: "tai-nghe" }], isPending: false }) }))
+vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [{ _id: "d".repeat(24), name: "Tai nghe", slug: "tai-nghe" }, { _id: "f".repeat(24), name: "Cáp sạc", slug: "cap-sac" }], isPending: false }) }))
 
 const state = vi.hoisted(() => ({
   product: { _id: "a".repeat(24), slug: "ceramic-chicken", product_name: "Ceramic Chicken", is_active: true, category: null, brand: null, price: 100000, discount: 10, stock: 4, description: "<p>Mô tả thật</p><script>alert(1)</script>", variants: [{ _id: "b".repeat(24), sku: "BLUE", variant_name: "Màu xanh", price: 200000, stock: 2 }] } as Product,
-  pending: false, error: false, relatedCount: 1, refetch: vi.fn(), list: vi.fn(),
+  pending: false, error: false, relatedCount: 1, refetch: vi.fn(), list: vi.fn(), count: vi.fn(),
 }))
 vi.mock("@/features/storefront/hooks/use-store-product-carousel", () => ({
   useStoreProductCarousel: (params: unknown) => {
@@ -130,44 +130,102 @@ it("does not invent an original price or discount badge for non-discounted produ
   } finally { state.product = original }
 })
 
-vi.mock("@/features/brands/hooks/use-public-brands", () => ({ usePublicBrands: () => ({ data: [{ _id: "c".repeat(24), name: "Baseus", slug: "baseus", logoUrl: "https://images.test/baseus.svg" }], isPending: false, isError: false, refetch: vi.fn() }) }))
+vi.mock("@/features/brands/hooks/use-public-brands", () => ({ usePublicBrands: () => ({ data: [{ _id: "c".repeat(24), name: "Baseus", slug: "baseus", logoUrl: "https://images.test/baseus.svg" }, { _id: "e".repeat(24), name: "Apple", slug: "apple" }], isPending: false, isError: false, refetch: vi.fn() }) }))
 
-it("filters the complete catalog by brand, category and price without a local search field", () => {
+
+vi.mock("@/features/storefront/hooks/use-store-filter-count", () => ({ useStoreFilterCount: (params: { brand?: string }, enabled: boolean) => {
+  state.count(params, enabled)
+  return { data: params.brand ? 7 : 23, isFetching: false, isError: false }
+} }))
+it("shows only the filter trigger and previews draft results before applying presets", () => {
   state.list.mockClear()
   render(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
-  expect(screen.queryByPlaceholderText("Tên sản phẩm…")).toBeNull()
-  expect(screen.getByRole("combobox", { name: /Sắp xếp theo/ })).toBeTruthy()
-  const quickBrands = screen.getByLabelText("Lọc nhanh theo thương hiệu")
-  expect(within(quickBrands).getByRole("button", { name: "Baseus" }).querySelector("img")?.getAttribute("src")).toBe("https://images.test/baseus.svg")
-  fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }))
+  const filters = screen.getByRole("region", { name: "Lọc và sắp xếp sản phẩm" })
+  expect(within(filters).getAllByRole("button")).toHaveLength(1)
+  expect(screen.queryByRole("combobox")).toBeNull()
+  expect(screen.queryByLabelText("Lọc nhanh theo thương hiệu")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Lọc" }))
   const dialog = screen.getByRole("dialog")
+  expect(within(dialog).queryByRole("spinbutton")).toBeNull()
+  expect(within(dialog).getByRole("button", { name: "Xem 23 kết quả" })).toBeTruthy()
   fireEvent.click(within(dialog).getByRole("button", { name: "Baseus" }))
   fireEvent.click(within(dialog).getByRole("button", { name: "Tai nghe" }))
-  fireEvent.change(within(dialog).getByLabelText("Giá từ (₫)"), { target: { value: "100000" } })
-  fireEvent.change(within(dialog).getByLabelText("Giá đến (₫)"), { target: { value: "500000" } })
-  fireEvent.click(within(dialog).getByRole("button", { name: /^Xem/ }))
-  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({
-    page: 1,
-    brand: "c".repeat(24),
-    category: "d".repeat(24),
-    minPrice: 100000,
-    maxPrice: 500000,
-  }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Từ 2 - 4 triệu" }))
+  expect(state.count).toHaveBeenLastCalledWith(expect.objectContaining({ brand: "c".repeat(24), category: "d".repeat(24), minPrice: 2000000, maxPrice: 4000000 }), true)
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ brand: undefined, category: undefined }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Xem 7 kết quả" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, brand: "c".repeat(24), category: "d".repeat(24), minPrice: 2000000, maxPrice: 4000000 }))
+})
+it("clears only the draft and applies it after confirmation", () => {
+  render(<MemoryRouter initialEntries={["/shop?search=Chicken&sort=price-desc&page=2&brand=cccccccccccccccccccccccc&minPrice=2000000&maxPrice=4000000"]}><StorefrontProductsPage /></MemoryRouter>)
+  fireEvent.click(screen.getByRole("button", { name: "Lọc" }))
+  const dialog = screen.getByRole("dialog")
+  fireEvent.click(within(dialog).getByRole("button", { name: "Bỏ chọn" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2, brand: "c".repeat(24) }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Xem 23 kết quả" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, search: "Chicken", sortBy: "price", sortOrder: "desc", brand: undefined, minPrice: undefined, maxPrice: undefined }))
+})
+it("uses inline server sorting and toggles the price direction", () => {
+  render(<MemoryRouter initialEntries={["/shop?page=2&brand=cccccccccccccccccccccccc"]}><StorefrontProductsPage /></MemoryRouter>)
+  const sort = screen.getByRole("navigation", { name: "Sắp xếp sản phẩm" })
+  expect(within(sort).getByRole("button", { name: "Nổi bật" }).getAttribute("aria-pressed")).toBe("true")
+  for (const [name, sortBy] of [["Mới", "createdAt"], ["Bán chạy", "is_best_seller"], ["% giảm giá", "discount"], ["Nổi bật", "is_hot"]]) {
+    fireEvent.click(within(sort).getByRole("button", { name }))
+    expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, sortBy, sortOrder: "desc", brand: "c".repeat(24) }))
+  }
+  fireEvent.click(within(sort).getByRole("button", { name: "Giá tăng hoặc giảm" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ sortBy: "price", sortOrder: "asc" }))
+  fireEvent.click(within(sort).getByRole("button", { name: "Giá tăng dần" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ sortBy: "price", sortOrder: "desc" }))
 })
 
-it("rejects an invalid price range and can clear applied filters", async () => {
-  state.list.mockClear()
-  render(<MemoryRouter initialEntries={["/shop?brand=cccccccccccccccccccccccc&minPrice=200000&maxPrice=50000"]}><StorefrontProductsPage /></MemoryRouter>)
-  fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }))
+it("shows API Apple and removable draft selections above brands without applying on close", () => {
+  render(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
+  fireEvent.click(screen.getByRole("button", { name: "Lọc" }))
   const dialog = screen.getByRole("dialog")
-  fireEvent.click(within(dialog).getByRole("button", { name: /^Xem/ }))
-  expect(within(dialog).getByRole("alert").textContent).toContain("Giá tối thiểu không thể lớn hơn giá tối đa.")
-  fireEvent.click(within(dialog).getByRole("button", { name: /Xóa bộ lọc/ }))
-  await waitFor(() => {
-    expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({
-      brand: undefined,
-      minPrice: undefined,
-      maxPrice: undefined,
-    }))
-  })
+  expect(within(dialog).getByRole("button", { name: "Apple" })).toBeTruthy()
+  fireEvent.click(within(dialog).getByRole("button", { name: "Baseus" }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Tai nghe" }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Dưới 2 triệu" }))
+  const selected = within(dialog).getByLabelText("Các bộ lọc đã chọn")
+  expect(within(selected).getByRole("button", { name: "Bỏ Baseus" })).toBeTruthy()
+  expect(within(selected).getByRole("button", { name: "Bỏ Tai nghe" })).toBeTruthy()
+  fireEvent.click(within(selected).getByRole("button", { name: "Bỏ Dưới 2 triệu" }))
+  expect(state.count).toHaveBeenLastCalledWith(expect.objectContaining({ brand: "c".repeat(24), category: "d".repeat(24), minPrice: undefined, maxPrice: undefined }), true)
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ brand: undefined, category: undefined }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Đóng bộ lọc" }))
+  const filters = screen.getByRole("region", { name: "Lọc và sắp xếp sản phẩm" })
+  expect(within(filters).queryByLabelText("Các bộ lọc đã chọn")).toBeNull()
+})
+it("shows applied chips outside and clears one or all while preserving search and sorting", () => {
+  render(<MemoryRouter initialEntries={[`/shop?search=cable&sort=price-desc&page=2&brand=${"c".repeat(24)}&category=${"d".repeat(24)}&maxPrice=2000000`]}><StorefrontProductsPage /></MemoryRouter>)
+  const filters = screen.getByRole("region", { name: "Lọc và sắp xếp sản phẩm" })
+  fireEvent.click(within(filters).getByRole("button", { name: "Bỏ Baseus" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ brand: undefined, category: "d".repeat(24), maxPrice: 2000000, page: 1, search: "cable", sortBy: "price", sortOrder: "desc" }))
+  fireEvent.click(within(filters).getByRole("button", { name: "Xóa tất cả" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ brand: undefined, category: undefined, minPrice: undefined, maxPrice: undefined, search: "cable", sortOrder: "desc" }))
+  expect(within(filters).queryByLabelText("Các bộ lọc đã chọn")).toBeNull()
+})
+
+it("applies multiple brands and categories and removes only the selected chip", () => {
+  render(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
+  fireEvent.click(screen.getByRole("button", { name: "Lọc" }))
+  const dialog = screen.getByRole("dialog")
+  for (const name of ["Baseus", "Apple", "Tai nghe", "Cáp sạc", "Dưới 2 triệu", "Từ 2 - 4 triệu"]) {
+    fireEvent.click(within(dialog).getByRole("button", { name }))
+  }
+  expect(state.count).toHaveBeenLastCalledWith(expect.objectContaining({
+    brand: ["c".repeat(24), "e".repeat(24)].join(","),
+    category: ["d".repeat(24), "f".repeat(24)].join(","), minPrice: 2000000, maxPrice: 4000000,
+  }), true)
+  expect(within(dialog).getByRole("button", { name: "Dưới 2 triệu" }).getAttribute("aria-pressed")).toBe("false")
+  fireEvent.click(within(dialog).getByRole("button", { name: "Xem 7 kết quả" }))
+  const filters = screen.getByRole("region", { name: "Lọc và sắp xếp sản phẩm" })
+  expect(within(filters).getByRole("button", { name: "Bỏ Apple" })).toBeTruthy()
+  expect(within(filters).getByRole("button", { name: "Bỏ Cáp sạc" })).toBeTruthy()
+  fireEvent.click(within(filters).getByRole("button", { name: "Bỏ Baseus" }))
+  fireEvent.click(within(filters).getByRole("button", { name: "Bỏ Tai nghe" }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({
+    brand: "e".repeat(24), category: "f".repeat(24), minPrice: 2000000, maxPrice: 4000000,
+  }))
 })

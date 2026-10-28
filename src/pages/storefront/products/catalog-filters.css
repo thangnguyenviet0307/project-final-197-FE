@@ -1,0 +1,28 @@
+/* Scoped to storefront catalog and its portalled filter dialog. */
+.store-catalog,
+.store-filter-dialog {
+  color-scheme: light;
+  --popover: #fff;
+  --popover-foreground: #111827;
+  --foreground: #111827;
+  --ring: #4d9210;
+}
+
+.store-catalog button,
+.store-filter-dialog button {
+  cursor: pointer;
+}
+
+.store-catalog button:disabled,
+.store-filter-dialog button:disabled {
+  cursor: not-allowed;
+}
+
+.store-filter-dialog input {
+  background-color: #fff;
+  color: #111827;
+}
+
+.store-filter-dialog input::placeholder {
+  color: #9ca3af;
+}

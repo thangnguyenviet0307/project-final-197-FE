@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react"
-import { Filter, RotateCcw, X } from "lucide-react"
+import "./catalog-filters.css"
+import { Filter, RotateCcw, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
 import { ListPagination } from "@/components/list-pagination"
 import { usePublicBrands } from "@/features/brands/hooks/use-public-brands"
@@ -14,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ProductCard } from "@/features/storefront/components/product-card"
+import { useStoreFilterCount } from "@/features/storefront/hooks/use-store-filter-count"
+import type { ProductsQuery } from "@/features/products/types/products"
 import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
 import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
 import { getApiError } from "@/services/api"
@@ -34,6 +37,20 @@ const PRICE_RANGES = [
   { label: "Trên 20 triệu", min: "20000000", max: "" },
 ] as const
 
+function selectionIds(value: string): string[] {
+  return [...new Set(value.split(",").filter(Boolean))]
+}
+
+function toggleSelection(value: string, id: string): string {
+  const ids = selectionIds(value)
+  return (ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id]).join(",")
+}
+
+function resolveCategories(value: string, categories: PublicCategory[]): string | undefined {
+  const ids = selectionIds(value).map(id => /^[a-f\d]{24}$/i.test(id) ? id : categories.find(item => item.slug === id || item.name === id)?._id)
+  return ids.length && ids.every(Boolean) ? [...new Set(ids)].join(",") : undefined
+}
+
 function filterDraftFromParams(params: URLSearchParams): FilterDraft {
   return {
     brand: params.get("brand") ?? "",
@@ -43,12 +60,12 @@ function filterDraftFromParams(params: URLSearchParams): FilterDraft {
   }
 }
 
-function BrandLogo({ brand, compact = false }: { brand: PublicBrand; compact?: boolean }) {
+function BrandLogo({ brand }: { brand: PublicBrand }) {
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = Boolean(brand.logoUrl && !imageFailed)
 
   return (
-    <span className={`flex min-w-0 items-center justify-center gap-2 ${compact ? "h-12 px-3" : "h-[50px] px-4"}`}>
+    <span className={`flex min-w-0 items-center justify-center gap-2 h-[50px] px-4`}>
       {showImage ? (
         <img
           src={brand.logoUrl}
@@ -56,10 +73,10 @@ function BrandLogo({ brand, compact = false }: { brand: PublicBrand; compact?: b
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={() => setImageFailed(true)}
-          className={`${compact ? "max-h-7 max-w-24" : "max-h-8 max-w-28"} object-contain`}
+          className={`max-h-8 max-w-28 object-contain`}
         />
       ) : (
-        <span className={`${compact ? "text-sm" : "text-base"} font-semibold tracking-wide text-gray-800`}>
+        <span aria-hidden="true" className={`text-base font-semibold tracking-wide text-gray-800`}>
           {brand.name}
         </span>
       )}
@@ -82,15 +99,45 @@ function FilterChoice({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`min-w-0 rounded-xl border text-sm transition-colors ${
+      className={`shrink-0 min-w-0 rounded-xl border text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] ${
         selected
-          ? "border-[#55b000] bg-[#f2f8ec] text-[#377b0c] ring-1 ring-[#55b000]"
+          ? "border-[#4d9210] bg-[#e9f5e0] text-[#397a16] ring-1 ring-[#4d9210]"
           : "border-gray-200 bg-white text-gray-700 hover:border-[#9acb74]"
       }`}
     >
       {children}
     </button>
   )
+}
+
+type SelectedFilterKey = "brand" | "category" | "price"
+interface SelectedFilter { key: SelectedFilterKey; value?: string; label: string }
+
+function SelectedFilters({ items, onRemove, onClear }: {
+  items: SelectedFilter[]; onRemove: (key: SelectedFilterKey, value?: string) => void; onClear: () => void
+}) {
+  return <div className="flex min-w-0 flex-wrap items-center gap-2.5" aria-label="Các bộ lọc đã chọn">
+    <span className="text-sm font-semibold text-gray-800">Đã chọn:</span>
+    {items.length ? <>
+      {items.map(item => <button key={`${item.key}:${item.value ?? ""}`} type="button" aria-label={`Bỏ ${item.label}`} onClick={() => onRemove(item.key, item.value)}
+        className="inline-flex min-h-10 max-w-full items-center gap-2 rounded-xl bg-[#e9f5e0] px-3 py-2 text-sm font-medium text-[#397a16] transition hover:bg-[#dcedcc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]">
+        <span className="break-words">{item.label}</span><X size={15} aria-hidden="true" className="shrink-0" />
+      </button>)}
+      <button type="button" onClick={onClear} className="min-h-10 rounded-md px-2 text-sm font-semibold text-[#4d9210] hover:underline focus-visible:outline-2 focus-visible:outline-[#4d9210]">Xóa tất cả</button>
+    </> : <span className="text-sm text-gray-500">Chưa chọn bộ lọc</span>}
+  </div>
+}
+
+function selectedFilters(values: FilterDraft, brands: PublicBrand[], categories: PublicCategory[]): SelectedFilter[] {
+  const items: SelectedFilter[] = []
+  for (const id of selectionIds(values.brand)) items.push({ key: "brand", value: id, label: brands.find(item => item._id === id)?.name ?? "Thương hiệu đã chọn" })
+  if (values.minPrice || values.maxPrice) {
+    const preset = PRICE_RANGES.find(range => range.min === values.minPrice && range.max === values.maxPrice)
+    const money = (value: string) => Number(value).toLocaleString("vi-VN") + " ₫"
+    items.push({ key: "price", label: preset?.label ?? `${values.minPrice ? money(values.minPrice) : "0 ₫"} – ${values.maxPrice ? money(values.maxPrice) : "Không giới hạn"}` })
+  }
+  for (const id of selectionIds(values.category)) items.push({ key: "category", value: id, label: categories.find(item => item._id === id || item.slug === id || item.name === id)?.name ?? "Danh mục đã chọn" })
+  return items
 }
 
 function categoryLabel(category: PublicCategory): string {
@@ -108,7 +155,7 @@ export default function StorefrontProductsPage() {
   const requested = Number(params.get("page"))
   const page = Number.isSafeInteger(requested) && requested > 0 ? requested : 1
   const search = params.get("search") ?? ""
-  const sort = params.get("sort") ?? "newest"
+  const sort = params.get("sort") ?? "featured"
   const brand = params.get("brand") ?? ""
   const category = params.get("category") ?? ""
   const minPriceParam = params.get("minPrice") ?? ""
@@ -120,9 +167,8 @@ export default function StorefrontProductsPage() {
   const draft = draftState?.key === filterKey ? draftState.value : filterDraftFromParams(params)
   const categories = usePublicCategories(true)
   const brands = usePublicBrands(true)
-  const categoryId = /^[a-f\d]{24}$/i.test(category)
-    ? category
-    : categories.data?.find((item) => item.name === category || item.slug === category)?._id
+  const filterBrands = brands.data ?? []
+  const categoryId = resolveCategories(category, categories.data ?? [])
   const query = useStoreProducts({
     page,
     limit: 12,
@@ -131,7 +177,7 @@ export default function StorefrontProductsPage() {
     category: categoryId,
     minPrice: parsePrice(minPriceParam),
     maxPrice: parsePrice(maxPriceParam),
-    sortBy: sort.startsWith("price") ? "price" : sort === "name" ? "product_name" : "createdAt",
+    sortBy: sort.startsWith("price") ? "price" : sort === "name" ? "product_name" : sort === "featured" ? "is_hot" : sort === "bestsellers" ? "is_best_seller" : sort === "discount" ? "discount" : "createdAt",
     sortOrder: sort === "price-asc" || sort === "name" ? "asc" : "desc",
   })
 
@@ -147,16 +193,6 @@ export default function StorefrontProductsPage() {
 
   function updateDraft(patch: Partial<FilterDraft>) {
     setDraftState({ key: filterKey, value: { ...draft, ...patch } })
-  }
-
-  function chooseQuickBrand(brandId: string) {
-    setParams((previous) => {
-      const next = new URLSearchParams(previous)
-      if (brand === brandId) next.delete("brand")
-      else next.set("brand", brandId)
-      next.delete("page")
-      return next
-    })
   }
 
   function applyFilters(event: FormEvent<HTMLFormElement>) {
@@ -176,7 +212,7 @@ export default function StorefrontProductsPage() {
       const next = new URLSearchParams(previous)
       for (const key of ["brand", "category", "minPrice", "maxPrice"]) next.delete(key)
       if (draft.brand) next.set("brand", draft.brand)
-      if (draft.category) next.set("category", draft.category)
+      if (draftCategoryId) next.set("category", draftCategoryId)
       if (draft.minPrice.trim()) next.set("minPrice", String(minPrice))
       if (draft.maxPrice.trim()) next.set("maxPrice", String(maxPrice))
       next.delete("page")
@@ -187,31 +223,52 @@ export default function StorefrontProductsPage() {
   }
 
   function clearFilters() {
-    setDraftState(null)
+    setDraftState({ key: filterKey, value: { brand: "", category: "", minPrice: "", maxPrice: "" } })
     setFilterError("")
-    setParams((previous) => {
+  }
+
+  const draftCategoryId = resolveCategories(draft.category, categories.data ?? [])
+  const draftMin = parsePrice(draft.minPrice)
+  const draftMax = parsePrice(draft.maxPrice)
+  const validDraft = (!draft.minPrice || draftMin !== undefined) && (!draft.maxPrice || draftMax !== undefined)
+    && (draftMin === undefined || draftMax === undefined || draftMin <= draftMax)
+    && (!draft.category || !!draftCategoryId)
+  const previewParams: Partial<ProductsQuery> = { search: search || undefined, brand: draft.brand || undefined,
+    category: draftCategoryId, minPrice: draftMin, maxPrice: draftMax }
+  const preview = useStoreFilterCount(previewParams, filtersOpen && validDraft)
+  const previewReady = validDraft && preview.data !== undefined && !preview.isFetching && !preview.isError
+  const appliedSelections = selectedFilters(filterDraftFromParams(params), filterBrands, categories.data ?? [])
+  const draftSelections = selectedFilters(draft, filterBrands, categories.data ?? [])
+  function removeDraftFilter(key: SelectedFilterKey, value?: string) {
+    updateDraft(key === "price" ? { minPrice: "", maxPrice: "" } : { [key]: selectionIds(draft[key]).filter(id => id !== value).join(",") })
+    setFilterError("")
+  }
+  function removeAppliedFilter(key?: SelectedFilterKey, value?: string) {
+    setParams(previous => {
       const next = new URLSearchParams(previous)
-      for (const key of ["brand", "category", "minPrice", "maxPrice", "page"]) next.delete(key)
+      const fields = key === undefined ? ["brand", "category", "minPrice", "maxPrice"] : key === "price" ? ["minPrice", "maxPrice"] : [key]
+      if ((key === "brand" || key === "category") && value) {
+        const remaining = selectionIds(previous.get(key) ?? "").filter(id => id !== value).join(",")
+        if (remaining) next.set(key, remaining)
+        else next.delete(key)
+      } else fields.forEach(field => next.delete(field))
+      next.delete("page")
       return next
     })
   }
-
-  const activeFilterCount = Number(Boolean(brand))
-    + Number(Boolean(category))
-    + Number(Boolean(minPriceParam || maxPriceParam))
   const selectedCategoryInvalid = Boolean(category && !categoryId && categories.data)
 
   return (
-    <div className="min-h-[60vh] bg-[#fbfcfa] text-gray-950">
+    <div className="store-catalog min-h-[60vh] bg-white text-gray-950">
       <div className="store-container space-y-6 py-8">
-        <nav className="text-sm"><Link to="/">Trang chủ</Link> / Khám phá sản phẩm</nav>
+        <nav aria-label="Breadcrumb" className="text-sm text-gray-500"><Link className="transition-colors hover:text-[#4d9210]" to="/">Trang chủ</Link> / Khám phá sản phẩm</nav>
         <div>
-          <h1 className="text-3xl font-bold">Khám phá sản phẩm</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-950 sm:text-3xl">Khám phá sản phẩm</h1>
           <p className="mt-2 text-sm text-gray-500">Chọn phụ kiện phù hợp từ danh sách sản phẩm của cửa hàng.</p>
         </div>
 
-        <section aria-label="Lọc và sắp xếp sản phẩm" className="space-y-4 rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
-          <div className="flex min-w-0 items-center gap-3">
+        <section aria-label="Lọc và sắp xếp sản phẩm" className="py-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <Dialog
               open={filtersOpen}
               onOpenChange={(open) => {
@@ -233,23 +290,18 @@ export default function StorefrontProductsPage() {
                 }}
                 aria-expanded={filtersOpen}
                 className={`inline-flex h-11 shrink-0 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition ${
-                  filtersOpen || activeFilterCount
+                  filtersOpen
                     ? "border-[#55b000] bg-[#f2f8ec] text-[#3e8011]"
                     : "border-gray-200 bg-white text-gray-800 hover:border-[#55b000]"
                 }`}
               >
                 {filtersOpen ? <X size={17} /> : <Filter size={17} />}
                 Lọc
-                {activeFilterCount > 0 && (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-[#55b000] text-xs text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
               </button>
 
-              <DialogContent className="max-h-[88vh] max-w-[min(1120px,calc(100%-24px))] gap-0 overflow-hidden rounded-xl p-0 sm:max-w-[min(1120px,calc(100%-48px))]">
-                <DialogHeader className="relative flex min-h-[72px] items-center justify-center border-b border-gray-100 px-5 py-4 sm:px-8">
-                  <DialogTitle className="text-lg font-bold text-gray-900">Tất cả bộ lọc</DialogTitle>
+              <DialogContent showCloseButton={false} className="store-filter-dialog flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl">
+                <DialogHeader className="relative flex min-h-20 shrink-0 flex-row items-center justify-between border-b border-gray-100 bg-[#f4f5f2] px-5 py-5 sm:px-8">
+                  <DialogTitle className="pr-24 text-xl font-bold tracking-tight text-gray-950">Tất cả bộ lọc</DialogTitle>
                   <DialogClose
                     aria-label="Đóng bộ lọc"
                     className="absolute right-4 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-600 hover:bg-gray-50"
@@ -258,23 +310,24 @@ export default function StorefrontProductsPage() {
                   </DialogClose>
                 </DialogHeader>
 
-                <form onSubmit={applyFilters} className="flex max-h-[calc(88vh-72px)] flex-col">
-                  <div className="space-y-7 overflow-y-auto px-5 py-6 sm:px-8">
+                <form onSubmit={applyFilters} className="flex min-h-0 flex-1 flex-col">
+                  <div className="min-h-0 space-y-6 overflow-y-auto overscroll-contain px-5 py-6 sm:px-8">
+                    <SelectedFilters items={draftSelections} onRemove={removeDraftFilter} onClear={clearFilters} />
                     <section aria-labelledby="filter-brands-heading">
-                      <h3 id="filter-brands-heading" className="mb-3 text-base font-bold text-gray-800">Thương hiệu</h3>
+                      <h3 id="filter-brands-heading" className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700">Thương hiệu</h3>
                       {brands.isPending ? (
                         <p role="status" className="py-4 text-sm text-gray-500">Đang tải thương hiệu…</p>
                       ) : brands.isError ? (
                         <div role="alert" className="py-3 text-sm text-red-700">
                           Không thể tải thương hiệu. <button type="button" onClick={() => void brands.refetch()} className="font-semibold underline">Thử lại</button>
                         </div>
-                      ) : brands.data?.length ? (
+                      ) : filterBrands.length ? (
                         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                          {brands.data.map((item) => (
+                          {filterBrands.map((item) => (
                             <FilterChoice
                               key={item._id}
-                              selected={draft.brand === item._id}
-                              onClick={() => updateDraft({ brand: draft.brand === item._id ? "" : item._id })}
+                              selected={selectionIds(draft.brand).includes(item._id)}
+                              onClick={() => updateDraft({ brand: toggleSelection(draft.brand, item._id) })}
                             >
                               <BrandLogo brand={item} />
                             </FilterChoice>
@@ -286,7 +339,7 @@ export default function StorefrontProductsPage() {
                     </section>
 
                     <section aria-labelledby="filter-price-heading">
-                      <h3 id="filter-price-heading" className="mb-3 text-base font-bold text-gray-800">Khoảng giá</h3>
+                      <h3 id="filter-price-heading" className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700">Khoảng giá</h3>
                       <div className="flex flex-wrap gap-2.5">
                         {PRICE_RANGES.map((range) => {
                           const selected = draft.minPrice === range.min && draft.maxPrice === range.max
@@ -301,43 +354,10 @@ export default function StorefrontProductsPage() {
                           )
                         })}
                       </div>
-                      <div className="mt-4">
-                        <p className="mb-2 text-sm font-medium text-[#3988e9]">Hoặc nhập khoảng giá phù hợp</p>
-                        <div className="grid max-w-xl grid-cols-2 gap-3">
-                          <label className="grid gap-1 text-xs text-gray-500">
-                            Giá từ (₫)
-                            <input
-                              id="store-min-price"
-                              type="number"
-                              min="0"
-                              step="1000"
-                              inputMode="numeric"
-                              value={draft.minPrice}
-                              onChange={(event) => updateDraft({ minPrice: event.target.value })}
-                              placeholder="Thấp nhất"
-                              className="h-11 min-w-0 rounded-lg border border-gray-200 px-3 text-sm text-gray-800"
-                            />
-                          </label>
-                          <label className="grid gap-1 text-xs text-gray-500">
-                            Giá đến (₫)
-                            <input
-                              id="store-max-price"
-                              type="number"
-                              min="0"
-                              step="1000"
-                              inputMode="numeric"
-                              value={draft.maxPrice}
-                              onChange={(event) => updateDraft({ maxPrice: event.target.value })}
-                              placeholder="Cao nhất"
-                              className="h-11 min-w-0 rounded-lg border border-gray-200 px-3 text-sm text-gray-800"
-                            />
-                          </label>
-                        </div>
-                      </div>
                     </section>
 
                     <section aria-labelledby="filter-categories-heading">
-                      <h3 id="filter-categories-heading" className="mb-3 text-base font-bold text-gray-800">Danh mục sản phẩm</h3>
+                      <h3 id="filter-categories-heading" className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700">Danh mục sản phẩm</h3>
                       {categories.isPending ? (
                         <p role="status" className="py-3 text-sm text-gray-500">Đang tải danh mục…</p>
                       ) : categories.isError ? (
@@ -352,8 +372,8 @@ export default function StorefrontProductsPage() {
                           {categories.data?.map((item) => (
                             <FilterChoice
                               key={item._id}
-                              selected={draft.category === item._id}
-                              onClick={() => updateDraft({ category: draft.category === item._id ? "" : item._id })}
+                              selected={selectionIds(draft.category).includes(item._id)}
+                              onClick={() => updateDraft({ category: toggleSelection(draft.category, item._id) })}
                             >
                               <span className="inline-flex min-h-11 items-center px-4">{categoryLabel(item)}</span>
                             </FilterChoice>
@@ -361,79 +381,43 @@ export default function StorefrontProductsPage() {
                         </div>
                       )}
                     </section>
+                    {preview.isError && <p role="alert" className="text-sm text-red-700">Không thể đếm kết quả. <button type="button" onClick={() => void preview.refetch()} className="underline">Thử lại</button></p>}
+                    {!validDraft && <p role="alert" className="text-sm text-red-700">Bộ lọc chưa hợp lệ. Hãy chọn lại khoảng giá/danh mục hoặc bấm Bỏ chọn.</p>}
                     {filterError && <p role="alert" className="text-sm text-red-700">{filterError}</p>}
                   </div>
 
-                  <div className="flex flex-col-reverse gap-3 border-t border-gray-100 bg-white px-5 py-4 sm:flex-row sm:justify-between sm:px-8">
+                  <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-gray-100 bg-[#f4f5f2] px-5 py-4 sm:flex-row sm:justify-between sm:px-8">
                     <button type="button" onClick={clearFilters} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-                      <RotateCcw size={15} /> Xóa bộ lọc
+                      <RotateCcw size={15} /> Bỏ chọn
                     </button>
-                    <button type="submit" className="h-11 rounded-lg bg-[#55b000] px-7 text-sm font-semibold text-white transition hover:bg-[#469500]">
-                      Xem {query.data?.pagination.total ?? ""} sản phẩm
+                    <button type="submit" disabled={!previewReady} className="disabled:cursor-not-allowed disabled:opacity-60 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]">
+                      {previewReady ? `Xem ${preview.data} kết quả` : "Đang tải kết quả…"}
                     </button>
                   </div>
                 </form>
               </DialogContent>
             </Dialog>
+            {appliedSelections.length > 0 && <SelectedFilters items={appliedSelections} onRemove={removeAppliedFilter} onClear={() => removeAppliedFilter()} />}
 
-            {brands.data?.length ? (
-              <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1" aria-label="Lọc nhanh theo thương hiệu">
-                {brands.data.map((item) => (
-                  <FilterChoice
-                    key={item._id}
-                    selected={brand === item._id}
-                    onClick={() => chooseQuickBrand(item._id)}
-                  >
-                    <BrandLogo brand={item} compact />
-                  </FilterChoice>
-                ))}
-              </div>
-            ) : brands.isError ? (
-              <p role="alert" className="text-sm text-red-700">Không thể tải thương hiệu.</p>
-            ) : null}
           </div>
-
-          {activeFilterCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-              <span className="text-sm text-gray-500">Đang lọc:</span>
-              {brand && brands.data?.find((item) => item._id === brand) && (
-                <span className="rounded-full bg-[#f2f8ec] px-3 py-1 text-xs font-medium text-[#3e8011]">
-                  {brands.data.find((item) => item._id === brand)?.name}
-                </span>
-              )}
-              {category && categories.data?.find((item) => item._id === categoryId) && (
-                <span className="rounded-full bg-[#f2f8ec] px-3 py-1 text-xs font-medium text-[#3e8011]">
-                  {categories.data.find((item) => item._id === categoryId)?.name}
-                </span>
-              )}
-              {(minPriceParam || maxPriceParam) && (
-                <span className="rounded-full bg-[#f2f8ec] px-3 py-1 text-xs font-medium text-[#3e8011]">
-                  {minPriceParam ? `${Number(minPriceParam).toLocaleString("vi-VN")} ₫` : "0 ₫"}
-                  {" – "}
-                  {maxPriceParam ? `${Number(maxPriceParam).toLocaleString("vi-VN")} ₫` : "Không giới hạn"}
-                </span>
-              )}
-              <button type="button" onClick={clearFilters} className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-[#438e00]">
-                <RotateCcw size={15} /> Xóa bộ lọc
-              </button>
-            </div>
-          )}
         </section>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {query.isSuccess ? (
-            <p className="text-sm text-gray-500">{query.data.pagination.total} sản phẩm</p>
-          ) : <span aria-hidden="true" />}
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            Sắp xếp theo:
-            <select value={sort} onChange={(event) => updateSort(event.target.value)} className="h-10 rounded-lg border border-gray-200 bg-white px-3 font-medium text-gray-800">
-              <option value="newest">Mới nhất</option>
-              <option value="name">Tên A–Z</option>
-              <option value="price-asc">Giá tăng dần</option>
-              <option value="price-desc">Giá giảm dần</option>
-            </select>
-          </label>
-        </div>
+        <nav aria-label="Sắp xếp sản phẩm" className="flex flex-wrap items-center gap-x-4 gap-y-3 py-2 text-sm sm:text-base">
+          <span className="text-gray-600">Sắp xếp theo:</span>
+          {([
+            ["featured", "Nổi bật"], ["newest", "Mới"], ["bestsellers", "Bán chạy"], ["discount", "% giảm giá"], ["price", "Giá"],
+          ] as const).map(([value, label], index) => {
+            const selected = value === "price" ? sort.startsWith("price") : sort === value
+            return <span key={value} className="inline-flex items-center gap-4">
+              {index > 0 && <span aria-hidden="true" className="size-1.5 rounded-full bg-gray-200" />}
+              <button type="button" aria-pressed={selected} aria-label={value === "price" ? `Giá ${sort === "price-asc" ? "tăng dần" : sort === "price-desc" ? "giảm dần" : "tăng hoặc giảm"}` : label}
+                onClick={() => updateSort(value === "price" ? sort === "price-asc" ? "price-desc" : "price-asc" : value)}
+                className={`inline-flex min-h-11 items-center gap-1 rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] ${selected ? "font-semibold text-[#4d9210]" : "text-gray-500 hover:text-[#4d9210]"}`}>
+                {label}{value === "price" && (sort === "price-asc" ? <ArrowUp size={14} /> : sort === "price-desc" ? <ArrowDown size={14} /> : <ArrowUpDown size={14} />)}
+              </button>
+            </span>
+          })}
+        </nav>
 
         {query.isPending ? (
           <p role="status" className="py-12 text-center text-gray-500">Đang tải sản phẩm…</p>

@@ -77,7 +77,7 @@ export interface ProductsQuery {
 
   page: number; limit: number; sku?: string; color?: string; size?: string
   search?: string; category?: string; brand?: string; minPrice?: number; maxPrice?: number
-  sortBy?: "product_name" | "price" | "createdAt"; sortOrder?: "asc" | "desc"
+  sortBy?: "product_name" | "price" | "createdAt" | "is_hot" | "is_best_seller" | "discount"; sortOrder?: "asc" | "desc"
   stockStatus?: "in_stock" | "low_stock" | "out_of_stock"
 }
 export interface ProductStatistics { total: number; active: number; outOfStock: number; stockUnits: number }
