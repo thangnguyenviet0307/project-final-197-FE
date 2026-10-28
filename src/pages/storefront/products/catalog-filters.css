@@ -26,3 +26,38 @@
 .store-filter-dialog input::placeholder {
   color: #9ca3af;
 }
+
+/* Avoid repainting the storefront through a blur while the panel opens. */
+.store-filter-overlay {
+  backdrop-filter: none;
+  background: rgb(0 0 0 / 28%);
+  animation: none;
+  transition: opacity 180ms ease-out;
+}
+
+.store-filter-dialog {
+  animation: none;
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+}
+
+.store-filter-overlay[data-starting-style],
+.store-filter-overlay[data-ending-style] {
+  opacity: 0;
+}
+
+.store-filter-dialog[data-starting-style],
+.store-filter-dialog[data-ending-style] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.store-filter-dialog form > div:first-child {
+  scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-filter-overlay,
+  .store-filter-dialog {
+    transition: none;
+  }
+}

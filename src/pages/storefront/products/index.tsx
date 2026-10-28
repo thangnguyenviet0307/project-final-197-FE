@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { memo, useState, type FormEvent } from "react"
 import "./catalog-filters.css"
 import { Filter, RotateCcw, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
@@ -16,10 +16,24 @@ import {
 } from "@/components/ui/dialog"
 import { ProductCard } from "@/features/storefront/components/product-card"
 import { useStoreFilterCount } from "@/features/storefront/hooks/use-store-filter-count"
+import type { Product } from "@/features/products/types/products"
 import type { ProductsQuery } from "@/features/products/types/products"
 import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
 import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
 import { getApiError } from "@/services/api"
+
+const CatalogProductGrid = memo(function CatalogProductGrid({ products }: { products: Product[] }) {
+  return <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+    {products.map(product => <ProductCard key={product._id} product={mapCatalogProduct(product)} />)}
+  </div>
+})
+
+function FilterOptionsLoading({ label }: { label: string }) {
+  return <div role="status" className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+    <span className="sr-only">{label}</span>
+    {Array.from({ length: 12 }, (_, index) => <div key={index} aria-hidden="true" className="h-[52px] rounded-xl bg-gray-100 motion-safe:animate-pulse" />)}
+  </div>
+}
 
 interface FilterDraft {
   brand: string
@@ -299,7 +313,7 @@ export default function StorefrontProductsPage() {
                 Lọc
               </button>
 
-              <DialogContent showCloseButton={false} className="store-filter-dialog flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl">
+              <DialogContent overlayClassName="store-filter-overlay" showCloseButton={false} className="store-filter-dialog flex h-[min(760px,90dvh)] max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl">
                 <DialogHeader className="relative flex min-h-20 shrink-0 flex-row items-center justify-between border-b border-gray-100 bg-[#f4f5f2] px-5 py-5 sm:px-8">
                   <DialogTitle className="pr-24 text-xl font-bold tracking-tight text-gray-950">Tất cả bộ lọc</DialogTitle>
                   <DialogClose
@@ -316,7 +330,7 @@ export default function StorefrontProductsPage() {
                     <section aria-labelledby="filter-brands-heading">
                       <h3 id="filter-brands-heading" className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700">Thương hiệu</h3>
                       {brands.isPending ? (
-                        <p role="status" className="py-4 text-sm text-gray-500">Đang tải thương hiệu…</p>
+                        <FilterOptionsLoading label="Đang tải thương hiệu…" />
                       ) : brands.isError ? (
                         <div role="alert" className="py-3 text-sm text-red-700">
                           Không thể tải thương hiệu. <button type="button" onClick={() => void brands.refetch()} className="font-semibold underline">Thử lại</button>
@@ -359,7 +373,7 @@ export default function StorefrontProductsPage() {
                     <section aria-labelledby="filter-categories-heading">
                       <h3 id="filter-categories-heading" className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700">Danh mục sản phẩm</h3>
                       {categories.isPending ? (
-                        <p role="status" className="py-3 text-sm text-gray-500">Đang tải danh mục…</p>
+                        <FilterOptionsLoading label="Đang tải danh mục…" />
                       ) : categories.isError ? (
                         <div role="alert" className="py-3 text-sm text-red-700">
                           Không thể tải danh mục. <button type="button" onClick={() => void categories.refetch()} className="font-semibold underline">Thử lại</button>
@@ -390,7 +404,7 @@ export default function StorefrontProductsPage() {
                     <button type="button" onClick={clearFilters} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
                       <RotateCcw size={15} /> Bỏ chọn
                     </button>
-                    <button type="submit" disabled={!previewReady} className="disabled:cursor-not-allowed disabled:opacity-60 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]">
+                    <button type="submit" disabled={!previewReady} aria-busy={!previewReady && !preview.isError} className="min-w-56 disabled:cursor-not-allowed disabled:opacity-60 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]">
                       {previewReady ? `Xem ${preview.data} kết quả` : "Đang tải kết quả…"}
                     </button>
                   </div>
@@ -431,9 +445,7 @@ export default function StorefrontProductsPage() {
             {selectedCategoryInvalid ? (
               <p role="alert">Danh mục không khả dụng. Vui lòng chọn danh mục khác.</p>
             ) : query.data.data.length ? (
-              <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
-                {query.data.data.map((product) => <ProductCard key={product._id} product={mapCatalogProduct(product)} />)}
-              </div>
+              <CatalogProductGrid products={query.data.data} />
             ) : (
               <p className="py-12 text-center text-gray-500">Không tìm thấy sản phẩm phù hợp với bộ lọc.</p>
             )}
