@@ -1,11 +1,11 @@
-import { fireEvent, render, screen, within } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { expect, it, vi } from "vitest"
 import type { Product } from "@/features/products/types/products"
 import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
-vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [], isPending: false }) }))
+vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [{ _id: "d".repeat(24), name: "Tai nghe", slug: "tai-nghe" }], isPending: false }) }))
 
 const state = vi.hoisted(() => ({
   product: { _id: "a".repeat(24), slug: "ceramic-chicken", product_name: "Ceramic Chicken", is_active: true, category: null, brand: null, price: 100000, discount: 10, stock: 4, description: "<p>Mô tả thật</p><script>alert(1)</script>", variants: [{ _id: "b".repeat(24), sku: "BLUE", variant_name: "Màu xanh", price: 200000, stock: 2 }] } as Product,
@@ -128,4 +128,46 @@ it("does not invent an original price or discount badge for non-discounted produ
     expect(screen.queryByLabelText("Giá gốc")).toBeNull()
     expect(screen.queryByText("-0%")).toBeNull()
   } finally { state.product = original }
+})
+
+vi.mock("@/features/brands/hooks/use-public-brands", () => ({ usePublicBrands: () => ({ data: [{ _id: "c".repeat(24), name: "Baseus", slug: "baseus", logoUrl: "https://images.test/baseus.svg" }], isPending: false, isError: false, refetch: vi.fn() }) }))
+
+it("filters the complete catalog by brand, category and price without a local search field", () => {
+  state.list.mockClear()
+  render(<MemoryRouter><StorefrontProductsPage /></MemoryRouter>)
+  expect(screen.queryByPlaceholderText("Tên sản phẩm…")).toBeNull()
+  expect(screen.getByRole("combobox", { name: /Sắp xếp theo/ })).toBeTruthy()
+  const quickBrands = screen.getByLabelText("Lọc nhanh theo thương hiệu")
+  expect(within(quickBrands).getByRole("button", { name: "Baseus" }).querySelector("img")?.getAttribute("src")).toBe("https://images.test/baseus.svg")
+  fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }))
+  const dialog = screen.getByRole("dialog")
+  fireEvent.click(within(dialog).getByRole("button", { name: "Baseus" }))
+  fireEvent.click(within(dialog).getByRole("button", { name: "Tai nghe" }))
+  fireEvent.change(within(dialog).getByLabelText("Giá từ (₫)"), { target: { value: "100000" } })
+  fireEvent.change(within(dialog).getByLabelText("Giá đến (₫)"), { target: { value: "500000" } })
+  fireEvent.click(within(dialog).getByRole("button", { name: /^Xem/ }))
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({
+    page: 1,
+    brand: "c".repeat(24),
+    category: "d".repeat(24),
+    minPrice: 100000,
+    maxPrice: 500000,
+  }))
+})
+
+it("rejects an invalid price range and can clear applied filters", async () => {
+  state.list.mockClear()
+  render(<MemoryRouter initialEntries={["/shop?brand=cccccccccccccccccccccccc&minPrice=200000&maxPrice=50000"]}><StorefrontProductsPage /></MemoryRouter>)
+  fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }))
+  const dialog = screen.getByRole("dialog")
+  fireEvent.click(within(dialog).getByRole("button", { name: /^Xem/ }))
+  expect(within(dialog).getByRole("alert").textContent).toContain("Giá tối thiểu không thể lớn hơn giá tối đa.")
+  fireEvent.click(within(dialog).getByRole("button", { name: /Xóa bộ lọc/ }))
+  await waitFor(() => {
+    expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({
+      brand: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+    }))
+  })
 })

@@ -1,14 +1,20 @@
 import type { ApiEnvelope } from "@/types/api"
-import { api } from "@/services/api"
+import { api, authApi } from "@/services/api"
 import type { Brand } from "@/features/brands/types/brands"
 
 import type {
   IBrand,
+  PublicBrand,
   CreateBrandInput,
   UpdateBrandInput,
 } from "@/features/brands/types/brands"
 
 export type BrandApiResponse<T> = ApiEnvelope<T>
+
+export async function listPublicBrands(signal?: AbortSignal): Promise<PublicBrand[]> {
+  const response = await authApi.get<BrandApiResponse<PublicBrand[]>>("/brands/public", { signal })
+  return response.data.data
+}
 
 export const brandsService = {
   // GET - Lấy danh sách Brands
