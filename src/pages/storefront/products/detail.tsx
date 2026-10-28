@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { toast } from "sonner"
+import { useCartStore } from "@/stores/cart.store"
 import { Link, useLocation, useParams } from "react-router-dom"
 import { useStoreProduct } from "@/features/storefront/hooks/use-store-products"
 import { ProductDetailGallery } from "@/features/products/components/product-detail-gallery"
@@ -14,6 +16,7 @@ import "@/features/products/components/product-description.css"
 const attributeLabel = (name: string) => name.charAt(0).toLocaleUpperCase("vi") + name.slice(1)
 
 function ProductDetails({ product }: { product: Product }) {
+  const addItem = useCartStore(state => state.addItem)
   const [activeTab, setActiveTab] = useState<"description" | "details">("description")
   const [quantity, setQuantity] = useState(product.minimumOrderQuantity ?? 1)
   const [selected, setSelected] = useState(() => {
@@ -26,6 +29,11 @@ function ProductDetails({ product }: { product: Product }) {
   const stock = variant?.stock ?? product.stock ?? 0
   const minimum = product.minimumOrderQuantity ?? 1
   const displayQuantity = Math.min(Math.max(minimum, quantity), Math.max(minimum, stock))
+  const handleAddToCart = () => {
+    const error = addItem(product, selected, displayQuantity)
+    if (error) toast.error(error)
+    else toast.success("Đã thêm sản phẩm vào giỏ hàng.")
+  }
   return <div className="space-y-12 sm:space-y-16">
     <section aria-label="Tổng quan sản phẩm" className="overflow-hidden rounded-3xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
     <div className="grid gap-8 md:grid-cols-2">
@@ -43,7 +51,7 @@ function ProductDetails({ product }: { product: Product }) {
         <p className="flex items-center gap-2 text-sm font-medium text-[#4d9210]"><Check size={16} />{stock > 0 ? "Còn " + stock + " sản phẩm" : "Hết hàng"}</p>
         {variant && <dl className="grid gap-2 text-sm">{Object.entries(variant.attributes ?? {}).map(([name, value]) => <div key={name}><dt className="text-gray-500">{attributeLabel(name)}</dt><dd>{value === null ? "—" : String(value)}</dd></div>)}</dl>}
         <p className="text-sm text-gray-500">Số lượng đặt tối thiểu: {product.minimumOrderQuantity ?? 1}</p>
-        <div className="flex flex-wrap gap-3"><div className="flex h-12 items-center rounded-xl border border-gray-200 bg-white"><button type="button" aria-label="Giảm số lượng" disabled={displayQuantity <= minimum || stock < minimum} onClick={() => setQuantity(displayQuantity - 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Minus size={16} /></button><span className="min-w-9 text-center text-sm font-semibold" aria-live="polite">{displayQuantity}</span><button type="button" aria-label="Tăng số lượng" disabled={displayQuantity >= stock} onClick={() => setQuantity(displayQuantity + 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Plus size={16} /></button></div><button disabled className="inline-flex h-12 flex-1 cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-200 px-6 text-sm font-semibold text-gray-500"><ShoppingBag size={18} />Đặt hàng sắp mở</button></div>
+        <div className="flex flex-wrap gap-3"><div className="flex h-12 items-center rounded-xl border border-gray-200 bg-white"><button type="button" aria-label="Giảm số lượng" disabled={displayQuantity <= minimum || stock < minimum} onClick={() => setQuantity(displayQuantity - 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Minus size={16} /></button><span className="min-w-9 text-center text-sm font-semibold" aria-live="polite">{displayQuantity}</span><button type="button" aria-label="Tăng số lượng" disabled={displayQuantity >= stock} onClick={() => setQuantity(displayQuantity + 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Plus size={16} /></button></div><button type="button" disabled={stock < minimum || price === null || (!!product.variants?.length && !variant)} onClick={handleAddToCart} className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4d9210] px-6 text-sm font-semibold text-white hover:bg-[#3d750c] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"><ShoppingBag size={18} />Thêm vào giỏ hàng</button></div>
       </div>
     </div>
         <div id="product-services" className="mt-6 grid scroll-mt-24 gap-3 border-t border-gray-100 pt-6 sm:grid-cols-3">{[

@@ -88,6 +88,20 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Deliberately unfinished areas
 
+- Cart contents now persist under localStorage `storefront-cart-v1` and synchronize via storage events across tabs on the same origin/browser. Persist only validated public product snapshots, variant keys and quantities, never credentials or purchase selection. New tabs/reloads restore contents; selection stays local to the tab and resets on cart entry. Prices/stock remain snapshots until server checkout validation is implemented.
+
+- The cart bulk-delete action removes only selected lines after confirmation, preserving unselected lines. Disable it when no lines are selected.
+
+- Every cart page entry clears purchase selection, including returning after continuing shopping. Items, variants and quantities stay intact; select-all resets and summary starts at zero.
+
+- Each cart line has a purchase-selection checkbox, selected by default for new lines. Summary totals include only selected lines and show zero when none are selected. Quantity changes preserve selection. Variant changes preserve selection; merged lines are selected if either source was selected. Header badge still counts all cart items.
+
+- Cart quantity controls at the right of each item update quantity within minimum-order and loaded variant/product stock limits. The amount below the variant picker stays at the selected variant unit price when quantity changes; the cart summary and header subtotal multiply unit price by quantity and remain estimates.
+
+- Cart variant selection uses the product snapshot loaded when adding the item. Switching variants updates image, discounted unit price and subtotals while retaining quantity. Merge an existing target variant only when combined quantity fits loaded stock; rejected changes preserve the original cart. No new stock reservation or checkout API is called.
+
+- `/cart` displays items added from product detail using an in-memory Zustand store. Merge by product/variant, validate minimum quantity and loaded stock, and allow removal. Header count/subtotal follow cart state. Reload clears the cart. Prices are snapshots and totals are estimates; checkout, payment and server cart persistence remain unfinished.
+
 - Storefront category navigation reads GET /categories/public without authentication. Only active, non-deleted categories and public fields (_id, name, slug, icon, parent) are returned. Administrative endpoints remain protected. Store catalog filters accept category IDs; existing marketing links using category names/slugs resolve through this public category list.
 
 - Storefront `/shop` and `/shop/:slug` read live Backend products via GET `/products/public` (paginated search, category and sorting) and GET `/products/public/:slug`. Home featured products and product menu also use this API, without authentication or staff permissions. Only active products with active, non-deleted category/brand references are public. Public responses use an explicit field allowlist and omit import provenance, image storage IDs and version fields. Products Admin links active products to their `/shop/:slug` detail in a new tab with noopener noreferrer. Public product queries share the `products` cache prefix so admin mutations invalidate them; other tabs refresh through the existing business-change sync. Cart and checkout remain unfinished; never fabricate a successful purchase.

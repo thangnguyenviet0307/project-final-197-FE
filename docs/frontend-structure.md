@@ -1,5 +1,23 @@
 # Cấu trúc Frontend
 
+Giỏ hàng hiện lưu trong localStorage (`storefront-cart-v1`), khôi phục khi tải lại/mở tab mới và đồng bộ thêm/sửa/xóa giữa các tab cùng origin qua storage event. `features/cart/utils/cart-storage.ts` kiểm tra dữ liệu và chỉ lưu snapshot catalog công khai, biến thể, số lượng. Trạng thái tích chọn không lưu/đồng bộ; lỗi storage vẫn cho phép dùng giỏ trong bộ nhớ. Cơ chế này thay thế hành vi giỏ mất khi tải lại được mô tả trước đây.
+
+Nút Mua hàng trong giỏ dẫn đến `/checkout` khi có sản phẩm được chọn. `pages/storefront/checkout/index.tsx` hiện là trang trống trong StoreLayout, chưa tạo đơn hoặc xử lý thanh toán.
+
+Mỗi lần mở lại trang giỏ hàng, `clearSelection` bỏ chọn toàn bộ dòng; nút chọn tất cả trở về chưa chọn, tạm tính về 0 ₫. Danh sách sản phẩm, biến thể và số lượng được giữ nguyên.
+
+Mỗi dòng giỏ có checkbox chọn mua, dòng mới mặc định được chọn. Tóm tắt chỉ tính đơn giá × số lượng của các dòng được chọn; bỏ chọn tất cả hiển thị 0 ₫. Đổi số lượng/biến thể giữ lựa chọn; gộp biến thể chọn dòng đích nếu một trong hai dòng được chọn. Badge header vẫn đếm toàn bộ giỏ.
+
+Trong mỗi ô giỏ hàng, bộ số lượng nằm ở mép phải và nút xóa nằm ở góc dưới bên phải. `cart-remove-confirmation.tsx` mở dialog xác nhận; chỉ nút Xác nhận xóa mới loại sản phẩm khỏi giỏ, Hủy/đóng giữ nguyên sản phẩm. Trên màn hình nhỏ, nhóm thao tác xuống dưới nội dung và căn phải.
+
+Bộ tăng/giảm số lượng nằm ở mép phải mỗi ô sản phẩm (`features/cart/components/cart-quantity.tsx`), giới hạn theo số lượng đặt tối thiểu và tồn kho của biến thể đã tải. Giá dưới ô biến thể luôn hiển thị đơn giá của biến thể đã chọn, giữ nguyên khi tăng/giảm số lượng; tạm tính và header tính đơn giá × số lượng.
+
+Ô biến thể trong giỏ dùng `features/cart/components/cart-variant-picker.tsx`: nút mũi tên phải mở dialog giữa màn hình, hiển thị các biến thể thực tế dưới dạng lựa chọn và nút Xác nhận. Đóng dialog bỏ lựa chọn chưa xác nhận; chỉ Xác nhận mới cập nhật giỏ. Biến thể thiếu tồn kho (kể cả số lượng đã có ở dòng đích) không chọn được.
+
+Giỏ hàng có ô chọn biến thể giữa tên sản phẩm và đơn giá. Đổi biến thể cập nhật ảnh, giá đã giảm, tạm tính và header từ dữ liệu catalog lưu lúc thêm. Nếu biến thể đích đã có trong giỏ, gộp số lượng; nếu không đủ tồn kho, giữ lựa chọn cũ. Số lượng vẫn ẩn trong ô sản phẩm.
+
+Nút giỏ hàng trên header dẫn đến `/cart` trong `StoreLayout`. Trang chi tiết thêm sản phẩm/biến thể và số lượng vào `stores/cart.store.ts` (Zustand trong bộ nhớ, mất khi tải lại). Mỗi ô sản phẩm hiển thị ảnh, tên và đơn giá lúc thêm; ẩn tên biến thể và số lượng. Giỏ giữ tạm tính và cho xóa sản phẩm. Thêm trùng gộp số lượng theo sản phẩm/biến thể, kiểm tra số lượng tối thiểu và tồn kho đã tải. Header hiển thị tổng số lượng và tạm tính; chưa có checkout hoặc lưu giỏ trên Backend.
+
 Khi deploy Vite SPA lên Vercel, `vercel.json` ở gốc repository FE rewrite URL về `/index.html` để React Router xử lý truy cập trực tiếp và tải lại các route như `/auth/login`, `/auth/products`, `/shop/:slug` và `/account/profile`. Vercel tiếp tục ưu tiên file tĩnh có thật. Chọn Framework Preset Vite, Output Directory `dist`, Build Command `pnpm build`; để `VITE_BASENAME` trống khi ứng dụng chạy ở `/`. Sau khi deploy, kiểm tra mở trực tiếp và F5 các URL này; route được bảo vệ vẫn yêu cầu đăng nhập và route không tồn tại vẫn dùng trang 404 của ứng dụng.
 
 Khu vực `/account` dùng hồ sơ customer (họ, tên, ngày sinh, giới tính, một email đăng nhập chỉ đọc, điện thoại), địa chỉ giao hàng riêng và lịch sử đơn hàng qua `/customer-auth/me`, `/customer-auth/shipping-address`, `/customer-auth/orders`. Schema nằm trong `features/profile/schemas/customer-account-schema.ts`; API/query đơn hàng khách nằm trong `features/orders/`. Chưa triển khai checkout/tạo đơn mua hàng từ storefront. Trang 404 storefront giữ `StoreLayout`; `/auth/*` có giao diện 404 quản trị riêng.
