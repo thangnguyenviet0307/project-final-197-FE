@@ -27,10 +27,7 @@ export const routes: RouteObject[] = [
         path: "/",
         lazy: page(() => import("@/pages/storefront/home/index")),
       },
-      {
-        path: "/landing",
-        lazy: page(() => import("@/pages/public/landing/page")),
-      },
+
       {
         path: "/shop",
         lazy: page(() => import("@/pages/storefront/products/index")),
@@ -163,12 +160,7 @@ export const routes: RouteObject[] = [
       },
 
       // TEMPLATE PAGES
-      {
-        path: "/auth/faqs",
-        lazy: page(() =>
-          import("@/pages/template/faqs/page")
-        ),
-      },
+
       {
         path: "/auth/pricing",
         element: <Navigate to="/auth/dashboard" replace />,
@@ -235,24 +227,9 @@ export const routes: RouteObject[] = [
         path: "/auth/settings/billing",
         element: <Navigate to="/auth/settings/user" replace />,
       },
-      {
-        path: "/auth/settings/appearance",
-        lazy: page(() =>
-          import("@/pages/admin/settings/appearance/page")
-        ),
-      },
-      {
-        path: "/auth/settings/notifications",
-        lazy: page(() =>
-          import("@/pages/admin/settings/notifications/page")
-        ),
-      },
-      {
-        path: "/auth/settings/connections",
-        lazy: page(() =>
-          import("@/pages/admin/settings/connections/page")
-        ),
-      },
+
+
+
 
       // ======================================
       // ADMIN ONLY

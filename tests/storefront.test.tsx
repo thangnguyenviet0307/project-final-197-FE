@@ -229,3 +229,15 @@ it("applies multiple brands and categories and removes only the selected chip", 
     brand: "e".repeat(24), category: "f".repeat(24), minPrice: 2000000, maxPrice: 4000000,
   }))
 })
+
+it("shows temporary unavailability for a stopped product or an exhausted selected variant", () => {
+  state.product.on_sale = false
+  const view = render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+  expect(screen.getByRole("button", { name: "T\u1ea1m h\u1ebft h\u00e0ng" }).hasAttribute("disabled")).toBe(true)
+  state.product.on_sale = true
+  const previous = state.product.variants![0].stock
+  state.product.variants![0].stock = 0
+  view.rerender(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
+  expect(screen.getByRole("button", { name: "T\u1ea1m h\u1ebft h\u00e0ng" }).hasAttribute("disabled")).toBe(true)
+  state.product.variants![0].stock = previous
+});

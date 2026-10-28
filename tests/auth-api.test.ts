@@ -186,3 +186,31 @@ it("keeps cookie-session initialization retryable during a network outage", asyn
   expect(useAuthStore.getState()).toMatchObject({ hasSession: true, isLoading: false, isAuthenticated: false });
   expect(useAuthStore.getState().initializationError).toBeTruthy();
 });
+
+it.each([400, 403])("keeps a cookie session retryable on transport/configuration error %s", async status => {
+  useAuthStore.setState({ accessToken: null, refreshToken: null, hasSession: true, isAuthenticated: false })
+  const marker = localStorage.getItem("admin-auth")
+  authApi.defaults.adapter = async config => { throw unauthorized(config, status) }
+  await initializeSession()
+  expect(useAuthStore.getState()).toMatchObject({ hasSession: true, isAuthenticated: false, isLoading: false })
+  expect(useAuthStore.getState().initializationError).toBeTruthy()
+  expect(localStorage.getItem("admin-auth")).toBe(marker)
+})
+it("retries an explicit refresh rotation conflict once without logging the user out", async () => {
+  let count = 0
+  authApi.defaults.adapter = async config => {
+    if (++count === 1) throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, response(config, { code: "AUTH_REFRESH_CONFLICT" }, 409))
+    return response(config, { data: newTokens })
+  }
+  await expect(refreshAccessToken()).resolves.toBe("new-access")
+  expect(count).toBe(2)
+  expect(useAuthStore.getState().isAuthenticated).toBe(true)
+})
+it("stores only a redacted area-specific refresh diagnostic", async () => {
+  authApi.defaults.adapter = async config => { throw unauthorized(config) }
+  await expect(refreshAccessToken()).rejects.toBeDefined()
+  const saved = sessionStorage.getItem("admin-auth-diagnostic")!
+  expect(JSON.parse(saved)).toMatchObject({ area: "admin", status: 401, code: "AUTH_REFRESH_FAILED" })
+  expect(saved).not.toContain("old-refresh")
+  expect(saved).not.toContain(user.email)
+})

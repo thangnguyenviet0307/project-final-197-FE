@@ -169,3 +169,6 @@ The obsolete is_best flag is removed from product models, contracts, form fields
 The storefront product tabs are Trang chủ, Mới, Nổi bật in that order; default is Trang chủ. They independently query is_home, is_new, is_hot. There is no separate Hot/Hay xem tab. is_best_seller is used only for the dedicated Best Seller section. The Most View section and sortBy=count_view support are removed; the Product count_view model field, public visit-increment endpoint/hook, and admin read-only view count remain active and existing counts are preserved.
 
 Bộ lọc `/shop`: CSS chuyển động và khung loading nằm trong `pages/storefront/products/catalog-filters.css`; hook `use-store-filter-count` gộp thay đổi trong 180ms, chỉ đếm khi popup mở và khóa xác nhận trong lúc chờ. Lưới sản phẩm được memo hóa để thay đổi bản nháp không dựng lại các thẻ phía sau.
+
+
+Demo cleanup: pages/template, public/landing, fake appearance/notifications/connections/billing/account settings and old dashboard fixture widgets are removed. Real profile settings and shared UI remain. See removed-demo-files.md for the exact file list.

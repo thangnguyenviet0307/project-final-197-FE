@@ -3,7 +3,6 @@
 import {
   EllipsisVertical,
   LogOut,
-  BellDot,
   CircleUser,
   KeyRound,
 } from "lucide-react"
@@ -91,13 +90,6 @@ export function NavUser({
               >
                 <KeyRound />
                 Đổi mật khẩu
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                render={<Link to="/auth/settings/notifications" />}
-              >
-                <BellDot />
-                Thông báo
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

@@ -4,8 +4,9 @@ import { getAuthArea, useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import type { ApiResponse } from "@/types/api"
 import type { TokenPair } from "@/features/auth/types/auth"
+import { resolveApiBaseUrl } from "@/services/api-base-url"
 
-const baseURL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1").replace(/\/$/, "")
+const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1", typeof window === "undefined" ? undefined : window.location.origin)
 export const api = axios.create({ baseURL, timeout: 15_000, withCredentials: true })
 // Auth endpoints use an isolated client so login/refresh errors never recursively refresh.
 export const authApi = axios.create({ baseURL, timeout: 15_000, withCredentials: true })
@@ -30,7 +31,19 @@ export function refreshAccessToken(): Promise<string> {
     return Promise.reject(new Error("Your session has expired."))
   }
   const area = getAuthArea()
-  const request = () => authApi.post<ApiResponse<TokenPair>>(`${area === "storefront" ? "/customer-auth" : "/auth"}/refresh`, {}, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": area } })
+  const sendRefresh = () => authApi.post<ApiResponse<TokenPair>>(`${area === "storefront" ? "/customer-auth" : "/auth"}/refresh`, {}, { headers: { "X-Auth-Transport": "cookie", "X-Login-Area": area } })
+  const request = async () => {
+    try { return await sendRefresh() }
+    catch (error) {
+      // A competing refresh may rotate the cookie before our compare-and-swap.
+      // Retry only that explicit conflict, never invalid credentials or network errors.
+      if (axios.isAxiosError(error) && error.response?.status === 409 && error.response.data?.code === "AUTH_REFRESH_CONFLICT") {
+        if (useAuthStore.getState().sessionVersion !== sessionVersion) throw new Error("Session changed", { cause: error })
+        return sendRefresh()
+      }
+      throw error
+    }
+  }
   const promise = (typeof navigator !== "undefined" && navigator.locks ? navigator.locks.request(`${area}-auth-refresh`, request) : request())
     .then(({ data }) => {
       if (useAuthStore.getState().sessionVersion !== sessionVersion) throw new Error("Session changed")
@@ -39,8 +52,14 @@ export function refreshAccessToken(): Promise<string> {
       return data.data.accessToken
     }).catch((error: unknown) => {
       const status = axios.isAxiosError(error) ? error.response?.status : undefined
+      if (useAuthStore.getState().sessionVersion === sessionVersion) {
+        const rawCode: unknown = axios.isAxiosError(error) ? error.response?.data?.code : undefined
+        const diagnostic = { area, status: status ?? null, code: typeof rawCode === "string" && /^AUTH_[A-Z_]+$/.test(rawCode) ? rawCode : "AUTH_REFRESH_FAILED", time: new Date().toISOString() }
+        try { sessionStorage.setItem(`${area}-auth-diagnostic`, JSON.stringify(diagnostic)) } catch { /* Diagnostics must never break authentication. */ }
+        console.warn("Authentication refresh failed", diagnostic)
+      }
       if (useAuthStore.getState().sessionVersion === sessionVersion && (
-        status === 400 || status === 401 || status === 403 || (error instanceof Error && error.message === "Invalid token response")
+        status === 401 || (error instanceof Error && error.message === "Invalid token response")
       )) clearAuth()
       throw error
     }).finally(() => {

@@ -25,7 +25,7 @@ export function StoreSearch() {
         type="search"
         value={keyword}
         onChange={(event) => setKeyword(event.target.value)}
-        placeholder="Tìm kiếm sản phẩm, thương hiệu..."
+        placeholder="Tìm kiếm sản phẩm, thương hiệu, danh mục..."
         aria-label="Tìm kiếm sản phẩm"
         className="min-w-0 flex-1 px-5 py-3 text-sm text-gray-800 outline-none"
       />

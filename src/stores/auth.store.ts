@@ -4,6 +4,7 @@ import type { TokenPair, User } from "@/features/auth/types/auth"
 
 export type AuthArea = "admin" | "storefront"
 let authArea: AuthArea = "admin"
+let areaConfigured = false
 export const getAuthArea = () => authArea
 export const authStorageKey = (area = authArea) => area === "admin" ? "admin-auth" : "customer-auth"
 
@@ -45,6 +46,7 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
   })),
 }), {
   name: "admin-auth",
+  skipHydration: true,
   version: 2,
   migrate: () => ({ hasSession: false, sessionId: null }),
   partialize: ({ hasSession, sessionId }) => ({ hasSession, sessionId }),
@@ -53,7 +55,7 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
 // Called before session bootstrap. Crossing areas reloads the document, so access
 // tokens and query caches are never reused between the two applications.
 export function configureAuthArea(area: AuthArea) {
-  if (area === authArea) return
+  if (areaConfigured && area === authArea) return
   let hasSession = false
   let sessionId: string | null = null
   try {
@@ -65,6 +67,7 @@ export function configureAuthArea(area: AuthArea) {
   } catch {
     // A missing/malformed marker must never restore credentials or identity.
   }
+  areaConfigured = true
   authArea = area
   useAuthStore.persist.setOptions({ name: authStorageKey(area) })
   useAuthStore.setState(state => ({

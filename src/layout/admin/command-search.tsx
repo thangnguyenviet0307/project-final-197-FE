@@ -7,12 +7,8 @@ import {
   LayoutDashboard,
   Shield,
   AlertTriangle,
-  HelpCircle,
   Users,
   User,
-  Bell,
-  Link2,
-  Palette,
   type LucideIcon,
 } from "lucide-react"
 
@@ -141,27 +137,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
       group: "Cài đặt",
       icon: User,
     },
-    {
-      title: "Giao diện",
-      url: "/auth/settings/appearance",
-      group: "Cài đặt",
-      icon: Palette,
-    },
-    {
-      title: "Thông báo",
-      url: "/auth/settings/notifications",
-      group: "Cài đặt",
-      icon: Bell,
-    },
-    {
-      title: "Kết nối",
-      url: "/auth/settings/connections",
-      group: "Cài đặt",
-      icon: Link2,
-    },
 
     // Pages
-    { title: "Câu hỏi thường gặp", url: "/auth/faqs", group: "Các trang", icon: HelpCircle },
   ]
 
   const groupedItems = searchItems.filter((item) =>

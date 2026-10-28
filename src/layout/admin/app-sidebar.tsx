@@ -6,7 +6,6 @@ import {
   Shield,
   AlertTriangle,
   Settings,
-  HelpCircle,
   LayoutTemplate,
   Tags,
   Users,
@@ -163,24 +162,7 @@ const data = {
               title: "Hồ sơ người dùng",
               url: "/auth/settings/user",
             },
-            {
-              title: "Giao diện",
-              url: "/auth/settings/appearance",
-            },
-            {
-              title: "Thông báo",
-              url: "/auth/settings/notifications",
-            },
-            {
-              title: "Kết nối",
-              url: "/auth/settings/connections",
-            },
           ],
-        },
-        {
-          title: "Câu hỏi thường gặp",
-          url: "/auth/faqs",
-          icon: HelpCircle,
         },
       ],
     },

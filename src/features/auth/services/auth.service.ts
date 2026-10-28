@@ -121,7 +121,7 @@ export function initializeSession(): Promise<void> {
   }).catch((error: unknown) => {
     if (useAuthStore.getState().sessionVersion !== version) return
     const failure = getApiError(error)
-    if (failure.statusCode === 401 || failure.statusCode === 403) clearAuth()
+    if (failure.statusCode === 401) clearAuth()
     else useAuthStore.setState({ isLoading: false, initializationError: failure.message })
   }).finally(() => { initializing = null })
   return initializing
