@@ -20,7 +20,13 @@ export default function CartPage() {
   const total = selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
 
   return <div className="bg-[#fbfcfa] py-8 sm:py-12"><div className="store-container space-y-6">
-    <h1 className="text-3xl font-bold tracking-tight"><Link to="/" className="inline-flex items-center gap-2 hover:text-[#4d9210]"><ChevronLeft aria-hidden="true" className="size-7" />Giỏ hàng</Link></h1>
+    <nav aria-label="Breadcrumb" className="rounded-2xl border border-gray-100 bg-white p-4 sm:px-6">
+      <ol className="flex items-center gap-2 whitespace-nowrap text-sm leading-5">
+        <li className="flex items-center"><Link to="/" className="flex items-center gap-2 font-semibold text-gray-900 hover:text-[#4d9210]"><ChevronLeft aria-hidden="true" className="size-5 shrink-0" />Trang chủ</Link></li>
+        <li aria-hidden="true" className="flex items-center text-gray-400">/</li>
+        <li className="flex items-center"><h1 aria-current="page" className="font-normal text-gray-500">Giỏ hàng</h1></li>
+      </ol>
+    </nav>
     {items.length === 0 ? <div className="flex flex-col items-center gap-5 rounded-2xl border border-gray-100 bg-white px-5 py-16 text-center">
       <ShoppingCart className="size-12 text-[#4d9210]" />
       <p className="text-lg font-semibold">Giỏ hàng của bạn đang trống</p>

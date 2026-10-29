@@ -13,6 +13,8 @@ export interface OrderItem {
   discount: number
 }
 export interface Order {
+  recipientName?: string
+  recipientPhone?: string
   orderCode?: string
   _id: string
   customerId: string | OrderPerson | null

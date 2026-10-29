@@ -2,9 +2,12 @@ import { create } from "zustand"
 import type { CartItem } from "@/features/cart/types/cart"
 import type { Product } from "@/features/products/types/products"
 import { discountedPrice } from "@/features/products/utils/product-price"
+import { buildCartItem } from "@/features/cart/utils/cart-item"
 import { CART_STORAGE_KEY, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
 
 interface CartState {
+  refreshProducts: (products: Product[]) => void
+  consumePurchasedItems: (purchased: { productId: string; variantId?: string; quantity: number }[]) => void
   items: CartItem[]
   removeSelected: () => void
   selectAll: () => void
@@ -17,6 +20,16 @@ interface CartState {
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
+  refreshProducts: products => set(state => ({ items: state.items.map(item => {
+    const product = products.find(current => current._id === item.productId)
+    return product ? buildCartItem(product, item.variantKey, item.quantity, item.selected) ?? item : item
+  }) })),
+  consumePurchasedItems: purchased => set(state => ({ items: state.items.flatMap(item => {
+    const bought = purchased.find(line => line.productId === item.productId && (line.variantId ?? "") === item.variantKey)
+    if (!bought) return [item]
+    const quantity = item.quantity - bought.quantity
+    return quantity > 0 ? [{ ...item, quantity, selected: false }] : []
+  }) })),
   items: [],
   removeSelected: () => set(state => ({ items: state.items.filter(item => !item.selected) })),
   clearSelection: () => set(state => ({ items: state.items.map(item => ({ ...item, selected: false })) })),
@@ -51,15 +64,8 @@ export const useCartStore = create<CartState>((set, get) => ({
     const existing = items.find(item => item.productId === product._id && item.variantKey === key)
     const nextQuantity = (existing?.quantity ?? 0) + quantity
     if (nextQuantity > (variant ? variant.stock ?? 0 : product.stock ?? 0)) return "Số lượng trong giỏ vượt quá tồn kho hiện tại."
-    const item: CartItem = {
-      product,
-      productId: product._id, variantKey: key, slug: product.slug,
-      name: product.product_name,
-      variantLabel: variant ? [variant.variant_name || variant.sku, variant.color, variant.size].filter(Boolean).join(" · ") : "",
-      image: variant?.image ?? product.thumbnail ?? product.images?.[0]?.secure_url ?? null,
-      unitPrice, quantity: nextQuantity,
-      selected: existing?.selected ?? true,
-    }
+    const item = buildCartItem(product, key, nextQuantity, existing?.selected ?? true)
+    if (!item) return "Sản phẩm chưa có thông tin hợp lệ."
     set({ items: existing ? items.map(current => current === existing ? item : current) : [...items, item] })
     return null
   },
