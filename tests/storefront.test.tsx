@@ -1,10 +1,16 @@
 import { fireEvent, render, screen, within } from "@testing-library/react"
-import { MemoryRouter, Route, Routes } from "react-router-dom"
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 import { expect, it, vi } from "vitest"
 import type { Product } from "@/features/products/types/products"
 import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
+import { useCartStore } from "@/stores/cart.store"
+import CartPage from "@/pages/storefront/cart"
+
+function LinkToCart() {
+  return <Link to="/cart">Mở giỏ hàng</Link>
+}
 vi.mock("@/features/categories/hooks/use-public-categories", () => ({ usePublicCategories: () => ({ data: [{ _id: "d".repeat(24), name: "Tai nghe", slug: "tai-nghe" }, { _id: "f".repeat(24), name: "Cáp sạc", slug: "cap-sac" }], isPending: false }) }))
 
 const state = vi.hoisted(() => ({
@@ -38,6 +44,21 @@ it("renders Backend detail, updates selected variant price, and sanitizes descri
   expect(screen.getByLabelText("Giá bán hiện tại").textContent).toBe("180.000 ₫")
   expect(screen.getByText("Còn 2 sản phẩm")).toBeTruthy()
   expect(view.container.querySelector("script")).toBeNull()
+})
+it("adds the selected quantity from product detail and displays it on the cart page", () => {
+  useCartStore.setState({ items: [] })
+  render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}>
+    <LinkToCart />
+    <Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /><Route path="/cart" element={<CartPage />} /></Routes>
+  </MemoryRouter>)
+  fireEvent.click(screen.getByRole("button", { name: "Tăng số lượng" }))
+  fireEvent.click(screen.getByRole("button", { name: "Thêm vào giỏ hàng" }))
+  fireEvent.click(screen.getByRole("link", { name: "Mở giỏ hàng" }))
+  fireEvent.click(screen.getByRole("button", { name: "Chọn tất cả sản phẩm" }))
+  expect(screen.getByText("180.000 ₫")).toBeTruthy()
+  expect(screen.getAllByText("360.000 ₫")).toBeTruthy()
+  expect(useCartStore.getState().items[0].quantity).toBe(2)
+  useCartStore.setState({ items: [] })
 })
 it("shows loading and request failures without falling back to fixture products", () => {
   state.pending = true

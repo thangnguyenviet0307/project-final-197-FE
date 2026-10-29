@@ -20,5 +20,6 @@ Xem `docs/CUSTOMER_ACCOUNT_MIGRATION.md` cho lịch sử chuyển đổi dữ li
 session customer. Hồ sơ dùng `/customer-auth/me`, địa chỉ giao hàng dùng
 `/customer-auth/shipping-address`, lịch sử đơn hàng dùng `/customer-auth/orders`
 với quyền sở hữu lấy từ phiên đăng nhập. Email hồ sơ là email đăng nhập chỉ đọc;
-địa chỉ không thu thập lại số điện thoại hoặc CCCD/CMND. Chưa triển khai giỏ hàng/checkout. Xem
+địa chỉ không thu thập lại số điện thoại hoặc CCCD/CMND. Giỏ hàng `/cart` nhận sản phẩm từ
+trang chi tiết, lưu tạm trong bộ nhớ và mất khi tải lại trang; chưa triển khai checkout. Xem
 [hợp đồng storefront](../../../docs/storefront-contract.md) trước khi triển khai.
