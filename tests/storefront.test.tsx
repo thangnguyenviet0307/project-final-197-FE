@@ -7,6 +7,8 @@ import StorefrontProductsPage from "@/pages/storefront/products"
 import StorefrontProductDetailPage from "@/pages/storefront/products/detail"
 import { FeaturedParts } from "@/features/storefront/components/featured-parts"
 import { StorefrontNewsSection } from "@/features/storefront/components/storefront-news-section"
+import { BlogSection } from "@/pages/public/landing/components/blog-section"
+import StorefrontArticleDetailPage from "@/pages/storefront/articles/detail"
 vi.mock("@/features/categories/hooks/use-public-categories", () => ({
   usePublicCategories: () => ({ data: [{ _id: "d".repeat(24), name: "Tai nghe", slug: "tai-nghe" }], isPending: false, isError: false, refetch: vi.fn() }),
 }))
@@ -20,6 +22,28 @@ vi.mock("@/features/storefront/services/catalog.service", () => ({
 const state = vi.hoisted(() => ({
   product: { _id: "a".repeat(24), slug: "ceramic-chicken", product_name: "Ceramic Chicken", is_active: true, category: null, brand: null, price: 100000, discount: 10, stock: 4, description: "<p>Mô tả thật</p><script>alert(1)</script>", variants: [{ _id: "b".repeat(24), sku: "BLUE", variant_name: "Màu xanh", price: 200000, stock: 2 }] } as Product,
   pending: false, error: false, relatedCount: 1, refetch: vi.fn(), list: vi.fn(),
+  articles: [{ _id: "article-1", type: "news" as const, title: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối", slug: "chon-cap-sac", category: "Cẩm nang chọn mua", excerpt: "Kiểm tra thiết bị trước khi chọn cáp.", content: "Nội dung bài viết", imageUrl: null, tags: ["cáp sạc"], authorName: "Ban biên tập", publishedAt: "2026-10-28T10:00:00.000Z", isFeatured: false, viewCount: 0, seo: {} }],
+  articlesPending: false, articlesError: false, articlesRefetch: vi.fn(),
+  article: { _id: "article-1", type: "blog" as const, title: "Bài viết mẫu", slug: "bai-viet-mau", category: "Kinh nghiệm", excerpt: "Tóm tắt bài viết.", content: "Dòng nội dung an toàn.\n<script>alert(1)</script>", imageUrl: null, tags: ["blog"], authorName: "Ban biên tập", publishedAt: "2026-10-28T10:00:00.000Z", isFeatured: false, viewCount: 0, seo: {} },
+}))
+vi.mock("@/features/storefront/hooks/use-public-articles", () => ({
+  usePublicArticles: (type: "news" | "blog") => ({
+    data: {
+      data: type === "blog" ? [{ ...state.article, type }] : state.articles.map((article) => ({ ...article, type })),
+      pagination: { page: 1, limit: 3, total: type === "blog" ? 1 : state.articles.length, totalPages: 1 },
+    },
+    isPending: state.articlesPending,
+    isError: state.articlesError,
+    error: new Error("Backend unavailable"),
+    refetch: state.articlesRefetch,
+  }),
+  usePublicArticle: () => ({
+    data: state.article,
+    isPending: state.articlesPending,
+    isError: state.articlesError,
+    error: new Error("Backend unavailable"),
+    refetch: state.articlesRefetch,
+  }),
 }))
 vi.mock("@/features/storefront/hooks/use-store-products", () => ({
   useStoreProducts: (params: unknown) => { state.list(params); return { data: { data: [state.product], pagination: { total: 1, totalPages: 1 } }, isPending: state.pending, isError: state.error, refetch: state.refetch } },
@@ -119,12 +143,38 @@ it("keeps regular catalog products in the Sale Products collection without a dis
     state.product = original
   }
 })
-it("renders the news section beneath featured products with category guide cards", () => {
+it("renders Backend news cards and links to the article detail page", () => {
   render(<MemoryRouter><StorefrontNewsSection /></MemoryRouter>)
   expect(screen.getByRole("region", { name: "Tin tức và cẩm nang phụ kiện" })).toBeTruthy()
   expect(screen.getByRole("heading", { name: "Tin tức và mẹo sử dụng phụ kiện" })).toBeTruthy()
   expect(screen.getByRole("heading", { name: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối" })).toBeTruthy()
-  expect(screen.getAllByRole("link", { name: "Xem danh mục Tai nghe" })).toHaveLength(2)
+  expect(screen.getByRole("link", { name: "Đọc bài viết" }).getAttribute("href")).toBe("/bai-viet/chon-cap-sac")
+})
+it("shows news loading, empty and request error states with retry", () => {
+  state.articlesPending = true
+  const view = render(<MemoryRouter><StorefrontNewsSection /></MemoryRouter>)
+  expect(screen.getByRole("status").textContent).toContain("Đang tải tin tức")
+  state.articlesPending = false
+  state.articlesError = true
+  view.rerender(<MemoryRouter><StorefrontNewsSection /></MemoryRouter>)
+  expect(screen.getByRole("alert").textContent).toContain("Backend unavailable")
+  fireEvent.click(screen.getByRole("button", { name: "Thử tải lại" }))
+  expect(state.articlesRefetch).toHaveBeenCalled()
+  state.articlesError = false
+  state.articles = []
+  view.rerender(<MemoryRouter><StorefrontNewsSection /></MemoryRouter>)
+  expect(screen.getByText("Chưa có tin tức được xuất bản.")).toBeTruthy()
+  state.articles = [{ _id: "article-1", type: "news", title: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối", slug: "chon-cap-sac", category: "Cẩm nang chọn mua", excerpt: "Kiểm tra thiết bị trước khi chọn cáp.", content: "Nội dung bài viết", imageUrl: null, tags: ["cáp sạc"], authorName: "Ban biên tập", publishedAt: "2026-10-28T10:00:00.000Z", isFeatured: false, viewCount: 0, seo: {} }]
+})
+it("renders live blog cards and a safe article detail page", () => {
+  render(<MemoryRouter><BlogSection /></MemoryRouter>)
+  expect(screen.getByText("Bài viết mẫu")).toBeTruthy()
+  expect(screen.getByRole("link", { name: "Tìm hiểu thêm" }).getAttribute("href")).toBe("/bai-viet/bai-viet-mau")
+
+  const detail = render(<MemoryRouter initialEntries={["/bai-viet/bai-viet-mau"]}><Routes><Route path="/bai-viet/:slug" element={<StorefrontArticleDetailPage />} /></Routes></MemoryRouter>)
+  expect(screen.getByRole("heading", { name: "Bài viết mẫu" })).toBeTruthy()
+  expect(detail.container.querySelector("script")).toBeNull()
+  expect(screen.getByText(/<script>alert\(1\)<\/script>/)).toBeTruthy()
 })
 it("keeps catalog search and pagination when returning from a product detail", () => {
   render(<MemoryRouter initialEntries={["/shop?search=Chicken&page=2"]}><Routes><Route path="/shop" element={<StorefrontProductsPage />} /><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
