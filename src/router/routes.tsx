@@ -40,6 +40,14 @@ export const routes: RouteObject[] = [
         path: "/contact",
         lazy: page(() => import("@/pages/storefront/contact/index")),
       },
+      {
+        path: "/cart",
+        lazy: page(() => import("@/pages/storefront/cart/index")),
+      },
+      {
+        path: "/checkout",
+        lazy: page(() => import("@/pages/storefront/checkout/index")),
+      },
 
       {
         element: <PublicOnlyRoute storefront />,

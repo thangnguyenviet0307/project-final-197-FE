@@ -38,6 +38,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Order lifecycle
 
+- Storefront checkout is implemented through POST `/customer-auth/orders` for authenticated enabled Customers only; customer identity always comes from the session. Strict input accepts recipient name/phone, legacy three-level locality codes, street/note, COD, requestId and product/variant quantities plus expected unit prices. Server validates locality hierarchy via cached Province Open API v1 (pre-July-2025), checks current public availability/catalog/minimum quantity/stock/prices and reserves stock plus creates an unassigned Pending order in one relations transaction. Shared order-reservation service also serves administrative creation. Price changes return 409 and require review; client prices never become order prices. Persist recipient/address snapshots independently of customer profile. Same customer/requestId plus same payload returns the existing order without reserving stock again; changed payload conflicts. No successful purchase UI before server confirmation. Free shipping is the current checkout policy. FE preserves drafts/cart on failure, prevents duplicate clicks, reuses requestId/body for uncertain retries while the page remains mounted, invalidates products/orders after success, and subtracts only purchased quantities from the current cart. No automatic purchase retries or profile/address writes. Locality provider failure fails closed with retry UI. MongoDB replica-set transaction integration tests need a dedicated MONGODB_TEST_URI; unit mocks do not prove transaction isolation/rollback.
+
 - Statuses: 1=pending, 2=processing, 3=rejected, 4=completed. Allowed transitions: 1 -> 2/3; 2 -> 3/4. Completed/rejected orders are terminal.
 - Staff can use PATCH /orders/:id/start for eligible unassigned/own pending orders. Admin chooses an active staff handler. Backend enforces a maximum of five active orders per handler.
 - Staff may complete/reject only their assigned open orders; rejection requires a trimmed cancellationReason, maximum 1000 characters. Admin may reject without a reason. Only admin may delete rejected orders or reassign staff.
@@ -87,6 +89,20 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 - Storefront header links customer names to /account/profile. The admin navigation item is Trang Bán hàng and opens / (storefront home) in a new tab with noopener noreferrer.
 
 ## Deliberately unfinished areas
+
+- Cart contents now persist under localStorage `storefront-cart-v1` and synchronize via storage events across tabs on the same origin/browser. Persist only validated public product snapshots, variant keys and quantities, never credentials or purchase selection. New tabs/reloads restore contents; selection stays local to the tab and resets on cart entry. Prices/stock remain snapshots until server checkout validation is implemented.
+
+- The cart bulk-delete action removes only selected lines after confirmation, preserving unselected lines. Disable it when no lines are selected.
+
+- Every cart page entry clears purchase selection, including returning after continuing shopping. Items, variants and quantities stay intact; select-all resets and summary starts at zero.
+
+- Each cart line has a purchase-selection checkbox, selected by default for new lines. Summary totals include only selected lines and show zero when none are selected. Quantity changes preserve selection. Variant changes preserve selection; merged lines are selected if either source was selected. Header badge still counts all cart items.
+
+- Cart quantity controls at the right of each item update quantity within minimum-order and loaded variant/product stock limits. The amount below the variant picker stays at the selected variant unit price when quantity changes; the cart summary and header subtotal multiply unit price by quantity and remain estimates.
+
+- Cart variant selection uses the product snapshot loaded when adding the item. Switching variants updates image, discounted unit price and subtotals while retaining quantity. Merge an existing target variant only when combined quantity fits loaded stock; rejected changes preserve the original cart. No new stock reservation or checkout API is called.
+
+- `/cart` displays items added from product detail using an in-memory Zustand store. Merge by product/variant, validate minimum quantity and loaded stock, and allow removal. Header count/subtotal follow cart state. Reload clears the cart. Prices are snapshots and totals are estimates; checkout, payment and server cart persistence remain unfinished.
 
 - Storefront category navigation reads GET /categories/public without authentication. Only active, non-deleted categories and public fields (_id, name, slug, icon, parent) are returned. Administrative endpoints remain protected. Store catalog filters accept category IDs; existing marketing links using category names/slugs resolve through this public category list.
 

@@ -17,7 +17,7 @@ const loaded = new Map()
 const allowed = new Set([
   "validations/common.validation.ts", "validations/customers.validation.ts",
   "validations/users.validation.ts", "validations/brands.validation.ts",
-  "validations/categories.validation.ts",
+  "validations/categories.validation.ts", "validations/checkout.validation.ts",
   "validations/products.validation.ts", "validations/hero-slides.validation.ts",
 ])
 
@@ -175,4 +175,17 @@ await heroService.listPublicHeroSlides()
 await heroService.createHeroSlide(heroInput)
 await heroService.updateHeroSlide({ id, input: { expectedVersion: 0, description: "Updated description", imageUrl: null } })
 await heroService.deleteHeroSlide({ id, expectedVersion: 1 })
+const checkoutValidation = loadValidation("validations/checkout.validation.ts")
+const checkoutService = evaluate(path.join(root, "src/features/checkout/services/checkout.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: {
+    async post(url, body) {
+      assert.equal(url, "/customer-auth/orders")
+      checkoutValidation.checkoutSchema.parse(body)
+      requests.push({ method: "POST", url, body })
+      return { data: { data: { _id: id, orderCode: "ORD-ABC234", totalAmount: 200000, orderStatus: 1 } } }
+    },
+  } }
+  throw new Error(`Unsupported checkout service import: ${specifier}`)
+})
+await checkoutService.createCheckout({ requestId: webcrypto.randomUUID(), recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, districtCode: 2, wardCode: 3, street: "12 Đường A", note: "", paymentMethod: "cod", items: [{ productId: id, quantity: 2, expectedUnitPrice: 100000 }] })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)
