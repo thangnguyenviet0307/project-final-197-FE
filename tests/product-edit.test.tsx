@@ -45,6 +45,15 @@ it("blocks an inventory edit if stock changed after the form was opened", async 
   expect((screen.getByLabelText("Tồn kho biến thể") as HTMLInputElement).value).toBe("9")
 })
 
+it("renames a product without sending the old slug as a workaround", async () => {
+  const writes = setup(original)
+  fireEvent.change(await screen.findByLabelText("Tên sản phẩm"), { target: { value: "Renamed case" } })
+  await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await screen.findByText("Saved product detail")
+  expect(writes.mock.calls[0][0]).toEqual({ product_name: "Renamed case" })
+})
+
 it("saves a variant edit with IDs and the explicit product price when inventory is unchanged", async () => {
   const writes = setup(original)
   queryClient.setQueryData(["orders", "detail", "cached-order"], { currentProductName: "Old name" })

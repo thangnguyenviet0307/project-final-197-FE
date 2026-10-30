@@ -1,6 +1,7 @@
 import type { Product } from "@/features/products/types/products"
 
 export interface CartItem {
+  unavailableReason?: string
   product: Product
   productId: string
   variantKey: string

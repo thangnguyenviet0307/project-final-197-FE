@@ -15,12 +15,12 @@ const productSchema = z.object({
   is_active: z.boolean().optional(), on_sale: z.boolean().optional(), variants: z.array(variantSchema).max(500).optional(),
 })
 const storedSchema = z.object({ version: z.literal(1), items: z.array(z.object({
-  product: productSchema, variantKey: text, quantity: z.number().int().positive().safe(),
+  product: productSchema, variantKey: text, quantity: z.number().int().positive().safe(), unavailableReason: text.optional(),
 })).max(500) })
 
 export function serializeCart(items: CartItem[]) {
   return JSON.stringify({ version: 1, items: items.map(item => ({
-    product: productSchema.parse({ ...item.product, thumbnail: item.product.thumbnail ?? item.product.images?.[0]?.secure_url }), variantKey: item.variantKey, quantity: item.quantity,
+    product: productSchema.parse({ ...item.product, thumbnail: item.product.thumbnail ?? item.product.images?.[0]?.secure_url }), variantKey: item.variantKey, quantity: item.quantity, ...(item.unavailableReason ? { unavailableReason: item.unavailableReason } : {}),
   })) })
 }
 

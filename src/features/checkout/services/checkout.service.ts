@@ -1,4 +1,5 @@
 import { api } from "@/services/api"
+import { checkoutResultSchema } from "@/features/checkout/schemas/checkout-schema"
 import type { ApiResponse } from "@/types/api"
 import type { CheckoutProvince, CheckoutRequest, CheckoutResult } from "@/features/checkout/types/checkout"
 export async function getCheckoutLocations(signal?: AbortSignal) {
@@ -7,5 +8,5 @@ export async function getCheckoutLocations(signal?: AbortSignal) {
 }
 export async function createCheckout(input: CheckoutRequest) {
   const { data } = await api.post<ApiResponse<CheckoutResult>>("/customer-auth/orders", input, { timeout: 45000 })
-  return data.data
+  return checkoutResultSchema.parse(data.data)
 }

@@ -12,20 +12,31 @@ export function HeroSlideForm({ slide, pending, save, reload }: { slide?: HeroSl
   const choices = (categories.data ?? []).filter(item => item.isActive && !item.isDeleted)
   const [draft, setDraft] = useState(() => ({ category: typeof slide?.category === "string" ? slide.category : slide?.category?._id ?? "", title: slide?.title ?? "", description: slide?.description ?? "", imageUrl: slide?.imageUrl ?? "", sortOrder: slide?.sortOrder ?? 0, isActive: slide?.isActive ?? true }))
   const [error, setError] = useState("")
+  const [categoryError, setCategoryError] = useState("")
   const [conflict, setConflict] = useState(false)
   async function submit(event: FormEvent) {
     event.preventDefault()
+    if (conflict || pending) return
     const schema = slide && !slide.category && !draft.category ? heroSlideSchema.omit({ category: true }) : heroSlideSchema
     const result = schema.safeParse(draft)
     if (!result.success) { setError(result.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`).join("; ")); return }
-    try { setError(""); await save({ ...result.data, category: draft.category }) } catch (failure) { const apiError = getApiError(failure); setError(apiError.message); setConflict(apiError.statusCode === 409 && !!slide) }
+    try {
+      setError(""); setCategoryError("")
+      await save({ ...result.data, category: draft.category })
+    } catch (failure) {
+      const apiError = getApiError(failure)
+      if (apiError.code === "CATEGORY_UNAVAILABLE") setCategoryError(apiError.message)
+      else setError(apiError.message)
+      setConflict(apiError.code === "VERSION_CONFLICT" && !!slide)
+    }
   }
   const unavailable = draft.category && !choices.some(item => item._id === draft.category)
   return <form onSubmit={submit} className="space-y-4">
     <fieldset disabled={pending || categories.isPending || categories.isError} className="space-y-4 disabled:opacity-70">
-      <label className="grid gap-2 text-sm">Danh mục<select required={!slide || !!slide.category} className="h-10 rounded-md border bg-background px-3" value={draft.category} onChange={event => setDraft(previous => ({ ...previous, category: event.target.value }))}>
+      <label className="grid gap-2 text-sm">Danh mục<select required={!slide || !!slide.category} aria-invalid={!!categoryError} aria-describedby={categoryError ? "hero-category-error" : undefined} className="h-10 rounded-md border bg-background px-3" value={draft.category} onChange={event => { setDraft(previous => ({ ...previous, category: event.target.value })); setCategoryError("") }}>
         <option value="">Chọn danh mục</option>{unavailable && <option value={draft.category} disabled>Danh mục không khả dụng</option>}{choices.map(item => <option key={item._id} value={item._id}>{item.name}</option>)}
       </select></label>
+      {categoryError && <p id="hero-category-error" role="alert" className="text-sm text-destructive">{categoryError}</p>}
       <label className="grid gap-2 text-sm">Tiêu đề<Textarea required maxLength={200} value={draft.title} onChange={event => setDraft(previous => ({ ...previous, title: event.target.value }))} /></label>
       <label className="grid gap-2 text-sm">Mô tả<Textarea maxLength={1000} value={draft.description} onChange={event => setDraft(previous => ({ ...previous, description: event.target.value }))} /></label>
       <label className="grid gap-2 text-sm">URL ảnh nền<Input type="url" maxLength={2048} value={draft.imageUrl} onChange={event => setDraft(previous => ({ ...previous, imageUrl: event.target.value }))} /><span className="text-xs text-muted-foreground">Để trống để dùng ảnh danh mục; nếu không có ảnh sẽ dùng nền tối.</span></label>

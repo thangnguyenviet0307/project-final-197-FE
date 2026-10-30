@@ -126,6 +126,7 @@ it("refreshes after a conflicting transition and prevents another invalid submis
   setup()
   fireEvent.click(await screen.findByRole("button", { name: `Cập nhật trạng thái ${id}` }))
   fireEvent.change(screen.getByLabelText("Trạng thái mới"), { target: { value: "3" } })
+  fireEvent.change(screen.getByLabelText("Lý do hủy"), { target: { value: "Khách yêu cầu hủy" } })
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận" }))
   await screen.findByText("Order changed; please retry")
   await screen.findByText("Đơn hàng đã thay đổi. Vui lòng chọn trạng thái khả dụng.")

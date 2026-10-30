@@ -19,6 +19,8 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
+      refetchInterval: query => ["products", "orders", "categories", "brands", "customers", "users", "hero-slides"].includes(String(query.queryKey[0])) ? 5_000 : false,
+      refetchIntervalInBackground: false,
       retry: false,
       staleTime: 30_000,
       refetchOnMount: "always",

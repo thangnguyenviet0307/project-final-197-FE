@@ -23,7 +23,7 @@ export function OrderActions({ order, onDeleted, disabled }: { order: Order; onD
   const allowed = orderTransitions[order.orderStatus] ?? []
   const pending = update.isPending || remove.isPending
   const needsClaim = admin && !order.userId && (next === 2 || next === 4)
-  const valid = next !== "" && allowed.includes(next) && !needsClaim && (next !== 3 || admin || !!reason.trim())
+  const valid = next !== "" && allowed.includes(next) && !needsClaim && (next !== 3 || !!reason.trim())
   const error = mode === "delete" ? remove.error : update.error
   function open(value: "status" | "delete") { update.reset(); remove.reset(); setNext(""); setReason(""); setMode(value) }
   return <>
@@ -35,7 +35,7 @@ export function OrderActions({ order, onDeleted, disabled }: { order: Order; onD
       <DialogContent showCloseButton={!pending}><DialogHeader><DialogTitle>{mode === "delete" ? "Xóa đơn hàng đã từ chối?" : "Cập nhật trạng thái đơn hàng"}</DialogTitle>
         <DialogDescription className="break-all">Đơn hàng {order.orderCode ?? order._id}. {mode === "delete" ? "Thao tác này xóa vĩnh viễn lịch sử đơn hàng và không thể hoàn tác." : `Trạng thái hiện tại: ${orderStatuses[order.orderStatus]}. Từ chối sẽ hoàn lại tồn kho và không thể hoàn tác.`}</DialogDescription></DialogHeader>
         {mode === "status" && <><label className="grid gap-2 text-sm">Trạng thái mới<select className="rounded-md border bg-background p-2" value={next} disabled={pending} onChange={event => setNext(Number(event.target.value) as OrderStatus)}><option value="" disabled>Chọn trạng thái</option>{allowed.map(status => <option key={status} value={status}>{orderStatuses[status]}</option>)}</select></label>
-          {next === 3 && <label className="grid gap-2 text-sm">Lý do hủy<textarea maxLength={1000} className="rounded-md border bg-background p-2" value={reason} required={!admin} disabled={pending} onChange={event => setReason(event.target.value)} /></label>}
+          {next === 3 && <label className="grid gap-2 text-sm">Lý do hủy<textarea maxLength={1000} className="rounded-md border bg-background p-2" value={reason} required disabled={pending} onChange={event => setReason(event.target.value)} /></label>}
           {needsClaim && <p className="text-sm">Chọn Phân công và bắt đầu để chỉ định nhân viên đang hoạt động trước.</p>}
           {next !== "" && !allowed.includes(next) && <p role="alert">Đơn hàng đã thay đổi. Vui lòng chọn trạng thái khả dụng.</p>}</>}
         {error && <p role="alert" className="text-destructive">{getApiError(error).message}</p>}

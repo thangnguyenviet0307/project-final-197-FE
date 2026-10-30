@@ -65,9 +65,9 @@ it("omits untouched inventory, catalog, name and active state from a description
   const input = { ...productDefaults(original), description: "New description" }
   expect(productUpdatePayload(input, { description: true }, original)).toEqual({ description: "New description" })
 })
-it("retains a custom slug on rename and omits the name on a price update", () => {
+it("omits slug on rename so the backend preserves it and omits the name on a price update", () => {
   expect(productUpdatePayload({ ...productDefaults(original), product_name: "Renamed case" }, { product_name: true }, original))
-    .toEqual({ product_name: "Renamed case", slug: "custom-campaign-case" })
+    .toEqual({ product_name: "Renamed case" })
   expect(productUpdatePayload({ ...productDefaults(original), price: 200 }, { price: true }, original)).toEqual({ price: 200 })
 })
 it("allows deactivation without resending inactive catalog references", () => {

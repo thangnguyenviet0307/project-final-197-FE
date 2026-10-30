@@ -10,10 +10,12 @@ function CategoryBranch({
   category,
   categories,
   ancestors = [],
+  onNavigate,
 }: {
   category: PublicCategory
   categories: PublicCategory[]
   ancestors?: string[]
+  onNavigate: () => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const submenuId = useId()
@@ -57,26 +59,27 @@ function CategoryBranch({
         if (!event.currentTarget.contains(event.relatedTarget)) setExpanded(false)
       }}
     >
-      {children.length ? (
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={submenuId}
-          onClick={() => setExpanded((value) => !value)}
-          className="flex min-h-[52px] w-full items-center gap-2.5 bg-white px-5 py-3 text-left text-base font-normal leading-6 text-[#666] transition-colors hover:bg-gray-50 hover:text-[#55b000] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]"
-        >
-          {content}
-          <ChevronRight
-            size={16}
-            strokeWidth={1.5}
-            className={`shrink-0 text-[#b5b5b5] transition-transform ${expanded ? "rotate-90" : ""}`}
-          />
-        </button>
-      ) : (
-        <Link to={`/shop?category=${category._id}`} className="flex min-h-[52px] items-center gap-2.5 bg-white px-5 py-3 text-base font-normal leading-6 text-[#666]">
+      <div className="flex items-stretch bg-white text-[#666] hover:bg-gray-50 hover:text-[#55b000]">
+        <Link to={`/shop?category=${category._id}`} onClick={onNavigate} className="flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base font-normal leading-6 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]">
           {content}
         </Link>
-      )}
+        {children.length > 0 && (
+          <button
+            type="button"
+            aria-label={`Danh mục con của ${category.name}`}
+            aria-expanded={expanded}
+            aria-controls={submenuId}
+            onClick={() => setExpanded((value) => !value)}
+            className="flex min-h-[52px] w-11 shrink-0 items-center justify-center hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]"
+          >
+            <ChevronRight
+              size={16}
+              strokeWidth={1.5}
+              className={`shrink-0 text-[#b5b5b5] transition-transform ${expanded ? "rotate-90" : ""}`}
+            />
+          </button>
+        )}
+      </div>
       {expanded && children.length > 0 && (
         <ul
           id={submenuId}
@@ -92,6 +95,7 @@ function CategoryBranch({
               category={child}
               categories={categories}
               ancestors={[...ancestors, category._id]}
+              onNavigate={onNavigate}
             />
           ))}
         </ul>
@@ -180,6 +184,7 @@ export function StoreDepartmentsMenu() {
                   key={category._id}
                   category={category}
                   categories={categories}
+                  onNavigate={() => setOpen(false)}
                 />
               ))}
             </ul>

@@ -21,6 +21,7 @@ import type { ProductsQuery } from "@/features/products/types/products"
 import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
 import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
 import { getApiError } from "@/services/api"
+import { CatalogSubcategories } from "@/features/storefront/components/catalog-subcategories"
 
 const CatalogProductGrid = memo(function CatalogProductGrid({ products }: { products: Product[] }) {
   return <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
@@ -63,6 +64,26 @@ function toggleSelection(value: string, id: string): string {
 function resolveCategories(value: string, categories: PublicCategory[]): string | undefined {
   const ids = selectionIds(value).map(id => /^[a-f\d]{24}$/i.test(id) ? id : categories.find(item => item.slug === id || item.name === id)?._id)
   return ids.length && ids.every(Boolean) ? [...new Set(ids)].join(",") : undefined
+}
+
+function childSelections(value: string, parentIds: string | undefined, categories: PublicCategory[]) {
+  const parents = selectionIds(parentIds ?? "")
+  const selected = new Map<string, PublicCategory>()
+  for (const id of selectionIds(value)) {
+    const child = categories.find(category => category._id === id)
+    if (child?.parent && parents.includes(child.parent) && !selected.has(child.parent)) selected.set(child.parent, child)
+  }
+  return [...selected.values()]
+}
+
+function effectiveCategories(parentIds: string | undefined, children: PublicCategory[]) {
+  return parentIds ? [...new Set(selectionIds(parentIds).map(id => children.find(child => child.parent === id)?._id ?? id))].join(",") : undefined
+}
+
+function retainSubcategories(params: URLSearchParams, parentIds: string | undefined, categories: PublicCategory[]) {
+  const ids = childSelections(params.get("subcategory") ?? "", parentIds, categories).map(child => child._id)
+  if (ids.length) params.set("subcategory", ids.join(","))
+  else params.delete("subcategory")
 }
 
 function filterDraftFromParams(params: URLSearchParams): FilterDraft {
@@ -183,12 +204,14 @@ export default function StorefrontProductsPage() {
   const brands = usePublicBrands(true)
   const filterBrands = brands.data ?? []
   const categoryId = resolveCategories(category, categories.data ?? [])
+  const subcategory = params.get("subcategory") ?? ""
+  const selectedChildren = childSelections(subcategory, categoryId, categories.data ?? [])
   const query = useStoreProducts({
     page,
     limit: 12,
     search: search || undefined,
     brand: brand || undefined,
-    category: categoryId,
+    category: effectiveCategories(categoryId, selectedChildren),
     minPrice: parsePrice(minPriceParam),
     maxPrice: parsePrice(maxPriceParam),
     sortBy: sort.startsWith("price") ? "price" : sort === "name" ? "product_name" : sort === "featured" ? "is_hot" : sort === "bestsellers" ? "is_best_seller" : sort === "discount" ? "discount" : "createdAt",
@@ -227,6 +250,7 @@ export default function StorefrontProductsPage() {
       for (const key of ["brand", "category", "minPrice", "maxPrice"]) next.delete(key)
       if (draft.brand) next.set("brand", draft.brand)
       if (draftCategoryId) next.set("category", draftCategoryId)
+      retainSubcategories(next, draftCategoryId, categories.data ?? [])
       if (draft.minPrice.trim()) next.set("minPrice", String(minPrice))
       if (draft.maxPrice.trim()) next.set("maxPrice", String(maxPrice))
       next.delete("page")
@@ -248,7 +272,7 @@ export default function StorefrontProductsPage() {
     && (draftMin === undefined || draftMax === undefined || draftMin <= draftMax)
     && (!draft.category || !!draftCategoryId)
   const previewParams: Partial<ProductsQuery> = { search: search || undefined, brand: draft.brand || undefined,
-    category: draftCategoryId, minPrice: draftMin, maxPrice: draftMax }
+    category: effectiveCategories(draftCategoryId, childSelections(subcategory, draftCategoryId, categories.data ?? [])), minPrice: draftMin, maxPrice: draftMax }
   const preview = useStoreFilterCount(previewParams, filtersOpen && validDraft)
   const previewReady = validDraft && preview.data !== undefined && !preview.isFetching && !preview.isError
   const appliedSelections = selectedFilters(filterDraftFromParams(params), filterBrands, categories.data ?? [])
@@ -266,6 +290,7 @@ export default function StorefrontProductsPage() {
         if (remaining) next.set(key, remaining)
         else next.delete(key)
       } else fields.forEach(field => next.delete(field))
+      retainSubcategories(next, resolveCategories(next.get("category") ?? "", categories.data ?? []), categories.data ?? [])
       next.delete("page")
       return next
     })
@@ -415,6 +440,14 @@ export default function StorefrontProductsPage() {
 
           </div>
         </section>
+
+        <CatalogSubcategories categories={categories.data ?? []} selectedIds={selectionIds(categoryId ?? "")} selectedChildIds={selectedChildren.map(child => child._id)} onChange={ids => setParams(previous => {
+          const next = new URLSearchParams(previous)
+          if (ids.length) next.set("subcategory", ids.join(","))
+          else next.delete("subcategory")
+          next.delete("page")
+          return next
+        })} />
 
         <nav aria-label="Sắp xếp sản phẩm" className="flex flex-wrap items-center gap-x-4 gap-y-3 py-2 text-sm sm:text-base">
           <span className="text-gray-600">Sắp xếp theo:</span>

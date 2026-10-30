@@ -24,14 +24,16 @@ function ProductDetails({ product }: { product: Product }) {
     return cheapest?._id ?? cheapest?.sku ?? ""
   })
   const variant = product.variants?.find(item => (item._id ?? item.sku) === selected)
-  const basePrice = variant?.price ?? product.price
+  const needsVariant = !!product.variants?.length && !variant
+  const basePrice = product.variants?.length ? variant?.price : product.price
   const price = basePrice === undefined ? null : discountedPrice(basePrice, product.discount)
   const stopped = product.on_sale === false
-  const stock = variant?.stock ?? product.stock ?? 0
+  const stock = product.variants?.length ? variant?.stock ?? 0 : product.stock ?? 0
   const minimum = product.minimumOrderQuantity ?? 1
   const displayQuantity = Math.min(Math.max(minimum, quantity), Math.max(minimum, stock))
   const handleAddToCart = () => {
-    const error = addItem(product, selected, displayQuantity)
+    if (needsVariant) return
+    const error = addItem(product, variant ? variant._id ?? variant.sku : "", displayQuantity)
     if (error) toast.error(error)
     else toast.success("Đã thêm sản phẩm vào giỏ hàng.")
   }
@@ -49,7 +51,8 @@ function ProductDetails({ product }: { product: Product }) {
         <div className="rounded-2xl border border-[#e5eedf] bg-[#f0f6eb] p-5"><p className="text-xs font-medium text-gray-500">Giá bán · VND</p><p aria-label="Giá bán hiện tại" aria-live="polite" className="mt-2 text-3xl font-bold text-[#4d9210] sm:text-4xl">{price === null ? "Chưa có giá" : formatPrice(price) + " ₫"}</p>
         {!!product.discount && basePrice !== undefined && <p className="mt-3 flex items-center gap-3 text-sm"><span className="text-gray-400 line-through">{formatPrice(basePrice)} ₫</span><span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#4d9210]">Tiết kiệm {product.discount}%</span></p>}</div>
         {!!product.variants?.length && <fieldset><legend className="mb-3 font-semibold">Chọn biến thể</legend><div className="flex flex-wrap gap-2">{product.variants.map(item => <button key={item._id ?? item.sku} type="button" aria-pressed={selected === (item._id ?? item.sku)} onClick={() => setSelected(item._id ?? item.sku)} className={`rounded-lg border px-4 py-2 ${selected === (item._id ?? item.sku) ? "border-green-700 bg-green-50" : "border-gray-200"}`}>{item.variant_name || item.sku}{[item.color, item.size].filter(Boolean).length > 0 && " · " + [item.color, item.size].filter(Boolean).join(" / ")}</button>)}</div></fieldset>}
-        <p className="flex items-center gap-2 text-sm font-medium text-[#4d9210]"><Check size={16} />{!stopped && stock > 0 ? "Còn " + stock + " sản phẩm" : "Hết hàng"}</p>
+        {needsVariant && <p role="alert" className="text-sm text-amber-700">Biến thể đã thay đổi. Vui lòng chọn lại biến thể trước khi thêm vào giỏ hàng.</p>}
+        <p className="flex items-center gap-2 text-sm font-medium text-[#4d9210]"><Check size={16} />{needsVariant ? "Chưa chọn biến thể hợp lệ" : !stopped && stock > 0 ? "Còn " + stock + " sản phẩm" : "Hết hàng"}</p>
         {variant && <dl className="grid gap-2 text-sm">{Object.entries(variant.attributes ?? {}).map(([name, value]) => <div key={name}><dt className="text-gray-500">{attributeLabel(name)}</dt><dd>{value === null ? "—" : String(value)}</dd></div>)}</dl>}
         <p className="text-sm text-gray-500">Số lượng đặt tối thiểu: {product.minimumOrderQuantity ?? 1}</p>
         <div className="flex flex-wrap gap-3"><div className="flex h-12 items-center rounded-xl border border-gray-200 bg-white"><button type="button" aria-label="Giảm số lượng" disabled={displayQuantity <= minimum || stock < minimum} onClick={() => setQuantity(displayQuantity - 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Minus size={16} /></button><span className="min-w-9 text-center text-sm font-semibold" aria-live="polite">{displayQuantity}</span><button type="button" aria-label="Tăng số lượng" disabled={displayQuantity >= stock} onClick={() => setQuantity(displayQuantity + 1)} className="flex size-11 items-center justify-center disabled:opacity-30"><Plus size={16} /></button></div><button type="button" disabled={stopped || stock < minimum || price === null || (!!product.variants?.length && !variant)} onClick={handleAddToCart} className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4d9210] px-6 text-sm font-semibold text-white hover:bg-[#3d750c] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500"><ShoppingBag size={18} />{stopped || stock < minimum ? "Tạm hết hàng" : "Thêm vào giỏ hàng"}</button></div>

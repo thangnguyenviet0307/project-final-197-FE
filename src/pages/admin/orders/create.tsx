@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { formatPrice } from "@/features/products/types/products"
 import { useUnsavedForm } from "@/hooks/use-unsaved-form"
+import { adminOrderSchema, type AdminOrderInput } from "@/features/orders/schemas/admin-order-schema"
 
 export default function CreateOrderPage() {
   const navigate = useNavigate()
@@ -21,10 +22,11 @@ export default function CreateOrderPage() {
   const [customerPage, setCustomerPage] = useState(1)
   const [items, setItems] = useState<{ productId: string; variantId?: string; quantity: number; label: string }[]>([])
   const [dirty, setDirty] = useState(false)
+  const [inputError, setInputError] = useState("")
   const navigation = useUnsavedForm(dirty)
   const customers = useQuery({ queryKey: ["customers", "order-picker", customerSearch, customerPage], queryFn: ({ signal }) => customersService.getCustomers({ search: customerSearch, page: customerPage, limit: 20 }, signal) })
   const products = useProducts({ search: productSearch, page: productPage, limit: 20 })
-  const mutation = useMutation({ mutationFn: async (input: { customerId: string; street: string; city: string; state: string; orderNote: string; paymentType: number; orderItems: { productId: string; variantId?: string; quantity: number }[] }) => {
+  const mutation = useMutation({ mutationFn: async (input: AdminOrderInput) => {
     const { data } = await api.post<{ data: { _id: string } }>("/orders", input)
     return data.data
   }, meta: { successMessage: "Order created." }, onSuccess: async order => {
@@ -36,7 +38,10 @@ export default function CreateOrderPage() {
     event.preventDefault()
     if (!items.length || !customerId) return
     const form = new FormData(event.currentTarget)
-    mutation.mutate({ customerId, street: String(form.get("street")), city: String(form.get("city")), state: String(form.get("state")), orderNote: String(form.get("orderNote")), paymentType: 1, orderItems: items.map(({ productId, variantId, quantity }) => ({ productId, ...(variantId ? { variantId } : {}), quantity })) })
+    const result = adminOrderSchema.safeParse({ customerId, street: String(form.get("street")), city: String(form.get("city")), state: String(form.get("state")), orderNote: String(form.get("orderNote")), paymentType: 1, orderItems: items.map(({ productId, variantId, quantity }) => ({ productId, ...(variantId ? { variantId } : {}), quantity })) })
+    if (!result.success) { setInputError(result.error.issues.map(issue => issue.message).join("; ")); return }
+    setInputError("")
+    mutation.mutate(result.data)
   }}>
     <Button nativeButton={false} variant="outline" render={<Link to="/auth/orders" />}>Back to orders</Button>
     <fieldset className="space-y-3 rounded-lg border p-4" disabled={mutation.isPending}><legend>Customer</legend>
@@ -57,9 +62,10 @@ export default function CreateOrderPage() {
       {items.map((item, index) => <div className="flex flex-wrap items-center gap-2" key={index}><span>{item.label}</span><Input className="w-24" aria-label={`Quantity ${index + 1}`} type="number" min={1} step={1} required value={item.quantity} onChange={event => setItems(previous => previous.map((line, i) => i === index ? { ...line, quantity: Number(event.target.value) } : line))} /><Button type="button" variant="outline" onClick={() => { setItems(previous => previous.filter((_, i) => i !== index)); setDirty(true) }}>Remove</Button></div>)}
       <p className="text-sm text-muted-foreground">Prices, discounts and stock availability are verified by the server when you create the order.</p>
     </fieldset>
-    <fieldset className="grid gap-3 sm:grid-cols-3" disabled={mutation.isPending}>{["street", "city", "state"].map(name => <label className="grid gap-2 text-sm capitalize" key={name}>{name}<Input name={name} maxLength={255} required /></label>)}</fieldset>
+    <fieldset className="grid gap-3 sm:grid-cols-3" disabled={mutation.isPending}>{["street", "city", "state"].map(name => <label className="grid gap-2 text-sm capitalize" key={name}>{name}<Input name={name} maxLength={name === "street" ? 255 : 50} required /></label>)}</fieldset>
     <label className="grid gap-2 text-sm">Order note<Input name="orderNote" maxLength={2000} disabled={mutation.isPending} /></label>
     <p>Payment: Cash on delivery</p>
+    {inputError && <p role="alert" className="text-destructive">{inputError}</p>}
     {mutation.isError && <p role="alert" className="text-destructive">{getApiError(mutation.error).message}</p>}
     <Button type="submit" disabled={mutation.isPending || !customerId || !items.length}>Create order</Button>
     {navigation.guard}

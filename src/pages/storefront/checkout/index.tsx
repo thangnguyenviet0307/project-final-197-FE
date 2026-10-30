@@ -9,7 +9,7 @@ import { CheckoutCustomerInformation } from "@/features/checkout/components/chec
 import { useAuthStore } from "@/stores/auth.store"
 import type { User } from "@/features/auth/types/auth"
 import { useCheckoutForm } from "@/features/checkout/hooks/use-checkout-form"
-import { discountedLineTotal } from "@/features/products/utils/product-price"
+import { cartTotal } from "@/features/cart/utils/cart-total"
 import { useUnsavedForm } from "@/hooks/use-unsaved-form"
 import { useRefreshCheckoutProducts } from "@/features/checkout/hooks/use-checkout"
 import { getApiError } from "@/services/api"
@@ -22,17 +22,14 @@ export default function CheckoutPage() {
 }
 
 function CheckoutScreen({ customer }: { customer: User | null }) {
-  const { form, submit, mutation, needsRecovery, locations } = useCheckoutForm(customer)
+  const { form, submit, mutation, needsRecovery, locations, recoveryRequest } = useCheckoutForm(customer)
   const refreshProducts = useRefreshCheckoutProducts()
   const navigation = useUnsavedForm(!mutation.isSuccess && (form.formState.isDirty || mutation.isPending || needsRecovery))
   const [showAllProducts, setShowAllProducts] = useState(false)
   const items = useCartStore(state => state.items)
   const selectedItems = items.filter(item => item.selected)
   const selectedQuantity = selectedItems.reduce((total, item) => total + item.quantity, 0)
-  const merchandiseTotal = selectedItems.reduce((total, item) => {
-    const variant = item.product.variants?.find(option => (option._id ?? option.sku) === item.variantKey)
-    return total + (discountedLineTotal(variant?.price ?? item.product.price ?? item.unitPrice, item.product.discount ?? 0, item.quantity) ?? item.unitPrice * item.quantity)
-  }, 0)
+  const merchandiseTotal = cartTotal(selectedItems)
 
   if (mutation.isSuccess) return (
     <div className="bg-gray-100 py-12"><section className="store-container"><div role="status" className="space-y-4 rounded-2xl border border-gray-100 bg-white p-6">
@@ -43,6 +40,24 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
       <Link to="/account/orders" className="inline-block font-medium text-[#4d9210] underline">Xem lịch sử đơn hàng</Link>
     </div></section></div>
   )
+
+  if (recoveryRequest) return <FormProvider {...form}>
+    <section className="store-container space-y-5 py-12">
+      <h1 className="text-xl font-semibold">Kiểm tra yêu cầu đặt hàng chưa xác nhận</h1>
+      <p role="status">Bấm Thử lại để kiểm tra đúng yêu cầu đã gửi. Thay đổi giỏ hàng hiện tại không thay đổi yêu cầu này.</p>
+      <p>Người nhận: {recoveryRequest.recipientName} · {recoveryRequest.phone}</p>
+      <p>Địa chỉ nhà: {recoveryRequest.street}</p>
+      <ul className="space-y-3">{recoveryRequest.items.map((line, index) => {
+        const current = items.find(item => item.productId === line.productId && item.variantKey === (line.variantId ?? ""))
+        return <li key={index}>{current?.name ?? `Sản phẩm ${line.productId}`} {current?.variantLabel || line.variantId || ""} · Số lượng: {line.quantity} · Đơn giá đã gửi: {formatPrice(line.expectedUnitPrice)} ₫</li>
+      })}</ul>
+      <p>Tổng tiền sẽ hiển thị sau khi hệ thống xác nhận kết quả.</p>
+      <form onSubmit={submit}><button type="submit" disabled={mutation.isPending} className="rounded-lg bg-red-600 px-4 py-3 font-semibold text-white disabled:opacity-60">{mutation.isPending ? "Đang kiểm tra…" : "Thử lại"}</button></form>
+      {form.formState.errors.root && <p role="alert" className="text-sm text-red-600">{form.formState.errors.root.message}</p>}
+      <Link to="/account/orders" className="block text-[#4d9210] underline">Kiểm tra lịch sử đơn hàng</Link>
+      {navigation.guard}
+    </section>
+  </FormProvider>
 
   return (
     <FormProvider {...form}>
@@ -87,6 +102,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                   <div className="min-w-0 flex-1 space-y-2">
                     <p className="break-words text-sm font-semibold">{item.name}</p>
                     {item.variantLabel && <p className="text-sm text-gray-500">{item.variantLabel}</p>}
+                    {item.unavailableReason && <p role="alert" className="text-sm text-red-600">{item.unavailableReason}</p>}
                     <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
                       <p className="font-semibold text-red-600"><span className="sr-only">Đơn giá: </span>{formatPrice(item.unitPrice)} ₫</p>
                       <p className="text-gray-600">Số lượng: <span className="font-medium text-gray-900">{item.quantity}</span></p>
@@ -145,7 +161,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
           </label>
           <button
             type="submit"
-            disabled={!customer || (!needsRecovery && (selectedItems.length === 0 || !locations.data)) || mutation.isPending || refreshProducts.isPending}
+            disabled={!customer || (!needsRecovery && (selectedItems.length === 0 || selectedItems.some(item => item.unavailableReason) || !locations.data)) || mutation.isPending || refreshProducts.isPending}
             className="w-full rounded-lg bg-red-600 px-4 py-3 text-base font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {mutation.isPending ? "Đang đặt hàng…" : needsRecovery ? "Thử lại" : "Thanh toán"}

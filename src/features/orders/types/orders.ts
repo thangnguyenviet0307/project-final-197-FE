@@ -13,6 +13,7 @@ export interface OrderItem {
   discount: number
 }
 export interface Order {
+  deliveryAddress?: { province: string; district: string; ward: string; provinceCode: number; districtCode: number; wardCode: number }
   recipientName?: string
   recipientPhone?: string
   orderCode?: string

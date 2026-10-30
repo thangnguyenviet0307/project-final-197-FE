@@ -141,7 +141,5 @@ export function productUpdatePayload(
   if (update.variants !== undefined && values.price !== undefined) update.price = values.price
   // Stock belongs to individual variants whenever the product has variants.
   if (values.variants.length) delete update.stock
-  // Sending a name makes the backend regenerate the slug unless it is retained explicitly.
-  if (update.product_name !== undefined && original.slug) update.slug = original.slug
   return update
 }

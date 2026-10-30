@@ -8,12 +8,12 @@ import AdminHeroSlidesPage from "@/pages/admin/hero-slides"
 import { api, clearAuth } from "@/services/api"
 import type { HeroSlide } from "@/features/hero-slides/types/hero-slides"
 vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
-vi.mock("@/features/categories/hooks/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Tai nghe", isActive: true, isDeleted: false }, { _id: "b".repeat(24), name: "Hidden", isActive: false, isDeleted: false }], isPending: false, isError: false }) }))
+vi.mock("@/features/categories/hooks/use-categories", () => ({ useCategories: () => ({ data: [{ _id: "a".repeat(24), name: "Tai nghe", isActive: true, isDeleted: false }, { _id: "b".repeat(24), name: "Hidden", isActive: false, isDeleted: false }, { _id: "d".repeat(24), name: "Replacement", isActive: true, isDeleted: false }], isPending: false, isError: false }) }))
 const originalAdapter = api.defaults.adapter
 const initial: HeroSlide = { _id: "c".repeat(24), category: { _id: "a".repeat(24), name: "Tai nghe", isActive: true, isDeleted: false }, title: "Original title", description: "Keep description", imageUrl: null, sortOrder: 2, isActive: true, __v: 3 }
 let rows: HeroSlide[]
 let writes: { method?: string; url?: string; body: Record<string, unknown> }[]
-let conflict = false
+let conflict: boolean | "category" = false
 let client: QueryClient
 beforeEach(() => {
   rows = [{ ...initial }]; writes = []; conflict = false; clearAuth()
@@ -22,7 +22,7 @@ beforeEach(() => {
     if (config.method !== "get") {
       const body = JSON.parse(config.data) as Record<string, unknown>
       writes.push({ method: config.method, url: config.url, body })
-      if (conflict) throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, { config, status: 409, statusText: "Conflict", headers: new AxiosHeaders(), data: { message: "Slide changed. Reload before saving." } })
+      if (conflict) throw new AxiosError("Conflict", "ERR_BAD_REQUEST", config, undefined, { config, status: 409, statusText: "Conflict", headers: new AxiosHeaders(), data: { code: conflict === "category" ? "CATEGORY_UNAVAILABLE" : "VERSION_CONFLICT", message: conflict === "category" ? "Category is unavailable" : "Slide changed. Reload before saving." } })
       if (config.method === "delete") rows = []
       else rows = [{ ...rows[0] ?? initial, ...body, category: initial.category, __v: (rows[0]?.__v ?? 0) + 1 } as HeroSlide]
     }
@@ -84,4 +84,21 @@ it("requires confirmation before deleting and sends the reviewed version", async
   fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Xóa slide" }))
   await screen.findByText(/Chưa có slide/)
   expect(writes[0]).toMatchObject({ method: "delete", url: `/hero-slides/${initial._id}`, body: { expectedVersion: 3 } })
+})
+
+it("keeps the draft editable after a category 409 and retries with the original version", async () => {
+  setup(); await screen.findByText("Original title")
+  fireEvent.click(screen.getByRole("button", { name: "Sửa" }))
+  fireEvent.change(screen.getByLabelText("Tiêu đề"), { target: { value: "Preserved draft" } })
+  conflict = "category"
+  fireEvent.click(screen.getByRole("button", { name: "Lưu slide" }))
+  await screen.findByText("Category is unavailable")
+  expect(screen.getByLabelText("Danh mục").getAttribute("aria-invalid")).toBe("true")
+  expect((screen.getByRole("button", { name: "Lưu slide" }) as HTMLButtonElement).disabled).toBe(false)
+  expect(screen.queryByRole("button", { name: /Tải lại dữ liệu/ })).toBeNull()
+  fireEvent.change(screen.getByLabelText("Danh mục"), { target: { value: "d".repeat(24) } })
+  conflict = false
+  fireEvent.click(screen.getByRole("button", { name: "Lưu slide" }))
+  await screen.findByText("Preserved draft")
+  expect(writes[1].body).toEqual({ title: "Preserved draft", category: "d".repeat(24), expectedVersion: 3 })
 })

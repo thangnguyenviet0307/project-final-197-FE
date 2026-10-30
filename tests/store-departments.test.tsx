@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest"
 import { fireEvent, render as renderUI, screen } from "@testing-library/react"
-import { MemoryRouter } from "react-router-dom"
+import { MemoryRouter, useLocation } from "react-router-dom"
 import { StoreDepartmentsMenu } from "@/layout/storefront/store-departments-menu"
 function render(ui: import("react").ReactElement) { return renderUI(ui, { wrapper: MemoryRouter }) }
 
@@ -34,6 +34,17 @@ it("opens the child mega menu on desktop hover and closes it when leaving the wh
   } finally {
     vi.unstubAllGlobals()
   }
+})
+
+it("navigates from a root category with children and closes the departments panel", () => {
+  function Location() { return <p data-testid="location">{useLocation().search}</p> }
+  render(<><StoreDepartmentsMenu /><Location /></>)
+  fireEvent.click(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }))
+  const root = screen.getByRole("link", { name: /Linh kiện/ })
+  expect(root.getAttribute("href")).toBe("/shop?category=1")
+  fireEvent.click(root)
+  expect(screen.getByTestId("location").textContent).toBe("?category=1")
+  expect(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }).getAttribute("aria-expanded")).toBe("false")
 })
 
 it("renders API hierarchy and unavailable-parent children; handles empty, loading and retry states", () => {

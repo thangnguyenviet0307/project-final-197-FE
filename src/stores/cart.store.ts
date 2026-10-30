@@ -4,10 +4,13 @@ import type { Product } from "@/features/products/types/products"
 import { discountedPrice } from "@/features/products/utils/product-price"
 import { buildCartItem } from "@/features/cart/utils/cart-item"
 import { CART_STORAGE_KEY, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
+import { appendCartOperation, readCartJournal, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
+
+let operationId: string | undefined
 
 interface CartState {
-  refreshProducts: (products: Product[]) => void
-  consumePurchasedItems: (purchased: { productId: string; variantId?: string; quantity: number }[]) => void
+  refreshProducts: (products: Product[], missingSlugs?: string[]) => void
+  consumePurchasedItems: (purchased: { productId: string; variantId?: string; quantity: number }[], requestId?: string) => void
   items: CartItem[]
   removeSelected: () => void
   selectAll: () => void
@@ -20,16 +23,29 @@ interface CartState {
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
-  refreshProducts: products => set(state => ({ items: state.items.map(item => {
+  refreshProducts: (products, missingSlugs = []) => set(state => ({ items: state.items.map(item => {
     const product = products.find(current => current._id === item.productId)
-    return product ? buildCartItem(product, item.variantKey, item.quantity, item.selected) ?? item : item
+    if (missingSlugs.includes(item.slug)) return { ...item, unavailableReason: "Sản phẩm không còn khả dụng." }
+    if (!product) return item
+    if (item.variantKey && !product.variants?.some(variant => (variant._id ?? variant.sku) === item.variantKey)) {
+      return { ...item, product, unavailableReason: "Biến thể không còn khả dụng. Vui lòng chọn lại hoặc xóa sản phẩm." }
+    }
+    return buildCartItem(product, item.variantKey, item.quantity, item.selected) ?? { ...item, product, unavailableReason: "Vui lòng chọn lại biến thể hợp lệ." }
   }) })),
-  consumePurchasedItems: purchased => set(state => ({ items: state.items.flatMap(item => {
-    const bought = purchased.find(line => line.productId === item.productId && (line.variantId ?? "") === item.variantKey)
-    if (!bought) return [item]
-    const quantity = item.quantity - bought.quantity
-    return quantity > 0 ? [{ ...item, quantity, selected: false }] : []
-  }) })),
+  consumePurchasedItems: (purchased, requestId) => {
+    if (requestId) {
+      try { if (localStorage.getItem(CART_OPERATION_PREFIX + requestId)) return } catch { /* In-memory cart remains available. */ }
+    }
+    operationId = requestId
+    try {
+      set(state => ({ items: state.items.flatMap(item => {
+        const bought = purchased.find(line => line.productId === item.productId && (line.variantId ?? "") === item.variantKey)
+        if (!bought) return [item]
+        const quantity = item.quantity - bought.quantity
+        return quantity > 0 ? [{ ...item, quantity, selected: false }] : []
+      }) }))
+    } finally { operationId = undefined }
+  },
   items: [],
   removeSelected: () => set(state => ({ items: state.items.filter(item => !item.selected) })),
   clearSelection: () => set(state => ({ items: state.items.map(item => ({ ...item, selected: false })) })),
@@ -48,7 +64,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     const variant = item.product.variants?.find(current => (current._id ?? current.sku) === variantKey)
     const stock = item.product.variants?.length ? variant?.stock ?? 0 : item.product.stock ?? 0
     if (quantity > stock) return "Số lượng trong giỏ vượt quá tồn kho hiện tại."
-    set(state => ({ items: state.items.map(current => current === item ? { ...current, quantity } : current) }))
+    set(state => ({ items: state.items.map(current => current === item ? buildCartItem(current.product, current.variantKey, quantity, current.selected) ?? current : current) }))
     return null
   },
   addItem: (product, variantKey, quantity) => {
@@ -86,36 +102,56 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 }))
 
-// Selection is local to each tab; persist only public catalog snapshots and quantities.
+// Selection stays local; immutable operations merge quantities across tabs.
 let applyingStoredCart = false
-function restoreCart(value: string | null) {
-  const stored = parseStoredCart(value)
-  if (!stored) return
+function applyItems(items: CartItem[]) {
   const previous = useCartStore.getState().items
   applyingStoredCart = true
   try {
-    useCartStore.setState({ items: [] })
-    for (const item of stored) {
-      useCartStore.getState().addItem({ ...item.product, category: null, brand: null }, item.variantKey, item.quantity)
-    }
-    useCartStore.setState(state => ({ items: state.items.map(item => ({
-      ...item, selected: previous.find(current => current.productId === item.productId && current.variantKey === item.variantKey)?.selected ?? false,
-    })) }))
+    useCartStore.setState({ items: items.map(item => ({ ...item,
+      selected: previous.find(current => current.productId === item.productId && current.variantKey === item.variantKey)?.selected ?? false,
+    })) })
   } finally { applyingStoredCart = false }
 }
-
+function restoreLegacy(value: string | null) {
+  const stored = parseStoredCart(value)
+  if (!stored) return
+  const items = stored.flatMap(item => {
+    const product = { ...item.product, category: null, brand: null }
+    const built = buildCartItem(product, item.variantKey, item.quantity, false)
+    return built ? [{ ...built, ...(item.unavailableReason ? { unavailableReason: item.unavailableReason } : {}) }] : []
+  })
+  applyItems(items)
+}
 if (typeof window !== "undefined") {
-  try { restoreCart(window.localStorage.getItem(CART_STORAGE_KEY)) } catch { /* Storage may be disabled. */ }
-  useCartStore.subscribe(state => {
+  try {
+    const journal = readCartJournal(localStorage)
+    if (journal) applyItems(journal)
+    else {
+      restoreLegacy(localStorage.getItem(CART_STORAGE_KEY))
+      appendCartOperation(localStorage, [], useCartStore.getState().items, "legacy-import")
+    }
+  } catch { /* Storage may be disabled. */ }
+  useCartStore.subscribe((state, previous) => {
     if (applyingStoredCart) return
     try {
-      const value = serializeCart(state.items)
-      if (window.localStorage.getItem(CART_STORAGE_KEY) !== value) window.localStorage.setItem(CART_STORAGE_KEY, value)
-    } catch { /* Keep the in-memory cart usable if browser storage is unavailable. */ }
+      appendCartOperation(localStorage, previous.items, state.items, operationId)
+      // Legacy snapshot is retained for migration/debugging, never used to merge
+      // writes from an active v2 tab.
+      const journal = readCartJournal(localStorage)
+      if (journal) applyItems(journal)
+      const value = serializeCart(useCartStore.getState().items)
+      if (localStorage.getItem(CART_STORAGE_KEY) !== value) localStorage.setItem(CART_STORAGE_KEY, value)
+    } catch { /* Keep the in-memory cart usable if storage is unavailable. */ }
   })
   window.addEventListener("storage", event => {
-    if (event.storageArea === window.localStorage && (event.key === CART_STORAGE_KEY || event.key === null)) {
-      restoreCart(event.key === null ? null : event.newValue)
-    }
+    if (event.storageArea !== localStorage) return
+    try {
+      if (event.key?.startsWith(CART_OPERATION_PREFIX) || event.key === null) {
+        const journal = readCartJournal(localStorage)
+        if (journal) applyItems(journal)
+        else if (event.key === null) applyItems([])
+      }
+    } catch { /* Ignore unavailable storage. */ }
   })
 }

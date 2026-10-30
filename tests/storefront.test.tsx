@@ -262,3 +262,48 @@ it("shows temporary unavailability for a stopped product or an exhausted selecte
   expect(screen.getByRole("button", { name: "T\u1ea1m h\u1ebft h\u00e0ng" }).hasAttribute("disabled")).toBe(true)
   state.product.variants![0].stock = previous
 });
+
+it("requires reselecting a removed variant after refetch without falling back to product price or stock", () => {
+  const original = state.product
+  try {
+    state.product = { ...original, stock: 99, variants: [
+      { _id: "b".repeat(24), sku: "FIRST", variant_name: "First", price: 200000, stock: 2 },
+      { _id: "c".repeat(24), sku: "SECOND", variant_name: "Second", price: 300000, stock: 3 },
+    ] }
+    const renderDetail = () => <MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>
+    const view = render(renderDetail())
+    fireEvent.click(screen.getByRole("button", { name: "Second" }))
+    fireEvent.click(screen.getByRole("tab", { name: "Thông tin chi tiết" }))
+    state.product = { ...state.product, variants: [state.product.variants![0]] }
+    view.rerender(renderDetail())
+    expect(screen.getByRole("alert").textContent).toContain("Vui lòng chọn lại biến thể")
+    expect(screen.getByLabelText("Giá bán hiện tại").textContent).toBe("Chưa có giá")
+    expect(screen.queryByText("Còn 99 sản phẩm")).toBeNull()
+    expect((screen.getByRole("button", { name: "Tạm hết hàng" }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByRole("tab", { name: "Thông tin chi tiết" }).getAttribute("aria-selected")).toBe("true")
+    fireEvent.click(screen.getByRole("button", { name: "First" }))
+    expect(screen.getByRole("button", { name: "First" }).getAttribute("aria-pressed")).toBe("true")
+    expect(screen.getByLabelText("Giá bán hiện tại").textContent).toBe("180.000 ₫")
+    expect(screen.getByText("Còn 2 sản phẩm")).toBeTruthy()
+  } finally { state.product = original }
+})
+
+it("keeps an existing selection after refetch and uses the base product only when all variants are removed", () => {
+  const original = state.product
+  try {
+    state.product = { ...original, on_sale: true, price: 100000, stock: 4 }
+    const renderDetail = () => <MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>
+    const view = render(renderDetail())
+    const selected = state.product.variants![0]
+    state.product = { ...state.product, variants: [{ ...selected, price: 250000, stock: 1 }] }
+    view.rerender(renderDetail())
+    expect(screen.getByLabelText("Giá bán hiện tại").textContent).toBe("225.000 ₫")
+    expect(screen.getByText("Còn 1 sản phẩm")).toBeTruthy()
+    state.product = { ...state.product, variants: [] }
+    view.rerender(renderDetail())
+    useCartStore.setState({ items: [] })
+    fireEvent.click(screen.getByRole("button", { name: "Thêm vào giỏ hàng" }))
+    expect(useCartStore.getState().items[0].variantKey).toBe("")
+    expect(useCartStore.getState().items[0].unitPrice).toBe(90000)
+  } finally { state.product = original }
+})

@@ -3,6 +3,16 @@ import { ZodError } from "zod"
 import type { ApiError } from "@/types/api"
 
 const localizedMessages: Array<[RegExp, string]> = [
+  [/^Product price changed; refresh and review before ordering$/i, "Giá sản phẩm đã thay đổi. Vui lòng cập nhật giá và tồn kho để xem lại trước khi đặt hàng."],
+  [/^Insufficient stock$/i, "Sản phẩm không đủ tồn kho. Vui lòng cập nhật tồn kho và giảm số lượng."],
+  [/^Product is temporarily unavailable$/i, "Sản phẩm hiện ngừng bán. Vui lòng chọn sản phẩm khác."],
+  [/^Active product not found$/i, "Sản phẩm không còn khả dụng. Vui lòng cập nhật giỏ hàng."],
+  [/^Variant not found$/i, "Biến thể không còn khả dụng. Vui lòng chọn lại biến thể hoặc xóa sản phẩm."],
+  [/^Select a product variant$/i, "Vui lòng chọn biến thể sản phẩm trước khi đặt hàng."],
+  [/^Quantity is below the product minimum order quantity$/i, "Số lượng chưa đạt mức đặt tối thiểu của sản phẩm. Vui lòng điều chỉnh giỏ hàng."],
+  [/^(Brand|Category) is missing or inactive$/i, "Sản phẩm thuộc thương hiệu hoặc danh mục không còn khả dụng. Vui lòng chọn sản phẩm khác."],
+  [/^Invalid province\/district\/ward hierarchy$/i, "Địa chỉ nhận hàng không hợp lệ. Vui lòng chọn lại tỉnh, huyện và xã."],
+  [/^Request ID already used with different checkout data$/i, "Yêu cầu đặt hàng này đã được gửi với nội dung khác. Vui lòng kiểm tra lịch sử đơn hàng."],
   [/^email hoặc mật khẩu không chính xác$/i, "Email hoặc mật khẩu không đúng, hoặc tài khoản đã bị vô hiệu hóa."],
   [/^token không được cung cấp$/i, "Thiếu thông tin xác thực. Vui lòng đăng nhập lại."],
   [/^token không hợp lệ$/i, "Thông tin xác thực không hợp lệ. Vui lòng đăng nhập lại."],
@@ -23,10 +33,6 @@ const localizedMessages: Array<[RegExp, string]> = [
   [/^sku tối đa 64 ký tự$/i, "Mã SKU không được vượt quá 64 ký tự."],
   [/^giá biến thể không được nhỏ hơn 0$/i, "Giá biến thể không được nhỏ hơn 0."],
 ]
-
-function isLocalized(message: string): boolean {
-  return /[\u0102-\u01b0\u1ea0-\u1ef9\u0110\u0111]/.test(message)
-}
 
 function translateMessage(message: string): string {
   const translation = localizedMessages.find(([pattern]) => pattern.test(message))?.[1]
@@ -79,7 +85,7 @@ function transportMessage(error: unknown): string {
 }
 
 function translateIssueMessage(message: string): string {
-  return isLocalized(message) ? translateMessage(message) : message
+  return translateMessage(message)
 }
 
 function validationLabel(field: string, url = ""): string {
@@ -170,6 +176,7 @@ export function getApiError(error: unknown): ApiError {
       statusCode,
       message,
       errors,
+      ...(typeof error.response?.data?.code === "string" ? { code: error.response.data.code } : {}),
     }
   }
 

@@ -8,6 +8,7 @@ import { CartClearConfirmation } from "@/features/cart/components/cart-clear-con
 import { useCartStore } from "@/stores/cart.store"
 import { ProductImage } from "@/features/products/components/product-image"
 import { formatPrice } from "@/features/products/types/products"
+import { cartTotal } from "@/features/cart/utils/cart-total"
 
 export default function CartPage() {
   const navigate = useNavigate()
@@ -17,7 +18,7 @@ export default function CartPage() {
   const setSelected = useCartStore(state => state.setSelected)
   const selectAll = useCartStore(state => state.selectAll)
   const selectedItems = items.filter(item => item.selected)
-  const total = selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+  const total = cartTotal(selectedItems)
 
   return <div className="bg-[#fbfcfa] py-8 sm:py-12"><div className="store-container space-y-6">
     <nav aria-label="Breadcrumb" className="rounded-2xl border border-gray-100 bg-white p-4 sm:px-6">
@@ -55,6 +56,7 @@ export default function CartPage() {
           <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
             <Link to={`/shop/${item.slug}`} className="break-words font-semibold hover:text-[#4d9210]">{item.name}</Link>
             <CartVariantPicker item={item} />
+            {item.unavailableReason && <p role="alert" className="text-sm text-red-600">{item.unavailableReason}</p>}
             <p aria-live="polite" className="font-semibold text-red-600">{formatPrice(item.unitPrice)} ₫</p>
           </div>
           <div className="col-span-2 flex flex-col items-end justify-between gap-4 self-stretch justify-self-end sm:col-span-1">

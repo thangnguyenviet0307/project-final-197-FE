@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest"
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AxiosError, AxiosHeaders } from "axios"
@@ -16,6 +16,7 @@ vi.mock("@/features/storefront/services/catalog.service", () => ({ getStoreProdu
 const product: Product = { _id: "a".repeat(24), slug: "test", product_name: "Sản phẩm A", price: 100000, stock: 20, category: null, brand: null }
 const other = { ...product, _id: "b".repeat(24), slug: "other", product_name: "Sản phẩm B" }
 beforeEach(() => {
+  sessionStorage.clear()
   vi.clearAllMocks()
   useAuthStore.setState({ user: { id: "customer", name: "Nguyễn An", firstName: "An", lastName: "Nguyễn", email: "test@example.com", phone: "0901234567", accountType: "customer", mustChangePassword: false }, isAuthenticated: true, isLoading: false })
   useCartStore.setState({ items: [] })
@@ -121,4 +122,30 @@ it("requires customer login before ordering and rounds discounted line totals li
   expect((screen.getByRole("button", { name: "Thanh toán" }) as HTMLButtonElement).disabled).toBe(true)
   expect(screen.getByRole("link", { name: "đăng nhập" }).getAttribute("href")).toBe("/thanh-vien?act=login")
   expect(discountedLineTotal(0.05, 10, 3)).toBe(0.14)
+})
+
+it("restores an uncertain request after page remount and retries with the original body even with no selection", async () => {
+  vi.mocked(createCheckout).mockRejectedValueOnce(new AxiosError("Timeout", "ECONNABORTED"))
+    .mockResolvedValueOnce({ _id: "order", orderCode: "ORD-ABC234", totalAmount: 200000, orderStatus: 1 })
+  mount()
+  await fillAddress()
+  fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
+  await screen.findByRole("button", { name: "Thử lại" })
+  const original = vi.mocked(createCheckout).mock.calls[0][0]
+  cleanup()
+  useCartStore.getState().clearSelection()
+  mount()
+  fireEvent.click(await screen.findByRole("button", { name: "Thử lại" }))
+  await screen.findByText("Đặt hàng thành công")
+  expect(vi.mocked(createCheckout).mock.calls[1][0]).toEqual(original)
+  expect(sessionStorage.getItem("storefront-pending-checkout-v1:customer")).toBeNull()
+})
+
+it("blocks checkout for an unavailable variant without discarding the cart", async () => {
+  useCartStore.getState().refreshProducts([], [product.slug!])
+  mount()
+  await fillAddress()
+  expect((screen.getByRole("button", { name: "Thanh toán" }) as HTMLButtonElement).disabled).toBe(true)
+  expect(createCheckout).not.toHaveBeenCalled()
+  expect(useCartStore.getState().items).toHaveLength(2)
 })

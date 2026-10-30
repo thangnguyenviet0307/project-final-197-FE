@@ -177,6 +177,10 @@ await heroService.updateHeroSlide({ id, input: { expectedVersion: 0, description
 await heroService.deleteHeroSlide({ id, expectedVersion: 1 })
 const checkoutValidation = loadValidation("validations/checkout.validation.ts")
 const checkoutService = evaluate(path.join(root, "src/features/checkout/services/checkout.service.ts"), specifier => {
+  if (specifier === "@/features/checkout/schemas/checkout-schema") return evaluate(path.join(root, "src/features/checkout/schemas/checkout-schema.ts"), dependency => {
+    if (dependency === "zod") return require("zod")
+    throw new Error(`Unsupported checkout schema import: ${dependency}`)
+  })
   if (specifier === "@/services/api") return { api: {
     async post(url, body) {
       assert.equal(url, "/customer-auth/orders")
@@ -188,4 +192,15 @@ const checkoutService = evaluate(path.join(root, "src/features/checkout/services
   throw new Error(`Unsupported checkout service import: ${specifier}`)
 })
 await checkoutService.createCheckout({ requestId: webcrypto.randomUUID(), recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, districtCode: 2, wardCode: 3, street: "12 Đường A", note: "", paymentMethod: "cod", items: [{ productId: id, quantity: 2, expectedUnitPrice: 100000 }] })
+const adminOrderAddress = evaluate(path.join(root, "src/features/orders/schemas/admin-order-schema.ts"), specifier => {
+  if (specifier === "zod") return require("zod")
+  throw new Error(`Unsupported order schema import: ${specifier}`)
+}).adminOrderAddressSchema
+const backendAddress = loadValidation("validations/common.validation.ts").createAddressSchema()
+for (const [field, limit] of [["street", 255], ["city", 50], ["state", 50]]) {
+  for (const length of [0, limit, limit + 1]) {
+    const value = { street: "Street", city: "City", state: "State", [field]: "x".repeat(length) }
+    assert.equal(adminOrderAddress.safeParse(value).success, backendAddress.safeParse(value).success, `Order address boundary: ${field}/${length}`)
+  }
+}
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

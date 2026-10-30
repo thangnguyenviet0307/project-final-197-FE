@@ -1,6 +1,7 @@
 import { beforeEach, expect, it } from "vitest"
 import { act, fireEvent, render, screen } from "@testing-library/react"
-import { CART_STORAGE_KEY, serializeCart } from "@/features/cart/utils/cart-storage"
+import { CART_STORAGE_KEY } from "@/features/cart/utils/cart-storage"
+import { appendCartOperation, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 import { useCartStore } from "@/stores/cart.store"
 import type { Product } from "@/features/products/types/products"
@@ -22,13 +23,14 @@ it("persists cart contents without purchase selection and restores changes from 
   const saved = window.localStorage.getItem(CART_STORAGE_KEY)!
   expect(JSON.parse(saved).items[0]).toMatchObject({ quantity: 2, variantKey: "blue" })
   expect(saved).not.toContain('"selected"')
-  useCartStore.setState({ items: [] })
-  act(() => window.dispatchEvent(new StorageEvent("storage", { key: CART_STORAGE_KEY, newValue: saved, storageArea: window.localStorage })))
-  expect(useCartStore.getState().items[0]).toMatchObject({ quantity: 2, variantKey: "blue", unitPrice: 180000, selected: false })
-  const changed = serializeCart(useCartStore.getState().items.map(item => ({ ...item, quantity: 3 })))
-  act(() => window.dispatchEvent(new StorageEvent("storage", { key: CART_STORAGE_KEY, newValue: changed, storageArea: window.localStorage })))
+  useCartStore.getState().clearSelection()
+  const before = useCartStore.getState().items
+  appendCartOperation(localStorage, before, before.map(item => ({ ...item, quantity: 3 })), "other-tab-add")
+  act(() => window.dispatchEvent(new StorageEvent("storage", { key: CART_OPERATION_PREFIX + "other-tab-add", storageArea: window.localStorage })))
+  expect(useCartStore.getState().items[0]).toMatchObject({ quantity: 3, variantKey: "blue", unitPrice: 180000, selected: false })
   expect(useCartStore.getState().items[0].quantity).toBe(3)
-  act(() => window.dispatchEvent(new StorageEvent("storage", { key: CART_STORAGE_KEY, newValue: null, storageArea: window.localStorage })))
+  appendCartOperation(localStorage, useCartStore.getState().items, [], "other-tab-remove")
+  act(() => window.dispatchEvent(new StorageEvent("storage", { key: CART_OPERATION_PREFIX + "other-tab-remove", storageArea: window.localStorage })))
   expect(useCartStore.getState().items).toEqual([])
 })
 

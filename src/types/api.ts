@@ -15,6 +15,7 @@ export interface ApiResponse<T> extends ApiResult<T> {
 }
 
 export interface ApiError {
+  code?: string
   statusCode: number
   message: string
   errors?: { field: string; message: string; code?: string }[]

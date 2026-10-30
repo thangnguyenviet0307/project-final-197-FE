@@ -12,6 +12,8 @@ import { OrderStatistics } from "@/features/orders/components/order-statistics"
 import { OrderDateFilter } from "@/features/orders/components/order-date-filter"
 import { orderDateBoundary, validOrderDate } from "@/features/orders/utils/order-date"
 import { OrderSearch } from "@/features/orders/components/order-search"
+import { useQuery } from "@tanstack/react-query"
+import { customersService } from "@/features/customers/services/customers.service"
 
 function positive(value: string | null, fallback: number, max = Number.MAX_SAFE_INTEGER) { const number = Number(value); return Number.isSafeInteger(number) && number > 0 && number <= max ? number : fallback }
 export default function AdminOrdersPage() {
@@ -25,6 +27,7 @@ export default function AdminOrdersPage() {
   const search = (params.get("search") ?? "").trim().slice(0, 100)
   const validRange = (!from || validOrderDate(from)) && (!to || validOrderDate(to)) && (!from || !to || from <= to)
   const customerId = params.get("customerId") ?? ""
+  const customer = useQuery({ queryKey: ["customers", "detail", customerId], queryFn: () => customersService.getCustomerById(customerId), enabled: /^[a-f\d]{24}$/i.test(customerId) })
   const query = useOrders({ page, limit, ...(/^[a-f\d]{24}$/i.test(customerId) ? { customerId } : {}), ...(search ? { search } : {}), ...(isOrderStatus(status) ? { orderStatus: status } : {}), ...(validRange && from ? { dateFrom: orderDateBoundary(from) } : {}), ...(validRange && to ? { dateTo: orderDateBoundary(to, true) } : {}) })
   const pagination = query.data?.pagination
   const totalPages = Math.max(1, pagination?.totalPages ?? 1)
@@ -33,6 +36,7 @@ export default function AdminOrdersPage() {
   return <BaseLayout title="Đơn hàng"><div className="space-y-5 px-4 lg:px-6">
     <Button nativeButton={false} render={<Link to="/auth/orders/new" />}>Create order</Button>
     <OrderStatistics />
+    {customerId && <div className="rounded-lg border p-4"><p className="font-semibold">Lịch sử đơn hàng của khách hàng: {customer.data ? `${customer.data.data.first_name} ${customer.data.data.last_name}` : customerId}</p>{customer.data && <p className="text-sm">{customer.data.data.email}</p>}<Link className="text-sm underline" to="/auth/orders">Xem tất cả đơn hàng</Link></div>}
     <div><h1 className="text-2xl font-semibold">Đơn hàng</h1><p className="text-sm text-muted-foreground">Xem lịch sử và quản lý xử lý đơn hàng. Đơn mới nhất hiển thị trước.</p></div>
     <OrderSearch key={search} initial={search} onSearch={value => change("search", value)} />
     <OrderDateFilter key={`${from}/${to}`} initialFrom={from} initialTo={to} onApply={(dateFrom, dateTo) => setParams(previous => {
