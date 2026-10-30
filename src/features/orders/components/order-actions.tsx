@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { LoaderCircle, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,7 +18,7 @@ export function OrderActions({ order, onDeleted, disabled }: { order: Order; onD
   const [reason, setReason] = useState("")
   const update = useUpdateOrderStatus()
   const remove = useDeleteOrder()
-  const admin = user?.role === "admin"
+  const admin = isAdministrator(user?.role)
   const handler = typeof order.userId === "string" ? order.userId : order.userId?._id
   const canEdit = admin || (user?.role === "staff" && handler === user.id)
   const allowed = orderTransitions[order.orderStatus] ?? []

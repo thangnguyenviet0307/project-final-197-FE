@@ -27,6 +27,14 @@ afterEach(() => {
 })
 
 describe("auth API/session", () => {
+  it("accepts a Super Admin login without downgrading the role", async () => {
+    authApi.defaults.adapter = async config => response(config, { data: {
+      ...newTokens, user: { ...user, role: "super_admin", accountType: "user" },
+    } })
+    const result = await login({ email: user.email, password: "Password123" })
+    expect(result.role).toBe("super_admin")
+    expect(useAuthStore.getState().user?.role).toBe("super_admin")
+  })
   it("accepts legacy login responses without firstName/lastName and displays the email", async () => {
     authApi.defaults.adapter = async (config) => response(config, { data: {
       ...newTokens, user: { id: "legacy", email: "legacy@example.com", role: "admin" },

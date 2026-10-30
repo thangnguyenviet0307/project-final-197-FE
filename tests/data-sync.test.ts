@@ -5,7 +5,23 @@ import { publishBusinessChange, subscribeToBusinessChanges } from "@/services/da
 import { queryClient } from "@/services/query-client"
 
 const cleanups: (() => void)[] = []
-afterEach(() => { cleanups.splice(0).reverse().forEach(stop => stop()); vi.restoreAllMocks(); localStorage.removeItem("admin-data-updated") })
+afterEach(() => { cleanups.splice(0).reverse().forEach(stop => stop()); vi.useRealTimers(); vi.restoreAllMocks(); localStorage.removeItem("admin-data-updated") })
+
+it("does not poll mounted business queries while idle but still refreshes after invalidation", async () => {
+  vi.useFakeTimers()
+  const client = new QueryClient({ defaultOptions: queryClient.getDefaultOptions() })
+  const read = vi.fn(async () => "current data")
+  const observer = new QueryObserver(client, { queryKey: ["products", "idle"], queryFn: read })
+  const stop = observer.subscribe(() => {})
+  cleanups.push(() => { stop(); client.clear() })
+  await vi.advanceTimersByTimeAsync(0)
+  expect(read).toHaveBeenCalledTimes(1)
+  await vi.advanceTimersByTimeAsync(60_000)
+  expect(read).toHaveBeenCalledTimes(1)
+  expect(observer.getCurrentResult().data).toBe("current data")
+  await client.invalidateQueries({ queryKey: ["products"] })
+  expect(read).toHaveBeenCalledTimes(2)
+})
 
 async function activeProduct() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 60_000 } } })

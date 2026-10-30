@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { PersonalSales } from "@/features/orders/components/personal-sales"
 import { Link } from "react-router-dom"
 import { useIsFetching, useQueryClient } from "@tanstack/react-query"
@@ -75,7 +76,7 @@ export default function DashboardPage() {
   const fetchingOrders = useIsFetching({ queryKey: ["orders"] })
   const fetchingProducts = useIsFetching({ queryKey: ["products"] })
   const refreshing = fetchingOrders + fetchingProducts > 0
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   return <BaseLayout title="Bảng điều khiển" description="Tổng quan nhanh về đơn hàng, sản phẩm và tồn kho.">
     <div className="space-y-6 px-4 lg:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">

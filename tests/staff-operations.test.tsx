@@ -76,7 +76,7 @@ it("staff can edit notes on their own open order", async () => {
   setup(<OrderNoteEditor order={order} />)
   fireEvent.change(screen.getByLabelText("Order note"), { target: { value: "Call before delivery" } })
   fireEvent.click(screen.getByRole("button", { name: "Save note" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("patch", `/orders/${id}/note`, { orderNote: "Call before delivery" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("patch", `/orders/${id}/note`, { orderNote: "Call before delivery", expectedOrderNote: "" }))
 })
 it("staff can add customers and inspect history without edit, delete or export controls", async () => {
   mockApi()

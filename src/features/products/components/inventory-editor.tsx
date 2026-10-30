@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
@@ -18,7 +19,7 @@ export function InventoryEditor({ product }: { product: Product }) {
     setOriginal(saved); setStocks(stocksFor(saved))
     await Promise.all([client.invalidateQueries({ queryKey: ["products"] }), client.invalidateQueries({ queryKey: ["orders"] })])
   } })
-  if (role !== "admin" && role !== "staff") return null
+  if (!isAdministrator(role) && role !== "staff") return null
   const valid = stocks.every(stock => stock.trim() !== "" && Number.isSafeInteger(Number(stock)) && Number(stock) >= 0)
   const busy = mutation.isPending || reloading
   return <section className="space-y-3 rounded-lg border p-4" aria-label="Cập nhật tồn kho">

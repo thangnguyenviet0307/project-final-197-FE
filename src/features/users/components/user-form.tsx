@@ -11,8 +11,10 @@ import { getDefaultUserPassword } from "@/features/users/services/users.service"
 import { createUserSchema } from "@/features/users/schemas/user-schema"
 import type { CreateUserInput } from "@/features/users/types/users"
 import { useCreateUser } from "@/features/users/hooks/use-create-user"
+import { useAuthStore } from "@/stores/auth.store"
 
 export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: () => void }) {
+  const superAdmin = useAuthStore(state => state.user?.role === "super_admin")
   const form = useForm<CreateUserInput>({
     resolver: zodResolver(createUserSchema),
     defaultValues: { firstName: "", lastName: "", email: "", password: getDefaultUserPassword("staff"), role: "staff" },
@@ -74,7 +76,7 @@ export function UserForm({ onSaved, onCancel }: { onSaved: () => void; onCancel:
                         </SelectTrigger>
                         <SelectContent alignItemWithTrigger={false} align="start" className="rounded-xl p-1.5">
                           <SelectItem value="staff" className="cursor-pointer rounded-lg px-3 py-2">Nhân viên</SelectItem>
-                          <SelectItem value="admin" className="cursor-pointer rounded-lg px-3 py-2">Quản trị viên</SelectItem>
+                          {superAdmin && <SelectItem value="admin" className="cursor-pointer rounded-lg px-3 py-2">Quản trị viên</SelectItem>}
                         </SelectContent>
                       </Select>
                     )} />

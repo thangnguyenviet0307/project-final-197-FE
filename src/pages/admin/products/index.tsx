@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useCallback, useState, type ReactElement } from "react"
 import { Link, useLocation, useSearchParams } from "react-router-dom"
 import { Eye, Pencil, Plus, Trash2, Package, CheckCircle2, PackageX, Boxes } from "lucide-react"
@@ -55,7 +56,7 @@ export default function AdminProductsPage() {
     updated.set("page", "1")
     return updated
   }, { replace: true }), [setParams])
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const [deleting, setDeleting] = useState<Product | null>(null)
   const changePage = (next: number) => setParams(previous => { previous.set("page", String(next)); return previous })
   const products = query.data?.data ?? []

@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { DeleteCategoryDialog } from "@/features/categories/components/delete-category-dialog"
 import { Link } from "react-router-dom"
 import { CatalogImage } from "@/components/catalog-image"
@@ -29,7 +30,7 @@ import {
 import { FolderTree, FolderPlus, Pencil, Trash2, CheckCircle2, Folder, Layers } from "lucide-react"
 
 export default function AdminCategoriesPage() {
-  const canManage = useAuthStore(state => state.user?.role === "admin")
+  const canManage = useAuthStore(state => isAdministrator(state.user?.role))
   const { data: categories = [], isLoading, isFetching, error, refetch } = useCategories()
 
   // Search & Filter state

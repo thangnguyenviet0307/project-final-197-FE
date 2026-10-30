@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -13,7 +14,7 @@ export function ReassignOrderAction({ order, disabled }: { order: Order; disable
   const [handler, setHandler] = useState("")
   const mutation = useReassignOrder()
   const current = typeof order.userId === "string" ? order.userId : order.userId?._id
-  if (role !== "admin" || ![1, 2].includes(order.orderStatus)) return null
+  if (!isAdministrator(role) || ![1, 2].includes(order.orderStatus)) return null
   return <>
     <Button size="sm" variant="outline" disabled={disabled || mutation.isPending} onClick={() => { mutation.reset(); setHandler(""); setOpen(true) }}>Đổi người xử lý</Button>
     <Dialog open={open} onOpenChange={value => { if (!mutation.isPending) setOpen(value) }}>

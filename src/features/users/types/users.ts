@@ -8,7 +8,7 @@ export interface ManagedUser {
   firstName: string;
   lastName: string;
   email: string;
-  role: "admin" | "staff";
+  role: "super_admin" | "admin" | "staff";
   active: boolean;
   mustChangePassword?: boolean;
   personalEmail?: string;

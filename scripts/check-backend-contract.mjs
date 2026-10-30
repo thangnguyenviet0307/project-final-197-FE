@@ -19,6 +19,7 @@ const allowed = new Set([
   "validations/users.validation.ts", "validations/brands.validation.ts",
   "validations/categories.validation.ts", "validations/checkout.validation.ts",
   "validations/products.validation.ts", "validations/hero-slides.validation.ts",
+  "validations/orders.validation.ts", "types/orders.type.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -203,4 +204,8 @@ for (const [field, limit] of [["street", 255], ["city", 50], ["state", 50]]) {
     assert.equal(adminOrderAddress.safeParse(value).success, backendAddress.safeParse(value).success, `Order address boundary: ${field}/${length}`)
   }
 }
+const noteValidation = loadValidation("validations/orders.validation.ts").updateOrderNoteSchema
+noteValidation.parse({ orderNote: "Updated note", expectedOrderNote: "Original note" })
+noteValidation.parse({ orderNote: "First note", expectedOrderNote: "" })
+assert.equal(noteValidation.safeParse({ orderNote: "Unsafe update without baseline" }).success, false)
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

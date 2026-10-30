@@ -20,23 +20,26 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Roles and authorization
 
+- Administrative roles are super_admin > admin > staff. Initial protected bootstrap creates the sole Super Admin; ordinary create/update payloads accept only admin/staff. Super Admin inherits all existing capabilities; Admin retains store operations but can create/manage/reset/revoke/delete only Staff and cannot change roles. Only Super Admin can create/manage Admin and change Admin/Staff roles. Every management write scopes target roles in Backend, not only the UI.
+- The Super Admin cannot be deactivated/deleted/demoted/reset through user management, even by itself; self profile/password APIs remain available. Ownership transfer requires current-password verification and an eligible active Admin/Staff with no temporary-password requirement, runs both role changes and session revocation in one locked transaction, and demotes the old owner to Admin. Both accounts sign in again. Existing databases require the explicit dry-run/apply first-account migration described in Backend scripts/README-super-admin.md; never silently promote on startup.
+
 - GET /products/statistics returns total, active, outOfStock and stockUnits across the catalog for ProductView roles. GET /orders/personal-sales returns completedOrders and revenue for completed orders assigned to the authenticated actor only. Register these named endpoints before /:id; retain ObjectId validation for actual detail routes.
 
 - Admin manages staff accounts, catalog metadata, prices, images, brands/categories and destructive operations.
 - Staff can read products/categories/brands/customers and all order history. Staff may accept eligible orders and manage only their assigned open orders. Staff cannot edit prices/catalog metadata, delete orders/customers, reassign handlers or manage users.
 - /brands is readable by admin/staff. Hide add/edit/delete controls from staff; /brands/new remains admin-only. Sidebar and command search must match route guards.
 - Inventory is editable by admin/staff only through PATCH /products/:id/inventory. Send expectedVersion plus stock OR variant IDs/stocks; never send prices or catalog fields. Keep the input after 409 and require explicit reload/review before retrying with a new version. Products with variants derive aggregate stock from variants.
-- Customer is an account type, not an administrative role. User roles are admin/staff only; customer credentials and contact profiles live exclusively in customers. Public registration accepts only firstName, lastName, email and password and never accepts role, activation or token fields.
+- Customer is an account type, not an administrative role. User roles are super_admin/admin/staff only; customer credentials and contact profiles live exclusively in customers. Public registration accepts only firstName, lastName, email and password and never accepts role, activation or token fields.
 - Customer registration creates exactly one Customer with accountEnabled=true and a hashed password. It never creates/queries users or links existing contacts by email. Legacy contacts are retained without login and excluded from the registered-customer management list.
 - User and Customer profiles are independent. Shared email/name/phone never trigger cross-collection synchronization, cascading update/delete or email-based linking. Customer IDs remain the order relation identity.
 - User emails are unique in users; customer emails are independently unique in customers. Identical emails can have independent passwords/sessions. Admin authentication queries users only; storefront authentication queries enabled customers only.
 - Migrate existing customer User accounts with Backend scripts/migrate-customer-accounts.mjs (read-only by default; --apply requires approved database change). Explicit accountId links preserve existing Customer IDs; unlinked accounts create a new Customer only when no email/ID conflict exists. Do not merge contacts by email. Migration archives source/destination before removing legacy User customer records, revokes customer sessions, preserves profiles and never writes orders. The old scope-user-email-indexes.mjs tool is obsolete and refuses to run.
 - customers.phone is non-unique. The customer-account migration inspects and, only in approved apply mode, removes a legacy unique phone index without editing contacts. Never run broad syncIndexes.
-- /users lists admin/staff accounts, excluding customer accounts. Customer registration must not grant access to staff API endpoints.
+- /users lists super_admin/admin/staff accounts, excluding customer accounts. Customer registration must not grant access to staff API endpoints.
 - Admin Customers lists only self-registered Customer accounts through GET /customers; no administrative role may create a customer. POST /customers returns 403 and CustomerCreate is removed. Existing admin update/delete and staff read permissions are retained; deactivating a Customer revokes only its customer session. Historical manual contacts remain in storage for orders.
 - Backend permissions always enforce access. Hiding a button or adding a client guard is not sufficient authorization.
 
-Business queries refresh every five seconds while visible, in addition to same-origin cross-tab invalidation.
+Business queries do not poll periodically. Keep mutation-driven cache invalidation and same-origin cross-tab change signals; revalidate on navigation, window focus and reconnect. Changes from another browser/device are picked up on revalidation or manual refresh, not pushed in real time.
 
 ## Order lifecycle
 
@@ -187,6 +190,10 @@ Catalog filter performance: the popup uses a stable viewport-bounded height, ske
 
 
 ## Confirmed review fixes
+
+- Order note editors use a stable order ID key. Background note changes update pristine editors, preserve dirty drafts and require an explicit choice between the latest note and the draft before saving. Note updates require expectedOrderNote (the exact original text, empty for missing/null notes). Backend compares it inside the atomic update alongside handler/open-status scope; stale edits return 409 ORDER_NOTE_CONFLICT. FE retains the original baseline until explicit conflict review and never automatically retries a conflicting write.
+- Cart persistence queues immutable before/after operations with stable IDs in memory until journal writes succeed. Flush pending operations before rehydration, retry on local changes/storage events/window focus, and retain pending purchase IDs to avoid consuming twice while storage is unavailable. Pending operations cannot survive closing/reloading the tab while storage remains unavailable.
+- Theme storage reads/writes may fail. Accept only light/dark/system from storage, fall back to the configured default, and update in-memory theme independently of persistence.
 
 - Product partial updates preserve the existing slug when slug is omitted, including name changes. Explicit slug changes use the existing unique-slug allocation. FE metadata updates no longer send the old slug to compensate for backend behavior.
 - Store detail retains a selected variant ID across refetch while it remains present. If it disappears while other variants remain, show a reselection prompt, no base-product price/stock fallback, and block adding to cart. Preserve unrelated tab/quantity drafts; quantity is bounded against the current selection. If all variants disappear, use the base product and an empty cart variant key.

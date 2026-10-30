@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -16,7 +17,7 @@ import { getApiError } from "@/services/api"
 export function ProductReviews({ id }: { id: string }) {
   const [page, setPage] = useState(1)
   const [deleting, setDeleting] = useState<string | null>(null)
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const { metrics, reviews, create, remove } = useProductReviews(id, page)
   const form = useForm<ProductReviewInput>({ resolver: zodResolver(productReviewSchema), defaultValues: { reviewerName: "", rating: 5, comment: "" } })
   return <section className="space-y-5 rounded-lg border p-4" aria-label="Đánh giá sản phẩm">

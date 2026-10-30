@@ -1,4 +1,5 @@
 "use client"
+import { isAdministrator } from "@/features/auth/utils/roles"
 
 import * as React from "react"
 import {
@@ -179,8 +180,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
       (!["/auth/users", "/auth/hero-slides"].includes(item.url) ||
-       user?.role === "admin")
-    ).map(item => item.url === "/auth/categories" && user?.role === "admin" ? {
+       isAdministrator(user?.role))
+    ).map(item => item.url === "/auth/categories" && isAdministrator(user?.role) ? {
       ...item,
       items: [
         { title: "Danh sách danh mục", url: "/auth/categories" },

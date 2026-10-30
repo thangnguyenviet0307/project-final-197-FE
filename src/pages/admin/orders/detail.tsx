@@ -24,9 +24,10 @@ export default function OrderDetailPage() {
   const customer = order ? orderCustomer(order) : null
   return <BaseLayout title="Chi tiết đơn hàng"><div className="space-y-6 px-4 lg:px-6">
     <Button nativeButton={false} variant="outline" render={<Link to={returnTo} />}>Về danh sách đơn hàng</Button>
-    {!order || query.isError ? <OrderQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
+    {!order ? <OrderQueryState invalid={!/^[a-f\d]{24}$/i.test(id)} error={query.error} retry={query.refetch} /> : <>
+      {query.isError && <div role="alert" className="space-y-2 text-sm text-destructive"><p>Không thể cập nhật đơn hàng. Đang giữ dữ liệu đã tải và bản nháp của bạn.</p><Button type="button" variant="outline" onClick={() => void query.refetch()}>Thử cập nhật lại</Button></div>}
       <div className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="break-all text-xl font-semibold">Đơn hàng {order.orderCode ?? order._id}</h1><p className="text-sm text-muted-foreground">{orderDate(order.orderDate)}</p></div><div className="flex flex-wrap items-center gap-2"><OrderStatusBadge status={order.orderStatus} /><OrderActions order={order} disabled={query.isFetching} onDeleted={() => navigate(returnTo, { replace: true })} /></div></div>
-      <OrderNoteEditor key={`${order._id}-${order.orderNote}`} order={order} />
+      <OrderNoteEditor key={order._id} order={order} />
       {order.cancellationReason && <p className="text-sm">Cancellation reason: {order.cancellationReason}</p>}
       {query.isFetching && <p role="status">Đang cập nhật đơn hàng…</p>}
       <div className="grid gap-4 md:grid-cols-2"><Card><CardHeader><CardTitle>Khách hàng và giao hàng</CardTitle></CardHeader><CardContent className="space-y-2 break-words text-sm"><p className="font-medium">{personName(customer)}</p><p>{customer?.email ?? "Chưa có email"}</p><p>{customer?.phone ?? "Chưa có số điện thoại"}</p>{order.recipientName && <p>Người nhận: {order.recipientName}</p>}{order.recipientPhone && <p>Số điện thoại người nhận: {order.recipientPhone}</p>}<p>{[order.street, order.deliveryAddress?.ward, order.city, order.state].filter(Boolean).join(", ")}</p>{order.orderNote && <p className="whitespace-pre-wrap">Ghi chú: {order.orderNote}</p>}</CardContent></Card>

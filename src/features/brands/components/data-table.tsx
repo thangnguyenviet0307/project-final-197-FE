@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useAuthStore } from "@/stores/auth.store"
 import { getApiError } from "@/services/api"
 import { Link } from "react-router-dom"
@@ -140,7 +141,7 @@ function DeleteBrandDialog({
 }
 
 export function BrandTable({ brands, searchQuery, onSearch, onDelete, onEdit }: BrandTableProps) {
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [page, setPage] = useState(1)
   const limit = 10

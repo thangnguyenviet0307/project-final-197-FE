@@ -7,6 +7,7 @@ import { CART_STORAGE_KEY, parseStoredCart, serializeCart } from "@/features/car
 import { appendCartOperation, readCartJournal, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
 
 let operationId: string | undefined
+const pendingOperations: { before: CartItem[]; after: CartItem[]; id: string }[] = []
 
 interface CartState {
   refreshProducts: (products: Product[], missingSlugs?: string[]) => void
@@ -34,6 +35,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   }) })),
   consumePurchasedItems: (purchased, requestId) => {
     if (requestId) {
+      if (pendingOperations.some(operation => operation.id === requestId)) return
       try { if (localStorage.getItem(CART_OPERATION_PREFIX + requestId)) return } catch { /* In-memory cart remains available. */ }
     }
     operationId = requestId
@@ -123,35 +125,50 @@ function restoreLegacy(value: string | null) {
   })
   applyItems(items)
 }
+// Keep stable operation IDs until persistence succeeds. Retrying after a partial
+// write cannot duplicate a delta, and stale journal data never replaces a draft.
+function syncCartStorage() {
+  while (pendingOperations.length) {
+    const operation = pendingOperations[0]
+    appendCartOperation(localStorage, operation.before, operation.after, operation.id)
+    pendingOperations.shift()
+  }
+  const journal = readCartJournal(localStorage)
+  if (journal) applyItems(journal)
+  const value = serializeCart(useCartStore.getState().items)
+  if (localStorage.getItem(CART_STORAGE_KEY) !== value) localStorage.setItem(CART_STORAGE_KEY, value)
+}
 if (typeof window !== "undefined") {
   try {
     const journal = readCartJournal(localStorage)
     if (journal) applyItems(journal)
     else {
       restoreLegacy(localStorage.getItem(CART_STORAGE_KEY))
-      appendCartOperation(localStorage, [], useCartStore.getState().items, "legacy-import")
+      pendingOperations.push({ before: [], after: useCartStore.getState().items, id: "legacy-import" })
+      syncCartStorage()
     }
   } catch { /* Storage may be disabled. */ }
   useCartStore.subscribe((state, previous) => {
     if (applyingStoredCart) return
     try {
-      appendCartOperation(localStorage, previous.items, state.items, operationId)
-      // Legacy snapshot is retained for migration/debugging, never used to merge
-      // writes from an active v2 tab.
-      const journal = readCartJournal(localStorage)
-      if (journal) applyItems(journal)
-      const value = serializeCart(useCartStore.getState().items)
-      if (localStorage.getItem(CART_STORAGE_KEY) !== value) localStorage.setItem(CART_STORAGE_KEY, value)
+      if (operationId || serializeCart(previous.items) !== serializeCart(state.items)) {
+        pendingOperations.push({ before: previous.items, after: state.items, id: operationId ?? crypto.randomUUID() })
+      }
+      syncCartStorage()
     } catch { /* Keep the in-memory cart usable if storage is unavailable. */ }
   })
   window.addEventListener("storage", event => {
-    if (event.storageArea !== localStorage) return
     try {
+      if (event.storageArea !== localStorage) return
       if (event.key?.startsWith(CART_OPERATION_PREFIX) || event.key === null) {
+        syncCartStorage()
         const journal = readCartJournal(localStorage)
         if (journal) applyItems(journal)
         else if (event.key === null) applyItems([])
       }
     } catch { /* Ignore unavailable storage. */ }
+  })
+  window.addEventListener("focus", () => {
+    try { syncCartStorage() } catch { /* Retry pending operations on the next change/focus. */ }
   })
 }

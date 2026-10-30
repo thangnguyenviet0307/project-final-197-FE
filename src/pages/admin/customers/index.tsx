@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useAuthStore } from "@/stores/auth.store"
 import { useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { getApiError } from "@/services/api"
 
 export default function CustomersPage() {
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const [params, setParams] = useSearchParams()
   const requestedPage = Number(params.get("page"))
   const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1

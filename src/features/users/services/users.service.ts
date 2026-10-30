@@ -7,7 +7,8 @@ export function getDefaultUserPassword(role: "admin" | "staff") {
 }
 
 // Demo password resets use the same role-based defaults as account creation.
-export function getTemporaryPassword(role: "admin" | "staff") {
+export function getTemporaryPassword(role: ManagedUser["role"]) {
+  if (role === "super_admin") throw new Error("Super Admin must change their own password")
   return getDefaultUserPassword(role)
 }
 
@@ -47,6 +48,14 @@ export async function deleteUser(id: string) {
   await api.delete(`/users/${encodeURIComponent(id)}`);
 }
 
-export async function updateUser({ id, input }: { id: string; input: Pick<ManagedUser, "role" | "active"> }) {
+export async function updateUser({ id, input }: { id: string; input: { role?: "admin" | "staff"; active: boolean } }) {
   await api.put(`/users/${encodeURIComponent(id)}`, input)
+}
+
+export async function transferOwnership(input: { targetUserId: string; currentPassword: string }) {
+  await api.post("/users/transfer-ownership", input)
+}
+
+export async function revokeUserSessions(id: string) {
+  await api.post(`/users/${encodeURIComponent(id)}/revoke-sessions`)
 }

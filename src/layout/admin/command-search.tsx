@@ -1,4 +1,5 @@
 "use client"
+import { isAdministrator } from "@/features/auth/utils/roles"
 
 import { useNavigate } from "react-router-dom"
 import {
@@ -143,7 +144,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/auth/users", "/auth/hero-slides"].includes(item.url) || role === "admin")
+    (!["/auth/users", "/auth/hero-slides"].includes(item.url) || isAdministrator(role))
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

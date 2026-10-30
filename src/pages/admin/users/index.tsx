@@ -30,6 +30,9 @@ import { useUsers } from "@/features/users/hooks/use-users"
 import { useResetUserPassword } from "@/features/users/hooks/use-reset-user-password"
 import { DeleteUserConfirmation } from "@/features/users/components/delete-user-confirmation"
 import { useUpdateUser } from "@/features/users/hooks/use-update-user"
+import { canManageUser, isAdministrator } from "@/features/auth/utils/roles"
+import { TransferOwnershipDialog } from "@/features/users/components/transfer-ownership-dialog"
+import { useRevokeUserSessions } from "@/features/users/hooks/use-revoke-user-sessions"
 import "@/pages/admin/users/index.css"
 
 type Status = "all" | "active" | "suspended"
@@ -43,6 +46,7 @@ const columns: { key: Column; label: string; width: string }[] = [
   { key: "role", label: "Vai trò", width: "8%" },
 ]
 const roleOptions = [
+  { value: "super_admin", label: "Super Admin" },
   { value: "all", label: "Tất cả vai trò" }, { value: "admin", label: "Quản trị viên" },
   { value: "staff", label: "Nhân viên" },
 ] as const
@@ -56,10 +60,11 @@ function getDisplayName(user: ManagedUser) {
 }
 function getUsername(user: ManagedUser) { return user.email.split("@")[0] || "" }
 function getRoleLabel(role: ManagedUser["role"]) {
+  if (role === "super_admin") return "Super Admin"
   return role === "admin" ? "Quản trị viên" : "Nhân viên"
 }
 function getRoleIcon(role: ManagedUser["role"]) {
-  const Icon = role === "admin" ? ShieldCheck : BriefcaseBusiness
+  const Icon = isAdministrator(role) ? ShieldCheck : BriefcaseBusiness
   return <Icon aria-hidden="true" className="size-4.5 shrink-0 text-muted-foreground" />
 }
 function getStatus(user: ManagedUser): Exclude<Status, "all"> {
@@ -159,11 +164,13 @@ export default function UsersPage() {
   const [profileUser, setProfileUser] = useState<ManagedUser | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null)
   const [resetTarget, setResetTarget] = useState<ManagedUser | null>(null)
+  const [transferTarget, setTransferTarget] = useState<ManagedUser | null>(null)
   const [editUser, setEditUser] = useState<ManagedUser | null>(null)
   const [editRole, setEditRole] = useState<ManagedUser["role"]>("staff")
   const [editActive, setEditActive] = useState(true)
   const [editError, setEditError] = useState("")
   const updateUser = useUpdateUser()
+  const revokeSessions = useRevokeUserSessions()
   const isSavingRole = updateUser.isPending
   const currentUser = useAuthStore(state => state.user)
 
@@ -193,7 +200,7 @@ export default function UsersPage() {
     if (!editUser) return
     try {
       setEditError("")
-      await updateUser.mutateAsync({ id: editUser._id, input: { role: editRole, active: editActive } })
+      await updateUser.mutateAsync({ id: editUser._id, input: { ...(currentUser?.role === "super_admin" && editRole !== "super_admin" ? { role: editRole } : {}), active: editActive } })
       setEditUser(null)
     } catch (error) { setEditError(getApiError(error).message) }
   }
@@ -233,6 +240,7 @@ export default function UsersPage() {
           <p className="text-xs text-muted-foreground">Vai trò, trạng thái và thứ tự sắp xếp được áp dụng cho tất cả các trang kết quả.</p>
         </div>
         <p role="status" className="text-sm text-muted-foreground">{users.isFetching && !users.isLoading ? search ? "Searching" : "Updating" : ""}</p>
+        {revokeSessions.error && <p role="alert" className="text-sm text-destructive">{getApiError(revokeSessions.error).message}</p>}
 
         {users.isError && <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">
           <span>{getApiError(users.error).message}</span><Button variant="outline" size="sm" onClick={() => void users.refetch()}>Thử lại</Button>
@@ -278,10 +286,12 @@ export default function UsersPage() {
                   </TableCell>)}
                   <TableCell className="px-1 text-center" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                     <DropdownMenu>
-                      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" disabled={user._id === currentUser?.id || isBusy} aria-label={`Chỉnh sửa tài khoản ${user.email}`} className="cursor-pointer rounded-md" />}><MoreHorizontal className="size-4.5" /></DropdownMenuTrigger>
+                      <DropdownMenuTrigger render={<Button variant="ghost" size="icon" disabled={!canManageUser(currentUser?.role, user.role) || user._id === currentUser?.id || isBusy} aria-label={`Chỉnh sửa tài khoản ${user.email}`} className="cursor-pointer rounded-md" />}><MoreHorizontal className="size-4.5" /></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="users-surface w-48">
                         <DropdownMenuItem onClick={() => openEditUser(user)}><UserRound className="size-4" />Chỉnh sửa</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setResetTarget(user)}><KeyRound className="size-4" />Đặt lại mật khẩu</DropdownMenuItem>
+                        <DropdownMenuItem disabled={revokeSessions.isPending} onClick={() => revokeSessions.mutate(user._id)}><KeyRound className="size-4" />Thu hồi phiên đăng nhập</DropdownMenuItem>
+                        {currentUser?.role === "super_admin" && user.active && !user.mustChangePassword && <DropdownMenuItem onClick={() => setTransferTarget(user)}><ShieldCheck className="size-4" />Chuyển quyền Super Admin</DropdownMenuItem>}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem variant="destructive" onClick={() => setDeleteTarget(user)}><Trash2 className="size-4" />Xóa tài khoản</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -313,8 +323,8 @@ export default function UsersPage() {
           <DialogHeader><DialogTitle>Chỉnh sửa tài khoản</DialogTitle><DialogDescription>Cập nhật vai trò và trạng thái truy cập của {editUser.email}.</DialogDescription></DialogHeader>
           <form className="space-y-5" onSubmit={handleEditSubmit}>
             <Field><FieldLabel htmlFor="edit-user-role">Vai trò</FieldLabel>
-              <select id="edit-user-role" value={editRole} onChange={event => setEditRole(event.target.value as ManagedUser["role"])} className="h-10 rounded-lg border border-input bg-background px-3 text-sm">
-                {roleOptions.filter(option => option.value !== "all").map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+              <select id="edit-user-role" value={editRole} disabled={currentUser?.role !== "super_admin"} onChange={event => setEditRole(event.target.value as ManagedUser["role"])} className="h-10 rounded-lg border border-input bg-background px-3 text-sm">
+                {roleOptions.filter(option => option.value !== "all" && option.value !== "super_admin").map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
             </Field>
             <Field><FieldLabel htmlFor="edit-user-status">Trạng thái</FieldLabel>
@@ -330,6 +340,7 @@ export default function UsersPage() {
         </DialogContent>
       </Dialog>}
       {resetTarget && <ResetPasswordDialog user={resetTarget} onClose={() => setResetTarget(null)} />}
+      {transferTarget && <TransferOwnershipDialog key={transferTarget._id} user={transferTarget} onClose={() => setTransferTarget(null)} />}
     </BaseLayout>
   )
 }

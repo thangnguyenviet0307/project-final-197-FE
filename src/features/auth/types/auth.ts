@@ -1,6 +1,6 @@
 import type { ShippingAddressValues } from "@/features/profile/schemas/customer-account-schema"
 
-export type Role = "admin" | "staff"
+export type Role = "super_admin" | "admin" | "staff"
 
 export interface User {
   id: string

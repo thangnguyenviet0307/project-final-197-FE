@@ -21,7 +21,7 @@ const userSchema = z.object({
   location: z.string().nullish().transform((value) => value ?? ""),
   bio: z.string().nullish().transform((value) => value ?? ""),
   avatar: z.string().nullish().transform((value) => value ?? ""),
-  email: z.string(), accountType: z.enum(["user", "customer"]).default("user"), role: z.enum(["admin", "staff"]).optional(),
+  email: z.string(), accountType: z.enum(["user", "customer"]).default("user"), role: z.enum(["super_admin", "admin", "staff"]).optional(),
   address: z.object({ street: z.string(), city: z.string(), state: z.string() }).optional(),
   mustChangePassword: z.boolean().default(false),
 }).superRefine((user, ctx) => {

@@ -17,7 +17,7 @@ const originalAdapter = api.defaults.adapter
 beforeEach(() => {
   queryClient.clear()
   clearAuth()
-  useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "self@example.com", role: "admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
+  useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "self@example.com", role: "super_admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
 })
 afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
 function UserTestRoutes() { return <Routes><Route path="/auth/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
@@ -33,6 +33,51 @@ function setup(role: "admin" | "staff" = "staff") {
   render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
   return writes
 }
+
+it("Admin cannot edit Admin/Super Admin accounts or offer Admin creation", async () => {
+  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role: "admin" } : null }))
+  setup("admin")
+  await screen.findByText("target@example.com")
+  expect((screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }) as HTMLButtonElement).disabled).toBe(true)
+  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
+  fireEvent.click(await screen.findByRole("combobox", { name: "Vai trò" }))
+  expect(screen.queryByRole("option", { name: "Quản trị viên" })).toBeNull()
+  expect(screen.queryByRole("option", { name: "Super Admin" })).toBeNull()
+  expect(screen.getByRole("option", { name: "Nhân viên" })).toBeTruthy()
+})
+
+it("Admin changes Staff status without sending a role change", async () => {
+  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role: "admin" } : null }))
+  const writes = setup()
+  await screen.findByText("target@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Chỉnh sửa" }))
+  expect((screen.getByLabelText("Vai trò") as HTMLSelectElement).disabled).toBe(true)
+  fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "suspended" } })
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { active: false }))
+})
+
+it("Super Admin transfers ownership only after entering their current password", async () => {
+  const writes = setup("admin")
+  await screen.findByText("target@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Chuyển quyền Super Admin" }))
+  const button = screen.getByRole("button", { name: "Xác nhận chuyển quyền" })
+  expect((button as HTMLButtonElement).disabled).toBe(true)
+  fireEvent.change(screen.getByLabelText("Mật khẩu hiện tại của bạn"), { target: { value: "CurrentPassword123" } })
+  fireEvent.click(button)
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/transfer-ownership", { targetUserId: "target", currentPassword: "CurrentPassword123" }))
+  await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(false))
+})
+
+it("Super Admin can revoke another account's sessions without changing its password", async () => {
+  const writes = setup()
+  await screen.findByText("target@example.com")
+  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Thu hồi phiên đăng nhập" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/target/revoke-sessions", undefined))
+})
 
 it("keeps Full name empty when the account has no name instead of copying the account email", async () => {
   setup()

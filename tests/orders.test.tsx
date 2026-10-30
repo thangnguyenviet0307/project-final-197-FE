@@ -28,6 +28,17 @@ function setup(role: "admin" | "staff" = "admin", path = "/auth/orders") {
 function mockOrder(value: Order = order) {
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders" ? [value] : value, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } })
 }
+it("keeps the note editor mounted when a background order refresh fails", async () => {
+  mockOrder({ ...order, orderNote: "Original" })
+  setup("admin", `/auth/orders/${id}`)
+  const textbox = await screen.findByRole("textbox", { name: "Order note" })
+  fireEvent.change(textbox, { target: { value: "Unsaved draft" } })
+  api.defaults.adapter = async () => { throw new Error("Offline") }
+  await queryClient.invalidateQueries({ queryKey: ["orders"] })
+  await screen.findByRole("button", { name: "Thử cập nhật lại" })
+  expect(screen.getByRole("textbox", { name: "Order note" })).toBe(textbox)
+  expect((textbox as HTMLTextAreaElement).value).toBe("Unsaved draft")
+})
 it("staff can view and open details but cannot mutate pending or rejected orders", async () => {
   mockOrder({ ...order, orderStatus: 3 })
   setup("staff")

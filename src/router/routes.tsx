@@ -148,7 +148,7 @@ export const routes: RouteObject[] = [
   // ADMIN / STAFF PROTECTED ROUTES
   // ==========================================
   {
-    element: <ProtectedRoute allowedRoles={["admin", "staff"]} />,
+    element: <ProtectedRoute allowedRoles={["super_admin", "admin", "staff"]} />,
     handle: { area: "admin" },
     children: [
       { path: "/auth/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
@@ -243,7 +243,7 @@ export const routes: RouteObject[] = [
       // ADMIN ONLY
       // ======================================
       {
-        element: <ProtectedRoute allowedRoles={["admin"]} />,
+        element: <ProtectedRoute allowedRoles={["super_admin", "admin"]} />,
         children: [
           { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
           // CATEGORIES

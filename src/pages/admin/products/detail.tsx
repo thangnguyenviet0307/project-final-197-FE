@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { ProductDetailGallery } from "@/features/products/components/product-detail-gallery"
 import { AdminStoreProductLink } from "@/features/storefront/components/admin-store-product-link"
 import { discountedPrice } from "@/features/products/utils/product-price"
@@ -22,7 +23,7 @@ import { ProductReviews } from "@/features/products/components/product-reviews"
 export default function ProductDetailPage() {
   const { id = "" } = useParams()
   const query = useProduct(id)
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const product = query.data
   const returnTo = useProductListLocation()
   const salePrice = product?.price === undefined ? null : discountedPrice(product.price, product.discount)

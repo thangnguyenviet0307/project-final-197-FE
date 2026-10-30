@@ -1,4 +1,5 @@
 "use client"
+import { isAdministrator } from "@/features/auth/utils/roles"
 
 import { useAuthStore } from "@/stores/auth.store"
 import { CustomerProfileDialog } from "@/features/customers/components/customer-profile-dialog"
@@ -65,7 +66,7 @@ function DeleteCustomerDialog({
   customer: ICustomer
   onDelete: (id: string) => Promise<void> | void
 }) {
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState("")
@@ -165,7 +166,7 @@ export function CustomerTable({
   onSearch,
   onDelete,
 }: CustomerTableProps) {
-  const admin = useAuthStore(state => state.user?.role === "admin")
+  const admin = useAuthStore(state => isAdministrator(state.user?.role))
   const [searchValue, setSearchValue] =
     useState(searchQuery)
 

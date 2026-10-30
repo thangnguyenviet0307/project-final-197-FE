@@ -18,7 +18,12 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = React.useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => {
+      try {
+        const stored = localStorage.getItem(storageKey)
+        return stored === "light" || stored === "dark" || stored === "system" ? stored : defaultTheme
+      } catch { return defaultTheme }
+    }
   )
 
   React.useEffect(() => {
@@ -42,8 +47,9 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
+      if (theme !== "light" && theme !== "dark" && theme !== "system") return
       setTheme(theme)
+      try { localStorage.setItem(storageKey, theme) } catch { /* Theme remains usable in memory. */ }
     },
   }
 

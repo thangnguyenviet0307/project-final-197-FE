@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -26,7 +27,7 @@ export function OrderDatesDialog({ order, disabled }: { order: Order; disabled?:
   const [planned, setPlanned] = useState("")
   const [completed, setCompleted] = useState("")
   const mutation = useUpdateOrderDates()
-  const admin = user?.role === "admin"
+  const admin = isAdministrator(user?.role)
   const handler = typeof order.userId === "string" ? order.userId : order.userId?._id
   const active = order.orderStatus === 1 || order.orderStatus === 2
   const eligible = (active && (admin || (user?.role === "staff" && handler === user.id))) || (admin && order.orderStatus === 4)

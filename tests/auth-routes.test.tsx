@@ -156,10 +156,16 @@ it.each(["/account/profile", "/account/orders", "/account/addresses", "/account/
   expect(await screen.findByText("Trang /thanh-vien")).toBeTruthy()
   expect(router.state.location.state.from.pathname).toBe(path)
 })
-it.each(["admin", "staff"] as const)("denies %s access to customer account", async role => {
+it.each(["super_admin", "admin", "staff"] as const)("denies %s access to customer account", async role => {
   session(role)
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/account/profile"] })} /></QueryClientProvider>)
   expect(await screen.findByText("Trang /403")).toBeTruthy()
+})
+
+it.each(["/auth/dashboard", "/auth/users", "/auth/products/new", "/auth/hero-slides"])("allows Super Admin to open %s", async path => {
+  session("super_admin")
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: [path] })} /></QueryClientProvider>)
+  expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
 })
 it("allows customers to open their profile", async () => {
   session("customer")

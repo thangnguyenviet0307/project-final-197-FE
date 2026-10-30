@@ -1,4 +1,5 @@
 "use client"
+import { isAdministrator } from "@/features/auth/utils/roles"
 
 import * as React from "react"
 import { Separator } from "@/components/ui/separator"
@@ -38,7 +39,7 @@ export function SiteHeader() {
           </div>
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden text-sm sm:inline">{user?.name}</span>
-            <Badge variant="secondary">{user?.role === "admin" ? "Quản trị viên" : user?.role === "staff" ? "Nhân viên" : "Khách hàng"}</Badge>
+            <Badge variant="secondary">{user?.role === "super_admin" ? "Super Admin" : isAdministrator(user?.role) ? "Quản trị viên" : user?.role === "staff" ? "Nhân viên" : "Khách hàng"}</Badge>
             <ModeToggle />
           </div>
         </div>

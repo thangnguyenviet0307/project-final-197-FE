@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/features/auth/utils/roles"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -26,7 +27,7 @@ export function StartOrderAction({ order, disabled }: { order: Order; disabled?:
   const [handler, setHandler] = useState("")
   const mutation = useStartOrder()
   const assignee = typeof order.userId === "string" ? order.userId : order.userId?._id
-  const admin = user?.role === "admin"
+  const admin = isAdministrator(user?.role)
   const eligible = order.orderStatus === 1 && (admin || (user?.role === "staff" && (!assignee || assignee === user.id)))
   if (!eligible || !user) return null
   if (!admin) return <div className="space-y-2"><Button size="sm" disabled={disabled || mutation.isPending} onClick={() => mutation.mutate({ id: order._id })}>{mutation.isPending ? "Starting…" : "Nhận đơn & bắt đầu"}</Button>{mutation.error && <p role="alert" className="text-sm text-destructive">{getApiError(mutation.error).message}</p>}</div>
