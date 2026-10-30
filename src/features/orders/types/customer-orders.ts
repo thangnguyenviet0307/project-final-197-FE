@@ -2,6 +2,9 @@ import type { OrderStatus } from "@/features/orders/types/orders"
 import type { Pagination } from "@/types/api"
 
 export interface CustomerOrder {
+  cancelledByCustomer?: boolean
+  recipientName?: string
+  recipientPhone?: string
   _id: string
   orderCode?: string
   orderDate: string
