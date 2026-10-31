@@ -24,7 +24,9 @@ export interface PublicArticle {
   }
 }
 
+export type PublicArticleSummary = Omit<PublicArticle, "content">
+export interface PublicArticleCategory { _id: string; name: string; slug: string; description: string }
 export interface PublicArticlesResult {
-  data: Omit<PublicArticle, "content">[]
+  data: PublicArticleSummary[]
   pagination: Pagination
 }

@@ -2,7 +2,7 @@ import { z } from "zod"
 export const checkoutResultSchema = z.object({
   _id: z.string().regex(/^[a-f\d]{24}$/i),
   orderCode: z.string().regex(/^ORD-[A-HJ-NP-Z2-9]{6}$/),
-  totalAmount: z.number().finite().nonnegative(),
+  totalAmount: z.number().nonnegative(),
   orderStatus: z.number().int().min(1).max(4),
 })
 export const checkoutRecipientSchema = z.object({

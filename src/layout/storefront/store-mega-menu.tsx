@@ -97,7 +97,7 @@ export function StoreMegaMenu() {
                   item === "Tin tức" ? (
                     <Link
                       key={item}
-                      to="/#tin-tuc"
+                      to="/bai-viet?type=news"
                       onClick={() => setOpen(false)}
                       className="group flex w-full items-center justify-between text-left text-sm text-gray-600 transition-colors hover:text-green-600"
                     >

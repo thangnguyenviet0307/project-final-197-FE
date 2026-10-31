@@ -18,6 +18,8 @@ export interface StorefrontProduct {
   image: string
   gallery: string[]
   badge?: string
+  badges?: { label: string; className: string }[]
+  visible?: boolean
   description: string
   features: string[]
   variants: StorefrontVariant[]

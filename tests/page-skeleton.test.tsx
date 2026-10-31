@@ -1,7 +1,8 @@
 import { expect, it } from "vitest"
 import { act, render, screen } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
-import { RouteFallback, isStorefrontRoute } from "@/router/route-fallback"
+import { RouteFallback } from "@/router/route-fallback"
+import { isStorefrontRoute } from "@/router/route-area"
 import { RootFallback } from "@/layout/root-layout"
 import { ContentSkeleton } from "@/components/page-skeleton"
 

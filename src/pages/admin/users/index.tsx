@@ -3,7 +3,7 @@ import { ListPagination } from "@/components/list-pagination"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ContentSkeleton } from "@/components/page-skeleton"
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState, type SubmitEvent } from "react"
 import {
   ArrowDown, ArrowUp, BriefcaseBusiness, Users, CheckCircle2, CirclePause,
   KeyRound,
@@ -195,7 +195,7 @@ export default function UsersPage() {
   function openEditUser(user: ManagedUser) {
     setEditUser(user); setEditRole(user.role); setEditActive(user.active); setEditError("")
   }
-  async function handleEditSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleEditSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!editUser) return
     try {

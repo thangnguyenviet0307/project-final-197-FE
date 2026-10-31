@@ -21,6 +21,7 @@ const allowed = new Set([
   "validations/products.validation.ts", "validations/hero-slides.validation.ts",
   "validations/orders.validation.ts", "types/orders.type.ts",
   "validations/articles.validation.ts", "validations/post-categories.validation.ts",
+  "validations/product-news.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -260,4 +261,16 @@ await editorialService.updatePostCategory({ id, input: { expectedVersion: 0, isA
 await editorialService.deleteArticle({ id, expectedVersion: 1 })
 await editorialService.deletePostCategory({ id, expectedVersion: 1 })
 postValidation.publicArticleQuerySchema.parse({ type: "news", isFeatured: "true", sort: "display", page: "1", limit: "3" })
+const newsValidation = loadValidation("validations/product-news.validation.ts")
+const productNewsService = evaluate(path.join(root, "src/features/products/services/product-news.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { authApi: {}, api: { async patch(url, body) {
+    assert.equal(url, `/products/${id}/news`)
+    newsValidation.productNewsSchema.parse(body)
+    requests.push({ method: "PATCH", url, body })
+    return { data: { data: { articleIds: body.articleIds, expectedVersion: body.expectedVersion + 1 } } }
+  } } }
+  throw new Error(`Unsupported product news import: ${specifier}`)
+})
+await productNewsService.updateProductNews({ id, input: { articleIds: [id], expectedVersion: 2 } })
+await productNewsService.updateProductNews({ id, input: { articleIds: [], expectedVersion: 3 } })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

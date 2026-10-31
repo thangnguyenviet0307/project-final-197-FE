@@ -11,6 +11,7 @@ import { getApiError } from "@/services/api"
 import { Check, Minus, Plus, ShieldCheck, ShoppingBag, Truck, RotateCcw } from "lucide-react"
 import { StoreRatingSummary, StoreProductReviews } from "@/features/storefront/components/store-product-feedback"
 import { RelatedProducts } from "@/features/storefront/components/related-products"
+import { ProductNewsSidebar } from "@/features/storefront/components/product-news-sidebar"
 import "@/features/products/components/product-description.css"
 
 const attributeLabel = (name: string) => name.charAt(0).toLocaleUpperCase("vi") + name.slice(1)
@@ -37,7 +38,7 @@ function ProductDetails({ product }: { product: Product }) {
     if (error) toast.error(error)
     else toast.success("Đã thêm sản phẩm vào giỏ hàng.")
   }
-  return <div className="space-y-12 sm:space-y-16">
+  return <div className="space-y-12 sm:space-y-16"><div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]"><div className="min-w-0 space-y-12 sm:space-y-16">
     <section aria-label="Tổng quan sản phẩm" className="overflow-hidden rounded-3xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
     <div className="grid gap-8 md:grid-cols-2">
       <div className="min-w-0 [&_section>div:first-child]:rounded-3xl [&_section>div:first-child]:border-gray-100 [&_section>div:first-child]:bg-white [&_section>div:first-child]:p-4 [&_section>div:first-child]:shadow-sm"><ProductDetailGallery key={variant?._id ?? variant?.sku ?? product._id} product={variant?.image ? { ...product, thumbnail: variant.image } : product} /></div>
@@ -82,8 +83,7 @@ function ProductDetails({ product }: { product: Product }) {
         ].map(([label, value], index) => <tr key={`${label}-${index}`} className="border-b border-gray-100 last:border-0 even:bg-gray-50/60"><th scope="row" className="w-2/5 break-words bg-gray-50 px-4 py-3 align-top font-medium text-gray-500">{label}</th><td className="whitespace-pre-wrap break-words px-4 py-3 align-top text-gray-700">{value ?? "Chưa có thông tin"}</td></tr>)}</tbody></table></div>
     </section>
     <StoreProductReviews key={product._id} product={product} />
-    <RelatedProducts slug={product.slug ?? ""} />
-  </div>
+  </div><ProductNewsSidebar slug={product.slug ?? ""} /></div><RelatedProducts slug={product.slug ?? ""} /></div>
 }
 
 export default function StorefrontProductDetailPage() {

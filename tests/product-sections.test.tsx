@@ -23,6 +23,17 @@ function setup(children: React.ReactNode) {
 async function expectColumn(column: number, region: ParentNode = document) {
   await waitFor(() => expect((region.querySelector(".product-carousel-track") as HTMLElement)?.style.getPropertyValue("--column-offset")).toBe(String(column)))
 }
+it.each([["is_home", "Trang chủ"], ["is_new", "Mới"], ["is_hot", "Nổi bật"], ["is_best_seller", "Bán chạy"]] as const)("limits home section %s to its own badge", async (flag, label) => {
+  vi.mocked(listStoreProducts).mockResolvedValue({ data: [{ _id: "mixed", slug: "mixed", product_name: "Mixed", category: null, brand: null, price: 100, on_sale: true, is_home: true, is_new: true, is_hot: true, is_best_seller: true }], pagination: { page: 1, limit: 8, total: 1, totalPages: 1 } })
+  setup(<ProductSection title="Section" filters={{ [flag]: true }} />)
+  await screen.findByRole("link", { name: "Xem Mixed" })
+  const region = screen.getByRole("region", { name: "Section" })
+  for (const badge of ["Trang chủ", "Mới", "Nổi bật", "Bán chạy"]) {
+    if (badge === label) expect(within(region).getByText(badge)).toBeTruthy()
+    else expect(within(region).queryByText(badge)).toBeNull()
+  }
+  expect(within(region).queryByText("Đang bán")).toBeNull()
+})
 it("slides one column/two products at a time, retains earlier cards and stops at a full final window", async () => {
   setup(<ProductSection title="Best Seller" filters={{ is_best_seller: true }} />)
   await screen.findByRole("link", { name: "Xem Item 0" })

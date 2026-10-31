@@ -23,6 +23,7 @@ vi.mock("@/features/storefront/hooks/use-store-product-carousel", () => ({
     return { data: { pages: [{ data: [state.product], pagination: { total: 1 } }] }, isPending: state.pending, isError: state.error, refetch: state.refetch }
   },
 }))
+vi.mock("@/features/products/hooks/use-product-news", () => ({ usePublicProductNews: () => ({ data: [], isPending: false, isError: false }) }))
 vi.mock("@/features/storefront/hooks/use-store-products", () => ({
   useStoreProducts: (params: unknown) => { state.list(params); return { data: { data: [state.product], pagination: { total: 1, totalPages: 1 } }, isPending: state.pending, isError: state.error, refetch: state.refetch } },
   useStoreProduct: () => ({ data: state.product, isPending: state.pending, isError: state.error, error: { statusCode: 404, message: "Not found" }, refetch: state.refetch }),
@@ -92,7 +93,7 @@ it("shows real rating/reviews, paginates reviews and links related products", ()
   fireEvent.click(screen.getByRole("tab", { name: "Thông tin chi tiết" }))
   expect(screen.getByRole("tab", { name: "Thông tin chi tiết" }).getAttribute("aria-selected")).toBe("true")
 })
-it("groups category labels and policies inside the overview, without duplicated policy rows or a news sidebar", () => {
+it("groups category labels and policies inside the overview, without duplicated policy rows and with a news sidebar", () => {
   const original = state.product
   state.product = { ...original, category: { _id: "d".repeat(24), name: "Tai nghe" }, tags: ["Bluetooth"], shippingInformation: "Giao trong 3 ngày", variants: original.variants?.map(variant => ({ ...variant, attributes: { material: "Cotton" } })) }
   try {
@@ -116,7 +117,10 @@ it("groups category labels and policies inside the overview, without duplicated 
     expect(within(table).getByRole("cell", { name: "BLUE" })).toBeTruthy()
     expect(within(table).getByRole("rowheader", { name: "Material" })).toBeTruthy()
     for (const name of ["Giao hàng", "Bảo hành", "Đổi trả"]) expect(within(table).queryByRole("rowheader", { name })).toBeNull()
-    expect(screen.queryByRole("complementary", { name: "Tin tức liên quan" })).toBeNull()
+    const sidebar = screen.getByRole("complementary", { name: "Tin tức liên quan" })
+    const related = screen.getByRole("region", { name: "Các sản phẩm liên quan" })
+    expect(sidebar.parentElement?.contains(related)).toBe(false)
+    expect(sidebar.parentElement?.nextElementSibling).toBe(related)
   } finally { state.product = original }
 })
 it("limits the related product section to five cards", () => {

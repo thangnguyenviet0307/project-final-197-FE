@@ -6,6 +6,7 @@ import { ProductImage } from "@/features/products/components/product-image"
 
 export function ProductCard({ product }: { product: StorefrontProduct }) {
   const location = useLocation()
+  if (product.visible === false) return null
   const linkState = { returnTo: location.pathname === "/shop" ? location.pathname + location.search : "/shop" }
   return (
     <article className="product-card group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition duration-300 hover:border-gray-200 hover:shadow-xl">
@@ -20,7 +21,10 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
           alt={product.name}
           className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
         />
-        {product.badge && (
+        {!!product.badges?.length && <div className="pointer-events-none absolute left-2 right-2 top-2 flex flex-wrap gap-1" aria-label="Nhãn sản phẩm">
+          {product.badges.map(badge => <span key={badge.label} className={`rounded-md px-2 py-1 text-[10px] font-bold leading-tight shadow-sm sm:text-xs ${badge.className}`}>{badge.label}</span>)}
+        </div>}
+        {!product.badges?.length && product.badge && (
           <span className="absolute left-3 top-3 rounded-full bg-[#e9f5e0] px-3 py-1 text-xs font-semibold text-[#397a16]">
             {product.badge}
           </span>

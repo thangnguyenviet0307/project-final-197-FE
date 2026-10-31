@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState, type SubmitEvent } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { categoryInputSchema } from "@/features/articles/schemas/article-schema"
@@ -11,7 +11,7 @@ export function PostCategoryForm({ category, pending, save, reload, onDirtyChang
   useEffect(() => { onDirtyChange?.(dirty) }, [dirty, onDirtyChange])
   const [error, setError] = useState("")
   const [conflict, setConflict] = useState(false)
-  async function submit(e: FormEvent) {
+  async function submit(e: SubmitEvent) {
     e.preventDefault()
     if (pending || conflict) return
     const parsed = categoryInputSchema.safeParse(draft)

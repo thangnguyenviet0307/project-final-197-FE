@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 import { Link } from "react-router-dom"
 import {
   ArrowUp,
@@ -31,7 +31,7 @@ export function StoreFooter() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
 
-  function handleSubscribe(event: FormEvent<HTMLFormElement>) {
+  function handleSubscribe(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!email.trim()) return

@@ -105,7 +105,7 @@ export function initializeSession(): Promise<void> {
   }
   const version = state.sessionVersion
   useAuthStore.setState({ isLoading: true, initializationError: null })
-  initializing = (state.accessToken ? Promise.resolve() : refreshAccessToken().then(() => undefined)).then(() => queryClient.fetchQuery({
+  initializing = (state.accessToken ? Promise.resolve() : refreshAccessToken().then(() => undefined)).then(() => queryClient.query({
     queryKey: ["auth", "me", version],
     queryFn: async ({ signal }) => {
       const { data } = await api.get<ApiResponse<unknown>>(`${authPath()}/me`, { signal })

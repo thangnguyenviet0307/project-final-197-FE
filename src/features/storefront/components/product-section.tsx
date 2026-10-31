@@ -21,6 +21,7 @@ export function ProductSection({ title, filters, children }: { title: string; fi
   const desktop = useSyncExternalStore(subscribeToWidth, isDesktop, () => true)
   const visibleColumns = desktop ? 4 : 2
   const query = useStoreProductCarousel(filters)
+  const badgeContext = filters.is_best_seller ? "is_best_seller" : filters.is_new ? "is_new" : filters.is_hot ? "is_hot" : "is_home"
   const products = query.data?.pages.flatMap(page => page.data) ?? []
   const total = query.data?.pages[0]?.pagination.total ?? 0
   const lastColumn = Math.max(0, Math.ceil(total / 2) - visibleColumns)
@@ -59,7 +60,7 @@ export function ProductSection({ title, filters, children }: { title: string; fi
             const product = products[index]
             const outside = Math.floor(index / 2) < currentColumn || Math.floor(index / 2) >= currentColumn + visibleColumns
             return <div key={product?._id ?? `slot-${index}`} className="product-carousel-item" inert={outside || !product} aria-hidden={outside || !product}>
-              {product ? <ProductCard product={mapCatalogProduct(product)} /> : <div className={`product-carousel-placeholder ${query.isPending ? "motion-safe:animate-pulse" : ""}`} />}
+              {product ? <ProductCard product={mapCatalogProduct(product, badgeContext)} /> : <div className={`product-carousel-placeholder ${query.isPending ? "motion-safe:animate-pulse" : ""}`} />}
             </div>
           })}
         </div>

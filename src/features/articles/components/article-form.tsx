@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState, type SubmitEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -36,7 +36,7 @@ export function ArticleForm({ article, categories, save, reload, pending, onDirt
       isFeatured: values.isFeatured, sortOrder: values.sortOrder, seo: { title: values.seoTitle, description: values.seoDescription },
     }
   }
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     if (pending || conflict) return
     try {

@@ -11,7 +11,6 @@ export function useUnsavedForm(dirty: boolean) {
     const beforeUnload = (event: BeforeUnloadEvent) => {
       if (saved.current) return
       event.preventDefault()
-      event.returnValue = ""
     }
     window.addEventListener("beforeunload", beforeUnload)
     return () => window.removeEventListener("beforeunload", beforeUnload)

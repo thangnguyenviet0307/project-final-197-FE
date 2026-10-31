@@ -9,6 +9,9 @@ export default function StorefrontArticleDetailPage() {
   const { slug = "" } = useParams()
   const article = usePublicArticle(slug)
   const location = useLocation()
+  const navigationState: unknown = location.state
+  const candidate = navigationState && typeof navigationState === "object" && "returnTo" in navigationState ? navigationState.returnTo : undefined
+  const returnTo = typeof candidate === "string" && /^\/bai-viet(?:\?|$)/.test(candidate) ? candidate : article.data?.type === "blog" ? "/bai-viet?type=blog" : "/bai-viet?type=news"
   const valid = slug.length <= 255 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug)
   const loaded = valid && !article.isPending && !article.isError && article.data?.slug === slug
   useRecordArticleView(slug, loaded, location.key)
@@ -27,6 +30,7 @@ export default function StorefrontArticleDetailPage() {
           <p className="text-gray-700">Không thể tải bài viết. {getApiError(article.error).message}</p>
           <div className="flex justify-center gap-4">
             <button type="button" className="font-semibold text-[#4d9210] underline" onClick={() => void article.refetch()}>Thử tải lại</button>
+            <Link to={returnTo} className="font-semibold text-[#4d9210] underline">Tất cả bài viết</Link>
             <Link to="/" className="font-semibold text-[#4d9210] underline">Về trang chủ</Link>
           </div>
         </div>
@@ -42,7 +46,7 @@ export default function StorefrontArticleDetailPage() {
   return (
     <main className="store-container py-10 sm:py-16">
       <article className="mx-auto max-w-4xl">
-        <Link to="/bai-viet" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline">
+        <Link to={returnTo} className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline">
           <ArrowLeft size={16} aria-hidden="true" />
           Tất cả bài viết
         </Link>

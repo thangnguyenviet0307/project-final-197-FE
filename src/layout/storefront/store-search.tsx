@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 import { Search } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -6,7 +6,7 @@ export function StoreSearch() {
   const [keyword, setKeyword] = useState("")
   const navigate = useNavigate()
 
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+  const handleSearch = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const value = keyword.trim()

@@ -4,6 +4,8 @@ import { expect, it, vi } from "vitest"
 import StorefrontArticlesPage from "@/pages/storefront/articles"
 
 vi.mock("@/features/storefront/hooks/use-public-articles", () => ({
+  usePublicArticleCategories: () => ({ data: [] }),
+  useArticleSidebar: () => ({ data: { data: [] } }),
   useArticleCatalog: () => ({ isPending: false, isError: false, isSuccess: true, isFetching: false, data: { data: [], pagination: { totalPages: 1 } } }),
 }))
 it("synchronizes search on history and type navigation while retaining a local draft on rerender", async () => {

@@ -4,8 +4,8 @@ import { buildCartItem } from "@/features/cart/utils/cart-item"
 import { parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
 
 export const CART_OPERATION_PREFIX = "storefront-cart-v2:guest:operation:"
-const changeSchema = z.object({ key: z.string(), delta: z.number().int().safe(), snapshot: z.string().optional() })
-const operationSchema = z.object({ id: z.string(), sequence: z.number().int().nonnegative().safe(), changes: z.array(changeSchema).max(1000) })
+const changeSchema = z.object({ key: z.string(), delta: z.number().int(), snapshot: z.string().optional() })
+const operationSchema = z.object({ id: z.string(), sequence: z.number().int().nonnegative(), changes: z.array(changeSchema).max(1000) })
 const lineKey = (item: CartItem) => JSON.stringify([item.productId, item.variantKey])
 
 function operations(storage: Storage, prefix: string) {

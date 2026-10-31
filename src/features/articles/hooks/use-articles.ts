@@ -5,7 +5,7 @@ export function useArticles(params: ArticleQuery) { return useQuery({ queryKey: 
 export function usePostCategories() { return useQuery({ queryKey: ["articles", "categories", "admin"], queryFn: ({ signal }) => service.listPostCategories(signal) }) }
 export function useArticleMutations() {
   const client = useQueryClient()
-  const onSuccess = () => client.invalidateQueries({ queryKey: ["articles"] })
+  const onSuccess = () => Promise.all([client.invalidateQueries({ queryKey: ["articles"] }), client.invalidateQueries({ queryKey: ["products"], predicate: query => query.queryKey.includes("news") })])
   const meta = { suppressGlobalErrorToast: true }
   return {
     create: useMutation({ mutationFn: service.createArticle, onSuccess, meta }),

@@ -42,7 +42,7 @@ export function StoreNavbar() {
 
             <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
-            <Link to="/#tin-tuc" className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black">
+            <Link to="/bai-viet?type=news" className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black">
               TIN TỨC
             </Link>
 
@@ -99,7 +99,7 @@ export function StoreNavbar() {
                 KHÁM PHÁ
               </Link>
 
-              <Link to="/#tin-tuc" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15">
+              <Link to="/bai-viet?type=news" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15">
                 TIN TỨC
               </Link>
 

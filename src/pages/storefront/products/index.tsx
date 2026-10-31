@@ -1,4 +1,4 @@
-import { memo, useState, type FormEvent } from "react"
+import { memo, useState, type SubmitEvent } from "react"
 import "./catalog-filters.css"
 import { Filter, RotateCcw, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
@@ -232,7 +232,7 @@ export default function StorefrontProductsPage() {
     setDraftState({ key: filterKey, value: { ...draft, ...patch } })
   }
 
-  function applyFilters(event: FormEvent<HTMLFormElement>) {
+  function applyFilters(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const minPrice = parsePrice(draft.minPrice)
     const maxPrice = parsePrice(draft.maxPrice)

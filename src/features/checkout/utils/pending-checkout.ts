@@ -5,7 +5,7 @@ import type { CheckoutRequest } from "@/features/checkout/types/checkout"
 const requestSchema = checkoutRecipientSchema.omit({ provinceCode: true, districtCode: true, wardCode: true }).extend({
   provinceCode: z.number().int().positive(), districtCode: z.number().int().positive(), wardCode: z.number().int().positive(),
   requestId: z.uuid(), paymentMethod: z.literal("cod"),
-  items: z.array(z.object({ productId: z.string().min(1), variantId: z.string().min(1).optional(), quantity: z.number().int().positive().safe(), expectedUnitPrice: z.number().finite().nonnegative() })).min(1).max(100),
+  items: z.array(z.object({ productId: z.string().min(1), variantId: z.string().min(1).optional(), quantity: z.number().int().positive(), expectedUnitPrice: z.number().nonnegative() })).min(1).max(100),
 })
 const key = (customerId: string) => `storefront-pending-checkout-v1:${customerId}`
 

@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react"
 import { useLocation } from "react-router-dom"
 import { getAuthArea } from "@/stores/auth.store"
-import { isStorefrontRoute } from "@/router/route-fallback"
+import { isStorefrontRoute } from "@/router/route-area"
 import { RootFallback } from "@/layout/root-layout"
 
 export function AuthAreaBoundary({ children }: { children: ReactNode }) {

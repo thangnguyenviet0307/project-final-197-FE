@@ -10,6 +10,6 @@ export const adminOrderSchema = adminOrderAddressSchema.extend({
   customerId: objectId,
   orderNote: z.string().trim().max(2000),
   paymentType: z.literal(1),
-  orderItems: z.array(z.object({ productId: objectId, variantId: objectId.optional(), quantity: z.number().int().positive().safe() })).min(1),
+  orderItems: z.array(z.object({ productId: objectId, variantId: objectId.optional(), quantity: z.number().int().positive() })).min(1),
 })
 export type AdminOrderInput = z.infer<typeof adminOrderSchema>

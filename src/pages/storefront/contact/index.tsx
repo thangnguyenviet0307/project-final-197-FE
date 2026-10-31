@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 import { Link } from "react-router-dom"
 import {
   ChevronRight,
@@ -44,7 +44,7 @@ export default function ContactPage() {
     setNotice("")
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (

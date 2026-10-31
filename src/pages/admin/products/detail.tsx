@@ -19,6 +19,7 @@ import "@/features/products/components/product-description.css"
 import { ProductGallery } from "@/features/products/components/product-gallery"
 import { ProductDetailsInfo } from "@/features/products/components/product-details-info"
 import { ProductReviews } from "@/features/products/components/product-reviews"
+import { ProductNewsEditor } from "@/features/products/components/product-news-editor"
 
 export default function ProductDetailPage() {
   const { id = "" } = useParams()
@@ -67,6 +68,7 @@ export default function ProductDetailPage() {
       <ProductDetailsInfo product={product} />
       <ProductReviews key={`reviews-${product._id}`} id={product._id} />
       {admin && <ProductGallery product={product} />}
+      {admin && <ProductNewsEditor key={product._id} id={product._id} />}
       {product.description && <section><h2 className="mb-2 text-lg font-semibold">Mô tả</h2><div className="product-description-content" dangerouslySetInnerHTML={{ __html: descriptionToHtml(product.description) }} /></section>}
       <section className="space-y-4"><h2 className="text-lg font-semibold">Biến thể</h2>{!product.variants?.length && <p className="text-sm text-muted-foreground">Chưa có biến thể.</p>}
         {product.variants?.map(variant => <article key={variant._id ?? variant.sku} className="space-y-3 rounded-lg border p-4"><h3 className="font-medium">{variant.variant_name || variant.sku}</h3>

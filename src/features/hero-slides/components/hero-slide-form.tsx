@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import { heroSlideSchema } from "@/features/hero-slides/schemas/hero-slide-schema"
 import type { HeroSlide, HeroSlideInput } from "@/features/hero-slides/types/hero-slides"
@@ -14,7 +14,7 @@ export function HeroSlideForm({ slide, pending, save, reload }: { slide?: HeroSl
   const [error, setError] = useState("")
   const [categoryError, setCategoryError] = useState("")
   const [conflict, setConflict] = useState(false)
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     if (conflict || pending) return
     const schema = slide && !slide.category && !draft.category ? heroSlideSchema.omit({ category: true }) : heroSlideSchema
