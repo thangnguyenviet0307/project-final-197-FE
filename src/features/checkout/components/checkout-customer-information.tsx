@@ -8,13 +8,13 @@ export function CheckoutCustomerInformation() {
   const { register, watch, setValue, formState: { errors } } = useFormContext<CheckoutRecipient>()
   const locations = useCheckoutLocations()
   const provinceCode = watch("provinceCode")
-  const districtCode = watch("districtCode")
   const province = locations.data?.find(item => String(item.code) === provinceCode)
-  const district = province?.districts.find(item => String(item.code) === districtCode)
+  const wards = province?.districts.flatMap(district => district.wards) ?? []
   const fieldError = (field: keyof CheckoutRecipient) => errors[field] && <p id={`checkout-${field}-error`} role="alert" className="text-xs text-red-600">{errors[field]?.message}</p>
   return (
     <section aria-labelledby="checkout-customer-heading" className="space-y-5 rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
       <h2 id="checkout-customer-heading" className="text-base font-semibold">Thông tin khách hàng</h2>
+      <p className="text-sm text-gray-500">Bạn có thể sửa thông tin nhận hàng. Nếu đã đăng nhập, số điện thoại và địa chỉ còn thiếu sẽ được lưu vào tài khoản sau khi đặt hàng thành công.</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {([
           ["recipientName", "Tên người nhận", "Nhập họ và tên người nhận", "name", 100],
@@ -27,24 +27,30 @@ export function CheckoutCustomerInformation() {
           </div>
         ))}
         <h3 className="text-sm font-medium sm:col-span-2">Địa chỉ nhận hàng</h3>
-        <p className="text-xs text-gray-500 sm:col-span-2">Chọn địa chỉ theo tỉnh/thành, quận/huyện, phường/xã trước sáp nhập 07/2025.</p>
+        <p className="text-xs text-gray-500 sm:col-span-2">Chọn tỉnh/thành và phường/xã theo danh sách địa phương trước sáp nhập 07/2025.</p>
+        <input type="hidden" {...register("districtCode")} />
         {locations.isPending && <p role="status" className="text-sm text-gray-500 sm:col-span-2">Đang tải danh sách địa phương…</p>}
         {locations.isError && <div role="alert" className="text-sm text-red-600 sm:col-span-2">{getApiError(locations.error).message} <button type="button" onClick={() => void locations.refetch()} className="underline">Thử lại</button></div>}
         {([
           ["provinceCode", "Tỉnh/Thành phố", locations.data ?? [], !locations.data],
-          ["districtCode", "Quận/Huyện", province?.districts ?? [], !province],
-          ["wardCode", "Phường/Xã", district?.wards ?? [], !district],
+          ["wardCode", "Phường/Xã", wards, !province],
         ] as const).map(([field, label, options, disabled]) => (
           <div key={field} className="space-y-2">
             <label htmlFor={`checkout-${field}`} className="block text-sm font-medium">{label}</label>
-            <select id={`checkout-${field}`} disabled={disabled} aria-required="true" aria-invalid={!!errors[field]} aria-describedby={errors[field] ? `checkout-${field}-error` : undefined} {...register(field, { onChange: () => {
-              if (field === "provinceCode") setValue("districtCode", "", { shouldDirty: true })
-              if (field !== "wardCode") setValue("wardCode", "", { shouldDirty: true })
+            <select id={`checkout-${field}`} value={watch(field)} disabled={disabled} aria-required="true" aria-invalid={!!errors[field]} aria-describedby={errors[field] ? `checkout-${field}-error` : undefined} {...register(field, { onChange: () => {
+              if (field === "provinceCode") {
+                setValue("districtCode", "", { shouldDirty: true })
+                setValue("wardCode", "", { shouldDirty: true })
+              } else {
+                const district = province?.districts.find(item => item.wards.some(ward => String(ward.code) === watch("wardCode")))
+                setValue("districtCode", district ? String(district.code) : "", { shouldDirty: true, shouldValidate: true })
+              }
             } })} className={inputClass}>
               <option value="">Chọn {label.toLowerCase()}</option>
               {options.map(option => <option key={option.code} value={String(option.code)}>{option.name}</option>)}
             </select>
             {fieldError(field)}
+            {field === "wardCode" && fieldError("districtCode")}
           </div>
         ))}
         <div className="space-y-2">

@@ -63,7 +63,9 @@ it("saves the separate shipping address without phone or identity fields", async
       expect(config.url).toBe("/customer-auth/shipping-address")
       payload = JSON.parse(config.data)
     }
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: { ...user, ...(payload ? { shippingAddress: payload } : {}) } } }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: { ...user, shippingAddress: payload ?? {
+      recipientName: "Nguyen An", email: user.email, province: "Hà Nội", district: "Quận cũ", ward: "Phường cũ", street: "12 Phố A", deliveryTime: "",
+    } } } }
   }
   render(<QueryClientProvider client={queryClient}><MemoryRouter><AddressesPage /></MemoryRouter></QueryClientProvider>)
   await screen.findByDisplayValue("buyer@example.com")
@@ -76,6 +78,7 @@ it("saves the separate shipping address without phone or identity fields", async
   await screen.findByText("Đã lưu địa chỉ giao hàng.")
   expect(payload).toMatchObject({ province: "Hồ Chí Minh", ward: "Bến Thành", street: "123 Đường A", email: user.email })
   expect(payload).not.toHaveProperty("phone")
+  expect(payload?.district).toBe("")
 })
 
 it("loads customer orders with no customer identity in request parameters", async () => {

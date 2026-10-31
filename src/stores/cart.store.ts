@@ -3,7 +3,8 @@ import type { CartItem } from "@/features/cart/types/cart"
 import type { Product } from "@/features/products/types/products"
 import { discountedPrice } from "@/features/products/utils/product-price"
 import { buildCartItem } from "@/features/cart/utils/cart-item"
-import { CART_STORAGE_KEY, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
+import { cartStorageKey, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
+import { useAuthStore } from "@/stores/auth.store"
 
 interface CartState {
   refreshProducts: (products: Product[]) => void
@@ -88,6 +89,12 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 // Selection is local to each tab; persist only public catalog snapshots and quantities.
 let applyingStoredCart = false
+const memoryCarts = new Map<string, CartItem[]>()
+function currentCartKey() {
+  const user = useAuthStore.getState().user
+  return cartStorageKey(user?.accountType === "customer" ? user.id : null)
+}
+let activeCartKey = currentCartKey()
 function restoreCart(value: string | null) {
   const stored = parseStoredCart(value)
   if (!stored) return
@@ -101,21 +108,39 @@ function restoreCart(value: string | null) {
     useCartStore.setState(state => ({ items: state.items.map(item => ({
       ...item, selected: previous.find(current => current.productId === item.productId && current.variantKey === item.variantKey)?.selected ?? false,
     })) }))
+    memoryCarts.set(activeCartKey, useCartStore.getState().items)
   } finally { applyingStoredCart = false }
 }
 
 if (typeof window !== "undefined") {
-  try { restoreCart(window.localStorage.getItem(CART_STORAGE_KEY)) } catch { /* Storage may be disabled. */ }
+  try { restoreCart(window.localStorage.getItem(activeCartKey)) } catch { /* Storage may be disabled. */ }
   useCartStore.subscribe(state => {
     if (applyingStoredCart) return
+    memoryCarts.set(activeCartKey, state.items)
     try {
       const value = serializeCart(state.items)
-      if (window.localStorage.getItem(CART_STORAGE_KEY) !== value) window.localStorage.setItem(CART_STORAGE_KEY, value)
+      if (window.localStorage.getItem(activeCartKey) !== value) window.localStorage.setItem(activeCartKey, value)
     } catch { /* Keep the in-memory cart usable if browser storage is unavailable. */ }
   })
+  useAuthStore.subscribe(() => {
+    const nextKey = currentCartKey()
+    if (nextKey === activeCartKey) return
+    memoryCarts.set(activeCartKey, useCartStore.getState().items)
+    activeCartKey = nextKey
+    const cached = memoryCarts.get(nextKey)
+    applyingStoredCart = true
+    try {
+      useCartStore.setState({ items: (cached ?? []).map(item => ({ ...item, selected: false })) })
+      // Never carry items or purchase selections from another identity.
+      const value = window.localStorage.getItem(nextKey)
+      if (value !== null || !cached) restoreCart(value)
+    } catch { /* Each identity retains its own in-memory cart if storage is disabled. */ }
+    finally { applyingStoredCart = false }
+  })
   window.addEventListener("storage", event => {
-    if (event.storageArea === window.localStorage && (event.key === CART_STORAGE_KEY || event.key === null)) {
-      restoreCart(event.key === null ? null : event.newValue)
-    }
+    if (event.storageArea !== window.localStorage) return
+    if (event.key === null) memoryCarts.clear()
+    else memoryCarts.delete(event.key)
+    if (event.key === activeCartKey || event.key === null) restoreCart(event.key === null ? null : event.newValue)
   })
 }
