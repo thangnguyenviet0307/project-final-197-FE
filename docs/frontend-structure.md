@@ -110,6 +110,12 @@ Không tạo `redux/` vì ứng dụng đang dùng Zustand. State cục bộ gi�
 
 Menu danh mục storefront dùng `features/categories/hooks/use-public-categories.ts` và GET `/categories/public` để hiển thị cây danh mục, ảnh, trạng thái tải/lỗi/trống. Chưa có điều hướng từ danh mục sang trang sản phẩm.
 
+Tin tức ở storefront và blog trên `/landing` dùng chung
+`features/storefront/services/articles.service.ts` cùng hook
+`use-public-articles.ts` để đọc `/articles/public` theo loại `news` hoặc `blog`.
+Trang đọc công khai dùng URL `/bai-viet/:slug`; nội dung bài được render như
+văn bản, không chèn HTML tùy ý từ Backend.
+
 ## Thêm website bán hàng
 
 1. Đặt trang cho khách tại `pages/storefront/`, ví dụ `products/index.tsx`, `products/detail.tsx`, `cart/index.tsx`, `checkout/index.tsx`.

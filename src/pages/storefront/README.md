@@ -6,15 +6,23 @@ Các trang storefront hiện có:
   danh mục, hướng dẫn mua sắm và cẩm nang phụ kiện.
 - `products/index.tsx`: danh sách sản phẩm và bộ lọc.
 - `products/detail.tsx`: chi tiết, gallery, chọn biến thể, tab nội dung và sản phẩm liên quan.
+- `articles/detail.tsx`: trang đọc tin tức/blog tại `/bai-viet/:slug`.
 
 Các trang storefront được đăng ký trong router và dùng `src/layout/storefront/`.
 Homepage và catalog dùng component trong `src/features/storefront/` và catalog API công khai;
-trang `/landing` là landing page riêng, còn `/shop` và `/shop/:slug` là storefront.
+`/shop` và `/shop/:slug` là catalog; trang `/landing` cũ đã được gỡ.
 Xem [quy tắc tổ chức Frontend](../../../docs/frontend-structure.md).
 
 Catalog và menu danh mục tải dữ liệu công khai từ Backend. Đăng ký qua
 `/customer-auth/register` chỉ tạo Customer, không tạo User hoặc ghép theo email.
 Xem `docs/CUSTOMER_ACCOUNT_MIGRATION.md` cho lịch sử chuyển đổi dữ liệu.
+
+Tin tức ở homepage `/` tải bài đã xuất bản từ
+`GET /articles/public?type=news`. API vẫn hỗ trợ `type=blog`; không khôi phục trang landing cũ. Trang `/bai-viet/:slug` đọc chi tiết bằng
+slug. Khi kiểm thử, tạo bài `published` tương ứng qua Backend
+`REST_CLIENT/articles.http`; bài `draft` không xuất hiện công khai. Frontend
+đọc API tại `VITE_API_BASE_URL` (mặc định
+`http://localhost:5000/api/v1`).
 
 Đăng ký và đăng nhập khách hàng dùng API xác thực hiện có; trang tài khoản yêu cầu
 session customer. Hồ sơ dùng `/customer-auth/me`, địa chỉ giao hàng dùng
