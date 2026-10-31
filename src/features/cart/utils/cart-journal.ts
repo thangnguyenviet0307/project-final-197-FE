@@ -3,16 +3,16 @@ import type { CartItem } from "@/features/cart/types/cart"
 import { buildCartItem } from "@/features/cart/utils/cart-item"
 import { parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
 
-export const CART_OPERATION_PREFIX = "storefront-cart-operation-v2:"
+export const CART_OPERATION_PREFIX = "storefront-cart-v2:guest:operation:"
 const changeSchema = z.object({ key: z.string(), delta: z.number().int().safe(), snapshot: z.string().optional() })
 const operationSchema = z.object({ id: z.string(), sequence: z.number().int().nonnegative().safe(), changes: z.array(changeSchema).max(1000) })
 const lineKey = (item: CartItem) => JSON.stringify([item.productId, item.variantKey])
 
-function operations(storage: Storage) {
+function operations(storage: Storage, prefix: string) {
   const result: z.infer<typeof operationSchema>[] = []
   for (let index = 0; index < storage.length; index++) {
     const key = storage.key(index)
-    if (!key?.startsWith(CART_OPERATION_PREFIX)) continue
+    if (!key?.startsWith(prefix)) continue
     try { result.push(operationSchema.parse(JSON.parse(storage.getItem(key)!))) } catch { /* Ignore malformed entries. */ }
   }
   return result.sort((a, b) => a.sequence - b.sequence || a.id.localeCompare(b.id))
@@ -20,8 +20,8 @@ function operations(storage: Storage) {
 
 // Each operation owns a separate key. Concurrent tab writes cannot overwrite
 // each other; quantities merge as deltas, including checkout stock consumption.
-export function appendCartOperation(storage: Storage, before: CartItem[], after: CartItem[], id?: string) {
-  if (id && storage.getItem(CART_OPERATION_PREFIX + id)) return
+export function appendCartOperation(storage: Storage, before: CartItem[], after: CartItem[], id?: string, prefix = CART_OPERATION_PREFIX) {
+  if (id && storage.getItem(prefix + id)) return
   const previous = new Map(before.map(item => [lineKey(item), item]))
   const current = new Map(after.map(item => [lineKey(item), item]))
   const changes = [...new Set([...previous.keys(), ...current.keys()])].flatMap(key => {
@@ -33,13 +33,13 @@ export function appendCartOperation(storage: Storage, before: CartItem[], after:
     return [{ key, delta, ...(metadataChanged ? { snapshot } : {}) }]
   })
   if (!changes.length && !id) return
-  const sequence = Math.max(0, ...operations(storage).map(value => value.sequence)) + 1
+  const sequence = Math.max(0, ...operations(storage, prefix).map(value => value.sequence)) + 1
   const operationId = id ?? crypto.randomUUID()
-  storage.setItem(CART_OPERATION_PREFIX + operationId, JSON.stringify({ id: operationId, sequence, changes }))
+  storage.setItem(prefix + operationId, JSON.stringify({ id: operationId, sequence, changes }))
 }
 
-export function readCartJournal(storage: Storage): CartItem[] | null {
-  const entries = operations(storage)
+export function readCartJournal(storage: Storage, prefix = CART_OPERATION_PREFIX): CartItem[] | null {
+  const entries = operations(storage, prefix)
   if (!entries.length) return null
   const lines = new Map<string, { quantity: number; item: CartItem }>()
   for (const entry of entries) for (const change of entry.changes) {

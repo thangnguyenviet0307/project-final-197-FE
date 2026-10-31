@@ -1,5 +1,5 @@
 
-import { NavLink, Outlet } from "react-router-dom"
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import {
   UserRound,
   Package,
@@ -33,13 +33,20 @@ const accountMenus = [
 ]
 
 export function AccountLayout() {
+  const { pathname } = useLocation()
+  const breadcrumbLabel = pathname.replace(/\/$/, "") === "/account/profile"
+    ? "Hồ sơ người dùng"
+    : "Tài khoản của tôi"
+
   return (
     <div className="store-account min-h-[65vh] bg-[#fafafa] text-gray-900">
       <div className="store-container py-8 sm:py-12">
         <div className="mb-8">
-          <p className="text-xs text-gray-500">
-            Trang chủ / Tài khoản của tôi
-          </p>
+          <nav aria-label="Đường dẫn" className="flex items-center gap-1 text-sm text-gray-500">
+            <Link to="/" className="font-semibold text-gray-900 hover:underline">Trang chủ</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{breadcrumbLabel}</span>
+          </nav>
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
             TÀI KHOẢN CỦA TÔI
           </h1>

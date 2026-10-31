@@ -1,7 +1,10 @@
 import { z } from "zod"
 import type { CartItem } from "@/features/cart/types/cart"
 
-export const CART_STORAGE_KEY = "storefront-cart-v1"
+export const CART_STORAGE_KEY = "storefront-cart-v2:guest"
+export function cartStorageKey(customerId: string | null) {
+  return customerId ? `storefront-cart-v2:customer:${encodeURIComponent(customerId)}` : CART_STORAGE_KEY
+}
 const text = z.string().max(2000)
 const nullableText = text.nullish()
 const variantSchema = z.object({

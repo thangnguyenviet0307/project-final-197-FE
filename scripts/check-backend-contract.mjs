@@ -17,7 +17,7 @@ const loaded = new Map()
 const allowed = new Set([
   "validations/common.validation.ts", "validations/customers.validation.ts",
   "validations/users.validation.ts", "validations/brands.validation.ts",
-  "validations/categories.validation.ts", "validations/checkout.validation.ts",
+  "validations/categories.validation.ts", "validations/checkout.validation.ts", "validations/customer-order-cancel.validation.ts",
   "validations/products.validation.ts", "validations/hero-slides.validation.ts",
   "validations/orders.validation.ts", "types/orders.type.ts",
 ])
@@ -177,12 +177,21 @@ await heroService.createHeroSlide(heroInput)
 await heroService.updateHeroSlide({ id, input: { expectedVersion: 0, description: "Updated description", imageUrl: null } })
 await heroService.deleteHeroSlide({ id, expectedVersion: 1 })
 const checkoutValidation = loadValidation("validations/checkout.validation.ts")
+const guestCheckoutApi = {
+  async post(url, body, config) {
+    assert.equal(url, "/storefront/checkout")
+    assert.equal(config.withCredentials, false)
+    checkoutValidation.checkoutSchema.parse(body)
+    requests.push({ method: "POST", url, body })
+    return { data: { data: { _id: id, orderCode: "ORD-ABC234", totalAmount: 200000, orderStatus: 1 } } }
+  },
+}
 const checkoutService = evaluate(path.join(root, "src/features/checkout/services/checkout.service.ts"), specifier => {
   if (specifier === "@/features/checkout/schemas/checkout-schema") return evaluate(path.join(root, "src/features/checkout/schemas/checkout-schema.ts"), dependency => {
     if (dependency === "zod") return require("zod")
     throw new Error(`Unsupported checkout schema import: ${dependency}`)
   })
-  if (specifier === "@/services/api") return { api: {
+  if (specifier === "@/services/api") return { authApi: guestCheckoutApi, api: {
     async post(url, body) {
       assert.equal(url, "/customer-auth/orders")
       checkoutValidation.checkoutSchema.parse(body)
@@ -208,4 +217,18 @@ const noteValidation = loadValidation("validations/orders.validation.ts").update
 noteValidation.parse({ orderNote: "Updated note", expectedOrderNote: "Original note" })
 noteValidation.parse({ orderNote: "First note", expectedOrderNote: "" })
 assert.equal(noteValidation.safeParse({ orderNote: "Unsafe update without baseline" }).success, false)
+await checkoutService.createCheckout(requests.at(-1).body, true)
+const cancelOrderValidation = loadValidation("validations/customer-order-cancel.validation.ts")
+const customerOrdersService = evaluate(path.join(root, "src/features/orders/services/customer-orders.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: {
+    async patch(url, body) {
+      assert.equal(url, `/customer-auth/orders/${id}/cancel`)
+      cancelOrderValidation.cancelCustomerOrderSchema.parse(body)
+      requests.push({ method: "PATCH", url, body })
+      return { data: { data: { _id: id, orderStatus: 3, cancelledByCustomer: true } } }
+    },
+  } }
+  throw new Error(`Unsupported customer order service import: ${specifier}`)
+})
+await customerOrdersService.cancelCustomerOrder({ id, cancellationReason: "Không còn nhu cầu" })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { FormProvider } from "react-hook-form"
-import { ChevronLeft } from "lucide-react"
+import { ArrowRight, Banknote, Check, ChevronLeft, LoaderCircle, Wallet } from "lucide-react"
 import { Link } from "react-router-dom"
 import { ProductImage } from "@/features/products/components/product-image"
 import { formatPrice } from "@/features/products/types/products"
@@ -13,12 +13,18 @@ import { cartTotal } from "@/features/cart/utils/cart-total"
 import { useUnsavedForm } from "@/hooks/use-unsaved-form"
 import { useRefreshCheckoutProducts } from "@/features/checkout/hooks/use-checkout"
 import { getApiError } from "@/services/api"
+import { useProfile } from "@/features/profile/hooks/use-profile"
 
 export default function CheckoutPage() {
   const user = useAuthStore(state => state.user)
   const loading = useAuthStore(state => state.isLoading)
   if (loading) return <p role="status" className="store-container py-12">Đang tải thông tin khách hàng…</p>
-  return <CheckoutScreen key={user?.id ?? "guest"} customer={user?.accountType === "customer" ? user : null} />
+  return user?.accountType === "customer" ? <CustomerCheckout key={user.id} customer={user} /> : <CheckoutScreen key="guest" customer={null} />
+}
+
+function CustomerCheckout({ customer }: { customer: User }) {
+  const profile = useProfile()
+  return <CheckoutScreen customer={profile.data ?? customer} />
 }
 
 function CheckoutScreen({ customer }: { customer: User | null }) {
@@ -37,7 +43,8 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
       <p>Mã đơn hàng: <strong>{mutation.data.orderCode}</strong></p>
       <p>Tổng tiền: <strong className="text-red-600">{formatPrice(mutation.data.totalAmount)} ₫</strong></p>
       <p className="text-sm text-gray-600">Bạn sẽ thanh toán khi nhận hàng.</p>
-      <Link to="/account/orders" className="inline-block font-medium text-[#4d9210] underline">Xem lịch sử đơn hàng</Link>
+      {customer ? <Link to="/account/orders" className="inline-block font-medium text-[#4d9210] underline">Xem lịch sử đơn hàng</Link>
+        : <><p className="text-sm text-gray-600">Vui lòng lưu mã đơn hàng để liên hệ cửa hàng khi cần hỗ trợ. Đơn mua không đăng nhập không xuất hiện trong lịch sử tài khoản.</p><Link to="/shop" className="inline-block font-medium text-[#4d9210] underline">Tiếp tục mua sắm</Link></>}
     </div></section></div>
   )
 
@@ -54,7 +61,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
       <p>Tổng tiền sẽ hiển thị sau khi hệ thống xác nhận kết quả.</p>
       <form onSubmit={submit}><button type="submit" disabled={mutation.isPending} className="rounded-lg bg-red-600 px-4 py-3 font-semibold text-white disabled:opacity-60">{mutation.isPending ? "Đang kiểm tra…" : "Thử lại"}</button></form>
       {form.formState.errors.root && <p role="alert" className="text-sm text-red-600">{form.formState.errors.root.message}</p>}
-      <Link to="/account/orders" className="block text-[#4d9210] underline">Kiểm tra lịch sử đơn hàng</Link>
+      {customer && <Link to="/account/orders" className="block text-[#4d9210] underline">Kiểm tra lịch sử đơn hàng</Link>}
       {navigation.guard}
     </section>
   </FormProvider>
@@ -153,20 +160,23 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
             </div>
           </dl>
         </aside>
-        <section aria-labelledby="checkout-payment-heading" className="space-y-4 rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
-          <h2 id="checkout-payment-heading" className="text-base font-semibold">Thanh toán</h2>
-          <label className="flex items-center gap-3 text-sm text-gray-900">
-            <input type="radio" name="paymentMethod" value="cod" checked readOnly className="size-4 shrink-0 accent-[#4d9210]" />
-            Thanh toán khi nhận hàng
+        <section aria-labelledby="checkout-payment-heading" className="space-y-5 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex items-center gap-3"><div className="flex size-10 items-center justify-center rounded-xl bg-gray-100 text-gray-700"><Wallet aria-hidden="true" className="size-5" /></div><div><h2 id="checkout-payment-heading" className="text-base font-semibold">Thanh toán</h2><p className="mt-0.5 text-xs text-gray-500">Phương thức thanh toán</p></div></div>
+          <label className="relative flex items-start gap-3 rounded-xl border border-[#4d9210]/30 bg-[#4d9210]/5 p-4 text-sm text-gray-900">
+            <input type="radio" name="paymentMethod" value="cod" checked readOnly className="peer sr-only" />
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white text-[#4d9210]"><Banknote aria-hidden="true" className="size-6" /></span>
+            <span className="min-w-0 flex-1"><span className="block font-semibold">Thanh toán khi nhận hàng</span><span className="mt-1 block text-xs leading-5 text-gray-500">Thanh toán bằng tiền mặt khi nhận được đơn hàng.</span></span>
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#4d9210] text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#4d9210]"><Check aria-hidden="true" className="size-3.5" /></span>
           </label>
           <button
             type="submit"
-            disabled={!customer || (!needsRecovery && (selectedItems.length === 0 || selectedItems.some(item => item.unavailableReason) || !locations.data)) || mutation.isPending || refreshProducts.isPending}
+            disabled={(!needsRecovery && (selectedItems.length === 0 || selectedItems.some(item => item.unavailableReason) || !locations.data)) || mutation.isPending || refreshProducts.isPending}
             className="w-full rounded-lg bg-red-600 px-4 py-3 text-base font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {mutation.isPending ? "Đang đặt hàng…" : needsRecovery ? "Thử lại" : "Thanh toán"}
+            {mutation.isPending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" /> : <ArrowRight aria-hidden="true" className="size-4" />}
           </button>
-          {!customer && <p className="text-sm text-gray-600">Vui lòng <Link to="/thanh-vien?act=login" state={{ from: "/checkout" }} className="text-[#4d9210] underline">đăng nhập</Link> để đặt hàng.</p>}
+          {!customer && <p className="text-sm text-gray-600">Bạn có thể đặt hàng không cần tài khoản, hoặc <Link to="/thanh-vien?act=login" state={{ from: "/checkout" }} className="text-[#4d9210] underline">đăng nhập</Link> để sử dụng thông tin đã lưu.</p>}
           {selectedItems.length === 0 && <p className="text-sm text-gray-500">Vui lòng quay lại giỏ hàng để chọn sản phẩm.</p>}
           {form.formState.errors.root && <p role="alert" className="text-sm text-red-600">{form.formState.errors.root.message}</p>}
           {mutation.isError && !needsRecovery && <button type="button" disabled={refreshProducts.isPending} onClick={() => refreshProducts.mutate()} className="block text-sm font-medium text-[#4d9210] underline disabled:opacity-60">{refreshProducts.isPending ? "Đang cập nhật…" : "Cập nhật giá và tồn kho để xem lại"}</button>}

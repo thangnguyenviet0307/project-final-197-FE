@@ -12,6 +12,7 @@ export const customerProfileSchema = profileSchema.pick({ firstName: true, lastN
 })
 
 export const shippingAddressSchema = z.object({
+  district: z.string().trim().max(100).optional(),
   recipientName: z.string().trim().min(1, "Vui lòng nhập tên người nhận.").max(100, "Tên người nhận tối đa 100 ký tự."),
   email: z.string().trim().email("Email không hợp lệ.").toLowerCase(),
   province: z.string().trim().min(1, "Vui lòng nhập tỉnh/thành phố.").max(100),

@@ -1,13 +1,14 @@
+import { useAuthStore } from "@/stores/auth.store"
 import { create } from "zustand"
 import type { CartItem } from "@/features/cart/types/cart"
 import type { Product } from "@/features/products/types/products"
 import { discountedPrice } from "@/features/products/utils/product-price"
 import { buildCartItem } from "@/features/cart/utils/cart-item"
-import { CART_STORAGE_KEY, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
+import { CART_STORAGE_KEY, cartStorageKey, parseStoredCart, serializeCart } from "@/features/cart/utils/cart-storage"
 import { appendCartOperation, readCartJournal, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
 
 let operationId: string | undefined
-const pendingOperations: { before: CartItem[]; after: CartItem[]; id: string }[] = []
+let pendingOperations: { before: CartItem[]; after: CartItem[]; id: string }[] = []
 
 interface CartState {
   refreshProducts: (products: Product[], missingSlugs?: string[]) => void
@@ -36,7 +37,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   consumePurchasedItems: (purchased, requestId) => {
     if (requestId) {
       if (pendingOperations.some(operation => operation.id === requestId)) return
-      try { if (localStorage.getItem(CART_OPERATION_PREFIX + requestId)) return } catch { /* In-memory cart remains available. */ }
+      try { if (localStorage.getItem(currentOperationPrefix() + requestId)) return } catch { /* In-memory cart remains available. */ }
     }
     operationId = requestId
     try {
@@ -106,6 +107,16 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 // Selection stays local; immutable operations merge quantities across tabs.
 let applyingStoredCart = false
+const memoryCarts = new Map<string, CartItem[]>()
+const scopedPending = new Map<string, typeof pendingOperations>()
+function currentCartKey() {
+  const user = useAuthStore.getState().user
+  return cartStorageKey(user?.accountType === "customer" ? user.id : null)
+}
+let activeCartKey = currentCartKey()
+function currentOperationPrefix() {
+  return activeCartKey === CART_STORAGE_KEY ? CART_OPERATION_PREFIX : `${activeCartKey}:operation:`
+}
 function applyItems(items: CartItem[]) {
   const previous = useCartStore.getState().items
   applyingStoredCart = true
@@ -130,26 +141,28 @@ function restoreLegacy(value: string | null) {
 function syncCartStorage() {
   while (pendingOperations.length) {
     const operation = pendingOperations[0]
-    appendCartOperation(localStorage, operation.before, operation.after, operation.id)
+    appendCartOperation(localStorage, operation.before, operation.after, operation.id, currentOperationPrefix())
     pendingOperations.shift()
   }
-  const journal = readCartJournal(localStorage)
+  const journal = readCartJournal(localStorage, currentOperationPrefix())
   if (journal) applyItems(journal)
+  memoryCarts.set(activeCartKey, useCartStore.getState().items)
   const value = serializeCart(useCartStore.getState().items)
-  if (localStorage.getItem(CART_STORAGE_KEY) !== value) localStorage.setItem(CART_STORAGE_KEY, value)
+  if (localStorage.getItem(activeCartKey) !== value) localStorage.setItem(activeCartKey, value)
 }
 if (typeof window !== "undefined") {
   try {
-    const journal = readCartJournal(localStorage)
+    const journal = readCartJournal(localStorage, currentOperationPrefix())
     if (journal) applyItems(journal)
     else {
-      restoreLegacy(localStorage.getItem(CART_STORAGE_KEY))
+      restoreLegacy(localStorage.getItem(activeCartKey))
       pendingOperations.push({ before: [], after: useCartStore.getState().items, id: "legacy-import" })
       syncCartStorage()
     }
   } catch { /* Storage may be disabled. */ }
   useCartStore.subscribe((state, previous) => {
     if (applyingStoredCart) return
+    memoryCarts.set(activeCartKey, state.items)
     try {
       if (operationId || serializeCart(previous.items) !== serializeCart(state.items)) {
         pendingOperations.push({ before: previous.items, after: state.items, id: operationId ?? crypto.randomUUID() })
@@ -157,12 +170,33 @@ if (typeof window !== "undefined") {
       syncCartStorage()
     } catch { /* Keep the in-memory cart usable if storage is unavailable. */ }
   })
+  useAuthStore.subscribe(() => {
+    const nextKey = currentCartKey()
+    if (nextKey === activeCartKey) return
+    try { syncCartStorage() } catch { /* Retain pending operations for this identity. */ }
+    memoryCarts.set(activeCartKey, useCartStore.getState().items)
+    scopedPending.set(activeCartKey, pendingOperations)
+    activeCartKey = nextKey
+    pendingOperations = scopedPending.get(nextKey) ?? []
+    applyingStoredCart = true
+    try { useCartStore.setState({ items: (memoryCarts.get(nextKey) ?? []).map(item => ({ ...item, selected: false })) }) }
+    finally { applyingStoredCart = false }
+    try {
+      const journal = readCartJournal(localStorage, currentOperationPrefix())
+      if (journal) syncCartStorage()
+      else {
+        if (!memoryCarts.has(nextKey)) restoreLegacy(localStorage.getItem(nextKey))
+        pendingOperations.push({ before: [], after: useCartStore.getState().items, id: "legacy-import" })
+        syncCartStorage()
+      }
+    } catch { /* Keep each identity's in-memory cart isolated when storage is unavailable. */ }
+  })
   window.addEventListener("storage", event => {
     try {
       if (event.storageArea !== localStorage) return
-      if (event.key?.startsWith(CART_OPERATION_PREFIX) || event.key === null) {
+      if (event.key?.startsWith(currentOperationPrefix()) || event.key === null) {
         syncCartStorage()
-        const journal = readCartJournal(localStorage)
+        const journal = readCartJournal(localStorage, currentOperationPrefix())
         if (journal) applyItems(journal)
         else if (event.key === null) applyItems([])
       }

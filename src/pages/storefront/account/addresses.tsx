@@ -19,7 +19,11 @@ function AddressEditor({ user }: { user: User }) {
   const mutation = useShippingAddress({ onSuccess: saved => {
     if (saved.shippingAddress) form.reset(saved.shippingAddress)
   }, onError: error => { form.setError("root", { message: getApiError(error).message }) } })
-  return <><form noValidate className="space-y-6" onSubmit={form.handleSubmit(values => { form.clearErrors(); mutation.mutate(values) })}>
+  return <><form noValidate className="space-y-6" onSubmit={form.handleSubmit(values => {
+    form.clearErrors()
+    const localityChanged = form.formState.dirtyFields.province || form.formState.dirtyFields.ward
+    mutation.mutate(localityChanged ? { ...values, district: "" } : values)
+  })}>
     <div className="border-b border-gray-200 pb-5"><h2 className="text-2xl font-bold">Địa chỉ của tôi</h2><p className="mt-2 text-sm text-gray-500">Lưu địa chỉ nhận hàng cho những lần mua sắm tiếp theo.</p></div>
     <fieldset disabled={mutation.isPending} className="grid gap-5 sm:grid-cols-2">
       {([

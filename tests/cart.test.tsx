@@ -1,6 +1,8 @@
-import { beforeEach, expect, it } from "vitest"
+import { useAuthStore } from "@/stores/auth.store"
+import type { User } from "@/features/auth/types/auth"
+import { beforeEach, expect, it, vi } from "vitest"
 import { act, fireEvent, render, screen } from "@testing-library/react"
-import { CART_STORAGE_KEY } from "@/features/cart/utils/cart-storage"
+import { CART_STORAGE_KEY, cartStorageKey, serializeCart } from "@/features/cart/utils/cart-storage"
 import { appendCartOperation, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 import { useCartStore } from "@/stores/cart.store"
@@ -16,7 +18,101 @@ const product: Product = {
   ],
 }
 
-beforeEach(() => useCartStore.setState({ items: [] }))
+beforeEach(() => {
+  useAuthStore.getState().clearSession()
+  window.localStorage.clear()
+  window.dispatchEvent(new StorageEvent("storage", { key: null, storageArea: window.localStorage }))
+  useCartStore.setState({ items: [] })
+})
+
+function signIn(id: string) {
+  const user: User = { id, name: id, firstName: id, lastName: "Customer", email: `${id}@example.com`, accountType: "customer", mustChangePassword: false }
+  useAuthStore.getState().setSession(user, { accessToken: "access" })
+}
+
+it("keeps independent carts for each customer and guest across login/logout and switching accounts", () => {
+  useCartStore.getState().addItem(product, "blue", 1)
+  signIn("customer-a")
+  expect(useCartStore.getState().items).toEqual([])
+  useCartStore.getState().addItem(product, "red", 1)
+  signIn("customer-b")
+  expect(useCartStore.getState().items).toEqual([])
+  useCartStore.getState().addItem(product, "blue", 2)
+  signIn("customer-a")
+  expect(useCartStore.getState().items).toHaveLength(1)
+  expect(useCartStore.getState().items[0]).toMatchObject({ variantKey: "red", quantity: 1, selected: false })
+  useAuthStore.getState().clearSession()
+  expect(useCartStore.getState().items[0]).toMatchObject({ variantKey: "blue", quantity: 1, selected: false })
+  signIn("customer-b")
+  expect(useCartStore.getState().items[0]).toMatchObject({ variantKey: "blue", quantity: 2, selected: false })
+  expect(JSON.parse(localStorage.getItem(cartStorageKey("customer-a"))!).items[0].variantKey).toBe("red")
+  expect(JSON.parse(localStorage.getItem(cartStorageKey("customer-b"))!).items[0].quantity).toBe(2)
+  expect(JSON.parse(localStorage.getItem(CART_STORAGE_KEY)!).items[0].quantity).toBe(1)
+})
+
+it("restores an account's stored cart and keeps profile/token updates in the same cart", () => {
+  useCartStore.getState().addItem(product, "red", 1)
+  const stored = serializeCart(useCartStore.getState().items)
+  localStorage.setItem(cartStorageKey("saved"), stored)
+  signIn("saved")
+  expect(useCartStore.getState().items[0]).toMatchObject({ variantKey: "red", selected: false })
+  useCartStore.getState().setSelected(product._id, "red", true)
+  const items = useCartStore.getState().items
+  useAuthStore.getState().setTokens({ accessToken: "new-token" })
+  useAuthStore.setState({ user: { ...useAuthStore.getState().user!, firstName: "Updated" } })
+  expect(useCartStore.getState().items).toBe(items)
+  localStorage.setItem(cartStorageKey("broken"), "invalid json")
+  signIn("broken")
+  expect(useCartStore.getState().items).toEqual([])
+})
+
+it("applies cross-tab changes only to the active customer's cart", () => {
+  signIn("customer-a")
+  useCartStore.getState().addItem(product, "blue", 1)
+  const before = useCartStore.getState().items
+  const changed = before.map(item => ({ ...item, quantity: 2 }))
+  for (const scope of [cartStorageKey("customer-b"), CART_STORAGE_KEY]) {
+    const key = `${scope}:operation:other-tab`
+    appendCartOperation(localStorage, before, changed, "other-tab", `${scope}:operation:`)
+    window.dispatchEvent(new StorageEvent("storage", { key, storageArea: localStorage }))
+  }
+  expect(useCartStore.getState().items[0].quantity).toBe(1)
+  const key = `${cartStorageKey("customer-a")}:operation:other-tab`
+  appendCartOperation(localStorage, before, changed, "other-tab", `${cartStorageKey("customer-a")}:operation:`)
+  window.dispatchEvent(new StorageEvent("storage", { key, storageArea: localStorage }))
+  expect(useCartStore.getState().items[0].quantity).toBe(2)
+  window.dispatchEvent(new StorageEvent("storage", { key: cartStorageKey("customer-b"), newValue: null, storageArea: localStorage }))
+  expect(useCartStore.getState().items[0].quantity).toBe(2)
+})
+
+it("never assigns the old shared cart to a guest or newly signed-in account", () => {
+  useCartStore.getState().addItem(product, "blue", 1)
+  const legacy = serializeCart(useCartStore.getState().items)
+  useCartStore.setState({ items: [] })
+  localStorage.setItem("storefront-cart-v1", legacy)
+  window.dispatchEvent(new StorageEvent("storage", { key: "storefront-cart-v1", newValue: legacy, storageArea: localStorage }))
+  expect(useCartStore.getState().items).toEqual([])
+  signIn("new-customer")
+  expect(useCartStore.getState().items).toEqual([])
+  expect(localStorage.getItem("storefront-cart-v1")).toBe(legacy)
+})
+
+it("keeps account carts separate when browser storage cannot be written", () => {
+  const originalWrite = Storage.prototype.setItem
+  const write = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key, value) {
+    if (key.startsWith("storefront-cart-v2:")) throw new Error("Storage disabled")
+    originalWrite.call(this, key, value)
+  })
+  try {
+    signIn("offline-a")
+    useCartStore.getState().addItem(product, "red", 1)
+    signIn("offline-b")
+    expect(useCartStore.getState().items).toEqual([])
+    useCartStore.getState().addItem(product, "blue", 2)
+    signIn("offline-a")
+    expect(useCartStore.getState().items[0]).toMatchObject({ variantKey: "red", quantity: 1 })
+  } finally { write.mockRestore() }
+})
 
 it("persists cart contents without purchase selection and restores changes from another tab", () => {
   useCartStore.getState().addItem(product, "blue", 2)
@@ -241,4 +337,13 @@ it("shows added product details in the cart and returns to empty state after rem
   expect(useCartStore.getState().items).toHaveLength(1)
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận" }))
   expect(screen.getByText("Giỏ hàng của bạn đang trống")).toBeTruthy()
+})
+
+it("never imports the previous shared journal into guest or customer carts", () => {
+  const legacy = serializeCart([{ product, productId: product._id, variantKey: "blue", quantity: 1 } as Parameters<typeof serializeCart>[0][number]])
+  localStorage.setItem("storefront-cart-operation-v2:old", JSON.stringify({ id: "old", sequence: 1, changes: [{ key: JSON.stringify([product._id, "blue"]), delta: 1, snapshot: legacy }] }))
+  window.dispatchEvent(new StorageEvent("storage", { key: "storefront-cart-operation-v2:old", storageArea: localStorage }))
+  expect(useCartStore.getState().items).toEqual([])
+  signIn("clean-customer")
+  expect(useCartStore.getState().items).toEqual([])
 })

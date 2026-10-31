@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest"
-import { appendCartOperation, readCartJournal } from "@/features/cart/utils/cart-journal"
+import { appendCartOperation, readCartJournal, CART_OPERATION_PREFIX } from "@/features/cart/utils/cart-journal"
 import { buildCartItem } from "@/features/cart/utils/cart-item"
 import { cartTotal } from "@/features/cart/utils/cart-total"
 import { useCartStore } from "@/stores/cart.store"
@@ -33,7 +33,7 @@ it("merges other-tab additions on recovery and does not repeat a pending purchas
     expect(useCartStore.getState().items[0].quantity).toBe(1)
   } finally { write.mockRestore() }
   appendCartOperation(localStorage, [base], [{ ...base, quantity: 4 }], "other-tab")
-  window.dispatchEvent(new StorageEvent("storage", { key: "storefront-cart-operation-v2:other-tab", storageArea: localStorage }))
+  window.dispatchEvent(new StorageEvent("storage", { key: CART_OPERATION_PREFIX + "other-tab", storageArea: localStorage }))
   expect(useCartStore.getState().items[0].quantity).toBe(2)
   window.dispatchEvent(new Event("focus"))
   expect(useCartStore.getState().items[0].quantity).toBe(2)
