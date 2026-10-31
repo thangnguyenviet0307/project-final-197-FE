@@ -172,3 +172,19 @@ it("allows customers to open their profile", async () => {
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={createMemoryRouter(replacePages(routes), { initialEntries: ["/account/profile"] })} /></QueryClientProvider>)
   expect(await screen.findByText("Trang profile")).toBeTruthy()
 })
+
+for (const path of ["/auth/articles", "/auth/post-categories"]) {
+  it(`blocks staff from ${path}`, async () => {
+    session("staff")
+    const router = createMemoryRouter(replacePages(routes), { initialEntries: [path] })
+    render(<RouterProvider router={router} />)
+    await waitForRoute()
+    function waitForRoute() { return screen.findByText("Trang /auth/403") }
+  })
+  it(`allows admin into ${path}`, async () => {
+    session("admin")
+    const router = createMemoryRouter(replacePages(routes), { initialEntries: [path] })
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByText(`Trang ${path}`)).toBeTruthy()
+  })
+}

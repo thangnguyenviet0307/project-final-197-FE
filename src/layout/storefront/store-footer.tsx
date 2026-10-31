@@ -16,16 +16,14 @@ import {
 } from "@/components/icons/brand-icons"
 
 const companyLinks = [
-  { label: "Giới thiệu", path: "/about" },
   { label: "Liên hệ", path: "/contact" },
-  { label: "Chính sách bảo mật", path: "/policies/privacy" },
-  { label: "Điều khoản sử dụng", path: "/policies/terms" },
+  { label: "Tin tức", path: "/bai-viet?type=news" },
+  { label: "Blog", path: "/bai-viet?type=blog" },
 ]
 
 const supportLinks = [
-  { label: "Câu hỏi thường gặp", path: "/faq" },
-  { label: "Chính sách giao hàng", path: "/policies/shipping" },
-  { label: "Chính sách đổi trả", path: "/policies/returns" },
+  { label: "Khám phá sản phẩm", path: "/shop" },
+  { label: "Giỏ hàng", path: "/cart" },
   { label: "Tài khoản của tôi", path: "/account/profile" },
 ]
 
@@ -128,13 +126,13 @@ export function StoreFooter() {
             </h3>
 
             <p className="mb-5 text-sm leading-7 text-gray-400">
-              Đăng ký email để nhận thông tin sản phẩm mới
-              và chương trình ưu đãi.
+              Chế độ xem trước: tính năng nhận tin chưa khả dụng. Email chưa được gửi hoặc lưu lại.
             </p>
 
             <form onSubmit={handleSubscribe} className="flex">
               <input
                 type="email"
+                disabled
                 required
                 value={email}
                 onChange={(event) => {
@@ -148,8 +146,9 @@ export function StoreFooter() {
 
               <button
                 type="submit"
+                disabled
                 aria-label="Đăng ký nhận tin"
-                className="rounded-r-md bg-[#65b719] px-4 text-white transition hover:bg-[#4d9210]"
+                className="rounded-r-md bg-[#65b719] px-4 text-white transition hover:bg-[#4d9210] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Send size={18} />
               </button>

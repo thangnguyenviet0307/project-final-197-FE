@@ -25,6 +25,6 @@ export interface PublicArticle {
 }
 
 export interface PublicArticlesResult {
-  data: PublicArticle[]
+  data: Omit<PublicArticle, "content">[]
   pagination: Pagination
 }

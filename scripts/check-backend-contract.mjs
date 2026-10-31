@@ -20,6 +20,7 @@ const allowed = new Set([
   "validations/categories.validation.ts", "validations/checkout.validation.ts", "validations/customer-order-cancel.validation.ts",
   "validations/products.validation.ts", "validations/hero-slides.validation.ts",
   "validations/orders.validation.ts", "types/orders.type.ts",
+  "validations/articles.validation.ts", "validations/post-categories.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -231,4 +232,32 @@ const customerOrdersService = evaluate(path.join(root, "src/features/orders/serv
   throw new Error(`Unsupported customer order service import: ${specifier}`)
 })
 await customerOrdersService.cancelCustomerOrder({ id, cancellationReason: "Không còn nhu cầu" })
+const postValidation = loadValidation("validations/articles.validation.ts")
+const categoryValidation = loadValidation("validations/post-categories.validation.ts")
+const editorialService = evaluate(path.join(root, "src/features/articles/services/articles.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: {
+    async post(url, body) {
+      if (url === "/articles") postValidation.createArticleSchema.parse(body)
+      else { assert.equal(url, "/articles/category-options"); categoryValidation.createPostCategorySchema.parse(body) }
+      requests.push({ method: "POST", url, body }); return { data: { data: { _id: id, __v: 0 } } }
+    },
+    async patch(url, body) {
+      if (url === `/articles/${id}`) postValidation.updateArticleSchema.parse(body)
+      else { assert.equal(url, `/articles/category-options/${id}`); categoryValidation.updatePostCategorySchema.parse(body) }
+      requests.push({ method: "PATCH", url, body }); return { data: { data: { _id: id, __v: 1 } } }
+    },
+    async delete(url, config) {
+      postValidation.articleVersionSchema.parse(config.data)
+      requests.push({ method: "DELETE", url, body: config.data }); return { data: { data: { deleted: true } } }
+    },
+  } }
+  throw new Error(`Unsupported articles service import: ${specifier}`)
+})
+await editorialService.createPostCategory({ name: "Guides", slug: "guides", description: "", isActive: true })
+await editorialService.createArticle({ type: "news", title: "New guide", category: "Guides", categoryId: id, excerpt: "Summary", content: "Content", authorName: "Editor", imageUrl: null, tags: [], status: "draft", publishAt: null, isFeatured: true, sortOrder: 2, seo: { title: "", description: "" } })
+await editorialService.updateArticle({ id, input: { expectedVersion: 0, isFeatured: false, sortOrder: 3 } })
+await editorialService.updatePostCategory({ id, input: { expectedVersion: 0, isActive: false } })
+await editorialService.deleteArticle({ id, expectedVersion: 1 })
+await editorialService.deletePostCategory({ id, expectedVersion: 1 })
+postValidation.publicArticleQuerySchema.parse({ type: "news", isFeatured: "true", sort: "display", page: "1", limit: "3" })
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

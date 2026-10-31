@@ -5,7 +5,7 @@ import { usePublicArticles } from "@/features/storefront/hooks/use-public-articl
 import { getApiError } from "@/services/api"
 
 export function StorefrontNewsSection() {
-  const articles = usePublicArticles("news")
+  const articles = usePublicArticles("news", 3, true)
 
   return (
     <section id="tin-tuc" aria-label="Tin tức và cẩm nang phụ kiện" className="bg-[#f5f6f4] py-12 sm:py-16">
@@ -15,6 +15,7 @@ export function StorefrontNewsSection() {
           description="Mẹo chọn mua và sử dụng phụ kiện, giúp bạn tìm hiểu kỹ hơn trước khi khám phá sản phẩm."
         />
 
+        <Link to="/bai-viet" className="mb-5 inline-flex items-center gap-2 font-semibold text-[#4d9210]">Tất cả tin tức & Blog <ArrowRight size={16} /></Link>
         {articles.isPending ? (
           <p role="status" className="py-8 text-center text-sm text-gray-500">Đang tải tin tức...</p>
         ) : articles.isError ? (

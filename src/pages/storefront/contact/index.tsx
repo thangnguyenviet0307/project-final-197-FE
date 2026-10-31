@@ -98,7 +98,7 @@ export default function ContactPage() {
           </h1>
 
           <p className="mt-3 max-w-xl text-sm leading-7 text-gray-300 sm:text-base">
-            Chúng tôi luôn sẵn sàng hỗ trợ. Hãy liên hệ và cho chúng tôi biết bạn cần giúp đỡ điều gì.
+            Trang liên hệ đang ở chế độ xem trước. Tính năng gửi lời nhắn và các kênh hỗ trợ sẽ được cập nhật sau.
           </p>
 
           <div className="mt-6 h-1 w-16 rounded-full bg-[#55b000]" />
@@ -120,7 +120,7 @@ export default function ContactPage() {
                   Gửi lời nhắn cho chúng tôi
                 </h3>
                 <p className="mt-1 text-xs text-gray-500">
-                  Vui lòng điền thông tin bên dưới.
+                  Chỉ kiểm tra thông tin trên trang; lời nhắn chưa được gửi hoặc lưu lại.
                 </p>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function ContactPage() {
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#55b000] px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#55b000]"
               >
                 <Send size={17} />
-                GỬI LỜI NHẮN
+                KIỂM TRA THÔNG TIN
               </button>
 
               <p className="text-xs leading-5 text-gray-400">

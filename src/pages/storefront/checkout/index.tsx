@@ -28,9 +28,9 @@ function CustomerCheckout({ customer }: { customer: User }) {
 }
 
 function CheckoutScreen({ customer }: { customer: User | null }) {
-  const { form, submit, mutation, needsRecovery, locations, recoveryRequest } = useCheckoutForm(customer)
+  const { form, submit, mutation, needsRecovery, locations, recoveryRequest, storageProblem, retryPendingStorage } = useCheckoutForm(customer)
   const refreshProducts = useRefreshCheckoutProducts()
-  const navigation = useUnsavedForm(!mutation.isSuccess && (form.formState.isDirty || mutation.isPending || needsRecovery))
+  const navigation = useUnsavedForm(!mutation.isSuccess && (form.formState.isDirty || mutation.isPending || needsRecovery || !!storageProblem))
   const [showAllProducts, setShowAllProducts] = useState(false)
   const items = useCartStore(state => state.items)
   const selectedItems = items.filter(item => item.selected)
@@ -43,10 +43,19 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
       <p>Mã đơn hàng: <strong>{mutation.data.orderCode}</strong></p>
       <p>Tổng tiền: <strong className="text-red-600">{formatPrice(mutation.data.totalAmount)} ₫</strong></p>
       <p className="text-sm text-gray-600">Bạn sẽ thanh toán khi nhận hàng.</p>
+      {!customer && <p className="text-sm text-gray-600">Đơn chưa được cửa hàng nhận sẽ tự hủy và hoàn tồn sau 24 giờ.</p>}
       {customer ? <Link to="/account/orders" className="inline-block font-medium text-[#4d9210] underline">Xem lịch sử đơn hàng</Link>
         : <><p className="text-sm text-gray-600">Vui lòng lưu mã đơn hàng để liên hệ cửa hàng khi cần hỗ trợ. Đơn mua không đăng nhập không xuất hiện trong lịch sử tài khoản.</p><Link to="/shop" className="inline-block font-medium text-[#4d9210] underline">Tiếp tục mua sắm</Link></>}
     </div></section></div>
   )
+
+  if (storageProblem) return <section className="store-container space-y-4 py-12">
+    <h1 className="text-xl font-semibold">Chưa thể kiểm tra yêu cầu đặt hàng trước đó</h1>
+    <p role="alert">{storageProblem === "invalid" ? "Dữ liệu khôi phục đơn hàng chưa hợp lệ. Yêu cầu cũ được giữ nguyên; vui lòng liên hệ cửa hàng để xác nhận trước khi tạo đơn khác." : "Không đọc được bộ nhớ phiên. Vui lòng bật lại bộ nhớ phiên rồi bấm Kiểm tra lại để tránh tạo trùng đơn."}</p>
+    <button type="button" onClick={retryPendingStorage} className="rounded-lg bg-red-600 px-4 py-3 font-semibold text-white">Kiểm tra lại</button>
+    {customer && <Link to="/account/orders" className="block text-[#4d9210] underline">Kiểm tra lịch sử đơn hàng</Link>}
+    {navigation.guard}
+  </section>
 
   if (recoveryRequest) return <FormProvider {...form}>
     <section className="store-container space-y-5 py-12">
@@ -69,6 +78,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
   return (
     <FormProvider {...form}>
     <form noValidate onSubmit={submit}>
+    {!customer && <p className="store-container py-3 text-sm text-gray-600">Đơn vãng lai được giữ kho tối đa 24 giờ khi chưa được cửa hàng nhận.</p>}
     <fieldset disabled={mutation.isPending} className="min-w-0">
     <div className="bg-gray-100 py-8 sm:py-12">
       <div className="store-container grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">

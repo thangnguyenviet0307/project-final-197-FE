@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { cleanup, act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -17,6 +17,7 @@ vi.mock("@/features/storefront/services/catalog.service", () => ({ getStoreProdu
 vi.mock("@/features/auth/services/auth.service", () => ({ getProfile: vi.fn() }))
 const product: Product = { _id: "a".repeat(24), slug: "test", product_name: "Sản phẩm A", price: 100000, stock: 20, category: null, brand: null }
 const other = { ...product, _id: "b".repeat(24), slug: "other", product_name: "Sản phẩm B" }
+afterEach(() => vi.restoreAllMocks())
 function savedProfile(): Awaited<ReturnType<typeof getProfile>> {
   return { ...useAuthStore.getState().user!, personalEmail: "", phone: useAuthStore.getState().user?.phone ?? "", location: "", bio: "", avatar: "", accountType: "customer" }
 }
@@ -29,6 +30,7 @@ function seedCart() {
 beforeEach(() => {
   sessionStorage.clear()
   vi.clearAllMocks()
+  vi.mocked(createCheckout).mockReset()
   useAuthStore.setState({ user: { id: "customer", name: "Nguyễn An", firstName: "An", lastName: "Nguyễn", email: "test@example.com", phone: "0901234567", accountType: "customer", mustChangePassword: false }, isAuthenticated: true, isLoading: false })
   vi.mocked(getProfile).mockImplementation(async () => savedProfile())
   seedCart()
@@ -43,6 +45,71 @@ function mount() {
   render(<QueryClientProvider client={client}><MemoryRouter><CheckoutPage /></MemoryRouter></QueryClientProvider>)
   return invalidation
 }
+
+it.each([false, true])("blocks storage read failure then recovers the original uncertain request (guest=%s)", async guest => {
+  if (guest) { useAuthStore.setState({ user: null, isAuthenticated: false }); seedCart() }
+  vi.mocked(createCheckout).mockRejectedValueOnce(new AxiosError("Timeout", "ECONNABORTED"))
+    .mockResolvedValueOnce({ _id: "order", orderCode: "ORD-ABC234", totalAmount: 200000, orderStatus: 1 })
+  mount()
+  await fillAddress()
+  if (guest) {
+    fireEvent.change(screen.getByLabelText("Tên người nhận"), { target: { value: "Guest" } })
+    fireEvent.change(screen.getByLabelText("Số điện thoại người nhận"), { target: { value: "0901234567" } })
+  }
+  fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
+  await screen.findByRole("button", { name: "Thử lại" })
+  const original = vi.mocked(createCheckout).mock.calls[0][0]
+  cleanup()
+  const key = `storefront-pending-checkout-v1:${guest ? "guest" : "customer"}`
+  const get = Storage.prototype.getItem
+  const spy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(function (this: Storage, name: string) {
+    if (name === key) throw new DOMException("Unavailable", "SecurityError")
+    return get.call(this, name)
+  })
+  mount()
+  expect(await screen.findByRole("button", { name: "Kiểm tra lại" })).toBeTruthy()
+  expect(screen.queryByRole("button", { name: "Thanh toán" })).toBeNull()
+  expect(createCheckout).toHaveBeenCalledTimes(1)
+  spy.mockRestore()
+  fireEvent.click(screen.getByRole("button", { name: "Kiểm tra lại" }))
+  fireEvent.click(await screen.findByRole("button", { name: "Thử lại" }))
+  await screen.findByText("Đặt hàng thành công")
+  expect(vi.mocked(createCheckout).mock.calls[1][0]).toEqual(original)
+  expect(createCheckout).toHaveBeenCalledTimes(2)
+})
+
+it("keeps invalid pending data locked and untouched on repeated recovery attempts", async () => {
+  const key = "storefront-pending-checkout-v1:customer"
+  sessionStorage.setItem(key, '{"requestId":"unresolved",')
+  mount()
+  fireEvent.click(await screen.findByRole("button", { name: "Kiểm tra lại" }))
+  expect(screen.getByRole("alert").textContent).toContain("chưa hợp lệ")
+  expect(screen.queryByRole("button", { name: "Thanh toán" })).toBeNull()
+  expect(createCheckout).not.toHaveBeenCalled()
+  expect(sessionStorage.getItem(key)).toBe('{"requestId":"unresolved",')
+})
+
+it("shows an expired reservation as a rejected checkout, preserves the cart and clears the resolved request", async () => {
+  useAuthStore.setState({ user: null, isAuthenticated: false })
+  seedCart()
+  vi.mocked(createCheckout).mockRejectedValueOnce(new AxiosError("Timeout", "ECONNABORTED"))
+  mount()
+  await fillAddress()
+  fireEvent.change(screen.getByLabelText("Tên người nhận"), { target: { value: "Guest" } })
+  fireEvent.change(screen.getByLabelText("Số điện thoại người nhận"), { target: { value: "0901234567" } })
+  fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
+  await screen.findByRole("button", { name: "Thử lại" })
+  vi.mocked(createCheckout).mockRejectedValueOnce(new AxiosError("Expired", "ERR_BAD_REQUEST", undefined, undefined, {
+    config: { headers: new AxiosHeaders() }, status: 409, statusText: "Conflict", headers: {},
+    data: { message: "Đơn hàng đã hết thời hạn chờ xác nhận 24 giờ và đã được hoàn tồn.", code: "CHECKOUT_RESERVATION_EXPIRED" },
+  }))
+  fireEvent.click(screen.getByRole("button", { name: "Thử lại" }))
+  await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("hết thời hạn"))
+  expect(screen.queryByText("Đặt hàng thành công")).toBeNull()
+  expect(sessionStorage.getItem("storefront-pending-checkout-v1:guest")).toBeNull()
+  expect(useCartStore.getState().items[0].quantity).toBe(2)
+  expect(createCheckout).toHaveBeenCalledTimes(2)
+})
 async function fillAddress() {
   await screen.findByRole("option", { name: "Tỉnh A" })
   fireEvent.change(screen.getByLabelText("Tỉnh/Thành phố"), { target: { value: "1" } })

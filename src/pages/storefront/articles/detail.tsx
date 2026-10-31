@@ -1,11 +1,20 @@
 import { ArrowLeft, CalendarDays, Newspaper } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useLocation, useParams } from "react-router-dom"
+import { useRecordArticleView } from "@/features/storefront/hooks/use-record-article-view"
+import { useArticleHead } from "@/features/storefront/hooks/use-article-head"
 import { usePublicArticle } from "@/features/storefront/hooks/use-public-articles"
 import { getApiError } from "@/services/api"
 
 export default function StorefrontArticleDetailPage() {
   const { slug = "" } = useParams()
   const article = usePublicArticle(slug)
+  const location = useLocation()
+  const valid = slug.length <= 255 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug)
+  const loaded = valid && !article.isPending && !article.isError && article.data?.slug === slug
+  useRecordArticleView(slug, loaded, location.key)
+  useArticleHead(loaded ? article.data : undefined)
+
+  if (slug.length > 255 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug)) return <main className="store-container py-12"><p role="alert">Không tìm thấy bài viết.</p><Link to="/bai-viet">Tất cả bài viết</Link></main>
 
   if (article.isPending) {
     return <main className="store-container py-16"><p role="status" className="text-center text-sm text-gray-500">Đang tải bài viết...</p></main>
@@ -33,9 +42,9 @@ export default function StorefrontArticleDetailPage() {
   return (
     <main className="store-container py-10 sm:py-16">
       <article className="mx-auto max-w-4xl">
-        <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline">
+        <Link to="/bai-viet" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline">
           <ArrowLeft size={16} aria-hidden="true" />
-          Về trang chủ
+          Tất cả bài viết
         </Link>
         <header>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-[#57952b]">

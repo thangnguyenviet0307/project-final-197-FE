@@ -1,3 +1,4 @@
+import { useValidListPage } from "@/hooks/use-valid-list-page"
 import { isAdministrator } from "@/features/auth/utils/roles"
 import { useCallback, useState, type ReactElement } from "react"
 import { Link, useLocation, useSearchParams } from "react-router-dom"
@@ -48,6 +49,7 @@ export default function AdminProductsPage() {
   }
   const filters = { ...flagFilters, search: params.get("search")?.trim() ?? "", category: params.get("category") ?? "", brand: params.get("brand") ?? "", stockStatus: stockStatus ?? "" }
   const query = useProducts({ ...flagQuery, page, limit, search: filters.search || undefined, category: filters.category || undefined, brand: filters.brand || undefined, stockStatus })
+  useValidListPage(page, query)
   const statistics = useProductStatistics()
   const applyFilters = useCallback((next: ProductFiltersValue) => setParams(previous => {
     const updated = new URLSearchParams(previous)
@@ -82,7 +84,7 @@ export default function AdminProductsPage() {
     {statistics.isError && <p role="alert" className="text-sm text-destructive">Không thể tải thống kê danh mục sản phẩm. <Button variant="outline" onClick={() => void statistics.refetch()}>Tải lại thống kê</Button></p>}
     <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{pagination ? `${pagination.total} products` : "Danh sách sản phẩm"}</p>
       {admin && <Button nativeButton={false} role="link" render={<Link to="/auth/products/new" state={linkState} />}><Plus />Thêm sản phẩm</Button>}</div>
-    <ProductFilters key={params.toString()} initial={filters} onChange={applyFilters} onReset={() => setParams(previous => {
+    <ProductFilters key={JSON.stringify(filters)} initial={filters} onChange={applyFilters} onReset={() => setParams(previous => {
       const updated = new URLSearchParams(previous)
       for (const name of ["sku", "color", "size", "search", "category", "brand", "minPrice", "maxPrice", "sortBy", "sortOrder", "stockStatus", ...productFlags.map(([field]) => field)]) updated.delete(name)
       updated.set("page", "1")
@@ -124,7 +126,6 @@ export default function AdminProductsPage() {
     </>}
     {deleting && <DeleteProductConfirmation key={deleting._id} product={deleting} onClose={() => setDeleting(null)} onDeleted={() => {
       setDeleting(null)
-      if (products.length === 1 && page > 1) changePage(page - 1)
     }} />}
   </div></TooltipProvider></BaseLayout>
 }

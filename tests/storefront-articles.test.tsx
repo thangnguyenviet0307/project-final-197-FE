@@ -3,6 +3,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom"
 import { expect, it, vi } from "vitest"
 import { StorefrontNewsSection } from "@/features/storefront/components/storefront-news-section"
 import StorefrontArticleDetailPage from "@/pages/storefront/articles/detail"
+vi.mock("@/features/storefront/services/articles.service", () => ({ recordArticleView: vi.fn(async () => {}) }))
 
 const state = vi.hoisted(() => ({
   articles: [{ _id: "article-1", type: "news" as const, title: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối", slug: "chon-cap-sac", category: "Cẩm nang chọn mua", excerpt: "Kiểm tra thiết bị trước khi chọn cáp.", content: "Nội dung bài viết", imageUrl: null, tags: ["cáp sạc"], authorName: "Ban biên tập", publishedAt: "2026-10-28T10:00:00.000Z", isFeatured: false, viewCount: 0, seo: {} }],

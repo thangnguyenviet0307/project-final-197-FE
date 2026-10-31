@@ -3,6 +3,7 @@ import { isAdministrator } from "@/features/auth/utils/roles"
 
 import * as React from "react"
 import {
+  Newspaper,
   LayoutDashboard,
   Shield,
   AlertTriangle,
@@ -56,6 +57,7 @@ const data = {
           url: "/auth/categories",
           icon: FolderTree,
         },
+        { title: "Tin tức & Blog", url: "/auth/articles", icon: Newspaper, items: [{ title: "Bài viết", url: "/auth/articles" }, { title: "Danh mục bài viết", url: "/auth/post-categories" }] },
         { title: "Sản phẩm", url: "/auth/products", icon: Package },
         { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
         {
@@ -179,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/auth/users", "/auth/hero-slides"].includes(item.url) ||
+      (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories"].includes(item.url) ||
        isAdministrator(user?.role))
     ).map(item => item.url === "/auth/categories" && isAdministrator(user?.role) ? {
       ...item,

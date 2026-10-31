@@ -29,6 +29,10 @@ export const routes: RouteObject[] = [
       },
 
       {
+        path: "/bai-viet",
+        lazy: page(() => import("@/pages/storefront/articles/index")),
+      },
+      {
         path: "/bai-viet/:slug",
         lazy: page(() => import("@/pages/storefront/articles/detail")),
       },
@@ -249,6 +253,8 @@ export const routes: RouteObject[] = [
       {
         element: <ProtectedRoute allowedRoles={["super_admin", "admin"]} />,
         children: [
+          { path: "/auth/articles", lazy: page(() => import("@/pages/admin/articles")) },
+          { path: "/auth/post-categories", lazy: page(() => import("@/pages/admin/post-categories")) },
           { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
           // CATEGORIES
           {
