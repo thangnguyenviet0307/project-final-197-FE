@@ -10,6 +10,7 @@ import {
 import "@/layout/storefront/account-layout.css"
 
 const accountMenus = [
+  { label: "Bảo hành của tôi", path: "/account/warranty", icon: Package },
   {
     label: "Hồ sơ của tôi",
     path: "/account/profile",

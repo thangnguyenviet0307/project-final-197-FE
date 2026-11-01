@@ -59,6 +59,8 @@ const data = {
         },
         { title: "Tin tức & Blog", url: "/auth/articles", icon: Newspaper, items: [{ title: "Bài viết", url: "/auth/articles" }, { title: "Danh mục bài viết", url: "/auth/post-categories" }] },
         { title: "Sản phẩm", url: "/auth/products", icon: Package },
+        { title: "Chính sách cửa hàng", url: "/auth/policies", icon: Shield },
+        { title: "Yêu cầu bảo hành", url: "/auth/warranties", icon: Shield },
         { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
         {
           title: "Người dùng",
@@ -181,7 +183,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     (item) =>
       item.title !== "Trang xác thực" &&
       item.title !== "Trang lỗi" &&
-      (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories"].includes(item.url) ||
+      (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories", "/auth/policies"].includes(item.url) ||
        isAdministrator(user?.role))
     ).map(item => item.url === "/auth/categories" && isAdministrator(user?.role) ? {
       ...item,
