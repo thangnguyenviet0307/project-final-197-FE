@@ -32,6 +32,14 @@ export const routes: RouteObject[] = [
         lazy: page(() => import("@/pages/public/landing/page")),
       },
       {
+        path: "/about",
+        lazy: page(() => import("@/pages/storefront/about")),
+      },
+      {
+        path: "/faq",
+        lazy: page(() => import("@/pages/storefront/faq")),
+      },
+      {
         path: "/bai-viet/:slug",
         lazy: page(() => import("@/pages/storefront/articles/detail")),
       },
