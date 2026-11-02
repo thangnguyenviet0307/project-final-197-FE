@@ -25,11 +25,11 @@ beforeEach(() => {
   mocks.admin.data = { content: { ...content }, __v: 2, publishedAt: null }
   mocks.publicPolicy.data = null
 })
-const wrap = (element: React.ReactNode) => <MemoryRouter>{element}</MemoryRouter>
+const wrap = (element: React.ReactNode) => <MemoryRouter initialEntries={["/chinh-sach-bao-hanh"]}>{element}</MemoryRouter>
 
 it("unpublished public policy shows an honest empty state and warranty entry point", () => {
   render(wrap(<PolicyPage />))
-  expect(screen.getByText("Chính sách đang được cập nhật")).toBeTruthy()
+  expect(screen.getByText("Chính sách bảo hành đang được cập nhật")).toBeTruthy()
   expect(screen.getByRole("link", { name: /Gửi yêu cầu bảo hành/ }).getAttribute("href")).toBe("/account/warranty")
 })
 it("public policy renders text safely rather than injecting HTML", () => {
@@ -37,6 +37,9 @@ it("public policy renders text safely rather than injecting HTML", () => {
   const { container } = render(wrap(<PolicyPage />))
   expect(screen.getByText('<script>alert("x")</script>')).toBeTruthy()
   expect(container.querySelector("script")).toBeNull()
+  expect(screen.queryByText(content.shipping)).toBeNull()
+  expect(screen.queryByText(content.returns)).toBeNull()
+  expect(screen.getByRole("link", { name: "Chính sách bảo hành" }).getAttribute("aria-current")).toBe("page")
 })
 it("background policy refresh preserves dirty text and the original expectedVersion", async () => {
   mocks.save.mockResolvedValue({ content: { ...content, warranty: "Bản đang soạn" }, __v: 3, publishedAt: null })
@@ -77,6 +80,7 @@ it("frontend validation requires full published policy and rejects identity over
 })
 
 it.each([
+  ["/chinh-sach-bao-hanh", "Chính sách bảo hành", "Điều kiện bảo hành"],
   ["/chinh-sach-bao-mat", "Chính sách bảo mật", "Thông tin bảo mật đã công bố"],
   ["/chinh-sach-giao-hang", "Chính sách giao hàng", "Giao hàng"],
   ["/chinh-sach-doi-tra", "Chính sách đổi trả", "Điều kiện đổi trả"],

@@ -15,6 +15,7 @@ export const customerSupportLinks: readonly Required<StoreInformationLink>[] = [
 ]
 
 export const policyDocuments = [
+  { key: "warranty", path: "/chinh-sach-bao-hanh", title: "Chính sách bảo hành", description: "Điều kiện bảo hành sản phẩm và cách gửi yêu cầu hỗ trợ sau mua hàng." },
   { key: "privacy", path: "/chinh-sach-bao-mat", title: "Chính sách bảo mật", description: "Thông tin về dữ liệu cá nhân, mục đích sử dụng và cách liên hệ khi cần hỗ trợ." },
   { key: "shipping", path: "/chinh-sach-giao-hang", title: "Chính sách giao hàng", description: "Thông tin vận chuyển, nhận hàng và xử lý các vấn đề trong quá trình giao hàng." },
   { key: "returns", path: "/chinh-sach-doi-tra", title: "Chính sách đổi trả", description: "Điều kiện tiếp nhận, quy trình đổi trả và phương án giải quyết sau mua hàng." },

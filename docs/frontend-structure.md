@@ -49,3 +49,5 @@ Footer links target implemented routes. Contact/newsletter disclose preview-only
 Use pnpm exclusively: `pnpm.cmd typecheck`, `pnpm.cmd lint`, `pnpm.cmd test`, `pnpm.cmd test:contracts`, `pnpm.cmd build`. Contract checks read sibling Backend schemas without database access. Unit/build success does not prove browser, production database or hosting behavior.
 
 The product detail sidebar sticks only within the main information grid at xl widths; related products are a separate following sibling outside the sticky boundary.
+
+Warranty policy uses the same public policy detail layout and sidebar as privacy/shipping/returns, displaying only the published warranty section and retaining the account warranty request link.
