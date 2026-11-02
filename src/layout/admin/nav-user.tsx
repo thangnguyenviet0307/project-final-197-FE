@@ -1,15 +1,10 @@
-"use client"
+"use client";
 
-import {
-  EllipsisVertical,
-  LogOut,
-  CircleUser,
-  KeyRound,
-} from "lucide-react"
-import { Link } from "react-router-dom"
+import { EllipsisVertical, LogOut, CircleUser, KeyRound } from "lucide-react";
+import { Link } from "react-router-dom";
 
-import { useLogout } from "@/features/auth/hooks/use-logout"
-import { UserAvatar } from "@/components/user-avatar"
+import { useLogout } from "@/features/auth/hooks/use-logout";
+import { UserAvatar } from "@/components/user-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,25 +13,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-  const logoutMutation = useLogout()
+  const { isMobile } = useSidebar();
+  const logoutMutation = useLogout();
 
   return (
     <SidebarMenu>
@@ -81,8 +76,12 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer" render={<Link to="/auth/settings/user" />}>
-                <CircleUser />Hồ sơ người dùng
+              <DropdownMenuItem
+                className="cursor-pointer"
+                render={<Link to="/auth/settings/user" />}
+              >
+                <CircleUser />
+                Hồ sơ người dùng
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -107,5 +106,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

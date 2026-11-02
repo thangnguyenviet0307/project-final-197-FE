@@ -1,7 +1,7 @@
-import { Outlet, useNavigation } from "react-router-dom"
+import { Outlet, useNavigation } from "react-router-dom";
 
-import { StoreSkeleton } from "@/layout/storefront/store-skeleton"
-import { PageSkeleton } from "@/components/page-skeleton"
+import { StoreSkeleton } from "@/layout/storefront/store-skeleton";
+import { PageSkeleton } from "@/components/page-skeleton";
 
 /** Thin top bar shown while the next route's code is loading. */
 function RouteProgress() {
@@ -13,20 +13,20 @@ function RouteProgress() {
     >
       <div className="route-progress-bar h-full w-1/3 bg-primary" />
     </div>
-  )
+  );
 }
 
 export function RootLayout() {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   return (
     <>
       {navigation.state === "loading" && <RouteProgress />}
       <Outlet />
     </>
-  )
+  );
 }
 
 /** Shown on the very first load, before any route has rendered. */
 export function RootFallback({ storefront = true }: { storefront?: boolean }) {
-  return storefront ? <StoreSkeleton /> : <PageSkeleton />
+  return storefront ? <StoreSkeleton /> : <PageSkeleton />;
 }

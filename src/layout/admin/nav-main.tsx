@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
-import { Link, useLocation } from "react-router-dom"
+import { ChevronRight, type LucideIcon } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,35 +17,35 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function NavMain({
   label,
   items,
 }: {
-  label: string
+  label: string;
   items: {
-    title: string
-    url: string
-    target?: string
-    icon?: LucideIcon
-    isActive?: boolean
+    title: string;
+    url: string;
+    target?: string;
+    icon?: LucideIcon;
+    isActive?: boolean;
     items?: {
-      title: string
-      url: string
-      isActive?: boolean
-    }[]
-  }[]
+      title: string;
+      url: string;
+      isActive?: boolean;
+    }[];
+  }[];
 }) {
-  const location = useLocation()
+  const location = useLocation();
 
   // Check if any subitem is active to determine if parent should be open
   const shouldBeOpen = (item: (typeof items)[0]) => {
-    if (item.isActive) return true
+    if (item.isActive) return true;
     return (
       item.items?.some((subItem) => location.pathname === subItem.url) || false
-    )
-  }
+    );
+  };
 
   return (
     <SidebarGroup>
@@ -82,18 +82,7 @@ export function NavMain({
                           render={
                             <Link
                               to={subItem.url}
-                              target={
-                                item.title === "Trang xác thực" ||
-                                item.title === "Trang lỗi"
-                                  ? "_blank"
-                                  : undefined
-                              }
-                              rel={
-                                item.title === "Trang xác thực" ||
-                                item.title === "Trang lỗi"
-                                  ? "noopener noreferrer"
-                                  : undefined
-                              }
+
                             />
                           }
                         >
@@ -109,7 +98,17 @@ export function NavMain({
                 tooltip={item.title}
                 className="cursor-pointer"
                 isActive={location.pathname === item.url}
-                render={<Link to={item.url} target={item.target} rel={item.target === "_blank" ? "noopener noreferrer" : undefined} />}
+                render={
+                  <Link
+                    to={item.url}
+                    target={item.target}
+                    rel={
+                      item.target === "_blank"
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                  />
+                }
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -119,5 +118,5 @@ export function NavMain({
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

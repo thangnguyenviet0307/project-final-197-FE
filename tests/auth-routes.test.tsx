@@ -28,6 +28,14 @@ function session(role: Role | "customer", mustChangePassword = false) {
 }
 beforeEach(() => { useAuthStore.getState().clearSession() })
 
+it.each(["/auth/sign-in-2", "/auth/sign-in-3", "/auth/sign-up", "/auth/sign-up-2", "/auth/sign-up-3", "/auth/forgot-password-2", "/auth/forgot-password-3", "/auth/settings/account", "/auth/settings/billing"])("removed template route %s reaches the admin not-found page", async path => {
+  session("admin")
+  const router = createMemoryRouter(replacePages(routes), { initialEntries: [path] })
+  render(<RouterProvider router={router} />)
+  expect(await screen.findByText("Trang /auth/*")).toBeTruthy()
+  expect(router.state.location.pathname).toBe(path)
+})
+
 it("redirects old admin bookmarks and retains search, hash and navigation state", async () => {
   session("admin")
   const router = createMemoryRouter(replacePages(routes), { initialEntries: [{ pathname: "/products", search: "?page=3", hash: "#catalog", state: { returnTo: "/auth/products?page=2" } }] })

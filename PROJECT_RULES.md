@@ -19,6 +19,8 @@ Read this file and AGENTS.md before changing either repository. The backend cont
 
 ## Repositories and architecture
 
+- Admin layout uses a fixed left inset sidebar with its ordinary mobile toggle. The floating theme/layout customizer and its exclusive hooks, contexts, presets and import UI are removed; the independent light/dark toggle remains. Navigation/search no longer contain auth/error demo entries. Auth template variants, account/billing settings aliases and unused unauthorized/server-error/maintenance demo routes are removed. Canonical login, profile, business routes, permission/not-found pages and ordinary legacy admin bookmarks remain available.
+
 - Frontend: React, Vite, strict TypeScript, React Router, TanStack Query, Zustand. Backend: Node.js, Express, strict TypeScript, MongoDB/Mongoose in ../project-final-197-BE.
 - Pages compose screens and URL state; feature hooks own queries/mutations/cache invalidation; services own HTTP; schemas own validation; types own contracts. Backend routes/controllers/services/models remain separate.
 - Reuse business rules and forms across admin/storefront; do not copy authentication or password logic.

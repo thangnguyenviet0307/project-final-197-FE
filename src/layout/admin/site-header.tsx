@@ -1,29 +1,29 @@
-"use client"
-import { isAdministrator } from "@/features/auth/utils/roles"
+"use client";
+import { isAdministrator } from "@/features/auth/utils/roles";
 
-import * as React from "react"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { CommandSearch, SearchTrigger } from "@/layout/admin/command-search"
-import { ModeToggle } from "@/components/mode-toggle"
-import { useAuthStore } from "@/stores/auth.store"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { CommandSearch, SearchTrigger } from "@/layout/admin/command-search";
+import { ModeToggle } from "@/components/mode-toggle";
+import { useAuthStore } from "@/stores/auth.store";
+import { Badge } from "@/components/ui/badge";
 
 export function SiteHeader() {
-  const user = useAuthStore((state) => state.user)
-  const [searchOpen, setSearchOpen] = React.useState(false)
+  const user = useAuthStore((state) => state.user);
+  const [searchOpen, setSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setSearchOpen((open) => !open)
+        e.preventDefault();
+        setSearchOpen((open) => !open);
       }
-    }
+    };
 
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   return (
     <>
@@ -39,12 +39,20 @@ export function SiteHeader() {
           </div>
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden text-sm sm:inline">{user?.name}</span>
-            <Badge variant="secondary">{user?.role === "super_admin" ? "Super Admin" : isAdministrator(user?.role) ? "Quản trị viên" : user?.role === "staff" ? "Nhân viên" : "Khách hàng"}</Badge>
+            <Badge variant="secondary">
+              {user?.role === "super_admin"
+                ? "Super Admin"
+                : isAdministrator(user?.role)
+                  ? "Quản trị viên"
+                  : user?.role === "staff"
+                    ? "Nhân viên"
+                    : "Khách hàng"}
+            </Badge>
             <ModeToggle />
           </div>
         </div>
       </header>
       <CommandSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </>
-  )
+  );
 }

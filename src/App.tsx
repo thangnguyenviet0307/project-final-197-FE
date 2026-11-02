@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ThemeProvider } from "@/context/theme-provider"
-import { SidebarConfigProvider } from "@/context/sidebar-context"
 import { Toaster } from "@/components/ui/toast"
 import { RootLayout } from "@/layout/root-layout"
 import { RouteFallback } from "@/router/route-fallback"
@@ -42,13 +41,11 @@ function App() {
       style={{ fontFamily: "var(--font-inter)" }}
     >
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <SidebarConfigProvider>
           <Toaster>
             <QueryClientProvider client={queryClient}>
               <AuthBootstrap storefront={isStorefrontRoute(router.state.location.pathname, basename || "/")}><RouterProvider router={router} /></AuthBootstrap>
             </QueryClientProvider>
           </Toaster>
-        </SidebarConfigProvider>
       </ThemeProvider>
     </div>
   )

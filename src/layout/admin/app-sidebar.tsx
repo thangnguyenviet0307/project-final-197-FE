@@ -1,13 +1,15 @@
-"use client"
-import { isAdministrator } from "@/features/auth/utils/roles"
-import { pendingInformationPages, policyDocuments } from "@/features/support/utils/policy-documents"
+"use client";
+import { isAdministrator } from "@/features/auth/utils/roles";
+import {
+  pendingInformationPages,
+  policyDocuments,
+} from "@/features/support/utils/policy-documents";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Newspaper,
   LayoutDashboard,
   Shield,
-  AlertTriangle,
   Settings,
   LayoutTemplate,
   Tags,
@@ -16,13 +18,13 @@ import {
   FolderTree,
   Package,
   ShoppingBag,
-} from "lucide-react"
-import { useAuthStore } from "@/stores/auth.store"
-import { Link } from "react-router-dom"
-import { Logo } from "@/components/logo"
+} from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
+import { Link } from "react-router-dom";
+import { Logo } from "@/components/logo";
 
-import { NavMain } from "@/layout/admin/nav-main"
-import { NavUser } from "@/layout/admin/nav-user"
+import { NavMain } from "@/layout/admin/nav-main";
+import { NavUser } from "@/layout/admin/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -31,7 +33,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const data = {
   user: {
@@ -58,30 +60,50 @@ const data = {
           url: "/auth/categories",
           icon: FolderTree,
         },
-        { title: "Tin tức & Blog", url: "/auth/articles", icon: Newspaper, items: [{ title: "Bài viết", url: "/auth/articles" }, { title: "Danh mục bài viết", url: "/auth/post-categories" }] },
+        {
+          title: "Thương hiệu",
+          url: "/auth/brands",
+          icon: Tags,
+        },
+
         { title: "Sản phẩm", url: "/auth/products", icon: Package },
-        { title: "Chính sách cửa hàng", url: "/auth/policies", icon: Shield, items: [
-          { title: "Tất cả chính sách", url: "/auth/policies" },
-          ...policyDocuments.map(document => ({ title: document.title, url: `/auth/policies/${document.key}` })),
-          ...pendingInformationPages.map(document => ({ title: document.title, url: `/auth/policies/${document.slug}` })),
-        ] },
-        { title: "Yêu cầu bảo hành", url: "/auth/warranties", icon: Shield },
-        { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
         {
           title: "Người dùng",
           url: "/auth/users",
           icon: Users,
         },
         {
-          title: "Thương hiệu",
-          url: "/auth/brands",
-          icon: Tags,
-        },
-        {
           title: "Khách hàng",
           url: "/auth/customers",
           icon: UserRound,
         },
+        { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
+        {
+          title: "Tin tức & Blog",
+          url: "/auth/articles",
+          icon: Newspaper,
+          items: [
+            { title: "Bài viết", url: "/auth/articles" },
+            { title: "Danh mục bài viết", url: "/auth/post-categories" },
+          ],
+        },
+        {
+          title: "Chính sách cửa hàng",
+          url: "/auth/policies",
+          icon: Shield,
+          items: [
+            { title: "Tất cả chính sách", url: "/auth/policies" },
+            ...policyDocuments.map((document) => ({
+              title: document.title,
+              url: `/auth/policies/${document.key}`,
+            })),
+            ...pendingInformationPages.map((document) => ({
+              title: document.title,
+              url: `/auth/policies/${document.slug}`,
+            })),
+          ],
+        },
+        { title: "Yêu cầu bảo hành", url: "/auth/warranties", icon: Shield },
       ],
     },
     {
@@ -92,76 +114,6 @@ const data = {
           url: "/",
           target: "_blank",
           icon: LayoutTemplate,
-        },
-        {
-          title: "Trang xác thực",
-          url: "#",
-          icon: Shield,
-          items: [
-            {
-              title: "Đăng nhập 1",
-              url: "/auth/sign-in",
-            },
-            {
-              title: "Đăng nhập 2",
-              url: "/auth/sign-in-2",
-            },
-            {
-              title: "Đăng nhập 3",
-              url: "/auth/sign-in-3",
-            },
-            {
-              title: "Đăng ký 1",
-              url: "/auth/sign-up",
-            },
-            {
-              title: "Đăng ký 2",
-              url: "/auth/sign-up-2",
-            },
-            {
-              title: "Đăng ký 3",
-              url: "/auth/sign-up-3",
-            },
-            {
-              title: "Quên mật khẩu 1",
-              url: "/auth/forgot-password",
-            },
-            {
-              title: "Quên mật khẩu 2",
-              url: "/auth/forgot-password-2",
-            },
-            {
-              title: "Quên mật khẩu 3",
-              url: "/auth/forgot-password-3",
-            },
-          ],
-        },
-        {
-          title: "Trang lỗi",
-          url: "#",
-          icon: AlertTriangle,
-          items: [
-            {
-              title: "Chưa xác thực",
-              url: "/errors/unauthorized",
-            },
-            {
-              title: "Không có quyền truy cập",
-              url: "/errors/forbidden",
-            },
-            {
-              title: "Không tìm thấy",
-              url: "/errors/not-found",
-            },
-            {
-              title: "Lỗi máy chủ",
-              url: "/errors/internal-server-error",
-            },
-            {
-              title: "Đang bảo trì",
-              url: "/errors/under-maintenance",
-            },
-          ],
         },
         {
           title: "Cài đặt",
@@ -177,27 +129,37 @@ const data = {
       ],
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useAuthStore((state) => state.user)
-  
+  const user = useAuthStore((state) => state.user);
+
   const groups = data.navGroups.map((group) => ({
-  ...group,
-   items: group.items.filter(
-    (item) =>
-      item.title !== "Trang xác thực" &&
-      item.title !== "Trang lỗi" &&
-      (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories", "/auth/policies"].includes(item.url) ||
-       isAdministrator(user?.role))
-    ).map(item => item.url === "/auth/categories" && isAdministrator(user?.role) ? {
-      ...item,
-      items: [
-        { title: "Danh sách danh mục", url: "/auth/categories" },
-        { title: "Hero trang chủ", url: "/auth/hero-slides" },
-      ],
-    } : item),
-  }))
+    ...group,
+    items: group.items
+      .filter(
+        (item) =>
+          (![
+            "/auth/users",
+            "/auth/hero-slides",
+            "/auth/articles",
+            "/auth/post-categories",
+            "/auth/policies",
+          ].includes(item.url) ||
+            isAdministrator(user?.role)),
+      )
+      .map((item) =>
+        item.url === "/auth/categories" && isAdministrator(user?.role)
+          ? {
+              ...item,
+              items: [
+                { title: "Danh sách danh mục", url: "/auth/categories" },
+                { title: "Hero trang chủ", url: "/auth/hero-slides" },
+              ],
+            }
+          : item,
+      ),
+  }));
 
   return (
     <Sidebar {...props}>
@@ -222,8 +184,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        {user && <NavUser user={{ name: user.name, email: user.email, avatar: user.avatar || "" }} />}
+        {user && (
+          <NavUser
+            user={{
+              name: user.name,
+              email: user.email,
+              avatar: user.avatar || "",
+            }}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

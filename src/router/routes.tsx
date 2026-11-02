@@ -1,19 +1,21 @@
+import type { ComponentType } from "react";
+import { Navigate, type RouteObject } from "react-router-dom";
 
-import type { ComponentType } from "react"
-import { Navigate, type RouteObject } from "react-router-dom"
+import { StoreLayout } from "@/layout/storefront/store-layout";
+import { AccountLayout } from "@/layout/storefront/account-layout";
 
-import { StoreLayout } from "@/layout/storefront/store-layout"
-import { AccountLayout } from "@/layout/storefront/account-layout"
-
-import { ProtectedRoute } from "@/router/protected-route"
-import { PublicOnlyRoute } from "@/router/public-only-route"
-import { LegacyAdminRedirect } from "@/router/legacy-admin-redirect"
-import { pendingInformationPages, policyDocuments } from "@/features/support/utils/policy-documents"
+import { ProtectedRoute } from "@/router/protected-route";
+import { PublicOnlyRoute } from "@/router/public-only-route";
+import { LegacyAdminRedirect } from "@/router/legacy-admin-redirect";
+import {
+  pendingInformationPages,
+  policyDocuments,
+} from "@/features/support/utils/policy-documents";
 
 function page(load: () => Promise<{ default: ComponentType }>) {
   return async () => ({
     Component: (await load()).default,
-  })
+  });
 }
 
 export const routes: RouteObject[] = [
@@ -24,9 +26,24 @@ export const routes: RouteObject[] = [
     element: <StoreLayout />,
     handle: { area: "storefront" },
     children: [
-      { path: "/chinh-sach-bao-hanh", lazy: page(() => import("@/pages/storefront/support/policy")) },
-      ...pendingInformationPages.map(document => ({ path: `/${document.slug}`, lazy: page(() => import("@/pages/storefront/support/information-placeholder")) })),
-      ...["/chinh-sach-bao-mat", "/chinh-sach-giao-hang", "/chinh-sach-doi-tra"].map(path => ({ path, lazy: page(() => import("@/pages/storefront/support/policy-detail")) })),
+      {
+        path: "/chinh-sach-bao-hanh",
+        lazy: page(() => import("@/pages/storefront/support/policy")),
+      },
+      ...pendingInformationPages.map((document) => ({
+        path: `/${document.slug}`,
+        lazy: page(
+          () => import("@/pages/storefront/support/information-placeholder"),
+        ),
+      })),
+      ...[
+        "/chinh-sach-bao-mat",
+        "/chinh-sach-giao-hang",
+        "/chinh-sach-doi-tra",
+      ].map((path) => ({
+        path,
+        lazy: page(() => import("@/pages/storefront/support/policy-detail")),
+      })),
       {
         path: "/",
         lazy: page(() => import("@/pages/storefront/home/index")),
@@ -64,9 +81,18 @@ export const routes: RouteObject[] = [
       {
         element: <PublicOnlyRoute storefront />,
         children: [
-          { path: "/thanh-vien", lazy: page(() => import("@/pages/storefront/auth/member")) },
-          { path: "/account/login", element: <Navigate to="/thanh-vien?act=login" replace /> },
-          { path: "/register", element: <Navigate to="/thanh-vien?act=register" replace /> },
+          {
+            path: "/thanh-vien",
+            lazy: page(() => import("@/pages/storefront/auth/member")),
+          },
+          {
+            path: "/account/login",
+            element: <Navigate to="/thanh-vien?act=login" replace />,
+          },
+          {
+            path: "/register",
+            element: <Navigate to="/thanh-vien?act=register" replace />,
+          },
         ],
       },
       // Customer account requires a customer session.
@@ -83,27 +109,26 @@ export const routes: RouteObject[] = [
               },
               {
                 path: "profile",
-                lazy: page(() =>
-                  import("@/pages/storefront/account/profile")
-                ),
+                lazy: page(() => import("@/pages/storefront/account/profile")),
               },
               {
                 path: "orders",
-                lazy: page(() =>
-                  import("@/pages/storefront/account/orders")
-                ),
+                lazy: page(() => import("@/pages/storefront/account/orders")),
               },
-              { path: "warranty", lazy: page(() => import("@/pages/storefront/account/warranty")) },
+              {
+                path: "warranty",
+                lazy: page(() => import("@/pages/storefront/account/warranty")),
+              },
               {
                 path: "addresses",
-                lazy: page(() =>
-                  import("@/pages/storefront/account/addresses")
+                lazy: page(
+                  () => import("@/pages/storefront/account/addresses"),
                 ),
               },
               {
                 path: "change-password",
-                lazy: page(() =>
-                  import("@/pages/storefront/account/change-password")
+                lazy: page(
+                  () => import("@/pages/storefront/account/change-password"),
                 ),
               },
             ],
@@ -122,136 +147,88 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: "/auth/login",
-        lazy: page(() =>
-          import("@/pages/auth/sign-in/page")
-        ),
+        lazy: page(() => import("@/pages/auth/sign-in/page")),
       },
       {
         path: "/auth/forgot-password",
-        lazy: page(() =>
-          import("@/pages/auth/forgot-password/page")
-        ),
+        lazy: page(() => import("@/pages/auth/forgot-password/page")),
       },
     ],
   },
 
-  // Compatibility redirects for existing auth URLs
-  ...[
-    "/auth/sign-in",
-    "/auth/sign-in-2",
-    "/auth/sign-in-3",
-    "/sign-in",
-    "/auth/sign-up",
-    "/auth/sign-up-2",
-    "/auth/sign-up-3",
-  ].map((path) => ({
+  // Common existing login bookmarks still resolve to the canonical login page.
+  ...["/auth/sign-in", "/sign-in"].map((path) => ({
     path,
     element: <Navigate to="/auth/login" replace />,
-  })),
-
-  ...[
-    "/auth/forgot-password-2",
-    "/auth/forgot-password-3",
-  ].map((path) => ({
-    path,
-    element: <Navigate to="/auth/forgot-password" replace />,
   })),
 
   // ==========================================
   // ADMIN / STAFF PROTECTED ROUTES
   // ==========================================
   {
-    element: <ProtectedRoute allowedRoles={["super_admin", "admin", "staff"]} />,
+    element: (
+      <ProtectedRoute allowedRoles={["super_admin", "admin", "staff"]} />
+    ),
     handle: { area: "admin" },
     children: [
-      { path: "/auth/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
-      { path: "/auth/warranties", lazy: page(() => import("@/pages/admin/support/warranties")) },
+      {
+        path: "/auth/customers",
+        lazy: page(() => import("@/pages/admin/customers/index")),
+      },
+      {
+        path: "/auth/warranties",
+        lazy: page(() => import("@/pages/admin/support/warranties")),
+      },
       // MAIN DASHBOARD
       {
         path: "/auth/dashboard",
-        lazy: page(() =>
-          import("@/pages/admin/dashboard/page")
-        ),
+        lazy: page(() => import("@/pages/admin/dashboard/page")),
       },
-
-      // OLD DASHBOARD URL
-
-      {
-        path: "/auth/dashboard-2",
-        element: <Navigate to="/auth/dashboard" replace />,
-      },
-
-      // TEMPLATE PAGES
-
-      {
-        path: "/auth/pricing",
-        element: <Navigate to="/auth/dashboard" replace />,
-      },
-
       // CATEGORIES
       {
         path: "/auth/categories",
-        lazy: page(() =>
-          import("@/pages/admin/categories/index")
-        ),
+        lazy: page(() => import("@/pages/admin/categories/index")),
       },
 
       // PRODUCTS
       {
         path: "/auth/products",
-        lazy: page(() =>
-          import("@/pages/admin/products/index")
-        ),
+        lazy: page(() => import("@/pages/admin/products/index")),
       },
       {
         path: "/auth/products/:id",
-        lazy: page(() =>
-          import("@/pages/admin/products/detail")
-        ),
+        lazy: page(() => import("@/pages/admin/products/detail")),
       },
 
-      { path: "/auth/brands", lazy: page(() => import("@/pages/admin/brands/index")) },
+      {
+        path: "/auth/brands",
+        lazy: page(() => import("@/pages/admin/brands/index")),
+      },
       // ORDERS
-      { path: "/auth/orders/new", lazy: page(() => import("@/pages/admin/orders/create")) },
+      {
+        path: "/auth/orders/new",
+        lazy: page(() => import("@/pages/admin/orders/create")),
+      },
       {
         path: "/auth/orders",
-        lazy: page(() =>
-          import("@/pages/admin/orders/index")
-        ),
+        lazy: page(() => import("@/pages/admin/orders/index")),
       },
       {
         path: "/auth/orders/:id",
-        lazy: page(() =>
-          import("@/pages/admin/orders/detail")
-        ),
+        lazy: page(() => import("@/pages/admin/orders/detail")),
       },
 
       // CHANGE PASSWORD - ADMIN / STAFF
       {
         path: "/auth/change-password",
-        lazy: page(() =>
-          import("@/pages/auth/change-password")
-        ),
+        lazy: page(() => import("@/pages/auth/change-password")),
       },
 
       // SETTINGS
       {
         path: "/auth/settings/user",
-        lazy: page(() =>
-          import("@/pages/admin/settings/user/page")
-        ),
+        lazy: page(() => import("@/pages/admin/settings/user/page")),
       },
-      {
-        path: "/auth/settings/account",
-        element: <Navigate to="/auth/settings/user" replace />,
-      },
-      {
-        path: "/auth/settings/billing",
-        element: <Navigate to="/auth/settings/user" replace />,
-      },
-
-
-
 
       // ======================================
       // ADMIN ONLY
@@ -259,57 +236,64 @@ export const routes: RouteObject[] = [
       {
         element: <ProtectedRoute allowedRoles={["super_admin", "admin"]} />,
         children: [
-          { path: "/auth/articles", lazy: page(() => import("@/pages/admin/articles")) },
-          { path: "/auth/policies", lazy: page(() => import("@/pages/admin/support/policy")) },
-          ...policyDocuments.map(document => ({ path: `/auth/policies/${document.key}`, lazy: page(() => import("@/pages/admin/support/policy")) })),
-          ...pendingInformationPages.map(document => ({ path: `/auth/policies/${document.slug}`, lazy: page(() => import("@/pages/admin/support/information-placeholder")) })),
-          { path: "/auth/post-categories", lazy: page(() => import("@/pages/admin/post-categories")) },
-          { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
+          {
+            path: "/auth/articles",
+            lazy: page(() => import("@/pages/admin/articles")),
+          },
+          {
+            path: "/auth/policies",
+            lazy: page(() => import("@/pages/admin/support/policy")),
+          },
+          ...policyDocuments.map((document) => ({
+            path: `/auth/policies/${document.key}`,
+            lazy: page(() => import("@/pages/admin/support/policy")),
+          })),
+          ...pendingInformationPages.map((document) => ({
+            path: `/auth/policies/${document.slug}`,
+            lazy: page(
+              () => import("@/pages/admin/support/information-placeholder"),
+            ),
+          })),
+          {
+            path: "/auth/post-categories",
+            lazy: page(() => import("@/pages/admin/post-categories")),
+          },
+          {
+            path: "/auth/hero-slides",
+            lazy: page(() => import("@/pages/admin/hero-slides")),
+          },
           // CATEGORIES
           {
             path: "/auth/categories/new",
-            lazy: page(() =>
-              import("@/pages/admin/categories/create")
-            ),
+            lazy: page(() => import("@/pages/admin/categories/create")),
           },
 
           // BRANDS
           {
             path: "/auth/brands/new",
-            lazy: page(() =>
-              import("@/pages/admin/brands/create")
-            ),
+            lazy: page(() => import("@/pages/admin/brands/create")),
           },
 
           // CUSTOMERS
 
-
           // USERS
           {
             path: "/auth/users",
-            lazy: page(() =>
-              import("@/pages/admin/users/page")
-            ),
+            lazy: page(() => import("@/pages/admin/users/page")),
           },
           {
             path: "/auth/users/new",
-            lazy: page(() =>
-              import("@/pages/admin/users/create")
-            ),
+            lazy: page(() => import("@/pages/admin/users/create")),
           },
 
           // PRODUCTS MANAGEMENT
           {
             path: "/auth/products/new",
-            lazy: page(() =>
-              import("@/pages/admin/products/create")
-            ),
+            lazy: page(() => import("@/pages/admin/products/create")),
           },
           {
             path: "/auth/products/:id/edit",
-            lazy: page(() =>
-              import("@/pages/admin/products/edit")
-            ),
+            lazy: page(() => import("@/pages/admin/products/edit")),
           },
         ],
       },
@@ -321,38 +305,46 @@ export const routes: RouteObject[] = [
   // ==========================================
   {
     path: "/403",
-    lazy: page(() =>
-      import("@/pages/errors/forbidden/page")
-    ),
+    lazy: page(() => import("@/pages/errors/forbidden/page")),
   },
   {
     path: "/errors/forbidden",
     element: <Navigate to="/403" replace />,
   },
-  {
-    path: "/errors/unauthorized",
-    lazy: page(() =>
-      import("@/pages/errors/unauthorized/page")
-    ),
-  },
-  {
-    path: "/errors/internal-server-error",
-    lazy: page(() =>
-      import("@/pages/errors/internal-server-error/page")
-    ),
-  },
-  {
-    path: "/errors/under-maintenance",
-    lazy: page(() =>
-      import("@/pages/errors/under-maintenance/page")
-    ),
-  },
 
   // Old bookmarks resolve to the canonical admin URL before any protected page renders.
-  ...["dashboard", "dashboard-2", "products", "categories", "brands", "orders", "users", "customers", "settings", "login", "forgot-password", "change-password", "faqs", "pricing"].map(segment => ({ path: `/${segment}/*`, handle: { area: "admin" }, element: <LegacyAdminRedirect /> })),
-  { path: "/admin/*", handle: { area: "admin" }, element: <LegacyAdminRedirect /> },
-  { path: "/auth", handle: { area: "admin" }, element: <Navigate to="/auth/dashboard" replace /> },
-  { path: "/auth/*", handle: { area: "admin" }, lazy: page(() => import("@/pages/errors/not-found/page")) },
+  ...[
+    "dashboard",
+    "products",
+    "categories",
+    "brands",
+    "orders",
+    "users",
+    "customers",
+    "settings",
+    "login",
+    "forgot-password",
+    "change-password",
+  ].map((segment) => ({
+    path: `/${segment}/*`,
+    handle: { area: "admin" },
+    element: <LegacyAdminRedirect />,
+  })),
+  {
+    path: "/admin/*",
+    handle: { area: "admin" },
+    element: <LegacyAdminRedirect />,
+  },
+  {
+    path: "/auth",
+    handle: { area: "admin" },
+    element: <Navigate to="/auth/dashboard" replace />,
+  },
+  {
+    path: "/auth/*",
+    handle: { area: "admin" },
+    lazy: page(() => import("@/pages/errors/not-found/page")),
+  },
 
   {
     path: "/auth/403",
@@ -365,8 +357,11 @@ export const routes: RouteObject[] = [
     element: <StoreLayout />,
     handle: { area: "storefront" },
     children: [
-      { path: "/errors/not-found", lazy: page(() => import("@/pages/storefront/not-found")) },
+      {
+        path: "/errors/not-found",
+        lazy: page(() => import("@/pages/storefront/not-found")),
+      },
       { path: "*", lazy: page(() => import("@/pages/storefront/not-found")) },
     ],
   },
-]
+];
