@@ -17,7 +17,6 @@ import {
 } from "@/components/icons/brand-icons"
 
 const supportLinks: readonly { label: string; path?: string }[] = [
-  { label: "Câu hỏi thường gặp" },
   ...customerSupportLinks,
 ]
 

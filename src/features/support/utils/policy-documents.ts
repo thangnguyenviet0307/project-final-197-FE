@@ -2,16 +2,23 @@ import type { PolicyContent } from "@/features/support/types/support"
 
 interface StoreInformationLink { label: string; path?: string }
 
+export const pendingInformationPages = [
+  { slug: "gioi-thieu", title: "Giới thiệu" },
+  { slug: "dieu-khoan-su-dung", title: "Điều khoản sử dụng" },
+  { slug: "cau-hoi-thuong-gap", title: "Câu hỏi thường gặp" },
+] as const
+
 export const companyInformationLinks: readonly StoreInformationLink[] = [
-  { label: "Giới thiệu" },
+  { label: "Giới thiệu", path: "/gioi-thieu" },
   { label: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },
-  { label: "Điều khoản sử dụng" },
+  { label: "Điều khoản sử dụng", path: "/dieu-khoan-su-dung" },
 ]
 
 export const customerSupportLinks: readonly Required<StoreInformationLink>[] = [
   { label: "Chính sách đổi trả", path: "/chinh-sach-doi-tra" },
   { label: "Chính sách giao hàng", path: "/chinh-sach-giao-hang" },
   { label: "Chính sách bảo hành", path: "/chinh-sach-bao-hanh" },
+  { label: "Câu hỏi thường gặp", path: "/cau-hoi-thuong-gap" },
 ]
 
 export const policyDocuments = [

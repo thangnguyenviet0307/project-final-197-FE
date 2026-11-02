@@ -1,5 +1,6 @@
 "use client"
 import { isAdministrator } from "@/features/auth/utils/roles"
+import { pendingInformationPages, policyDocuments } from "@/features/support/utils/policy-documents"
 
 import * as React from "react"
 import {
@@ -59,7 +60,11 @@ const data = {
         },
         { title: "Tin tức & Blog", url: "/auth/articles", icon: Newspaper, items: [{ title: "Bài viết", url: "/auth/articles" }, { title: "Danh mục bài viết", url: "/auth/post-categories" }] },
         { title: "Sản phẩm", url: "/auth/products", icon: Package },
-        { title: "Chính sách cửa hàng", url: "/auth/policies", icon: Shield },
+        { title: "Chính sách cửa hàng", url: "/auth/policies", icon: Shield, items: [
+          { title: "Tất cả chính sách", url: "/auth/policies" },
+          ...policyDocuments.map(document => ({ title: document.title, url: `/auth/policies/${document.key}` })),
+          ...pendingInformationPages.map(document => ({ title: document.title, url: `/auth/policies/${document.slug}` })),
+        ] },
         { title: "Yêu cầu bảo hành", url: "/auth/warranties", icon: Shield },
         { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
         {

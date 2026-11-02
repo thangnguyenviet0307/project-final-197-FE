@@ -1,5 +1,6 @@
 "use client"
 import { isAdministrator } from "@/features/auth/utils/roles"
+import { pendingInformationPages, policyDocuments } from "@/features/support/utils/policy-documents"
 
 import { useNavigate } from "react-router-dom"
 import {
@@ -44,6 +45,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const searchItems: SearchItem[] = [
     { title: "Chính sách cửa hàng", url: "/auth/policies", group: "Ứng dụng", icon: Shield },
+    ...policyDocuments.map(document => ({ title: document.title, url: `/auth/policies/${document.key}`, group: "Chính sách cửa hàng", icon: Shield })),
+    ...pendingInformationPages.map(document => ({ title: document.title, url: `/auth/policies/${document.slug}`, group: "Chính sách cửa hàng", icon: Shield })),
     { title: "Yêu cầu bảo hành", url: "/auth/warranties", group: "Ứng dụng", icon: Shield },
     // Overview
     {
@@ -148,6 +151,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
+    (!item.url.startsWith("/auth/policies/") || isAdministrator(role)) &&
     (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories", "/auth/policies"].includes(item.url) || isAdministrator(role))
   ).reduce(
     (acc, item) => {

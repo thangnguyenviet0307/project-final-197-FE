@@ -51,6 +51,15 @@ it("background policy refresh preserves dirty text and the original expectedVers
   fireEvent.click(screen.getByRole("button", { name: "Lưu bản nháp" }))
   await waitFor(() => expect(mocks.save).toHaveBeenCalledWith({ content: { ...content, warranty: "Bản đang soạn" }, expectedVersion: 2, publish: false }))
 })
+it("edits a dedicated policy while preserving other sections and the shared version", async () => {
+  mocks.save.mockResolvedValue({ ...mocks.admin.data, __v: 3 })
+  render(<MemoryRouter initialEntries={["/auth/policies/privacy"]}><AdminPolicyPage /></MemoryRouter>)
+  expect(screen.queryByLabelText("Chính sách giao hàng")).toBeNull()
+  fireEvent.change(screen.getByLabelText("Chính sách bảo mật"), { target: { value: "Bản bảo mật mới" } })
+  expect(screen.getByRole("link", { name: "Xem trang công khai" }).getAttribute("href")).toBe("/chinh-sach-bao-mat")
+  fireEvent.click(screen.getByRole("button", { name: "Lưu bản nháp" }))
+  await waitFor(() => expect(mocks.save).toHaveBeenCalledWith({ content: { ...content, privacy: "Bản bảo mật mới" }, expectedVersion: 2, publish: false }))
+})
 it("a version conflict retains the policy draft and locks both save actions", async () => {
   mocks.save.mockRejectedValue({ isAxiosError: true, response: { status: 409, data: { message: "Dữ liệu đã thay đổi.", code: "VERSION_CONFLICT" } } })
   render(wrap(<AdminPolicyPage />))

@@ -2,6 +2,10 @@
 
 ## Policies and warranty requests (2026-11-01)
 
+- Public introduction, terms and FAQ placeholder routes share `StoreInformationLayout` with policy detail pages: common breadcrumb, grouped sidebar with active link, hero, contact and shopping links. FAQ is included in the shared customer-support navigation. These three pages still do not fetch a content API or persist content.
+
+- Policy sidebar expands to the combined editor plus dedicated `/auth/policies/privacy`, `/warranty`, `/returns`, `/shipping` editors using the existing shared versioned policy API. Saving/publishing still applies to the whole snapshot and preserves other sections; all routes/search entries remain Admin/Super Admin only. Introduction, terms and FAQ have public routes `/gioi-thieu`, `/dieu-khoan-su-dung`, `/cau-hoi-thuong-gap` and matching `/auth/policies/<slug>` placeholder routes only, with no content API, editing or persistence.
+
 - `/chinh-sach-bao-hanh` reads only the last published policy from `/support/policy`. Admin/Super Admin edits `/auth/policies`; saving a draft never changes the public snapshot. Publishing requires all six sections including privacy. Every save carries the original expectedVersion; conflicts preserve drafts and require explicit reload. No warranty durations, contact details or legal terms are invented or auto-published.
 - Dedicated public policy pages are `/chinh-sach-bao-mat`, `/chinh-sach-giao-hang` and `/chinh-sach-doi-tra`. They read privacy/shipping/returns from the same published snapshot, never draft content or suggestion fallbacks. Legacy content reads normalize missing privacy to an empty string without database writes. New writes require the privacy field; drafts may leave it empty, publication may not. Deploy FE/BE contract updates together.
 - Admin may explicitly insert privacy/shipping/returns suggestions into empty fields only. This changes only the local draft and preserves all non-empty fields and the original version. Suggestions need review of actual data handling, delivery/return terms and support contacts; no insertion auto-saves/publishes or invents time limits.

@@ -8,6 +8,7 @@ import { AccountLayout } from "@/layout/storefront/account-layout"
 import { ProtectedRoute } from "@/router/protected-route"
 import { PublicOnlyRoute } from "@/router/public-only-route"
 import { LegacyAdminRedirect } from "@/router/legacy-admin-redirect"
+import { pendingInformationPages, policyDocuments } from "@/features/support/utils/policy-documents"
 
 function page(load: () => Promise<{ default: ComponentType }>) {
   return async () => ({
@@ -24,6 +25,7 @@ export const routes: RouteObject[] = [
     handle: { area: "storefront" },
     children: [
       { path: "/chinh-sach-bao-hanh", lazy: page(() => import("@/pages/storefront/support/policy")) },
+      ...pendingInformationPages.map(document => ({ path: `/${document.slug}`, lazy: page(() => import("@/pages/storefront/support/information-placeholder")) })),
       ...["/chinh-sach-bao-mat", "/chinh-sach-giao-hang", "/chinh-sach-doi-tra"].map(path => ({ path, lazy: page(() => import("@/pages/storefront/support/policy-detail")) })),
       {
         path: "/",
@@ -259,6 +261,8 @@ export const routes: RouteObject[] = [
         children: [
           { path: "/auth/articles", lazy: page(() => import("@/pages/admin/articles")) },
           { path: "/auth/policies", lazy: page(() => import("@/pages/admin/support/policy")) },
+          ...policyDocuments.map(document => ({ path: `/auth/policies/${document.key}`, lazy: page(() => import("@/pages/admin/support/policy")) })),
+          ...pendingInformationPages.map(document => ({ path: `/auth/policies/${document.slug}`, lazy: page(() => import("@/pages/admin/support/information-placeholder")) })),
           { path: "/auth/post-categories", lazy: page(() => import("@/pages/admin/post-categories")) },
           { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
           // CATEGORIES
