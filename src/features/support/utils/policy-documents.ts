@@ -3,8 +3,8 @@ import type { PolicyContent } from "@/features/support/types/support"
 interface StoreInformationLink { label: string; path?: string }
 
 export const companyInformationLinks: readonly StoreInformationLink[] = [
-  { label: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },
   { label: "Giới thiệu" },
+  { label: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },
   { label: "Điều khoản sử dụng" },
 ]
 
