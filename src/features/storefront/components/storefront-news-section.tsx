@@ -8,7 +8,7 @@ export function StorefrontNewsSection() {
   const articles = usePublicArticles("news")
 
   return (
-    <section id="tin-tuc" aria-label="Tin tức và cẩm nang phụ kiện" className="bg-white py-12 sm:py-16">
+    <section id="tin-tuc" aria-label="Tin tức và cẩm nang phụ kiện" className="scroll-mt-4 bg-white py-12 sm:py-16">
       <div className="store-container">
         <SectionHeading
           eyebrow="Góc chia sẻ"

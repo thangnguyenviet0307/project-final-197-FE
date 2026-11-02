@@ -7,73 +7,48 @@ import {
   Sparkles,
 } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useAboutPageContent } from "@/features/storefront/hooks/use-storefront-page-content"
+import { getApiError } from "@/services/api"
 
-const principles = [
-  {
-    icon: Eye,
-    title: "Rõ ràng",
-    description:
-      "Thông tin sản phẩm, phiên bản và đánh giá được trình bày tại nơi bạn cần xem, giúp việc tìm hiểu dễ dàng hơn.",
-  },
-  {
-    icon: Compass,
-    title: "Thuận tiện",
-    description:
-      "Danh mục, tìm kiếm và bài viết giúp bạn bắt đầu từ nhu cầu của mình và lần lượt khám phá nội dung liên quan.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Minh bạch",
-    description:
-      "Chúng tôi phân biệt rõ tính năng đang dùng được và phần chưa triển khai, không biến nội dung tham khảo thành lời hứa giao dịch.",
-  },
-]
-
-const offerings = [
-  {
-    title: "Danh mục sản phẩm",
-    description:
-      "Khám phá phụ kiện và thiết bị công nghệ theo danh mục, thương hiệu hoặc từ khóa.",
-  },
-  {
-    title: "Thông tin chi tiết",
-    description:
-      "Xem hình ảnh, mô tả, lựa chọn phiên bản và giá đang hiển thị trên trang sản phẩm.",
-  },
-  {
-    title: "Bài viết và đánh giá",
-    description:
-      "Đọc bài viết tham khảo và xem đánh giá được hiển thị tại từng sản phẩm.",
-  },
-  {
-    title: "Tài khoản khách hàng",
-    description:
-      "Đăng ký để quản lý hồ sơ, địa chỉ mặc định, mật khẩu và lịch sử đơn hàng hiện có.",
-  },
-]
-
-const steps = [
-  {
-    number: "01",
-    title: "Tìm điều bạn quan tâm",
-    description:
-      "Chọn danh mục trên thanh điều hướng hoặc nhập tên sản phẩm, thương hiệu vào ô tìm kiếm.",
-  },
-  {
-    number: "02",
-    title: "Xem thông tin sản phẩm",
-    description:
-      "Mở sản phẩm để xem nội dung, các phiên bản và đánh giá nếu có. Thông tin có thể khác nhau giữa các sản phẩm.",
-  },
-  {
-    number: "03",
-    title: "Tham khảo trước khi quyết định",
-    description:
-      "Đọc bài viết và câu hỏi thường gặp để hiểu phạm vi dịch vụ hiện tại. Website chưa hỗ trợ đặt hàng hoặc thanh toán.",
-  },
-]
+const principleIcons = [Eye, Compass, Lightbulb]
 
 export default function StorefrontAboutPage() {
+  const query = useAboutPageContent()
+
+  if (query.isPending) {
+    return (
+      <main className="store-container py-20 text-center">
+        <p role="status" className="text-sm text-gray-500">
+          Đang tải thông tin DemoStore...
+        </p>
+      </main>
+    )
+  }
+
+  if (query.isError) {
+    return (
+      <main className="store-container py-20 text-center">
+        <div role="alert" className="mx-auto max-w-lg">
+          <p className="font-semibold text-gray-800">
+            Không thể tải thông tin giới thiệu.
+          </p>
+          <p className="mt-2 text-sm text-gray-600">
+            {getApiError(query.error).message}
+          </p>
+          <button
+            type="button"
+            onClick={() => void query.refetch()}
+            className="mt-4 font-semibold text-[#4d9210] underline"
+          >
+            Thử tải lại
+          </button>
+        </div>
+      </main>
+    )
+  }
+
+  const content = query.data
+
   return (
     <div className="bg-white text-gray-900">
       <section className="relative isolate overflow-hidden bg-[#223328] text-white">
@@ -84,17 +59,14 @@ export default function StorefrontAboutPage() {
         <div className="store-container relative py-16 sm:py-24 lg:py-28">
           <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
             <Sparkles size={15} aria-hidden="true" />
-            VỀ DEMOSTORE
+            {content.eyebrow}
           </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-            Khám phá công nghệ,
-            <span className="block text-[#99df54]">theo cách thật dễ dàng.</span>
+            {content.title}
+            <span className="block text-[#99df54]">{content.highlight}</span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-8 text-gray-300 sm:text-lg">
-            DemoStore là cửa hàng trực tuyến giới thiệu phụ kiện và thiết bị
-            công nghệ. Bạn có thể tìm sản phẩm, xem thông tin chi tiết, đọc bài
-            viết và tham khảo đánh giá — tất cả trong một trải nghiệm đơn giản,
-            dễ theo dõi.
+            {content.intro}
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
@@ -118,30 +90,16 @@ export default function StorefrontAboutPage() {
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
-              CÂU CHUYỆN CỦA CHÚNG TÔI
+              {content.story.eyebrow}
             </p>
             <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-              Công nghệ dễ khám phá hơn khi thông tin được sắp xếp rõ ràng.
+              {content.story.title}
             </h2>
           </div>
           <div className="space-y-5 text-base leading-8 text-gray-600">
-            <p>
-              DemoStore được xây dựng như một điểm đến để tìm hiểu sản phẩm
-              công nghệ. Từ danh mục và thương hiệu đến trang chi tiết, các
-              thông tin được sắp xếp để bạn dễ tìm, dễ đọc và dễ so sánh những
-              lựa chọn đang được giới thiệu.
-            </p>
-            <p>
-              Bên cạnh catalog, website có bài viết, đánh giá sản phẩm và tài
-              khoản khách hàng. Chúng tôi muốn việc tham khảo trở nên thuận
-              tiện, dù bạn đang tìm một sản phẩm cụ thể hay chỉ đang khám phá
-              những lựa chọn mới.
-            </p>
-            <p>
-              DemoStore hiện ưu tiên trải nghiệm xem và tìm hiểu. Các chức năng
-              mua hàng sẽ chỉ được giới thiệu khi đã sẵn sàng; vui lòng xem lưu
-              ý về dịch vụ bên dưới để biết phạm vi hoạt động hiện tại.
-            </p>
+            {content.story.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
         </div>
       </section>
@@ -157,13 +115,13 @@ export default function StorefrontAboutPage() {
             </h2>
           </div>
           <div className="mx-auto mt-9 grid max-w-5xl gap-4 sm:grid-cols-2">
-            {offerings.map((item, index) => (
+            {content.offerings.map((item, index) => (
               <article
                 key={item.title}
                 className="flex gap-4 rounded-xl border border-gray-100 bg-white p-5 sm:p-6"
               >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#55b000]/10 text-sm font-bold text-[#4d9210]">
-                  0{index + 1}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
                   <h3 className="font-bold">{item.title}</h3>
@@ -188,65 +146,67 @@ export default function StorefrontAboutPage() {
             </h2>
           </div>
           <div className="mx-auto mt-10 grid max-w-6xl gap-5 md:grid-cols-3">
-            {principles.map(({ icon: Icon, title, description }) => (
-              <article
-                key={title}
-                className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-7"
-              >
-                <div className="flex size-12 items-center justify-center rounded-xl bg-[#55b000]/10 text-[#4d9210]">
-                  <Icon size={23} aria-hidden="true" />
-                </div>
-                <h3 className="mt-5 text-lg font-bold">{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-gray-600">
-                  {description}
-                </p>
-              </article>
-            ))}
+            {content.principles.map((item, index) => {
+              const Icon = principleIcons[index % principleIcons.length]
+              return (
+                <article
+                  key={item.title}
+                  className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm sm:p-7"
+                >
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-[#55b000]/10 text-[#4d9210]">
+                    <Icon size={23} aria-hidden="true" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-gray-600">
+                    {item.description}
+                  </p>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-gray-100 bg-[#f7faf5]">
+        <div className="store-container py-16 sm:py-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
+                BẮT ĐẦU TỪ ĐÂU?
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                Ba bước để khám phá DemoStore
+              </h2>
+            </div>
+            <ol className="mt-9 grid gap-4 md:grid-cols-3">
+              {content.steps.map((step, index) => (
+                <li
+                  key={step.title}
+                  className="rounded-xl border border-gray-200 bg-white p-6 sm:p-7"
+                >
+                  <span className="text-sm font-extrabold tracking-widest text-[#57952b]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-4 text-lg font-bold">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-gray-600">
+                    {step.description}
+                  </p>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </section>
 
       <section className="store-container py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
-              BẮT ĐẦU TỪ ĐÂU?
-            </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Ba bước để khám phá DemoStore
-            </h2>
-          </div>
-          <ol className="mt-9 grid gap-4 md:grid-cols-3">
-            {steps.map((step) => (
-              <li
-                key={step.number}
-                className="rounded-xl border border-gray-200 p-6 sm:p-7"
-              >
-                <span className="text-sm font-extrabold tracking-widest text-[#57952b]">
-                  {step.number}
-                </span>
-                <h3 className="mt-4 text-lg font-bold">{step.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-gray-600">
-                  {step.description}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="store-container pb-16 sm:pb-20">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 rounded-2xl border border-[#dcebcf] bg-[#f7faf5] p-6 sm:p-8 lg:flex-row lg:items-center lg:gap-8">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white text-[#4d9210] shadow-sm">
             <PackageSearch size={24} aria-hidden="true" />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-bold">Lưu ý về phạm vi hiện tại</h2>
+            <h2 className="text-lg font-bold">{content.notice.title}</h2>
             <p className="mt-2 text-sm leading-7 text-gray-600">
-              DemoStore hiện hỗ trợ khám phá và tham khảo thông tin sản phẩm.
-              Tính năng đặt hàng, thanh toán và gửi lời nhắn từ biểu mẫu liên
-              hệ chưa khả dụng; các nội dung về giao hàng, đổi trả và bảo hành
-              cũng chưa được công bố thành chính sách chính thức.
+              {content.notice.description}
             </p>
           </div>
           <Link

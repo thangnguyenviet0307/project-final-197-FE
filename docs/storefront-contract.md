@@ -12,6 +12,7 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 
 | Khu vực | Backend hiện tại | Giới hạn cho storefront |
 | --- | --- | --- |
+| Nội dung giới thiệu/FAQ | GET `/api/v1/storefront/pages/about` và GET `/api/v1/storefront/pages/faq` | Public, chỉ đọc; trang lấy nội dung từ Backend, không có API chỉnh sửa/CMS |
 | Đăng nhập | `/auth/register`, `/auth/login`, `/auth/me`, refresh/logout | Đã có tài khoản role customer; đăng ký → đăng nhập → homepage. Khách không có quyền quản trị |
 | Customers | CRUD `/customers`, phân trang/search | Hồ sơ liên hệ, không chứa thông tin xác thực hoặc quan hệ với session người mua |
 | Catalog | `/products`, `/categories`, `/brands` | Yêu cầu xác thực và quyền nội bộ; không gọi bằng tài khoản admin nhúng trong Frontend |
@@ -33,6 +34,8 @@ Tài liệu này là danh sách quyết định cần chốt cho giai đoạn Fr
 Catalog khách và chi tiết sản phẩm → giỏ hàng → checkout/tạo đơn → xác thực/tài khoản khách và lịch sử đơn theo chính sách đã chốt. Nếu checkout yêu cầu đăng nhập, triển khai xác thực trước checkout.
 
 Trang đặt tại `src/pages/storefront`, layout tại `src/layout/storefront`; nghiệp vụ mới nằm trong `src/features`. Chỉ tái sử dụng service/hook quản trị sau khi kiểm tra quyền, response và side effect điều hướng.
+
+Hai trang `/about` và `/faq` lấy nội dung public từ Backend qua React Query. Trạng thái tải/lỗi được hiển thị tại trang; nội dung FAQ được lọc theo từ khóa và chủ đề ở Frontend. REST Client requests và response contract nằm tại Backend `REST_CLIENT/storefront-pages.http` và `docs/storefront-pages-api.md`.
 
 ## Account đã triển khai
 
