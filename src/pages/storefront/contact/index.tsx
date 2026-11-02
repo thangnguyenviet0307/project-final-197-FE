@@ -1,5 +1,6 @@
 
 import { useState, type SubmitEvent } from "react"
+import { contactSchema } from "@/features/contact/schemas/contact-schema"
 import { Link } from "react-router-dom"
 import {
   ChevronRight,
@@ -26,10 +27,12 @@ const initialForm: ContactForm = {
 }
 
 const fieldClass =
-  "w-full rounded-md border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-[#55b000] focus:ring-2 focus:ring-[#55b000]/10"
+  "w-full rounded-md border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-800 outline-none transition-colors placeholder:text-gray-400 aria-invalid:border-red-600 focus:border-[#55b000] focus:ring-2 focus:ring-[#55b000]/10"
 
 export default function ContactPage() {
   const [form, setForm] = useState<ContactForm>(initialForm)
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactForm, string>>>({})
+  const [submitted, setSubmitted] = useState(false)
   const [notice, setNotice] = useState("")
 
   const updateField = (
@@ -41,23 +44,28 @@ export default function ContactPage() {
       [field]: value,
     }))
 
+    if (submitted) {
+      const result = contactSchema.shape[field].safeParse(value)
+      setErrors(previous => ({ ...previous, [field]: result.success ? undefined : result.error.issues[0]?.message }))
+    }
     setNotice("")
   }
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (
-      !form.name.trim() ||
-      !form.email.trim() ||
-      !form.subject.trim() ||
-      form.message.trim().length < 10
-    ) {
-      setNotice(
-        "Vui lòng điền đầy đủ thông tin và nhập lời nhắn có ít nhất 10 ký tự."
-      )
+    setSubmitted(true)
+    const result = contactSchema.safeParse(form)
+    if (!result.success) {
+      const nextErrors: Partial<Record<keyof ContactForm, string>> = {}
+      for (const issue of result.error.issues) nextErrors[issue.path[0] as keyof ContactForm] ??= issue.message
+      setErrors(nextErrors)
+      const first = Object.keys(nextErrors)[0]
+      if (first) event.currentTarget.querySelector<HTMLElement>(`#contact-${first}`)?.focus()
+      setNotice("")
       return
     }
+    setErrors({})
 
     // Chưa có API gửi liên hệ dành cho khách hàng.
     setNotice(
@@ -125,7 +133,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <form
+            <form noValidate
               onSubmit={handleSubmit}
               className="mt-8 space-y-5"
             >
@@ -135,11 +143,13 @@ export default function ContactPage() {
                     htmlFor="contact-name"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Họ và tên *
+                    Họ và tên <span className="text-red-600" aria-hidden="true">*</span>
                   </label>
 
                   <input
                     id="contact-name"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? "contact-name-error" : undefined}
                     type="text"
                     required
                     maxLength={100}
@@ -151,6 +161,7 @@ export default function ContactPage() {
                     }
                     className={fieldClass}
                   />
+                  {errors.name && <p id="contact-name-error" role="alert" className="mt-1 text-sm text-red-600">{errors.name}</p>}
                 </div>
 
                 <div>
@@ -158,11 +169,13 @@ export default function ContactPage() {
                     htmlFor="contact-email"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Địa chỉ email *
+                    Địa chỉ email <span className="text-red-600" aria-hidden="true">*</span>
                   </label>
 
                   <input
                     id="contact-email"
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? "contact-email-error" : undefined}
                     type="email"
                     required
                     maxLength={150}
@@ -174,6 +187,7 @@ export default function ContactPage() {
                     }
                     className={fieldClass}
                   />
+                  {errors.email && <p id="contact-email-error" role="alert" className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
               </div>
 
@@ -182,11 +196,13 @@ export default function ContactPage() {
                   htmlFor="contact-subject"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Chủ đề *
+                  Chủ đề <span className="text-red-600" aria-hidden="true">*</span>
                 </label>
 
                 <input
                   id="contact-subject"
+                  aria-invalid={!!errors.subject}
+                  aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                   type="text"
                   required
                   maxLength={150}
@@ -197,6 +213,7 @@ export default function ContactPage() {
                   }
                   className={fieldClass}
                 />
+                  {errors.subject && <p id="contact-subject-error" role="alert" className="mt-1 text-sm text-red-600">{errors.subject}</p>}
               </div>
 
               <div>
@@ -204,11 +221,13 @@ export default function ContactPage() {
                   htmlFor="contact-message"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Lời nhắn *
+                  Lời nhắn <span className="text-red-600" aria-hidden="true">*</span>
                 </label>
 
                 <textarea
                   id="contact-message"
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? "contact-message-error" : undefined}
                   required
                   minLength={10}
                   maxLength={2000}
@@ -220,6 +239,7 @@ export default function ContactPage() {
                   }
                   className={`${fieldClass} resize-y`}
                 />
+                  {errors.message && <p id="contact-message-error" role="alert" className="mt-1 text-sm text-red-600">{errors.message}</p>}
               </div>
 
               {notice && (

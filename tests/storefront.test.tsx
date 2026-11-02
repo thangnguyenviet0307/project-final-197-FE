@@ -193,15 +193,32 @@ it("clears only the draft and applies it after confirmation", () => {
 it("uses inline server sorting and toggles the price direction", () => {
   render(<MemoryRouter initialEntries={["/shop?page=2&brand=cccccccccccccccccccccccc"]}><StorefrontProductsPage /></MemoryRouter>)
   const sort = screen.getByRole("navigation", { name: "Sắp xếp sản phẩm" })
-  expect(within(sort).getByRole("button", { name: "Nổi bật" }).getAttribute("aria-pressed")).toBe("true")
-  for (const [name, sortBy] of [["Mới", "createdAt"], ["Bán chạy", "is_best_seller"], ["% giảm giá", "discount"], ["Nổi bật", "is_hot"]]) {
+  expect(within(sort).getByRole("button", { name: "Tất cả" }).getAttribute("aria-pressed")).toBe("true")
+  for (const [name, sortBy, flags] of [
+    ["Mới", "createdAt", { is_best_seller: false, is_new: true }],
+    ["Bán chạy", "is_best_seller", { is_best_seller: true }],
+    ["% giảm giá", "discount", {}],
+    ["Nổi bật", "is_hot", { is_best_seller: false, is_new: false, is_hot: true }],
+  ] as const) {
     fireEvent.click(within(sort).getByRole("button", { name }))
-    expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, sortBy, sortOrder: "desc", brand: "c".repeat(24) }))
+    expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, sortBy, sortOrder: "desc", brand: "c".repeat(24), ...flags }))
+    const request = state.list.mock.lastCall![0]
+    for (const field of ["is_best_seller", "is_new", "is_hot"] as const) {
+      expect(request[field]).toBe((flags as Partial<Record<typeof field, boolean>>)[field])
+    }
   }
   fireEvent.click(within(sort).getByRole("button", { name: "Giá tăng hoặc giảm" }))
   expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ sortBy: "price", sortOrder: "asc" }))
   fireEvent.click(within(sort).getByRole("button", { name: "Giá tăng dần" }))
   expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ sortBy: "price", sortOrder: "desc" }))
+  fireEvent.click(within(sort).getByRole("button", { name: "Mới" }))
+  fireEvent.click(screen.getByRole("button", { name: "Lọc" }))
+  expect(state.count).toHaveBeenLastCalledWith(expect.objectContaining({ is_best_seller: false, is_new: true }), true)
+  fireEvent.click(screen.getByRole("button", { name: "Đóng bộ lọc" }))
+  fireEvent.click(within(sort).getByRole("button", { name: "Tất cả" }))
+  expect(state.list.mock.lastCall![0].is_new).toBeUndefined()
+  expect(state.list.mock.lastCall![0].is_best_seller).toBeUndefined()
+  expect(state.list.mock.lastCall![0].is_hot).toBeUndefined()
 })
 
 it("shows API Apple and removable draft selections above brands without applying on close", () => {

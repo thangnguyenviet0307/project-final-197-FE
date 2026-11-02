@@ -211,7 +211,7 @@ it("updates a flag from its column and refreshes the product list", async () => 
   const button = await screen.findByRole("button", { name: "New: Phone case" })
   expect(button.getAttribute("aria-pressed")).toBe("false")
   fireEvent.click(button)
-  await waitFor(() => expect(writes).toEqual([{ is_new: true, expectedVersion: 2 }]))
+  await waitFor(() => expect(writes).toEqual([{ is_best_seller: false, is_hot: false, is_new: true, expectedVersion: 2 }]))
   await waitFor(() => expect(screen.getByRole("button", { name: "New: Phone case" }).getAttribute("aria-pressed")).toBe("true"))
 })
 

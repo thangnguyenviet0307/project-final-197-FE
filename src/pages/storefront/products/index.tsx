@@ -20,6 +20,7 @@ import type { Product } from "@/features/products/types/products"
 import type { ProductsQuery } from "@/features/products/types/products"
 import { useStoreProducts } from "@/features/storefront/hooks/use-store-products"
 import { mapCatalogProduct } from "@/features/storefront/utils/map-catalog-product"
+import { catalogBadgeFilter } from "@/features/storefront/utils/catalog-badge-filter"
 import { getApiError } from "@/services/api"
 import { CatalogSubcategories } from "@/features/storefront/components/catalog-subcategories"
 
@@ -190,7 +191,7 @@ export default function StorefrontProductsPage() {
   const requested = Number(params.get("page"))
   const page = Number.isSafeInteger(requested) && requested > 0 ? requested : 1
   const search = params.get("search") ?? ""
-  const sort = params.get("sort") ?? "featured"
+  const sort = params.get("sort") ?? "all"
   const brand = params.get("brand") ?? ""
   const category = params.get("category") ?? ""
   const minPriceParam = params.get("minPrice") ?? ""
@@ -207,6 +208,7 @@ export default function StorefrontProductsPage() {
   const subcategory = params.get("subcategory") ?? ""
   const selectedChildren = childSelections(subcategory, categoryId, categories.data ?? [])
   const query = useStoreProducts({
+    ...catalogBadgeFilter(sort),
     page,
     limit: 12,
     search: search || undefined,
@@ -271,7 +273,7 @@ export default function StorefrontProductsPage() {
   const validDraft = (!draft.minPrice || draftMin !== undefined) && (!draft.maxPrice || draftMax !== undefined)
     && (draftMin === undefined || draftMax === undefined || draftMin <= draftMax)
     && (!draft.category || !!draftCategoryId)
-  const previewParams: Partial<ProductsQuery> = { search: search || undefined, brand: draft.brand || undefined,
+  const previewParams: Partial<ProductsQuery> = { ...catalogBadgeFilter(sort), search: search || undefined, brand: draft.brand || undefined,
     category: effectiveCategories(draftCategoryId, childSelections(subcategory, draftCategoryId, categories.data ?? [])), minPrice: draftMin, maxPrice: draftMax }
   const preview = useStoreFilterCount(previewParams, filtersOpen && validDraft)
   const previewReady = validDraft && preview.data !== undefined && !preview.isFetching && !preview.isError
@@ -452,7 +454,7 @@ export default function StorefrontProductsPage() {
         <nav aria-label="Sắp xếp sản phẩm" className="flex flex-wrap items-center gap-x-4 gap-y-3 py-2 text-sm sm:text-base">
           <span className="text-gray-600">Sắp xếp theo:</span>
           {([
-            ["featured", "Nổi bật"], ["newest", "Mới"], ["bestsellers", "Bán chạy"], ["discount", "% giảm giá"], ["price", "Giá"],
+            ["all", "Tất cả"], ["featured", "Nổi bật"], ["newest", "Mới"], ["bestsellers", "Bán chạy"], ["discount", "% giảm giá"], ["price", "Giá"],
           ] as const).map(([value, label], index) => {
             const selected = value === "price" ? sort.startsWith("price") : sort === value
             return <span key={value} className="inline-flex items-center gap-4">

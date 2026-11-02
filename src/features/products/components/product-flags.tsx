@@ -15,7 +15,7 @@ export function ProductFlags({ product, editable, disabled, reload }: { product:
       {editable ? <Button variant="ghost" size="sm" aria-label={`${label}: ${product.product_name}`} aria-pressed={enabled}
         disabled={disabled || mutation.isPending || failed || product.__v === undefined}
         className={enabled ? "text-emerald-600" : "text-muted-foreground"}
-        onClick={() => mutation.mutate({ id: product._id, input: { [field]: !enabled, expectedVersion: product.__v! } }, { onError: () => setFailed(true) })}>
+        onClick={() => mutation.mutate({ id: product._id, input: { ...(!enabled && ["is_best_seller", "is_new", "is_hot"].includes(field) ? { is_best_seller: false, is_new: false, is_hot: false } : {}), [field]: !enabled, expectedVersion: product.__v! } }, { onError: () => setFailed(true) })}>
         {enabled ? "✓" : "✕"}
       </Button> : <span aria-label={`${label}: ${String(enabled)}`}>{enabled ? "✓" : "✕"}</span>}
       {field === "on_sale" && failed && <div role="alert" className="min-w-40 text-xs text-destructive">{getApiError(mutation.error).message}<Button variant="outline" size="sm" disabled={disabled} onClick={async () => { try { await reload(); setFailed(false); mutation.reset() } catch { /* Keep the failure until a successful explicit reload. */ } }}>Tải lại để kiểm tra</Button></div>}

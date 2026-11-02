@@ -104,10 +104,10 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_active")} />Sản phẩm đang hoạt động</label>
       <fieldset className="flex flex-wrap gap-4"><legend>Hiển thị sản phẩm</legend>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("on_sale")} />On sale - Đang bán</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_new")} />New - Mới</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_hot")} />Hot - Nổi bật</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_new")} onChange={event => { for (const name of ["is_best_seller", "is_new", "is_hot"] as const) form.setValue(name, name === "is_new" && event.target.checked, { shouldDirty: true }) }} />New - Mới</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_hot")} onChange={event => { for (const name of ["is_best_seller", "is_new", "is_hot"] as const) form.setValue(name, name === "is_hot" && event.target.checked, { shouldDirty: true }) }} />Hot - Nổi bật</label>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_home")} />Home - Trang chủ</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_best_seller")} />Best Seller - Bán chạy</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...form.register("is_best_seller")} onChange={event => { for (const name of ["is_best_seller", "is_new", "is_hot"] as const) form.setValue(name, name === "is_best_seller" && event.target.checked, { shouldDirty: true }) }} />Best Seller - Bán chạy</label>
       </fieldset>
       <ProductDetailsFields form={form} />
       <ProductVariantsFields form={form} />

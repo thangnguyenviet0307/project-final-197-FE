@@ -24,7 +24,8 @@ beforeEach(() => {
 it("maps checked product flags to corner badges without inventing a sale discount", () => {
   const mapped = mapCatalogProduct({ _id: "product", product_name: "Cable", slug: "cable", category: null, brand: null, price: 100, on_sale: true, is_best_seller: true, is_new: true, is_hot: true, is_home: true })
   const view = render(<MemoryRouter><ProductCard product={mapped} /></MemoryRouter>)
-  for (const label of ["Bán chạy", "Mới", "Nổi bật"]) expect(screen.getByText(label)).toBeTruthy()
+  expect(mapped.badges).toHaveLength(1)
+  expect(screen.getByText(mapped.badges![0].label)).toBeTruthy()
   expect(screen.queryByText("Đang bán")).toBeNull()
   expect(screen.queryByText("Trang chủ")).toBeNull()
   expect(mapped.discount).toBe(0)

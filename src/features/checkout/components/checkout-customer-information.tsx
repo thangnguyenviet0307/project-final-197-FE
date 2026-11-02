@@ -16,14 +16,14 @@ export function CheckoutCustomerInformation() {
           ["phone", "Số điện thoại người nhận", "Nhập số điện thoại người nhận", "tel", 20],
         ] as const).map(([field, label, placeholder, autoComplete, maxLength]) => (
           <div key={field} className="space-y-2">
-            <label htmlFor={`checkout-${field}`} className="block text-sm font-medium">{label}</label>
+            <label htmlFor={`checkout-${field}`} className="block text-sm font-medium">{label}<span aria-hidden="true" className="ml-1 text-red-600 after:content-['*']" /></label>
             <input id={`checkout-${field}`} type={field === "phone" ? "tel" : "text"} autoComplete={autoComplete} maxLength={maxLength} placeholder={placeholder} aria-required="true" aria-invalid={!!errors[field]} aria-describedby={errors[field] ? `checkout-${field}-error` : undefined} {...register(field)} className={inputClass} />
             {fieldError(field)}
           </div>
         ))}
         <div className="space-y-2 sm:col-span-2">
-          <label htmlFor="checkout-email" className="block text-sm font-medium">Email nhận hàng</label>
-          <input id="checkout-email" type="email" autoComplete="email" maxLength={254} placeholder="Nhập email nhận thông tin đơn hàng" aria-invalid={!!errors.email} aria-describedby={errors.email ? "checkout-email-error" : undefined} {...register("email")} className={inputClass} />
+          <label htmlFor="checkout-email" className="block text-sm font-medium">Email nhận hàng<span aria-hidden="true" className="ml-1 text-red-600 after:content-['*']" /></label>
+          <input id="checkout-email" aria-required="true" type="email" autoComplete="email" maxLength={254} placeholder="Nhập email nhận thông tin đơn hàng" aria-invalid={!!errors.email} aria-describedby={errors.email ? "checkout-email-error" : undefined} {...register("email")} className={inputClass} />
           {fieldError("email")}
         </div>
         <h3 className="text-sm font-medium sm:col-span-2">Địa chỉ nhận hàng</h3>
@@ -35,7 +35,7 @@ export function CheckoutCustomerInformation() {
           setValue("districtCode", "", { shouldDirty: true })
         }} />
         <div className="space-y-2">
-          <label htmlFor="checkout-street" className="block text-sm font-medium">Địa chỉ nhà</label>
+          <label htmlFor="checkout-street" className="block text-sm font-medium">Địa chỉ nhà<span aria-hidden="true" className="ml-1 text-red-600 after:content-['*']" /></label>
           <input id="checkout-street" autoComplete="street-address" maxLength={255} placeholder="Nhập địa chỉ nhà" aria-required="true" aria-invalid={!!errors.street} aria-describedby={errors.street ? "checkout-street-error" : undefined} {...register("street")} className={inputClass} />
           {fieldError("street")}
         </div>

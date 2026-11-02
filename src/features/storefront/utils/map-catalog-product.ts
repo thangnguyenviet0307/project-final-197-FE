@@ -19,7 +19,7 @@ export function mapCatalogProduct(product: Product, context: ProductBadgeContext
         ...(product.is_hot && (context === "catalog" || context === "is_hot") ? [{ label: "Nổi bật", className: "bg-rose-600 text-white" }] : []),
         ...(product.is_home && context === "is_home" ? [{ label: "Trang chủ", className: "bg-violet-600 text-white" }] : []),
       ]),
-    ],
+    ].slice(0, 1),
     image: gallery[0] ?? "", gallery, description: product.description ?? "", features: [],
     variants: (product.variants?.length ? product.variants : [{ sku: product.sku ?? "", variant_name: "Tiêu chuẩn", price: product.price ?? 0, stock: product.stock }]).map(variant => ({
       name: variant.variant_name || variant.sku, color: "#6b7280", image: variant.image || gallery[0] || "", stock: variant.stock,
