@@ -1,0 +1,85 @@
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { useSupportMutations, useWarranty } from "@/features/support/hooks/use-support"
+import { updateWarrantySchema, validateWarrantyImage } from "@/features/support/schemas/support-schema"
+import type { WarrantyDetail, WarrantyStatus } from "@/features/support/types/support"
+import { warrantyLabels, warrantyTransitions, supportDate } from "@/features/support/utils/support"
+import { getApiError } from "@/services/api"
+import { useAuthStore } from "@/stores/auth.store"
+import { useUnsavedForm } from "@/hooks/use-unsaved-form"
+
+function WarrantyUpdateForm({ initial, reload, saved }: { initial: WarrantyDetail; reload: () => Promise<void>; saved: (doc: WarrantyDetail) => void }) {
+  const user = useAuthStore(state => state.user)
+  const [baseline, setBaseline] = useState(initial)
+  const choices = warrantyTransitions[baseline.status]
+  const [status, setStatus] = useState<WarrantyStatus>(choices[0] ?? baseline.status)
+  const [note, setNote] = useState("")
+  const [error, setError] = useState("")
+  const [conflict, setConflict] = useState(false)
+  const mutation = useSupportMutations().update
+  const navigation = useUnsavedForm(note.length > 0)
+  const mayHandle = user?.role !== "staff" || baseline.status === "submitted" || baseline.handlerId === user?.id
+  async function submit() {
+    const parsed = updateWarrantySchema.safeParse({ status, note, expectedVersion: baseline.__v })
+    if (!parsed.success) { setError(parsed.error.issues[0].message); return }
+    try {
+      const result = await mutation.mutateAsync({ ...parsed.data, id: baseline._id })
+      setBaseline(result); setNote(""); setError(""); setStatus(warrantyTransitions[result.status][0] ?? result.status); saved(result)
+    } catch (failure) { const apiError = getApiError(failure); setError(apiError.message); if (apiError.statusCode === 409) setConflict(true) }
+  }
+  return <section className="mt-6 rounded-xl border p-4"><h4 className="font-semibold">Xử lý yêu cầu</h4>
+    {!choices.length ? <p className="mt-3 text-sm text-muted-foreground">Yêu cầu đã kết thúc.</p> : !mayHandle ? <p className="mt-3 text-sm text-muted-foreground">Yêu cầu do nhân viên khác phụ trách. Bạn có thể xem lịch sử xử lý.</p> : <form className="mt-3 space-y-3" onSubmit={event => { event.preventDefault(); void submit() }}>
+      <label htmlFor="warranty-status" className="block text-sm">Trạng thái tiếp theo</label><select id="warranty-status" value={status} onChange={event => setStatus(event.target.value as WarrantyStatus)} disabled={mutation.isPending || conflict} className="w-full rounded-lg border bg-background p-3 text-sm">{choices.map(choice => <option key={choice} value={choice}>{warrantyLabels[choice]}</option>)}</select>
+      <label htmlFor="warranty-note" className="block text-sm">Phản hồi cho khách hàng</label><textarea id="warranty-note" required maxLength={1000} rows={4} value={note} disabled={mutation.isPending} onChange={event => setNote(event.target.value)} className="w-full rounded-lg border bg-background p-3 text-sm" />
+      <p className="text-xs text-muted-foreground">Phản hồi được hiển thị cho khách. Khi tiếp nhận, bạn trở thành người phụ trách yêu cầu.</p>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      {conflict && <p role="alert" className="text-sm">Bản nháp được giữ lại. Hãy tải bản mới để kiểm tra trạng thái trước khi lưu tiếp.</p>}
+      <Button disabled={mutation.isPending || conflict} type="submit">{mutation.isPending ? "Đang lưu…" : baseline.status === "submitted" ? "Tiếp nhận yêu cầu" : "Cập nhật trạng thái"}</Button>
+    </form>}
+    <Button className="mt-3" variant="outline" disabled={mutation.isPending} onClick={() => navigation.confirmDiscard(() => void reload())}>Tải bản mới</Button>{navigation.guard}
+  </section>
+}
+function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
+  const [file, setFile] = useState<File | null>(null)
+  const [inputKey, setInputKey] = useState(0)
+  const [error, setError] = useState("")
+  const mutation = useSupportMutations().upload
+  const navigation = useUnsavedForm(file !== null)
+  async function upload() {
+    if (!file) return
+    const invalid = validateWarrantyImage(file)
+    if (invalid) { setError(invalid); return }
+    try { await mutation.mutateAsync({ id: detail._id, file }); setFile(null); setInputKey(value => value + 1); setError("") }
+    catch (failure) { setError(getApiError(failure).message) }
+  }
+  return <div className="mt-5 space-y-3"><label htmlFor="warranty-image" className="block text-sm font-semibold">Bổ sung ảnh ({detail.images.length}/5)</label><p className="text-xs text-muted-foreground">JPG, PNG, WebP; tối đa 5 MB/ảnh. Không tải ảnh chứa mật khẩu hoặc thông tin nhạy cảm.</p>
+    <input key={inputKey} id="warranty-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={mutation.isPending || detail.images.length >= 5 || detail.status !== "submitted"} onChange={event => { setFile(event.target.files?.[0] ?? null); setError("") }} className="block w-full text-sm" />
+    {detail.status !== "submitted" && <p className="text-sm text-muted-foreground">Yêu cầu đã được tiếp nhận, không thể bổ sung ảnh.</p>}
+    {error && <p role="alert" className="text-sm text-destructive">{error}</p>}<Button variant="outline" disabled={!file || mutation.isPending || detail.images.length >= 5 || detail.status !== "submitted"} onClick={() => void upload()}>{mutation.isPending ? "Đang tải ảnh…" : "Tải ảnh lên"}</Button>{navigation.guard}
+  </div>
+}
+export function WarrantyDetailPanel({ id, admin }: { id: string; admin: boolean }) {
+  const query = useWarranty(admin, id)
+  const [session, setSession] = useState(0)
+  const [message, setMessage] = useState("")
+  async function reload() {
+    const result = await query.refetch()
+    if (result.isSuccess) { setSession(value => value + 1); setMessage("") }
+    else setMessage(getApiError(result.error).message)
+  }
+  if (query.isPending) return <p role="status">Đang tải yêu cầu…</p>
+  if (!query.data) return <div role="alert"><p>{getApiError(query.error).message}</p><Button onClick={() => void query.refetch()}>Thử lại</Button></div>
+  const detail = query.data
+  return <section className="rounded-2xl border bg-background p-5 sm:p-6" aria-label="Chi tiết yêu cầu bảo hành">
+    <div className="flex flex-wrap justify-between gap-3"><h3 className="text-xl font-bold">Chi tiết bảo hành</h3><span className="rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-900">{warrantyLabels[detail.status]}</span></div>
+    <p className="mt-3 font-semibold">{detail.productName}{detail.variantName && ` · ${detail.variantName}`}</p><p className="mt-1 text-sm text-muted-foreground">Đơn {detail.orderCode} · {supportDate(detail.createdAt)}</p><p className="mt-1 break-all text-xs text-muted-foreground">Mã yêu cầu: {detail._id}</p>
+    {admin && <div className="mt-4 rounded-lg bg-muted/30 p-3 text-sm"><p>{detail.customerName}</p><p className="break-all">{detail.customerEmail}</p><p>{detail.customerPhone || "Chưa có số điện thoại"}</p></div>}
+    <h4 className="mt-5 font-semibold">Mô tả của khách hàng</h4><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{detail.description}</p>
+    {!!detail.images.length && <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">{detail.images.map((image, index) => <a key={image._id} href={image.url} target="_blank" rel="noreferrer"><img src={image.url} alt={`Ảnh tình trạng sản phẩm ${index + 1}`} className="aspect-square w-full rounded-xl border object-cover" /><span className="text-xs underline">Mở ảnh {index + 1}</span></a>)}</div>}
+    {!!detail.images.length && <p className="mt-2 text-xs text-muted-foreground">Liên kết ảnh có hiệu lực trong 1 giờ. Tải lại nếu ảnh không còn hiển thị.</p>}
+    {!admin && <WarrantyImageForm detail={detail} />}
+    <h4 className="mt-6 font-semibold">Lịch sử xử lý</h4><ol className="mt-4 space-y-4 border-l-2 border-green-200 pl-4">{detail.history.map((entry, index) => <li key={index}><p className="text-sm font-semibold">{warrantyLabels[entry.status]}</p><p className="mt-1 text-xs text-muted-foreground">{supportDate(entry.createdAt)} · {entry.actorName}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{entry.note}</p></li>)}</ol>
+    {message && <p role="status" className="mt-4 text-sm">{message}</p>}
+    {admin ? <WarrantyUpdateForm key={session} initial={detail} reload={reload} saved={() => setMessage("Đã cập nhật yêu cầu bảo hành.")} /> : <Button className="mt-5" variant="outline" onClick={() => void reload()}>Tải lại yêu cầu</Button>}
+  </section>
+}

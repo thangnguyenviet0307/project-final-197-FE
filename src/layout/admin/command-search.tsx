@@ -43,6 +43,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const role = useAuthStore((state) => state.user?.role)
 
   const searchItems: SearchItem[] = [
+    { title: "Chính sách cửa hàng", url: "/auth/policies", group: "Ứng dụng", icon: Shield },
+    { title: "Yêu cầu bảo hành", url: "/auth/warranties", group: "Ứng dụng", icon: Shield },
     // Overview
     {
       title: "Bảng điều khiển",
@@ -146,7 +148,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const groupedItems = searchItems.filter((item) =>
     item.group !== "Trang xác thực" && item.group !== "Trang lỗi" &&
-    (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories"].includes(item.url) || isAdministrator(role))
+    (!["/auth/users", "/auth/hero-slides", "/auth/articles", "/auth/post-categories", "/auth/policies"].includes(item.url) || isAdministrator(role))
   ).reduce(
     (acc, item) => {
       if (!acc[item.group]) {

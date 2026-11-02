@@ -22,6 +22,8 @@ const companyLinks = [
 ]
 
 const supportLinks = [
+  { label: "Chính sách & bảo hành", path: "/chinh-sach-bao-hanh" },
+  { label: "Yêu cầu bảo hành", path: "/account/warranty" },
   { label: "Khám phá sản phẩm", path: "/shop" },
   { label: "Giỏ hàng", path: "/cart" },
   { label: "Tài khoản của tôi", path: "/account/profile" },

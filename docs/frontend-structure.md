@@ -1,5 +1,9 @@
 # Frontend architecture
 
+Policies and warranty live in `features/support/` (types, schemas, HTTP services, query/mutation hooks and shared request components). Pages are `/chinh-sach-bao-hanh`, `/account/warranty`, `/auth/policies` and `/auth/warranties`. Policy editor sessions retain their original version during refetch; public content uses only the published Backend snapshot. Warranty requests use completed owned order items and separate attachment uploads, with private media URLs and a customer-visible status history.
+
+Usage, API contracts and deployment acceptance: [POLICY_WARRANTY.md](../POLICY_WARRANTY.md).
+
 This document describes the current application. Detailed business rules and verification commands live in [PROJECT_RULES.md](../PROJECT_RULES.md); the sibling Backend defines the API contract.
 
 ## Responsibilities

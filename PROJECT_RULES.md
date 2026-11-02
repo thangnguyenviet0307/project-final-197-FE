@@ -1,5 +1,14 @@
 # Project rules for AI Agents
 
+## Policies and warranty requests (2026-11-01)
+
+- `/chinh-sach-bao-hanh` reads only the last published policy from `/support/policy`. Admin/Super Admin edits `/auth/policies`; saving a draft never changes the public snapshot. Publishing requires all five sections. Every save carries the original expectedVersion; conflicts preserve drafts and require explicit reload. No warranty durations, contact details or legal terms are invented or auto-published.
+- Customers use `/account/warranty` and `/support/customer/*` to submit requests for an item in their own Completed order. Ownership and product snapshots come from the Backend, never client identity/name fields. Guest orders are not linked; direct them to actual store support with their saved order code. A request is an application for review, not automatic warranty approval.
+- Request creation has durable account/requestId replay protection; changed content conflicts. FE keeps the same request body for uncertain retries while the page remains open and guards navigation/unload. Warranty drafts/retry bodies are not persisted across a forced reload or closing the tab.
+- Lifecycle: submitted -> reviewing -> repairing/resolved/rejected; repairing -> resolved/rejected. Terminal states cannot reopen. Acceptance assigns the authenticated employee; Staff can update only their own accepted requests, Admin/Super Admin can handle all. Each transition requires a customer-visible note and expectedVersion and atomically appends history. No order status, stock or payment is changed by warranty processing.
+- Up to five JPG/PNG/WebP images, 5 MB each, may be attached to an owned submitted request. Verify file signatures, enforce the limit/status/version atomically, deduplicate identical bytes for uncertain retries, and upload as Cloudinary authenticated assets. DTOs expose one-hour signed download URLs only after ownership/administrative checks. Failed link writes clean up storage or enqueue authenticated cleanup retries. Cloudinary configuration and real browser/media delivery still require environment acceptance.
+- `/auth/warranties` is available to Admin/Super Admin/Staff; policy editing is Admin/Super Admin only, with Backend enforcement. Queries have loading/error/retry/empty states, no polling, and use mutation/cross-tab/focus revalidation. New store_policies/warranty_requests collections have no historical data migration; startup creates only their own scoped indexes.
+
 Read this file and AGENTS.md before changing either repository. The backend contract is authoritative. Verify the current code; do not assume earlier chat or test counts describe the current checkout.
 
 ## Repositories and architecture

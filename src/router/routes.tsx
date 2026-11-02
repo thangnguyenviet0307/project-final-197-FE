@@ -23,6 +23,7 @@ export const routes: RouteObject[] = [
     element: <StoreLayout />,
     handle: { area: "storefront" },
     children: [
+      { path: "/chinh-sach-bao-hanh", lazy: page(() => import("@/pages/storefront/support/policy")) },
       {
         path: "/",
         lazy: page(() => import("@/pages/storefront/home/index")),
@@ -89,6 +90,7 @@ export const routes: RouteObject[] = [
                   import("@/pages/storefront/account/orders")
                 ),
               },
+              { path: "warranty", lazy: page(() => import("@/pages/storefront/account/warranty")) },
               {
                 path: "addresses",
                 lazy: page(() =>
@@ -160,6 +162,7 @@ export const routes: RouteObject[] = [
     handle: { area: "admin" },
     children: [
       { path: "/auth/customers", lazy: page(() => import("@/pages/admin/customers/index")) },
+      { path: "/auth/warranties", lazy: page(() => import("@/pages/admin/support/warranties")) },
       // MAIN DASHBOARD
       {
         path: "/auth/dashboard",
@@ -254,6 +257,7 @@ export const routes: RouteObject[] = [
         element: <ProtectedRoute allowedRoles={["super_admin", "admin"]} />,
         children: [
           { path: "/auth/articles", lazy: page(() => import("@/pages/admin/articles")) },
+          { path: "/auth/policies", lazy: page(() => import("@/pages/admin/support/policy")) },
           { path: "/auth/post-categories", lazy: page(() => import("@/pages/admin/post-categories")) },
           { path: "/auth/hero-slides", lazy: page(() => import("@/pages/admin/hero-slides")) },
           // CATEGORIES

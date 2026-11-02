@@ -22,6 +22,7 @@ const allowed = new Set([
   "validations/orders.validation.ts", "types/orders.type.ts",
   "validations/articles.validation.ts", "validations/post-categories.validation.ts",
   "validations/product-news.validation.ts",
+  "validations/support.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -273,4 +274,37 @@ const productNewsService = evaluate(path.join(root, "src/features/products/servi
 })
 await productNewsService.updateProductNews({ id, input: { articleIds: [id], expectedVersion: 2 } })
 await productNewsService.updateProductNews({ id, input: { articleIds: [], expectedVersion: 3 } })
+const supportValidation = loadValidation("validations/support.validation.ts")
+const supportService = evaluate(path.join(root, "src/features/support/services/support.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: {
+    async put(url, body) {
+      assert.equal(url, "/support/admin/policy")
+      supportValidation.savePolicySchema.parse(body)
+      requests.push({ method: "PUT", url, body }); return { data: { data: { __v: 1, content: body.content } } }
+    },
+    async post(url, body) {
+      assert.equal(url, "/support/customer/requests")
+      supportValidation.createWarrantySchema.parse(body)
+      requests.push({ method: "POST", url, body }); return { data: { data: { _id: id } } }
+    },
+    async patch(url, body) {
+      assert.equal(url, `/support/admin/requests/${id}`)
+      supportValidation.updateWarrantySchema.parse(body)
+      requests.push({ method: "PATCH", url, body }); return { data: { data: { _id: id } } }
+    },
+    async get(url, config) {
+      assert.ok(["/support/customer/eligible-orders", "/support/customer/requests", "/support/admin/requests"].includes(url))
+      supportValidation.supportListSchema.parse(config.params)
+      requests.push({ method: "GET", url, query: config.params }); return { data: { data: [], pagination: {} } }
+    },
+  } }
+  throw new Error(`Unsupported support service import: ${specifier}`)
+})
+const policyContent = { warranty: "Warranty terms", returns: "Returns", shipping: "Shipping", payment: "COD", support: "Contact" }
+await supportService.savePolicy({ content: policyContent, publish: true, expectedVersion: 0 })
+await supportService.createWarranty({ requestId: webcrypto.randomUUID(), orderId: id, itemIndex: 0, description: "Product will not turn on" })
+await supportService.updateWarranty({ id, expectedVersion: 0, status: "reviewing", note: "Received for inspection" })
+await supportService.eligibleOrders(1)
+await supportService.listWarranties(false, 1, "")
+await supportService.listWarranties(true, 2, "reviewing")
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

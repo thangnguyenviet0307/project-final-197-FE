@@ -1,0 +1,53 @@
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { BaseLayout } from "@/layout/admin/base-layout"
+import { Button } from "@/components/ui/button"
+import { useAdminPolicy, useSupportMutations } from "@/features/support/hooks/use-support"
+import type { AdminPolicy } from "@/features/support/types/support"
+import { policySections, supportDate } from "@/features/support/utils/support"
+import { savePolicySchema } from "@/features/support/schemas/support-schema"
+import { getApiError } from "@/services/api"
+import { useUnsavedForm } from "@/hooks/use-unsaved-form"
+
+function PolicyEditor({ initial, reload }: { initial: AdminPolicy; reload: () => Promise<void> }) {
+  const [baseline, setBaseline] = useState(initial)
+  const [content, setContent] = useState(initial.content)
+  const [error, setError] = useState("")
+  const [message, setMessage] = useState("")
+  const [conflict, setConflict] = useState(false)
+  const mutations = useSupportMutations()
+  const dirty = JSON.stringify(content) !== JSON.stringify(baseline.content)
+  const navigation = useUnsavedForm(dirty)
+  async function save(publish: boolean) {
+    const parsed = savePolicySchema.safeParse({ content, publish, expectedVersion: baseline.__v })
+    if (!parsed.success) { setError(parsed.error.issues[0].message); return }
+    setError(""); setMessage("")
+    try {
+      const saved = await mutations.savePolicy.mutateAsync(parsed.data)
+      setBaseline(saved); setContent(saved.content)
+      setMessage(publish ? "Đã công bố chính sách lên website." : "Đã lưu bản nháp. Bản công khai được giữ đến lần công bố tiếp theo.")
+    } catch (failure) { const apiError = getApiError(failure); setError(apiError.message); if (apiError.statusCode === 409) setConflict(true) }
+  }
+  return <div className="space-y-6">
+    <div className="rounded-xl border bg-muted/30 p-5"><p>Nhập chính sách thực tế của cửa hàng. Thông tin riêng trên từng sản phẩm cần thống nhất với nội dung này.</p><p className="mt-2 text-sm text-muted-foreground">{baseline.publishedAt ? `Lần công bố gần nhất: ${supportDate(baseline.publishedAt)}` : "Chưa có chính sách được công bố."}</p></div>
+    {policySections.map(section => <div key={section.key}><label htmlFor={section.key} className="font-semibold">{section.title}</label><p id={`${section.key}-hint`} className="my-2 text-sm text-muted-foreground">{section.hint}</p><textarea id={section.key} aria-describedby={`${section.key}-hint`} rows={6} maxLength={4000} value={content[section.key]} disabled={mutations.savePolicy.isPending} onChange={event => { setContent({ ...content, [section.key]: event.target.value }); setMessage("") }} className="w-full rounded-lg border bg-background p-3 text-sm leading-6" /><p className="text-right text-xs text-muted-foreground">{content[section.key].length}/4000</p></div>)}
+    {error && <p role="alert" className="text-destructive">{error}</p>}{message && <p role="status" className="text-green-700">{message}</p>}
+    {conflict && <p role="alert">Phiên bản đã thay đổi. Bản đang nhập được giữ lại; hãy sao chép nếu cần rồi tải bản mới để kiểm tra.</p>}
+    <div className="flex flex-wrap gap-3"><Button disabled={mutations.savePolicy.isPending || conflict} onClick={() => void save(false)}>Lưu bản nháp</Button><Button disabled={mutations.savePolicy.isPending || conflict} onClick={() => void save(true)}>Công bố chính sách</Button><Button variant="outline" disabled={mutations.savePolicy.isPending} onClick={() => navigation.confirmDiscard(() => void reload())}>Tải bản mới</Button><Link to="/chinh-sach-bao-hanh" target="_blank" rel="noreferrer" className="self-center text-sm underline">Xem trang công khai</Link></div>
+    {navigation.guard}
+  </div>
+}
+export default function AdminPolicyPage() {
+  const query = useAdminPolicy()
+  const [session, setSession] = useState(0)
+  const [reloadError, setReloadError] = useState("")
+  async function reload() {
+    const result = await query.refetch()
+    if (result.isSuccess) { setReloadError(""); setSession(value => value + 1) }
+    else setReloadError(getApiError(result.error).message)
+  }
+  return <BaseLayout title="Chính sách & bảo hành" description="Soạn nội dung và công bố chính sách mua hàng."><div className="mx-4 max-w-4xl lg:mx-6">
+    {reloadError && <p role="alert">{reloadError}</p>}
+    {query.data ? <PolicyEditor key={session} initial={query.data} reload={reload} /> : query.isError ? <div role="alert"><p>{getApiError(query.error).message}</p><Button onClick={() => void query.refetch()}>Thử lại</Button></div> : <p role="status">Đang tải chính sách…</p>}
+  </div></BaseLayout>
+}

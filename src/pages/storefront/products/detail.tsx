@@ -123,6 +123,7 @@ function ProductDetails({ product }: { product: Product }) {
                   </p>
                 </div>
                 <StoreRatingSummary slug={product.slug ?? ""} />
+                <Link to="/chinh-sach-bao-hanh" className="inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline"><ShieldCheck size={18} /> Chính sách & hướng dẫn bảo hành</Link>
                 <div className="rounded-2xl border border-[#e5eedf] bg-[#f0f6eb] p-5">
                   <p className="text-xs font-medium text-gray-500">
                     Giá bán · VND
