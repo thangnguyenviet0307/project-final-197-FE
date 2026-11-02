@@ -300,7 +300,7 @@ const supportService = evaluate(path.join(root, "src/features/support/services/s
   } }
   throw new Error(`Unsupported support service import: ${specifier}`)
 })
-const policyContent = { warranty: "Warranty terms", returns: "Returns", shipping: "Shipping", payment: "COD", support: "Contact" }
+const policyContent = { warranty: "Warranty terms", returns: "Returns", shipping: "Shipping", payment: "COD", support: "Contact", privacy: "Privacy terms" }
 await supportService.savePolicy({ content: policyContent, publish: true, expectedVersion: 0 })
 await supportService.createWarranty({ requestId: webcrypto.randomUUID(), orderId: id, itemIndex: 0, description: "Product will not turn on" })
 await supportService.updateWarranty({ id, expectedVersion: 0, status: "reviewing", note: "Received for inspection" })

@@ -1,6 +1,7 @@
 
 import { useState, type SubmitEvent } from "react"
 import { Link } from "react-router-dom"
+import { companyInformationLinks as companyLinks, customerSupportLinks } from "@/features/support/utils/policy-documents"
 import {
   ArrowUp,
   Mail,
@@ -15,18 +16,9 @@ import {
   Youtube,
 } from "@/components/icons/brand-icons"
 
-const companyLinks = [
-  { label: "Liên hệ", path: "/contact" },
-  { label: "Tin tức", path: "/bai-viet?type=news" },
-  { label: "Blog", path: "/bai-viet?type=blog" },
-]
-
-const supportLinks = [
-  { label: "Chính sách & bảo hành", path: "/chinh-sach-bao-hanh" },
-  { label: "Yêu cầu bảo hành", path: "/account/warranty" },
-  { label: "Khám phá sản phẩm", path: "/shop" },
-  { label: "Giỏ hàng", path: "/cart" },
-  { label: "Tài khoản của tôi", path: "/account/profile" },
+const supportLinks: readonly { label: string; path?: string }[] = [
+  { label: "Câu hỏi thường gặp" },
+  ...customerSupportLinks,
 ]
 
 export function StoreFooter() {
@@ -89,13 +81,13 @@ export function StoreFooter() {
 
             <ul className="space-y-3 text-sm">
               {companyLinks.map((item) => (
-                <li key={item.path}>
-                  <Link
+                <li key={item.label}>
+                  {item.path ? <Link
                     to={item.path}
                     className="transition-colors hover:text-[#65b719]"
                   >
                     {item.label}
-                  </Link>
+                  </Link> : <span aria-disabled="true" title="Đang cập nhật">{item.label}</span>}
                 </li>
               ))}
             </ul>
@@ -109,13 +101,13 @@ export function StoreFooter() {
 
             <ul className="space-y-3 text-sm">
               {supportLinks.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
+                <li key={item.label}>
+                  {item.path ? <a
+                    href={item.path}
                     className="transition-colors hover:text-[#65b719]"
                   >
                     {item.label}
-                  </Link>
+                  </a> : <span aria-disabled="true" title="Đang cập nhật">{item.label}</span>}
                 </li>
               ))}
             </ul>

@@ -3,6 +3,7 @@ import { z } from "zod"
 export const policyContentSchema = z.object({
   warranty: z.string().trim().max(4000), returns: z.string().trim().max(4000),
   shipping: z.string().trim().max(4000), payment: z.string().trim().max(4000), support: z.string().trim().max(4000),
+  privacy: z.string().trim().max(4000),
 }).strict()
 export const savePolicySchema = z.object({ content: policyContentSchema, expectedVersion: z.number().int().nonnegative(), publish: z.boolean() }).strict()
   .refine(value => !value.publish || Object.values(value.content).every(text => text.length > 0), { message: "Vui lòng điền đủ các mục trước khi công bố chính sách." })

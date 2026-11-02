@@ -3,12 +3,13 @@ import { beforeEach, expect, it, vi } from "vitest"
 import { MemoryRouter } from "react-router-dom"
 import AdminPolicyPage from "@/pages/admin/support/policy"
 import PolicyPage from "@/pages/storefront/support/policy"
+import PolicyDetailPage from "@/pages/storefront/support/policy-detail"
 import { WarrantyCreateForm } from "@/features/support/components/warranty-create-form"
 import { savePolicySchema, createWarrantySchema } from "@/features/support/schemas/support-schema"
 
-const content = { warranty: "Điều kiện bảo hành", returns: "Điều kiện đổi trả", shipping: "Giao hàng", payment: "COD", support: "Liên hệ cửa hàng" }
+const content = { warranty: "Điều kiện bảo hành", returns: "Điều kiện đổi trả", shipping: "Giao hàng", payment: "COD", support: "Liên hệ cửa hàng", privacy: "Thông tin bảo mật đã công bố" }
 const mocks = vi.hoisted(() => ({
-  admin: { data: { content: { warranty: "", returns: "", shipping: "", payment: "", support: "" }, __v: 2, publishedAt: null as string | null }, isError: false, error: null, refetch: vi.fn() },
+  admin: { data: { content: { warranty: "", returns: "", shipping: "", payment: "", support: "", privacy: "" }, __v: 2, publishedAt: null as string | null }, isError: false, error: null, refetch: vi.fn() },
   publicPolicy: { data: null as { content: typeof content; publishedAt: string } | null, isPending: false, isError: false },
   save: vi.fn(), create: vi.fn(),
 }))
@@ -70,6 +71,33 @@ it("uncertain warranty submission retries the identical request and retains desc
   expect(mocks.create.mock.calls[0][0]).toEqual(mocks.create.mock.calls[1][0])
 })
 it("frontend validation requires full published policy and rejects identity overrides", () => {
+  expect(savePolicySchema.safeParse({ content: { ...content, privacy: " " }, publish: true, expectedVersion: 0 }).success).toBe(false)
   expect(savePolicySchema.safeParse({ content: { ...content, warranty: " " }, publish: true, expectedVersion: 0 }).success).toBe(false)
   expect(createWarrantySchema.safeParse({ requestId: crypto.randomUUID(), orderId: "a".repeat(24), itemIndex: 0, description: "Lỗi sản phẩm", customerId: "b".repeat(24) }).success).toBe(false)
+})
+
+it.each([
+  ["/chinh-sach-bao-mat", "Chính sách bảo mật", "Thông tin bảo mật đã công bố"],
+  ["/chinh-sach-giao-hang", "Chính sách giao hàng", "Giao hàng"],
+  ["/chinh-sach-doi-tra", "Chính sách đổi trả", "Điều kiện đổi trả"],
+])("dedicated policy page %s reads the matching published section", (path, title, text) => {
+  mocks.publicPolicy.data = { content, publishedAt: "2026-11-02T00:00:00Z" }
+  render(<MemoryRouter initialEntries={[path]}><PolicyDetailPage /></MemoryRouter>)
+  expect(screen.getByRole("heading", { level: 1, name: title })).toBeTruthy()
+  expect(screen.getByText(text)).toBeTruthy()
+})
+it("a missing legacy privacy section never falls back to editorial suggestions", () => {
+  mocks.publicPolicy.data = { content: { ...content, privacy: "" }, publishedAt: "2026-11-01T00:00:00Z" }
+  render(<MemoryRouter initialEntries={["/chinh-sach-bao-mat"]}><PolicyDetailPage /></MemoryRouter>)
+  expect(screen.getByText("Chính sách bảo mật đang được cập nhật")).toBeTruthy()
+  expect(screen.queryByText(/Cookie và dữ liệu trên thiết bị/)).toBeNull()
+})
+it("policy suggestions fill empty drafts without replacing existing content or publishing", () => {
+  mocks.admin.data.content = { ...content, privacy: "", shipping: "" }
+  render(wrap(<AdminPolicyPage />))
+  fireEvent.click(screen.getByRole("button", { name: "Chèn gợi ý bảo mật, giao hàng và đổi trả" }))
+  expect((screen.getByLabelText("Chính sách bảo mật") as HTMLTextAreaElement).value).toContain("Cookie và dữ liệu trên thiết bị")
+  expect((screen.getByLabelText("Chính sách giao hàng") as HTMLTextAreaElement).value).toContain("miễn phí vận chuyển")
+  expect((screen.getByLabelText("Chính sách đổi trả") as HTMLTextAreaElement).value).toBe(content.returns)
+  expect(mocks.save).not.toHaveBeenCalled()
 })

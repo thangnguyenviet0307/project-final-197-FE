@@ -2,11 +2,13 @@
 
 ## Sử dụng
 
-1. Admin/Super Admin mở `/auth/policies`, nhập đủ năm mục theo chính sách thực tế của cửa hàng. `Lưu bản nháp` chỉ lưu nội dung quản trị; `Công bố chính sách` cập nhật bản khách hàng được đọc. Không có nội dung bảo hành mẫu được tự động công bố.
+1. Admin/Super Admin mở `/auth/policies`, nhập đủ sáu mục theo chính sách thực tế của cửa hàng, bao gồm bảo mật. Nút chèn gợi ý chỉ điền các mục bảo mật/giao hàng/đổi trả đang trống vào bản nháp cục bộ, không ghi đè nội dung đã nhập và không tự lưu/công bố. Rà soát nhà cung cấp, phạm vi chia sẻ, thời hạn lưu trữ và các điều kiện giao/đổi trả thực tế trước khi công bố. `Lưu bản nháp` chỉ lưu nội dung quản trị; `Công bố chính sách` cập nhật bản khách hàng được đọc.
 2. Khách đọc `/chinh-sach-bao-hanh` từ footer hoặc trang chi tiết sản phẩm. Khi chưa có bản công bố, trang thông báo đang cập nhật và dẫn đến liên hệ.
 3. Khách đăng nhập vào `/account/warranty`, chọn một sản phẩm trong đơn của mình đã Hoàn tất, mô tả lỗi và gửi. Sau khi có xác nhận, mở chi tiết để bổ sung ảnh. Đơn khách vãng lai cần liên hệ cửa hàng bằng mã đơn đã lưu; không tự liên kết vào tài khoản.
 4. Nhân viên mở `/auth/warranties`, chọn yêu cầu Chờ tiếp nhận và nhập phản hồi để tiếp nhận. Nhân viên chỉ xử lý yêu cầu mình phụ trách sau khi tiếp nhận; Admin/Super Admin xử lý được tất cả.
 5. Khách đọc phản hồi và lịch sử trạng thái trong chi tiết yêu cầu. Việc gửi yêu cầu không xác nhận đủ điều kiện bảo hành; hệ thống không tự suy diễn thời hạn bảo hành từ mô tả sản phẩm.
+
+Ba trang chính sách riêng: `/chinh-sach-bao-mat`, `/chinh-sach-giao-hang`, `/chinh-sach-doi-tra`. Footer và trang tổng quan dẫn đến các trang này. Tất cả dùng bản đã công bố từ cùng API; chưa có nội dung sẽ hiển thị thông báo cập nhật. Dữ liệu cũ thiếu `privacy` được bổ sung chuỗi rỗng trong phản hồi đọc, không chạy migration hoặc thay đổi bản công khai. Các request lưu mới phải gửi đủ trường `privacy`; có thể để trống khi lưu nháp nhưng không thể công bố khi còn trống. Cập nhật FE và BE cùng phiên bản.
 
 ## API
 
