@@ -4,6 +4,8 @@ Policies and warranty live in `features/support/` (types, schemas, HTTP services
 
 Usage, API contracts and deployment acceptance: [POLICY_WARRANTY.md](../POLICY_WARRANTY.md).
 
+Dedicated privacy, shipping and returns routes (`/chinh-sach-bao-mat`, `/chinh-sach-giao-hang`, `/chinh-sach-doi-tra`) compose the shared public policy detail page. `policy-documents.ts` owns their navigation metadata and explicitly inserted editorial draft suggestions; suggestions never become public fallback content. Legacy policy reads normalize the new privacy field without overwriting existing content.
+
 This document describes the current application. Detailed business rules and verification commands live in [PROJECT_RULES.md](../PROJECT_RULES.md); the sibling Backend defines the API contract.
 
 ## Responsibilities

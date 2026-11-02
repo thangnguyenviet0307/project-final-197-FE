@@ -24,6 +24,7 @@ export const routes: RouteObject[] = [
     handle: { area: "storefront" },
     children: [
       { path: "/chinh-sach-bao-hanh", lazy: page(() => import("@/pages/storefront/support/policy")) },
+      ...["/chinh-sach-bao-mat", "/chinh-sach-giao-hang", "/chinh-sach-doi-tra"].map(path => ({ path, lazy: page(() => import("@/pages/storefront/support/policy-detail")) })),
       {
         path: "/",
         lazy: page(() => import("@/pages/storefront/home/index")),

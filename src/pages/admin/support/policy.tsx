@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button"
 import { useAdminPolicy, useSupportMutations } from "@/features/support/hooks/use-support"
 import type { AdminPolicy } from "@/features/support/types/support"
 import { policySections, supportDate } from "@/features/support/utils/support"
+import { policySuggestions } from "@/features/support/utils/policy-documents"
 import { savePolicySchema } from "@/features/support/schemas/support-schema"
 import { getApiError } from "@/services/api"
 import { useUnsavedForm } from "@/hooks/use-unsaved-form"
 
 function PolicyEditor({ initial, reload }: { initial: AdminPolicy; reload: () => Promise<void> }) {
-  const [baseline, setBaseline] = useState(initial)
-  const [content, setContent] = useState(initial.content)
+  const [baseline, setBaseline] = useState(() => ({ ...initial, content: { ...initial.content, privacy: initial.content.privacy ?? "" } }))
+  const [content, setContent] = useState(() => ({ ...initial.content, privacy: initial.content.privacy ?? "" }))
   const [error, setError] = useState("")
   const [message, setMessage] = useState("")
   const [conflict, setConflict] = useState(false)
@@ -29,7 +30,7 @@ function PolicyEditor({ initial, reload }: { initial: AdminPolicy; reload: () =>
     } catch (failure) { const apiError = getApiError(failure); setError(apiError.message); if (apiError.statusCode === 409) setConflict(true) }
   }
   return <div className="space-y-6">
-    <div className="rounded-xl border bg-muted/30 p-5"><p>Nhập chính sách thực tế của cửa hàng. Thông tin riêng trên từng sản phẩm cần thống nhất với nội dung này.</p><p className="mt-2 text-sm text-muted-foreground">{baseline.publishedAt ? `Lần công bố gần nhất: ${supportDate(baseline.publishedAt)}` : "Chưa có chính sách được công bố."}</p></div>
+    <div className="rounded-xl border bg-muted/30 p-5"><p>Nhập chính sách thực tế của cửa hàng. Thông tin riêng trên từng sản phẩm cần thống nhất với nội dung này.</p><p className="mt-2 text-sm text-muted-foreground">{baseline.publishedAt ? `Lần công bố gần nhất: ${supportDate(baseline.publishedAt)}` : "Chưa có chính sách được công bố."}</p><p className="mt-3 text-sm text-muted-foreground">Nội dung gợi ý cần được rà soát và bổ sung phạm vi chia sẻ dữ liệu, thời hạn lưu trữ, điều kiện giao hàng và đổi trả thực tế trước khi công bố. Chỉ những mục đang trống được điền.</p><Button className="mt-3" variant="outline" disabled={mutations.savePolicy.isPending || conflict} onClick={() => { setContent(current => ({ ...current, ...Object.fromEntries(Object.entries(policySuggestions).filter(([key]) => !current[key as keyof typeof current].trim())) })); setMessage("Đã chèn gợi ý vào các mục đang trống. Hãy rà soát trước khi lưu hoặc công bố.") }}>Chèn gợi ý bảo mật, giao hàng và đổi trả</Button></div>
     {policySections.map(section => <div key={section.key}><label htmlFor={section.key} className="font-semibold">{section.title}</label><p id={`${section.key}-hint`} className="my-2 text-sm text-muted-foreground">{section.hint}</p><textarea id={section.key} aria-describedby={`${section.key}-hint`} rows={6} maxLength={4000} value={content[section.key]} disabled={mutations.savePolicy.isPending} onChange={event => { setContent({ ...content, [section.key]: event.target.value }); setMessage("") }} className="w-full rounded-lg border bg-background p-3 text-sm leading-6" /><p className="text-right text-xs text-muted-foreground">{content[section.key].length}/4000</p></div>)}
     {error && <p role="alert" className="text-destructive">{error}</p>}{message && <p role="status" className="text-green-700">{message}</p>}
     {conflict && <p role="alert">Phiên bản đã thay đổi. Bản đang nhập được giữ lại; hãy sao chép nếu cần rồi tải bản mới để kiểm tra.</p>}

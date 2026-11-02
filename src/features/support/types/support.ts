@@ -1,6 +1,6 @@
 import type { Pagination } from "@/types/api"
 
-export interface PolicyContent { warranty: string; returns: string; shipping: string; payment: string; support: string }
+export interface PolicyContent { warranty: string; returns: string; shipping: string; payment: string; support: string; privacy: string }
 export interface PublicPolicy { content: PolicyContent; publishedAt: string | null }
 export interface AdminPolicy { content: PolicyContent; publishedAt: string | null; __v: number }
 export type WarrantyStatus = "submitted" | "reviewing" | "repairing" | "resolved" | "rejected"
