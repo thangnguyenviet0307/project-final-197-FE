@@ -36,7 +36,7 @@ export default function AdminOrdersPage() {
   return <BaseLayout title="Đơn hàng"><div className="space-y-5 px-4 lg:px-6">
     <Button nativeButton={false} render={<Link to="/auth/orders/new" />}>Create order</Button>
     <OrderStatistics />
-    {customerId && <div className="rounded-lg border p-4"><p className="font-semibold">Lịch sử đơn hàng của khách hàng: {customer.data ? `${customer.data.data.first_name} ${customer.data.data.last_name}` : customerId}</p>{customer.data && <p className="text-sm">{customer.data.data.email}</p>}<Link className="text-sm underline" to="/auth/orders">Xem tất cả đơn hàng</Link></div>}
+    {customerId && <div className="rounded-lg border p-4"><p className="font-semibold">Lịch sử đơn hàng của khách hàng: {customer.data ? customer.data.data.displayName || `${customer.data.data.last_name} ${customer.data.data.first_name}`.trim() : customerId}</p>{customer.data && <p className="text-sm">{customer.data.data.email}</p>}<Link className="text-sm underline" to="/auth/orders">Xem tất cả đơn hàng</Link></div>}
     <div><h1 className="text-2xl font-semibold">Đơn hàng</h1><p className="text-sm text-muted-foreground">Xem lịch sử và quản lý xử lý đơn hàng. Đơn mới nhất hiển thị trước.</p></div>
     <OrderSearch key={search} initial={search} onSearch={value => change("search", value)} />
     <OrderDateFilter key={`${from}/${to}`} initialFrom={from} initialTo={to} onApply={(dateFrom, dateTo) => setParams(previous => {

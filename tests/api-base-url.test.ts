@@ -1,6 +1,12 @@
 import { expect, it } from "vitest"
 import { resolveApiBaseUrl } from "@/services/api-base-url"
 
+it("uses same-origin API requests in production even with an old direct backend environment value", () => {
+  expect(resolveApiBaseUrl("https://project-final-197-be.onrender.com/api/v1", "https://project-final-197-fe.vercel.app", true)).toBe("/api/v1")
+  expect(resolveApiBaseUrl("http://localhost:5000/api/v1", "https://project-final-197-fe.vercel.app", true)).toBe("/api/v1")
+  expect(resolveApiBaseUrl("/api/v1", undefined, true)).toBe("/api/v1")
+})
+
 it("keeps loopback refresh cookies same-site when the frontend uses another local alias", () => {
   expect(resolveApiBaseUrl("http://localhost:5000/api/v1/", "http://127.0.0.1:5173")).toBe("http://127.0.0.1:5000/api/v1")
   expect(resolveApiBaseUrl("http://127.0.0.1:5000/api/v1", "http://localhost:5173")).toBe("http://localhost:5000/api/v1")

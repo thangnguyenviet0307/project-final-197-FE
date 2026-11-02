@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form"
+import { useEffect } from "react"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useProfile } from "@/features/profile/hooks/use-profile"
 import { useUpdateProfile } from "@/features/profile/hooks/use-update-profile"
@@ -13,7 +14,13 @@ import { getApiError } from "@/services/api"
 function ProfileEditor({ user }: { user: User }) {
   const valuesFromCustomer = (saved: User): CustomerProfileValues => ({ firstName: saved.firstName, lastName: saved.lastName, phone: saved.phone ?? "", birthDate: saved.birthDate ?? "", gender: saved.gender ?? "" })
   const form = useForm<CustomerProfileValues>({ resolver: zodResolver(customerProfileSchema), defaultValues: valuesFromCustomer(user) })
-  const navigation = useUnsavedForm(form.formState.isDirty)
+  useEffect(() => {
+    form.reset({ firstName: user.firstName, lastName: user.lastName, phone: user.phone ?? "", birthDate: user.birthDate ?? "", gender: user.gender ?? "" }, { keepDirtyValues: true })
+  }, [user, form])
+  const { dirtyFields, isDirty } = form.formState
+  const navigation = useUnsavedForm(isDirty || Object.keys(dirtyFields).length > 0)
+  const birthDate = useWatch({ control: form.control, name: "birthDate" })
+  const currentYear = new Date().getFullYear()
   const mutation = useUpdateProfile({ onSuccess: saved => form.reset(valuesFromCustomer(saved)), onError: error => {
     const failure = getApiError(error)
     form.setError("root", { message: failure.message })
@@ -29,7 +36,19 @@ function ProfileEditor({ user }: { user: User }) {
       {([["lastName", "Họ"], ["firstName", "Tên"]] as const).map(([name, label]) => <Field key={name}>
         <FieldLabel htmlFor={`customer-profile-${name}`}>{label}</FieldLabel><Input id={`customer-profile-${name}`} autoComplete={name === "lastName" ? "family-name" : "given-name"} aria-invalid={!!form.formState.errors[name]} {...form.register(name)} /><FieldError errors={[form.formState.errors[name]]} />
       </Field>)}
-      <Field><FieldLabel htmlFor="customer-birth-date">Ngày sinh</FieldLabel><Input id="customer-birth-date" type="date" autoComplete="bday" aria-invalid={!!form.formState.errors.birthDate} {...form.register("birthDate")} /><FieldError errors={[form.formState.errors.birthDate]} /></Field>
+      <Field><FieldLabel htmlFor="customer-birth-date">Ngày sinh</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          <select aria-label="Năm sinh" className="h-10 rounded-md border bg-background px-3 text-sm" value={birthDate.slice(0, 4)} onChange={event => {
+            const year = Number(event.target.value)
+            if (!year) { form.setValue("birthDate", "", { shouldDirty: true, shouldValidate: form.formState.isSubmitted }); return }
+            const month = Number(birthDate.slice(5, 7)) || 1
+            const day = Math.min(Number(birthDate.slice(8, 10)) || 1, new Date(Date.UTC(year, month, 0)).getUTCDate())
+            const value = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+            const today = new Date().toISOString().slice(0, 10)
+            form.setValue("birthDate", value > today ? today : value, { shouldDirty: true, shouldValidate: form.formState.isSubmitted })
+          }}><option value="">Chọn năm</option>{Array.from({ length: currentYear - 1900 + 1 }, (_, index) => currentYear - index).map(year => <option key={year} value={year}>{year}</option>)}</select>
+          <Input id="customer-birth-date" className="min-w-0 flex-1" type="date" max={new Date().toISOString().slice(0, 10)} autoComplete="bday" aria-invalid={!!form.formState.errors.birthDate} {...form.register("birthDate")} />
+        </div><FieldError errors={[form.formState.errors.birthDate]} /></Field>
       <Field><FieldLabel htmlFor="customer-gender">Giới tính</FieldLabel><select id="customer-gender" aria-invalid={!!form.formState.errors.gender} {...form.register("gender")}><option value="">Chưa chọn</option><option value="male">Nam</option><option value="female">Nữ</option><option value="other">Khác</option></select><FieldError errors={[form.formState.errors.gender]} /></Field>
       <Field><FieldLabel htmlFor="account-email">Email</FieldLabel><Input id="account-email" type="email" value={user.email} readOnly aria-describedby="account-email-hint" /></Field>
       <Field><FieldLabel htmlFor="customer-phone">Số điện thoại</FieldLabel><Input id="customer-phone" type="tel" autoComplete="tel" aria-invalid={!!form.formState.errors.phone} {...form.register("phone")} /><FieldError errors={[form.formState.errors.phone]} /></Field>

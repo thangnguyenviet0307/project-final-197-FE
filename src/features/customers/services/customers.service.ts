@@ -11,6 +11,9 @@ import type {
 interface BackendCustomer {
   _id: string
   firstName: string
+  displayName?: string
+  customerType?: "registered" | "guest"
+  contactSource?: "guest"
   lastName: string
   email: string
   birthDate?: ICustomer["birthDate"]
@@ -38,6 +41,9 @@ function mapCustomer(customer: BackendCustomer): ICustomer {
   return {
     _id: customer._id,
     first_name: customer.firstName,
+    displayName: customer.displayName,
+    customerType: customer.customerType,
+    contactSource: customer.contactSource,
     last_name: customer.lastName,
     email: customer.email,
     phone: customer.phone,
@@ -86,9 +92,9 @@ function toBackendCustomer(
 
 export const customersService = {
   // GET danh sách Customers
-  getCustomers: async (params: { page: number; limit: number; search?: string; isActive?: boolean }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
+  getCustomers: async ({ accountsOnly = false, ...params }: { page: number; limit: number; search?: string; isActive?: boolean; accountsOnly?: boolean }, signal?: AbortSignal): Promise<CustomerResponse<ICustomer[]> & { pagination: CustomerPagination }> => {
     const response = await api.get<CustomersListResponse>(
-      "/customers",
+      accountsOnly ? "/customers/accounts" : "/customers",
       {
         params,
         signal,

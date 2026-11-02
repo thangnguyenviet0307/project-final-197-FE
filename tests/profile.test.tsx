@@ -16,7 +16,7 @@ vi.mock("@/layout/admin/base-layout", () => ({
 
 const originalAdapter = api.defaults.adapter
 const user = {
-  id: "self", firstName: "Test", lastName: "User", name: "Test User", role: "staff" as const,
+  id: "self", firstName: "Test", lastName: "User", name: "User Test", role: "staff" as const,
   email: "account@example.com", personalEmail: "personal@example.com", phone: "0123456", location: "HCM", bio: "Hello", mustChangePassword: false,
 }
 beforeEach(() => {
@@ -39,7 +39,7 @@ function DeleteAccountControl({ onDeleted }: { onDeleted: () => void }) {
 it("loads the profile and keeps account email/role readonly while removing template fields", async () => {
   api.defaults.adapter = async (config) => ({ config, data: { data: user }, headers: new AxiosHeaders(), status: 200, statusText: "" })
   renderPage(<UserProfilePage />)
-  expect(await screen.findByText("Test User")).toBeTruthy()
+  expect(await screen.findByText("User Test")).toBeTruthy()
   expect(screen.getByText("Thông tin cá nhân")).toBeTruthy()
   expect(screen.queryByText("Ảnh hồ sơ")).toBeNull()
   expect(screen.queryByText("Contact your administrator to change your account email.")).toBeNull()
@@ -74,9 +74,9 @@ it("saves profile via API, updates the sidebar's user state, and invalidates the
   fireEvent.change(await screen.findByLabelText("Tên"), { target: { value: "Updated" } })
   fireEvent.change(screen.getByLabelText("Email cá nhân"), { target: { value: "new@example.com" } })
   fireEvent.click(screen.getByRole("button", { name: "Lưu thông tin" }))
-  expect(await screen.findByText("Updated User")).toBeTruthy()
+  expect(await screen.findByText("User Updated")).toBeTruthy()
   expect(screen.queryByLabelText("Tên")).toBeNull()
-  expect(useAuthStore.getState().user).toMatchObject({ name: "Updated User", personalEmail: "new@example.com" })
+  expect(useAuthStore.getState().user).toMatchObject({ name: "User Updated", personalEmail: "new@example.com" })
   expect(invalidation).toHaveBeenCalledWith({ queryKey: ["users"] })
 })
 
@@ -86,7 +86,7 @@ it("opens the edit form on request and returns to the saved profile when cancele
   fireEvent.click(await screen.findByRole("button", { name: "Cập nhật thông tin cá nhân" }))
   fireEvent.change(await screen.findByLabelText("Tên"), { target: { value: "Preview" } })
   fireEvent.click(screen.getByRole("button", { name: "Hủy" }))
-  expect(await screen.findByText("Test User")).toBeTruthy()
+  expect(await screen.findByText("User Test")).toBeTruthy()
   expect(screen.queryByLabelText("Tên")).toBeNull()
 })
 

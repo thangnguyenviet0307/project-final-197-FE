@@ -56,9 +56,36 @@ it("keeps the customer draft when profile save fails", async () => {
   expect(screen.getByLabelText("Tên")).toHaveProperty("value", "Draft")
 })
 
+it("selects a birth year directly and clamps leap day without stepping through calendar months", async () => {
+  let payload: Record<string, string> | undefined
+  api.defaults.adapter = async config => {
+    if (config.method === "patch") payload = JSON.parse(config.data)
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: { ...user, birthDate: "2000-02-29", ...payload } } }
+  }
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><ProfilePage /></MemoryRouter></QueryClientProvider>)
+  await screen.findByDisplayValue("2000-02-29")
+  fireEvent.change(screen.getByLabelText("Năm sinh"), { target: { value: "1999" } })
+  expect(screen.getByLabelText("Ngày sinh")).toHaveProperty("value", "1999-02-28")
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await waitFor(() => expect(payload?.birthDate).toBe("1999-02-28"))
+})
+
+it("keeps edited profile fields but refreshes untouched contact details after checkout changes the profile", async () => {
+  let phone = "0901234567"
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: { ...user, phone } } })
+  render(<QueryClientProvider client={queryClient}><MemoryRouter><ProfilePage /></MemoryRouter></QueryClientProvider>)
+  await screen.findByDisplayValue(phone)
+  fireEvent.change(screen.getByLabelText("Tên"), { target: { value: "My draft" } })
+  phone = "0987654321"
+  await queryClient.invalidateQueries({ queryKey: ["auth", "me"] })
+  await waitFor(() => expect(screen.getByLabelText("Số điện thoại")).toHaveProperty("value", phone))
+  expect(screen.getByLabelText("Tên")).toHaveProperty("value", "My draft")
+})
+
 it("saves the separate shipping address without phone or identity fields", async () => {
   let payload: Record<string, string> | undefined
   api.defaults.adapter = async config => {
+    if (config.url?.endsWith("checkout-locations")) return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ code: 79, name: "Hồ Chí Minh", wards: [{ code: 26740, name: "Bến Thành" }] }] } }
     if (config.method === "patch") {
       expect(config.url).toBe("/customer-auth/shipping-address")
       payload = JSON.parse(config.data)
@@ -71,12 +98,19 @@ it("saves the separate shipping address without phone or identity fields", async
   await screen.findByDisplayValue("buyer@example.com")
   expect(screen.queryByLabelText(/Số điện thoại/)).toBeNull()
   expect(screen.queryByLabelText(/CCCD/)).toBeNull()
-  fireEvent.change(screen.getByLabelText(/Tỉnh \/ Thành phố/), { target: { value: "Hồ Chí Minh" } })
-  fireEvent.change(screen.getByLabelText(/Phường \/ Xã/), { target: { value: "Bến Thành" } })
+  await screen.findByRole("option", { name: "Hồ Chí Minh" })
+  fireEvent.change(screen.getByLabelText("Tỉnh/Thành phố"), { target: { value: "79" } })
+  await waitFor(() => expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("false"))
+  expect(screen.queryByRole("alert")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Lưu địa chỉ" }))
+  await waitFor(() => expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("true"))
+  expect(screen.getByLabelText("Tỉnh/Thành phố").getAttribute("aria-invalid")).toBe("false")
+  fireEvent.change(screen.getByLabelText("Phường/Xã"), { target: { value: "26740" } })
+  await waitFor(() => expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("false"))
   fireEvent.change(screen.getByLabelText(/Địa chỉ chi tiết/), { target: { value: "123 Đường A" } })
   fireEvent.click(screen.getByRole("button", { name: "Lưu địa chỉ" }))
   await screen.findByText("Đã lưu địa chỉ giao hàng.")
-  expect(payload).toMatchObject({ province: "Hồ Chí Minh", ward: "Bến Thành", street: "123 Đường A", email: user.email })
+  expect(payload).toMatchObject({ addressVersion: 2, provinceCode: 79, wardCode: 26740, province: "Hồ Chí Minh", ward: "Bến Thành", street: "123 Đường A", email: user.email })
   expect(payload).not.toHaveProperty("phone")
   expect(payload?.district).toBe("")
 })

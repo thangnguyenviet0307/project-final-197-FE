@@ -28,7 +28,7 @@ const userSchema = z.object({
   if (user.accountType === "customer" ? user.role !== undefined : user.role === undefined) ctx.addIssue({ code: "custom", message: "Invalid account identity" })
 }).transform((user) => ({
   ...user,
-  name: `${user.firstName} ${user.lastName}`.trim() || user.name?.trim() || user.email,
+  name: `${user.lastName} ${user.firstName}`.trim() || user.name?.trim() || user.email,
 }))
 
 const authPath = () => getAuthArea() === "storefront" ? "/customer-auth" : "/auth"

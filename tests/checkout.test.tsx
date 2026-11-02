@@ -35,8 +35,8 @@ beforeEach(() => {
   vi.mocked(getProfile).mockImplementation(async () => savedProfile())
   seedCart()
   vi.mocked(getCheckoutLocations).mockResolvedValue([
-    { code: 1, name: "Tỉnh A", districts: [{ code: 2, name: "Huyện B", wards: [{ code: 3, name: "Xã C" }] }, { code: 7, name: "Huyện G", wards: [{ code: 8, name: "Xã H" }] }] },
-    { code: 4, name: "Tỉnh D", districts: [{ code: 5, name: "Huyện E", wards: [{ code: 6, name: "Xã F" }] }] },
+    { code: 1, name: "Tỉnh A", wards: [{ code: 3, name: "Xã C" }, { code: 8, name: "Xã H" }] },
+    { code: 4, name: "Tỉnh D", wards: [{ code: 6, name: "Xã F" }] },
   ])
 })
 function mount() {
@@ -111,11 +111,40 @@ it("shows an expired reservation as a rejected checkout, preserves the cart and 
   expect(createCheckout).toHaveBeenCalledTimes(2)
 })
 async function fillAddress() {
+  fireEvent.change(screen.getByLabelText("Email nhận hàng"), { target: { value: "test@example.com" } })
   await screen.findByRole("option", { name: "Tỉnh A" })
   fireEvent.change(screen.getByLabelText("Tỉnh/Thành phố"), { target: { value: "1" } })
   fireEvent.change(screen.getByLabelText("Phường/Xã"), { target: { value: "3" } })
   fireEvent.change(screen.getByLabelText("Địa chỉ nhà"), { target: { value: "12 Đường A" } })
 }
+it("shows required locality errors only after submission and clears them after correction", async () => {
+  mount()
+  await screen.findByRole("option", { name: "Tỉnh A" })
+  fireEvent.change(screen.getByLabelText("Tỉnh/Thành phố"), { target: { value: "1" } })
+  await act(async () => {})
+  expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("false")
+  expect(screen.queryByRole("alert")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
+  await waitFor(() => expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("true"))
+  fireEvent.change(screen.getByLabelText("Phường/Xã"), { target: { value: "3" } })
+  await waitFor(() => expect(screen.getByLabelText("Phường/Xã").getAttribute("aria-invalid")).toBe("false"))
+  expect(createCheckout).not.toHaveBeenCalled()
+})
+
+it("requires a guest email on submit while preserving the delivery draft", async () => {
+  useAuthStore.setState({ user: null, isAuthenticated: false })
+  seedCart()
+  mount()
+  await fillAddress()
+  fireEvent.change(screen.getByLabelText("Tên người nhận"), { target: { value: "Guest" } })
+  fireEvent.change(screen.getByLabelText("Số điện thoại người nhận"), { target: { value: "0901234567" } })
+  fireEvent.change(screen.getByLabelText("Email nhận hàng"), { target: { value: "" } })
+  expect(screen.getByLabelText("Email nhận hàng").getAttribute("aria-invalid")).toBe("false")
+  fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
+  await waitFor(() => expect(screen.getByLabelText("Email nhận hàng").getAttribute("aria-invalid")).toBe("true"))
+  expect(createCheckout).not.toHaveBeenCalled()
+  expect(screen.getByLabelText("Tên người nhận")).toHaveProperty("value", "Guest")
+})
 it("validates recipient fields without sending invalid orders and resets dependent address selections", async () => {
   mount()
   await fillAddress()
@@ -139,14 +168,28 @@ it("loads the latest saved profile and resolves the complete delivery address", 
   expect(screen.getByLabelText("Địa chỉ nhà")).toHaveProperty("value", "99 Đường B")
 })
 
-it("selects wards across the province and derives the district for checkout", async () => {
+it("selects a current ward and submits a v2 address without a district", async () => {
   vi.mocked(createCheckout).mockResolvedValue({ _id: "order", orderCode: "ORD-ABC234", totalAmount: 200000, orderStatus: 1 })
   mount()
   await fillAddress()
   fireEvent.change(screen.getByLabelText("Phường/Xã"), { target: { value: "8" } })
   fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
   await screen.findByText("Đặt hàng thành công")
-  expect(vi.mocked(createCheckout).mock.calls[0][0]).toMatchObject({ provinceCode: 1, districtCode: 7, wardCode: 8 })
+  expect(vi.mocked(createCheckout).mock.calls[0][0]).toMatchObject({ provinceCode: 1, addressVersion: 2, wardCode: 8 })
+  expect(vi.mocked(createCheckout).mock.calls[0][0]).not.toHaveProperty("districtCode")
+})
+
+it("requires explicit v2 reselection after an uncommitted old checkout is rejected", async () => {
+  const old = { requestId: crypto.randomUUID(), recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, districtCode: 2, wardCode: 3, street: "12 Đường A", note: "", paymentMethod: "cod", items: [{ productId: product._id, quantity: 2, expectedUnitPrice: 100000 }] }
+  sessionStorage.setItem("storefront-pending-checkout-v1:customer", JSON.stringify(old))
+  vi.mocked(createCheckout).mockRejectedValue(new AxiosError("Old address", "ERR_BAD_REQUEST", undefined, undefined, { config: { headers: new AxiosHeaders() }, status: 400, statusText: "Bad Request", headers: new AxiosHeaders(), data: { message: "Vui lòng chọn lại địa chỉ mới." } }))
+  mount()
+  fireEvent.click(await screen.findByRole("button", { name: "Thử lại" }))
+  await screen.findByRole("button", { name: "Thanh toán" })
+  expect(screen.getByLabelText("Tỉnh/Thành phố")).toHaveProperty("value", "")
+  expect(screen.getByLabelText("Phường/Xã")).toHaveProperty("value", "")
+  expect(sessionStorage.getItem("storefront-pending-checkout-v1:customer")).toBeNull()
+  expect(createCheckout).toHaveBeenCalledTimes(1)
 })
 
 it("preserves edited checkout fields when the saved profile arrives later", async () => {
@@ -168,7 +211,7 @@ it("submits selected lines only, shows server confirmation and retains unselecte
   await fillAddress()
   fireEvent.click(screen.getByRole("button", { name: "Thanh toán" }))
   await screen.findByText("Đặt hàng thành công")
-  expect(vi.mocked(createCheckout).mock.calls[0][0]).toMatchObject({ recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, districtCode: 2, wardCode: 3, paymentMethod: "cod", items: [{ productId: product._id, quantity: 2, expectedUnitPrice: 100000 }] })
+  expect(vi.mocked(createCheckout).mock.calls[0][0]).toMatchObject({ recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, addressVersion: 2, wardCode: 3, paymentMethod: "cod", items: [{ productId: product._id, quantity: 2, expectedUnitPrice: 100000 }] })
   expect(useCartStore.getState().items.map(item => item.productId)).toEqual([other._id])
   expect(invalidation).toHaveBeenCalledWith({ queryKey: ["orders"] })
   expect(invalidation).toHaveBeenCalledWith({ queryKey: ["products"] })

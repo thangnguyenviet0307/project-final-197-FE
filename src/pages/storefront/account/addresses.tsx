@@ -1,4 +1,8 @@
-import { useForm } from "react-hook-form"
+import { useEffect } from "react"
+import { LocalityFields } from "@/features/checkout/components/locality-fields"
+import { useCheckoutLocations } from "@/features/checkout/hooks/use-checkout"
+import { checkoutValuesFromProfile } from "@/features/checkout/utils/checkout-profile"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useProfile } from "@/features/profile/hooks/use-profile"
 import { useShippingAddress } from "@/features/profile/hooks/use-shipping-address"
@@ -15,20 +19,40 @@ function AddressEditor({ user }: { user: User }) {
     recipientName: `${user.lastName} ${user.firstName}`.trim(), email: user.email,
     province: user.address?.state ?? "", ward: user.address?.city ?? "", street: user.address?.street ?? "", deliveryTime: "",
   } })
+  useEffect(() => {
+    form.reset(user.shippingAddress ?? { recipientName: `${user.lastName} ${user.firstName}`.trim(), email: user.email, province: user.address?.state ?? "", ward: user.address?.city ?? "", street: user.address?.street ?? "", deliveryTime: "" }, { keepDirtyValues: true })
+  }, [user, form])
+  const locations = useCheckoutLocations()
+  const { dirtyFields } = form.formState
+  useEffect(() => {
+    if (dirtyFields.province || dirtyFields.ward || dirtyFields.provinceCode || dirtyFields.wardCode) return
+    const saved = checkoutValuesFromProfile(user, locations.data)
+    form.setValue("provinceCode", saved.provinceCode ? Number(saved.provinceCode) : undefined)
+    form.setValue("wardCode", saved.wardCode ? Number(saved.wardCode) : undefined)
+  }, [user, locations.data, dirtyFields, form])
+  const [provinceCodeValue, wardCodeValue] = useWatch({ control: form.control, name: ["provinceCode", "wardCode"] })
   const navigation = useUnsavedForm(form.formState.isDirty)
   const mutation = useShippingAddress({ onSuccess: saved => {
     if (saved.shippingAddress) form.reset(saved.shippingAddress)
   }, onError: error => { form.setError("root", { message: getApiError(error).message }) } })
   return <><form noValidate className="space-y-6" onSubmit={form.handleSubmit(values => {
     form.clearErrors()
-    const localityChanged = form.formState.dirtyFields.province || form.formState.dirtyFields.ward
-    mutation.mutate(localityChanged ? { ...values, district: "" } : values)
+    const province = locations.data?.find(item => item.code === values.provinceCode)
+    const ward = province?.wards?.find(item => item.code === values.wardCode)
+    if (!province || !ward) { form.setError("ward", { message: "Vui lòng chọn tỉnh/thành và phường/xã hiện hành." }); return }
+    mutation.mutate({ ...values, addressVersion: 2, district: "", province: province.name, ward: ward.name })
   })}>
     <div className="border-b border-gray-200 pb-5"><h2 className="text-2xl font-bold">Địa chỉ của tôi</h2><p className="mt-2 text-sm text-gray-500">Lưu địa chỉ nhận hàng cho những lần mua sắm tiếp theo.</p></div>
     <fieldset disabled={mutation.isPending} className="grid gap-5 sm:grid-cols-2">
+      <LocalityFields idPrefix="shipping" provinceCode={String(provinceCodeValue ?? "")} wardCode={String(wardCodeValue ?? "")} provinceError={form.formState.errors.province?.message} wardError={form.formState.errors.ward?.message} onChange={(provinceCode, wardCode) => {
+        const province = locations.data?.find(item => String(item.code) === provinceCode)
+        const ward = province?.wards?.find(item => String(item.code) === wardCode)
+        form.setValue("provinceCode", provinceCode ? Number(provinceCode) : undefined, { shouldDirty: true })
+        form.setValue("wardCode", wardCode ? Number(wardCode) : undefined, { shouldDirty: true })
+        form.setValue("province", province?.name ?? "", { shouldDirty: true })
+        form.setValue("ward", ward?.name ?? "", { shouldDirty: true, shouldValidate: form.formState.isSubmitted })
+      }} />
       {([
-        ["province", "Tỉnh / Thành phố", "Ví dụ: Thành phố Hồ Chí Minh", "address-level1"],
-        ["ward", "Phường / Xã", "Nhập phường hoặc xã", "address-level2"],
         ["recipientName", "Tên người nhận", "Nhập họ và tên người nhận", "name"],
         ["email", "Email nhận hàng", "Nhập email nhận thông tin giao hàng", "email"],
         ["street", "Địa chỉ chi tiết", "Số nhà, tên đường, tòa nhà…", "street-address"],

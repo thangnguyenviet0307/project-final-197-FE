@@ -203,7 +203,7 @@ const checkoutService = evaluate(path.join(root, "src/features/checkout/services
   } }
   throw new Error(`Unsupported checkout service import: ${specifier}`)
 })
-await checkoutService.createCheckout({ requestId: webcrypto.randomUUID(), recipientName: "Nguyễn An", phone: "0901234567", provinceCode: 1, districtCode: 2, wardCode: 3, street: "12 Đường A", note: "", paymentMethod: "cod", items: [{ productId: id, quantity: 2, expectedUnitPrice: 100000 }] })
+await checkoutService.createCheckout({ requestId: webcrypto.randomUUID(), recipientName: "Nguyễn An", phone: "0901234567", addressVersion: 2, provinceCode: 1, wardCode: 3, street: "12 Đường A", note: "", paymentMethod: "cod", items: [{ productId: id, quantity: 2, expectedUnitPrice: 100000 }] })
 const adminOrderAddress = evaluate(path.join(root, "src/features/orders/schemas/admin-order-schema.ts"), specifier => {
   if (specifier === "zod") return require("zod")
   throw new Error(`Unsupported order schema import: ${specifier}`)

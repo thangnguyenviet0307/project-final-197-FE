@@ -7,6 +7,9 @@ export interface ICustomer {
   last_name: string
   phone: string
   email: string
+  displayName?: string
+  customerType?: "registered" | "guest"
+  contactSource?: "guest"
   birthDate?: string
   gender?: "" | "male" | "female" | "other"
   shippingAddress?: ShippingAddressValues

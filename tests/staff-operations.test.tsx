@@ -30,7 +30,7 @@ function mockApi() {
   const writes = vi.fn()
   api.defaults.adapter = async config => {
     if (config.method !== "get") writes(config.method, config.url, JSON.parse(config.data))
-    const data = config.url === "/customers" ? [{ _id: customerId, firstName: "Jane", lastName: "Doe", email: "jane@example.com", phone: "0123456789", address: { street: "Street", city: "City", state: "State" } }]
+    const data = (config.url === "/customers" || config.url === "/customers/accounts") ? [{ _id: customerId, firstName: "Jane", lastName: "Doe", email: "jane@example.com", phone: "0123456789", address: { street: "Street", city: "City", state: "State" } }]
       : config.url === "/products" ? [{ _id: id, product_name: "Phone", is_active: true, price: 100, stock: 5, variants: [] }]
       : { _id: id }
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data, pagination: { page: 1, limit: 20, total: 1, totalPages: 1 } } }

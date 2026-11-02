@@ -15,7 +15,7 @@ function displayDate(value?: string) {
 
 export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
   const [open, setOpen] = useState(false)
-  const name = `${customer.first_name} ${customer.last_name}`.trim()
+  const name = customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()
   const details = [
     ["Mã khách hàng", customer._id], ["Họ và tên", name],
     ["Email", customer.email], ["Số điện thoại", customer.phone],
@@ -30,6 +30,7 @@ export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
     <Button type="button" variant="ghost" size="sm" aria-label={`Xem ${name}`} onClick={() => setOpen(true)}><Eye className="size-4" />Xem</Button>
     <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-lg">
       <DialogHeader><DialogTitle>Hồ sơ khách hàng</DialogTitle><DialogDescription>Thông tin chi tiết của {name || customer.email}.</DialogDescription></DialogHeader>
+        {customer.contactSource === "guest" && <p className="text-sm text-muted-foreground">Thông tin nhận hàng cập nhật từ đơn không đăng nhập, chưa xác minh danh tính. Hồ sơ đăng nhập được giữ riêng.</p>}
       <div className="flex min-w-0 items-center gap-4 rounded-lg bg-muted/50 p-4">
         <UserAvatar name={name || customer.email} className="size-14" />
         <div className="min-w-0"><p className="wrap-break-word text-lg font-semibold">{name || "Chưa cung cấp"}</p><p className="break-all text-sm text-muted-foreground">{customer.email}</p></div>

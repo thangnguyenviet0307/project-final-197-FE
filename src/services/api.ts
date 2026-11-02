@@ -6,7 +6,7 @@ import type { ApiResponse } from "@/types/api"
 import type { TokenPair } from "@/features/auth/types/auth"
 import { resolveApiBaseUrl } from "@/services/api-base-url"
 
-const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1", typeof window === "undefined" ? undefined : window.location.origin)
+const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1", typeof window === "undefined" ? undefined : window.location.origin, import.meta.env.PROD)
 export const api = axios.create({ baseURL, timeout: 15_000, withCredentials: true })
 // Auth endpoints use an isolated client so login/refresh errors never recursively refresh.
 export const authApi = axios.create({ baseURL, timeout: 15_000, withCredentials: true })

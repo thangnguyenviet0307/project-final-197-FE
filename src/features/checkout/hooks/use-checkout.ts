@@ -6,7 +6,7 @@ import { getStoreProduct } from "@/features/storefront/services/catalog.service"
 import { getApiError } from "@/services/api"
 
 export function useCheckoutLocations() {
-  return useQuery({ queryKey: ["checkout-locations", "legacy-v1"], queryFn: ({ signal }) => getCheckoutLocations(signal), staleTime: 24 * 60 * 60 * 1000 })
+  return useQuery({ queryKey: ["checkout-locations", "current-v2"], queryFn: ({ signal }) => getCheckoutLocations(signal), staleTime: 24 * 60 * 60 * 1000 })
 }
 export function useCheckout() {
   const client = useQueryClient()

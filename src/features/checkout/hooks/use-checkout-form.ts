@@ -24,13 +24,13 @@ export function useCheckoutForm(customer: User | null) {
   const needsRecovery = recoveryRequest !== null
   const form = useForm<CheckoutRecipient>({
     resolver: zodResolver(checkoutRecipientSchema),
-    defaultValues: restored ? { ...restored, provinceCode: String(restored.provinceCode), districtCode: String(restored.districtCode), wardCode: String(restored.wardCode) } : checkoutValuesFromProfile(customer),
+    defaultValues: restored ? { ...restored, email: restored.email ?? "", provinceCode: String(restored.provinceCode), districtCode: String(restored.districtCode ?? ""), wardCode: String(restored.wardCode) } : checkoutValuesFromProfile(customer),
   })
   const { dirtyFields } = form.formState
   function restoreRequest(request: CheckoutRequest) {
     attempt.current = request
     setRecoveryRequest(request)
-    form.reset({ ...request, provinceCode: String(request.provinceCode), districtCode: String(request.districtCode), wardCode: String(request.wardCode) })
+    form.reset({ ...request, email: request.email ?? "", provinceCode: String(request.provinceCode), districtCode: String(request.districtCode ?? ""), wardCode: String(request.wardCode) })
   }
   function retryPendingStorage() {
     const state = readPendingCheckout(scope)
@@ -56,6 +56,7 @@ export function useCheckoutForm(customer: User | null) {
     if (customer && (useAuthStore.getState().user?.accountType !== "customer" || useAuthStore.getState().user?.id !== customer.id)) { form.setError("root", { message: "Vui lòng đăng nhập tài khoản khách hàng để đặt hàng." }); return }
     const items = useCartStore.getState().items.filter(item => item.selected)
     if (!attempt.current) {
+      if (!customer && !values.email) { form.setError("email", { message: "Vui lòng nhập email nhận hàng." }); return }
       const state = readPendingCheckout(scope)
       if (state.status === "pending") { restoreRequest(state.request); return }
       if (state.status !== "empty") { setStorageProblem(state.status); return }
@@ -63,9 +64,10 @@ export function useCheckoutForm(customer: User | null) {
       if (items.length > 100) { form.setError("root", { message: "Mỗi đơn hàng tối đa 100 dòng sản phẩm. Vui lòng chia thành các đơn nhỏ hơn." }); return }
       if (items.some(item => item.unavailableReason)) { form.setError("root", { message: "Vui lòng xử lý sản phẩm không khả dụng trong giỏ hàng trước khi đặt." }); return }
       const province = locations.data?.find(item => String(item.code) === values.provinceCode)
-      const district = province?.districts.find(item => String(item.code) === values.districtCode)
-      if (!district?.wards.some(item => String(item.code) === values.wardCode)) { form.setError("wardCode", { message: "Vui lòng chọn lại địa chỉ nhận hàng hợp lệ." }); return }
-      attempt.current = { ...values, provinceCode: Number(values.provinceCode), districtCode: Number(values.districtCode), wardCode: Number(values.wardCode), paymentMethod: "cod", requestId: crypto.randomUUID(), items: items.map(item => ({ productId: item.productId, ...(item.variantKey ? { variantId: item.variantKey } : {}), quantity: item.quantity, expectedUnitPrice: item.unitPrice })) }
+      const wards = province?.wards
+      if (!wards?.some(item => String(item.code) === values.wardCode)) { form.setError("wardCode", { message: "Vui lòng chọn lại địa chỉ nhận hàng hợp lệ." }); return }
+      const recipient = { recipientName: values.recipientName, phone: values.phone, ...(values.email ? { email: values.email } : {}), street: values.street, note: values.note }
+      attempt.current = { ...recipient, addressVersion: 2, provinceCode: Number(values.provinceCode), wardCode: Number(values.wardCode), paymentMethod: "cod", requestId: crypto.randomUUID(), items: items.map(item => ({ productId: item.productId, ...(item.variantKey ? { variantId: item.variantKey } : {}), quantity: item.quantity, expectedUnitPrice: item.unitPrice })) }
     }
     try { savePendingCheckout(scope, attempt.current) }
     catch (error) {
@@ -82,9 +84,13 @@ export function useCheckoutForm(customer: User | null) {
       setRecoveryRequest(null)
     } catch (error) {
       const failure = getApiError(error)
+      const needsCurrentAddress = failure.statusCode === 400 && attempt.current?.addressVersion !== 2
       const uncertain = failure.statusCode === 0 || failure.statusCode === 408 || failure.statusCode >= 500 || (needsRecovery && [401, 403, 429].includes(failure.statusCode))
       setRecoveryRequest(uncertain ? attempt.current : null)
       if (!uncertain) { if (attempt.current) clearPendingCheckout(scope, attempt.current.requestId); attempt.current = null }
+      if (needsCurrentAddress) {
+        for (const field of ["provinceCode", "wardCode", "districtCode"] as const) form.setValue(field, "", { shouldDirty: true })
+      }
       form.setError("root", { message: uncertain ? "Chưa xác nhận được kết quả đặt hàng. Bấm Thử lại để kiểm tra cùng yêu cầu, tránh tạo trùng đơn. Bạn cũng có thể kiểm tra lịch sử đơn hàng." : failure.message })
       failure.errors?.forEach(issue => {
         if (issue.field in values) form.setError(issue.field as keyof CheckoutRecipient, { message: issue.message })

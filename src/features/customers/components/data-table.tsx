@@ -104,7 +104,7 @@ function DeleteCustomerDialog({
         variant="ghost"
         size="icon"
         className="h-8 w-8 cursor-pointer text-destructive"
-        aria-label={`Xóa ${customer.first_name} ${customer.last_name}`}
+        aria-label={`Xóa ${customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()}`}
         onClick={() => setOpen(true)}
       >
         <Trash2 className="size-4" />
@@ -119,7 +119,7 @@ function DeleteCustomerDialog({
           <AlertDialogDescription>
             Bạn có chắc chắn muốn xóa khách hàng{" "}
             <strong>
-              {customer.first_name} {customer.last_name}
+              {customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()}
             </strong>{" "}
             không?
           </AlertDialogDescription>
@@ -220,9 +220,9 @@ export function CustomerTable({
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium">
-                        {customer.first_name}{" "}
-                        {customer.last_name}
+                        {customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()}
                       </span>
+                      {customer.customerType === "guest" && <span className="text-xs text-muted-foreground">Khách vãng lai · Không có tài khoản</span>}
 
                     </div>
                   </TableCell>

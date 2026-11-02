@@ -49,6 +49,20 @@ it("exposes no administrative customer creation method", () => {
   expect(Object.hasOwn(customersService, "createCustomer")).toBe(false)
 })
 
+it("displays a guest CRM contact and links its administrative order history", async () => {
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
+    data: [{ ...customer, firstName: "", lastName: "", displayName: "Guest Buyer", customerType: "guest", contactSource: "guest" }],
+    pagination: { page: 1, limit: 10, total: 1, totalPages: 1 },
+  } })
+  setup(<CustomersPage />, "/auth/customers")
+  expect(await screen.findByText("Guest Buyer")).toBeTruthy()
+  expect(screen.getByText(/Khách vãng lai/)).toBeTruthy()
+  const link = screen.getAllByRole("link").find(item => item.getAttribute("href")?.includes(customer._id))
+  expect(link?.getAttribute("href")).toContain(`customerId=${customer._id}`)
+  fireEvent.click(screen.getByRole("button", { name: "Xem Guest Buyer" }))
+  expect(await screen.findByText(/chưa xác minh danh tính/)).toBeTruthy()
+})
+
 it("shows newly registered contacts in the single contact list without an account section", async () => {
   const requests: string[] = []
   api.defaults.adapter = async config => {
@@ -90,7 +104,7 @@ it("maps current customer profile and shipping data into the administrative tabl
   const table = await screen.findByRole("table", { name: "Hồ sơ khách hàng" })
   for (const value of ["29/02/2000", "Nữ", "0901234567", "Người nhận mới", "shipping@example.com", "K19A/25 Hà Huy Tập, Thanh Khê, Đà Nẵng", "Sáng mỗi ngày"]) expect(within(table).getByText(value)).toBeTruthy()
   expect(within(table).queryByText("One, Tỉnh/thành phố, Bang/khu vực")).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "Xem An Nguyen" }))
+  fireEvent.click(screen.getByRole("button", { name: "Xem Nguyen An" }))
   const dialog = await screen.findByRole("dialog", { name: "Hồ sơ khách hàng" })
   expect(within(dialog).getByText("Nữ")).toBeTruthy()
   expect(within(dialog).getByText("shipping@example.com")).toBeTruthy()
@@ -137,7 +151,7 @@ it("has no create action and permits existing customer deletion only after confi
   setup(<CustomersPage />)
   await screen.findByText("an@example.com")
   expect(screen.queryByRole("button", { name: /Thêm khách hàng/ })).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "Xóa An Nguyen" }))
+  fireEvent.click(screen.getByRole("button", { name: "Xóa Nguyen An" }))
   fireEvent.click(await screen.findByRole("button", { name: "Xóa khách hàng" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", `/customers/${customer._id}`, undefined))
 })
@@ -148,10 +162,10 @@ it.each(["admin", "staff"] as const)("%s can inspect customer details without ch
   setup(<CustomersPage />)
   await screen.findByText("an@example.com")
   expect(screen.queryByRole("checkbox")).toBeNull()
-  expect(screen.queryByRole("button", { name: "Chỉnh sửa An Nguyen" })).toBeNull()
-  if (role === "admin") expect(screen.getByRole("button", { name: "Xóa An Nguyen" })).toBeTruthy()
-  else expect(screen.queryByRole("button", { name: "Xóa An Nguyen" })).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "Xem An Nguyen" }))
+  expect(screen.queryByRole("button", { name: "Chỉnh sửa Nguyen An" })).toBeNull()
+  if (role === "admin") expect(screen.getByRole("button", { name: "Xóa Nguyen An" })).toBeTruthy()
+  else expect(screen.queryByRole("button", { name: "Xóa Nguyen An" })).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Xem Nguyen An" }))
   const dialog = await screen.findByRole("dialog", { name: "Hồ sơ khách hàng" })
   expect(within(dialog).getByText("0901234567")).toBeTruthy()
   expect(within(dialog).getByText("One, Tỉnh/thành phố, Bang/khu vực")).toBeTruthy()
@@ -235,7 +249,7 @@ it("keeps the customer delete dialog open when an order reference prevents delet
   mockApi("customers", true)
   setup(<CustomersPage />)
   await screen.findByText("an@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Xóa An Nguyen" }))
+  fireEvent.click(screen.getByRole("button", { name: "Xóa Nguyen An" }))
   fireEvent.click(await screen.findByRole("button", { name: "Xóa khách hàng" }))
   expect(await within(screen.getByRole("alertdialog")).findByRole("alert")).toBeTruthy()
 })

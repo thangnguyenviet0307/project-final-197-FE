@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/auth.store"
 import { queryClient } from "@/services/query-client"
 import type { User } from "@/features/auth/types/auth"
 
-const user: User = { id: "a", name: "Test User", firstName: "Test", lastName: "User", email: "test@example.com", role: "staff", mustChangePassword: false }
+const user: User = { id: "a", name: "User Test", firstName: "Test", lastName: "User", email: "test@example.com", role: "staff", mustChangePassword: false }
 const oldTokens = { accessToken: "old-access", refreshToken: "old-refresh" }
 const newTokens = { accessToken: "new-access", refreshToken: "new-refresh" }
 const response = (config: InternalAxiosRequestConfig, data: unknown, status = 200) => ({ data, status, statusText: "", headers: new AxiosHeaders(), config })
@@ -27,6 +27,11 @@ afterEach(() => {
 })
 
 describe("auth API/session", () => {
+  it("displays Vietnamese family name before given name without changing stored fields", async () => {
+    authApi.defaults.adapter = async config => response(config, { data: { ...newTokens, user: { ...user, accountType: "customer", role: undefined, firstName: "Ý Nhân", lastName: "Hắc" } } })
+    const saved = await login({ email: user.email, password: "Password123" }, true)
+    expect(saved).toMatchObject({ name: "Hắc Ý Nhân", firstName: "Ý Nhân", lastName: "Hắc" })
+  })
   it("accepts a Super Admin login without downgrading the role", async () => {
     authApi.defaults.adapter = async config => response(config, { data: {
       ...newTokens, user: { ...user, role: "super_admin", accountType: "user" },
@@ -142,7 +147,7 @@ describe("auth API/session", () => {
     api.defaults.adapter = vi.fn(async (config) => response(config, { data: { ...user, role: "admin" } }))
     await Promise.all([initializeSession(), initializeSession()])
     expect(api.defaults.adapter).toHaveBeenCalledTimes(1)
-    expect(useAuthStore.getState()).toMatchObject({ isLoading: false, isAuthenticated: true, user: { role: "admin", name: "Test User" } })
+    expect(useAuthStore.getState()).toMatchObject({ isLoading: false, isAuthenticated: true, user: { role: "admin", name: "User Test" } })
   })
 
   it("persists only a session marker and never credentials or a cached role", () => {

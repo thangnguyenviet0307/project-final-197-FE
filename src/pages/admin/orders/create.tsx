@@ -24,7 +24,7 @@ export default function CreateOrderPage() {
   const [dirty, setDirty] = useState(false)
   const [inputError, setInputError] = useState("")
   const navigation = useUnsavedForm(dirty)
-  const customers = useQuery({ queryKey: ["customers", "order-picker", customerSearch, customerPage], queryFn: ({ signal }) => customersService.getCustomers({ search: customerSearch, page: customerPage, limit: 20 }, signal) })
+  const customers = useQuery({ queryKey: ["customers", "order-picker", customerSearch, customerPage], queryFn: ({ signal }) => customersService.getCustomers({ search: customerSearch, page: customerPage, limit: 20, accountsOnly: true }, signal) })
   const products = useProducts({ search: productSearch, page: productPage, limit: 20 })
   const mutation = useMutation({ mutationFn: async (input: AdminOrderInput) => {
     const { data } = await api.post<{ data: { _id: string } }>("/orders", input)

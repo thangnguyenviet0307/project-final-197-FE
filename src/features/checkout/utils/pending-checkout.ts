@@ -2,11 +2,12 @@ import { z } from "zod"
 import { checkoutRecipientSchema } from "@/features/checkout/schemas/checkout-schema"
 import type { CheckoutRequest } from "@/features/checkout/types/checkout"
 
-const requestSchema = checkoutRecipientSchema.omit({ provinceCode: true, districtCode: true, wardCode: true }).extend({
-  provinceCode: z.number().int().positive(), districtCode: z.number().int().positive(), wardCode: z.number().int().positive(),
+const requestSchema = checkoutRecipientSchema.omit({ email: true, provinceCode: true, districtCode: true, wardCode: true }).extend({
+  provinceCode: z.number().int().positive(), districtCode: z.number().int().positive().optional(), addressVersion: z.literal(2).optional(), wardCode: z.number().int().positive(),
+  email: z.string().trim().email().max(254).optional(),
   requestId: z.uuid(), paymentMethod: z.literal("cod"),
   items: z.array(z.object({ productId: z.string().min(1), variantId: z.string().min(1).optional(), quantity: z.number().int().positive(), expectedUnitPrice: z.number().nonnegative() })).min(1).max(100),
-})
+}).refine(input => input.addressVersion === 2 || input.districtCode !== undefined)
 const key = (customerId: string) => `storefront-pending-checkout-v1:${customerId}`
 
 // Session storage survives reload/navigation in this tab. No credentials are saved.
