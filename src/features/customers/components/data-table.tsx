@@ -182,17 +182,17 @@ export function CustomerTable({
   const visibleCustomers = customers
 
   return (
-    <div className="w-full space-y-4">
+    <div className="min-w-0 w-full space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Tổng cộng: {total} khách hàng</p>
       </div>
-      <form aria-label="Bộ lọc khách hàng" className="grid items-end gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={event => { event.preventDefault(); onSearch(searchValue) }}>
-        <Field className="lg:col-span-2"><FieldLabel htmlFor="customer-search">Tên, email hoặc số điện thoại</FieldLabel><Input id="customer-search" aria-label="Tìm khách hàng" placeholder="Tìm khách hàng..." value={searchValue} onChange={event => { setSearchValue(event.target.value); if (!event.target.value.trim() && searchQuery) onSearch("") }} /></Field>
-        <Field><FieldLabel htmlFor="customer-status">Trạng thái</FieldLabel><select id="customer-status" className="h-8 rounded-md border bg-background px-2 text-sm" value={status} onChange={event => onStatusChange?.(event.target.value === "active" ? "active" : event.target.value === "inactive" ? "inactive" : "all")}><option value="all">Tất cả trạng thái</option><option value="active">Đang hoạt động</option><option value="inactive">Ngừng hoạt động</option></select></Field>
-        <div className="flex gap-2"><Button type="submit" variant="outline"><Search />Tìm kiếm</Button><Button type="button" variant="outline" onClick={() => { setSearchValue(""); if (onResetFilters) onResetFilters(); else onSearch("") }}>Đặt lại</Button></div>
+      <form aria-label="Bộ lọc khách hàng" className="grid items-end gap-4 rounded-lg border p-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4" onSubmit={event => { event.preventDefault(); onSearch(searchValue) }}>
+        <Field className="min-w-0 @xl/main:col-span-2"><FieldLabel htmlFor="customer-search">Tên, email hoặc số điện thoại</FieldLabel><Input id="customer-search" aria-label="Tìm khách hàng" placeholder="Tìm khách hàng..." value={searchValue} onChange={event => { setSearchValue(event.target.value); if (!event.target.value.trim() && searchQuery) onSearch("") }} /></Field>
+        <Field><FieldLabel htmlFor="customer-status">Trạng thái</FieldLabel><select id="customer-status" className="h-8 min-w-0 w-full rounded-md border bg-background px-2 text-sm" value={status} onChange={event => onStatusChange?.(event.target.value === "active" ? "active" : event.target.value === "inactive" ? "inactive" : "all")}><option value="all">Tất cả trạng thái</option><option value="active">Đang hoạt động</option><option value="inactive">Ngừng hoạt động</option></select></Field>
+        <div className="flex flex-wrap gap-2 [&>button]:flex-1"><Button type="submit" variant="outline"><Search />Tìm kiếm</Button><Button type="button" variant="outline" onClick={() => { setSearchValue(""); if (onResetFilters) onResetFilters(); else onSearch("") }}>Đặt lại</Button></div>
       </form>
       {/* Bảng Customers */}
-      <div className="overflow-x-auto rounded-md border">
+      <div className="min-w-0 rounded-md border">
         <Table aria-label="Hồ sơ khách hàng">
           <TableHeader>
             <TableRow>

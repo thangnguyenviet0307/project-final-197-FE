@@ -15,7 +15,7 @@ export function CustomerStatistics() {
   const queries = useCustomerStatistics()
   const failed = queries.find(query => query.isError)
   return <div className="space-y-3">
-    <section aria-label="Thống kê khách hàng" className="grid gap-4 sm:grid-cols-3" aria-busy={queries.some(query => query.isFetching)}>
+    <section aria-label="Thống kê khách hàng" className="grid min-w-0 gap-4 @2xl/main:grid-cols-3" aria-busy={queries.some(query => query.isFetching)}>
       {cards.map(({ label, Icon }, index) => <Card key={label}>
         <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle><Icon className="size-5 text-muted-foreground" /></CardHeader>
         <CardContent>{queries[index].isPending ? <Skeleton className="h-8 w-16" /> : <p className="text-2xl font-bold tabular-nums">{queries[index].isError ? "—" : queries[index].data?.toLocaleString("vi-VN") ?? "—"}</p>}</CardContent>

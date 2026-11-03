@@ -25,7 +25,7 @@ export default function CustomersPage() {
     setParams(previous => { const nextParams = new URLSearchParams(previous); nextParams.set("page", String(next)); return nextParams })
   }
   return <BaseLayout title="Khách hàng" description="Quản lý hồ sơ liên hệ của khách hàng, bao gồm khách đăng ký trên website.">
-    <div className="space-y-4 px-4 lg:px-6">
+    <div className="min-w-0 space-y-4 px-4 lg:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-semibold">Hồ sơ liên hệ</h2><Button variant="outline" disabled={query.isFetching} onClick={() => void query.refetch()}>{query.isFetching ? "Đang cập nhật…" : "Làm mới danh sách"}</Button></div>
       <CustomerStatistics />
       {success && <p role="status">{success}</p>}

@@ -148,12 +148,12 @@ export function StoreDepartmentsMenu() {
         }}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex h-14 w-full items-center justify-between rounded-t-lg bg-black px-5 text-white transition-colors hover:bg-[#171717]"
+        className="relative flex h-14 w-full items-center justify-center rounded-t-lg bg-black px-12 text-white transition-colors hover:bg-[#171717] lg:justify-between lg:px-5"
       >
         <span className="text-sm font-bold uppercase tracking-wider">
           DANH MỤC SẢN PHẨM
         </span>
-        <Menu size={23} />
+        <Menu size={23} className="absolute right-5 shrink-0 lg:static" />
       </button>
 
       {open && (
