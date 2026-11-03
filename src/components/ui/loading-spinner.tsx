@@ -18,10 +18,10 @@ export function LoadingSpinner({
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[200px]">
+    <div className="flex min-h-[200px] items-center justify-center">
       <div
         className={cn(
-          'animate-spin rounded-full border-b-2 border-primary',
+          'border-primary animate-spin rounded-full border-b-2',
           sizeClasses[size],
           className
         )}

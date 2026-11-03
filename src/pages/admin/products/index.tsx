@@ -200,7 +200,7 @@ export default function AdminProductsPage() {
             {stats.map(({ label, value, Icon, color }) => (
               <Card key={label}>
                 <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-                  <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+                  <CardTitle className="text-muted-foreground text-xs font-medium uppercase">
                     {label}
                   </CardTitle>
                   <Icon className={`size-4 shrink-0 ${color}`} />
@@ -213,7 +213,7 @@ export default function AdminProductsPage() {
                       (value ?? '—')
                     )}
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Toàn bộ danh mục
                   </p>
                 </CardContent>
@@ -221,7 +221,7 @@ export default function AdminProductsPage() {
             ))}
           </section>
           {statistics.isError && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               Không thể tải thống kê danh mục sản phẩm.{' '}
               <Button
                 variant="outline"
@@ -232,7 +232,7 @@ export default function AdminProductsPage() {
             </p>
           )}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {pagination
                 ? `${pagination.total} products`
                 : 'Danh sách sản phẩm'}
@@ -288,13 +288,13 @@ export default function AdminProductsPage() {
           ) : (
             <>
               {query.isFetching && (
-                <p role="status" className="text-sm text-muted-foreground">
+                <p role="status" className="text-muted-foreground text-sm">
                   Đang cập nhật sản phẩm…
                 </p>
               )}
               {!products.length ? (
                 <div className="grid justify-items-center gap-3 rounded-lg border py-12">
-                  <Package className="size-8 text-muted-foreground" />
+                  <Package className="text-muted-foreground size-8" />
                   <p>Không tìm thấy sản phẩm.</p>
                   {page > 1 && (
                     <Button
@@ -349,7 +349,7 @@ export default function AdminProductsPage() {
                         return (
                           <TableRow key={product._id}>
                             <TableCell>
-                              <div className="flex min-w-56 max-w-96 items-center gap-3">
+                              <div className="flex max-w-96 min-w-56 items-center gap-3">
                                 <ProductImage
                                   src={product.thumbnail}
                                   alt=""
@@ -364,12 +364,12 @@ export default function AdminProductsPage() {
                                   >
                                     {product.product_name}
                                   </Link>
-                                  <p className="truncate text-xs text-muted-foreground">
+                                  <p className="text-muted-foreground truncate text-xs">
                                     SKU: {product.sku || 'Chưa có SKU sản phẩm'}
                                   </p>
                                   {!!product.tags?.length && (
                                     <p
-                                      className="truncate text-xs text-muted-foreground"
+                                      className="text-muted-foreground truncate text-xs"
                                       title={product.tags.join(', ')}
                                     >
                                       {product.tags.join(' · ')}
@@ -392,7 +392,7 @@ export default function AdminProductsPage() {
                                 ? '—'
                                 : `${product.discount}%`}
                             </TableCell>
-                            <TableCell className="whitespace-nowrap font-medium text-emerald-600 dark:text-emerald-400">
+                            <TableCell className="font-medium whitespace-nowrap text-emerald-600 dark:text-emerald-400">
                               {salePrice === null
                                 ? '—'
                                 : formatPrice(salePrice)}

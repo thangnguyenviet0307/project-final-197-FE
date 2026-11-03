@@ -73,7 +73,7 @@ export default function StorefrontFAQPage() {
     <div className="bg-white text-gray-900">
       <section className="bg-[#223328] text-white">
         <div className="store-container py-12 sm:py-16">
-          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
+          <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.24em] text-[#99df54] uppercase">
             <CircleHelp size={15} aria-hidden="true" />
             {content.eyebrow}
           </p>
@@ -96,7 +96,7 @@ export default function StorefrontFAQPage() {
             <Search
               size={19}
               aria-hidden="true"
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
             />
             <input
               id="faq-search"
@@ -104,7 +104,7 @@ export default function StorefrontFAQPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Bạn muốn tìm hiểu điều gì?"
-              className="w-full rounded-xl border border-gray-200 bg-white py-4 pl-12 pr-4 text-sm outline-none transition focus:border-[#55b000] focus:ring-4 focus:ring-[#55b000]/10"
+              className="w-full rounded-xl border border-gray-200 bg-white py-4 pr-4 pl-12 text-sm transition outline-none focus:border-[#55b000] focus:ring-4 focus:ring-[#55b000]/10"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function StorefrontFAQPage() {
                             className="shrink-0 text-[#4d9210] transition-transform group-open:rotate-180"
                           />
                         </summary>
-                        <div className="max-w-3xl whitespace-pre-line pb-5 pr-8 text-sm leading-7 text-gray-600">
+                        <div className="max-w-3xl pr-8 pb-5 text-sm leading-7 whitespace-pre-line text-gray-600">
                           {item.answer}
                         </div>
                       </details>

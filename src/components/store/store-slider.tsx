@@ -42,7 +42,7 @@ export function StoreSlider({ children, className = '' }: StoreSliderProps) {
             type="button"
             onClick={previousSlide}
             aria-label="Slide trước"
-            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 text-black shadow transition hover:bg-[#55b000] hover:text-white"
+            className="absolute top-1/2 left-4 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 text-black shadow transition hover:bg-[#55b000] hover:text-white"
           >
             <ChevronLeft size={20} />
           </button>
@@ -51,7 +51,7 @@ export function StoreSlider({ children, className = '' }: StoreSliderProps) {
             type="button"
             onClick={nextSlide}
             aria-label="Slide tiếp theo"
-            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 text-black shadow transition hover:bg-[#55b000] hover:text-white"
+            className="absolute top-1/2 right-4 z-10 -translate-y-1/2 rounded-full bg-white/90 p-3 text-black shadow transition hover:bg-[#55b000] hover:text-white"
           >
             <ChevronRight size={20} />
           </button>

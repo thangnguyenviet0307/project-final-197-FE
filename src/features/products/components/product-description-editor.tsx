@@ -70,7 +70,7 @@ export function ProductDescriptionEditor({
             );
         }}
       />
-      <p id="description-hint" className="mt-2 text-xs text-muted-foreground">
+      <p id="description-hint" className="text-muted-foreground mt-2 text-xs">
         {value.length}/2000 ký tự, bao gồm định dạng. Hình ảnh được quản lý
         riêng.
       </p>

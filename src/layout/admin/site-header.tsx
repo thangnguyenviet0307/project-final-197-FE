@@ -32,9 +32,9 @@ export function SiteHeader() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mx-2 data-vertical:self-center data-vertical:h-4"
+            className="mx-2 data-vertical:h-4 data-vertical:self-center"
           />
-          <div className="flex-1 max-w-sm">
+          <div className="max-w-sm flex-1">
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
           <div className="ml-auto flex items-center gap-2">

@@ -76,11 +76,11 @@ export function StorefrontNewsSection() {
                   )}
                 </Link>
                 <div className="p-5 sm:p-6">
-                  <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-[#57952b]">
+                  <p className="flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] text-[#57952b] uppercase">
                     <Newspaper size={14} />
                     {article.category}
                   </p>
-                  <h3 className="mt-3 min-h-14 text-lg font-bold leading-7 text-gray-950">
+                  <h3 className="mt-3 min-h-14 text-lg leading-7 font-bold text-gray-950">
                     <Link
                       to={`/bai-viet/${encodeURIComponent(article.slug)}`}
                       className="hover:text-[#4d9210]"

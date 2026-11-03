@@ -297,7 +297,7 @@ export default function CreateOrderPage() {
               </Button>
             </div>
           ))}
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Prices, discounts and stock availability are verified by the server
             when you create the order.
           </p>

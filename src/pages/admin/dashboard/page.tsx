@@ -84,7 +84,7 @@ function ProductOverview() {
         {cards.map(({ label, value, Icon, color }) => (
           <Card key={label}>
             <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-              <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+              <CardTitle className="text-muted-foreground text-xs font-medium uppercase">
                 {label}
               </CardTitle>
               <Icon className={`size-4 shrink-0 ${color}`} />
@@ -146,7 +146,7 @@ function RecentOrders() {
         {query.isPending || query.isError ? (
           <OrderQueryState error={query.error} retry={query.refetch} />
         ) : !query.data?.data.length ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground py-12 text-center text-sm">
             Chưa có đơn hàng.
           </p>
         ) : (
@@ -166,13 +166,13 @@ function RecentOrders() {
                   <TableCell>
                     <Link
                       to={`/auth/orders/${order._id}`}
-                      className="font-medium text-primary underline-offset-4 hover:underline"
+                      className="text-primary font-medium underline-offset-4 hover:underline"
                     >
                       {order.orderCode ?? order._id}
                     </Link>
                   </TableCell>
                   <TableCell>{personName(orderCustomer(order))}</TableCell>
-                  <TableCell className="whitespace-nowrap text-muted-foreground">
+                  <TableCell className="text-muted-foreground whitespace-nowrap">
                     {orderDate(order.orderDate)}
                   </TableCell>
                   <TableCell>
@@ -235,7 +235,7 @@ function LowStockProducts() {
             </Button>
           </div>
         ) : !query.data?.data.length ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground py-12 text-center text-sm">
             Không có sản phẩm sắp hết hàng.
           </p>
         ) : (
@@ -253,11 +253,11 @@ function LowStockProducts() {
                 <Link
                   to={`/auth/products/${product._id}`}
                   state={{ returnTo: '/auth/products?stockStatus=low_stock' }}
-                  className="min-w-0 flex-1 break-words text-sm font-medium underline-offset-4 hover:underline"
+                  className="min-w-0 flex-1 text-sm font-medium break-words underline-offset-4 hover:underline"
                 >
                   {product.product_name}
                 </Link>
-                <span className="shrink-0 text-sm font-semibold tabular-nums text-amber-600 dark:text-amber-400">
+                <span className="shrink-0 text-sm font-semibold text-amber-600 tabular-nums dark:text-amber-400">
                   {product.stock ?? '—'} còn lại
                 </span>
               </li>
@@ -282,7 +282,7 @@ export default function DashboardPage() {
     >
       <div className="space-y-6 px-4 lg:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {admin
               ? 'Thống kê bao gồm tất cả đơn hàng.'
               : 'Bạn có thể xem toàn bộ lịch sử đơn hàng và quản lý đơn được giao, với tối đa 5 đơn đang xử lý.'}{' '}

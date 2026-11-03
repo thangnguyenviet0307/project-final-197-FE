@@ -61,7 +61,7 @@ export default function OrderDetailPage() {
         ) : (
           <>
             {query.isError && (
-              <div role="alert" className="space-y-2 text-sm text-destructive">
+              <div role="alert" className="text-destructive space-y-2 text-sm">
                 <p>
                   Không thể cập nhật đơn hàng. Đang giữ dữ liệu đã tải và bản
                   nháp của bạn.
@@ -77,10 +77,10 @@ export default function OrderDetailPage() {
             )}
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h1 className="break-all text-xl font-semibold">
+                <h1 className="text-xl font-semibold break-all">
                   Đơn hàng {order.orderCode ?? order._id}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {orderDate(order.orderDate)}
                 </p>
               </div>
@@ -105,7 +105,7 @@ export default function OrderDetailPage() {
                 <CardHeader>
                   <CardTitle>Khách hàng và giao hàng</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 break-words text-sm">
+                <CardContent className="space-y-2 text-sm break-words">
                   <p className="font-medium">{personName(customer)}</p>
                   <p>{customer?.email ?? 'Chưa có email'}</p>
                   <p>{customer?.phone ?? 'Chưa có số điện thoại'}</p>
@@ -174,7 +174,7 @@ export default function OrderDetailPage() {
             </div>
             <section className="space-y-3">
               <h2 className="text-lg font-semibold">Sản phẩm đã đặt</h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Giá, mức giảm giá và mã SKU được lưu tại thời điểm mua. Tên sản
                 phẩm, biến thể và tùy chọn sử dụng thông tin tại thời điểm mua
                 nếu có. Đơn hàng cũ có thể hiển thị Chưa ghi nhận.
@@ -211,7 +211,7 @@ export default function OrderDetailPage() {
                           </div>
                           {typeof item.productId === 'object' &&
                             item.productId?.product_name && (
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-muted-foreground text-sm">
                                 Tên hiện tại: {item.productId.product_name}
                               </p>
                             )}
@@ -222,7 +222,7 @@ export default function OrderDetailPage() {
                           <p className="font-mono text-xs">
                             {item.variantId ?? 'Chưa ghi nhận'}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-muted-foreground text-xs">
                             {item.selectedOptions
                               ? Object.entries(item.selectedOptions)
                                   .map(

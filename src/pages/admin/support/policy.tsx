@@ -71,17 +71,17 @@ function PolicyEditor({
   }
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-muted/30 p-5">
+      <div className="bg-muted/30 rounded-xl border p-5">
         <p>
           Nhập chính sách thực tế của cửa hàng. Thông tin riêng trên từng sản
           phẩm cần thống nhất với nội dung này.
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-2 text-sm">
           {baseline.publishedAt
             ? `Lần công bố gần nhất: ${supportDate(baseline.publishedAt)}`
             : 'Chưa có chính sách được công bố.'}
         </p>
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-sm">
           Nội dung gợi ý cần được rà soát và bổ sung phạm vi chia sẻ dữ liệu,
           thời hạn lưu trữ, điều kiện giao hàng và đổi trả thực tế trước khi
           công bố. Chỉ những mục đang trống được điền.
@@ -110,7 +110,7 @@ function PolicyEditor({
         </Button>
       </div>
       {document && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Bạn đang soạn {document.title.toLowerCase()}. Lưu và công bố áp dụng
           cho toàn bộ bản chính sách, bao gồm các mục khác trong bản nháp.{' '}
           <Link to="/auth/policies" className="underline">
@@ -127,7 +127,7 @@ function PolicyEditor({
             </label>
             <p
               id={`${section.key}-hint`}
-              className="my-2 text-sm text-muted-foreground"
+              className="text-muted-foreground my-2 text-sm"
             >
               {section.hint}
             </p>
@@ -140,7 +140,7 @@ function PolicyEditor({
                 setMessage('');
               }}
             />
-            <p className="text-right text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-right text-xs">
               {content[section.key].length}/30000
             </p>
           </div>

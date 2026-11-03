@@ -58,8 +58,8 @@ export function ProductReviews({ id }: { id: string }) {
               ['Số đánh giá', metrics.data.reviewCount],
               ['Đã bán (đơn hoàn tất)', metrics.data.soldCount],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg bg-muted p-4">
-                <dt className="text-sm text-muted-foreground">{label}</dt>
+              <div key={label} className="bg-muted rounded-lg p-4">
+                <dt className="text-muted-foreground text-sm">{label}</dt>
                 <dd className="mt-1 text-xl font-semibold">{value}</dd>
               </div>
             ))}
@@ -78,14 +78,14 @@ export function ProductReviews({ id }: { id: string }) {
       ) : (
         <>
           {!reviews.data?.data.length && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Chưa có đánh giá ở trang này.
             </p>
           )}
           {reviews.data?.data.map((review) => (
             <article key={review._id} className="space-y-2 border-b pb-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="break-words font-medium">
+                <h3 className="font-medium break-words">
                   {review.reviewerName}
                 </h3>
                 <span
@@ -95,7 +95,7 @@ export function ProductReviews({ id }: { id: string }) {
                   ★ {review.rating}/5
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {review.date
                   ? new Date(review.date).toLocaleString('vi-VN')
                   : 'Chưa có ngày'}{' '}
@@ -106,7 +106,7 @@ export function ProductReviews({ id }: { id: string }) {
                     ? 'Nhập từ DummyJSON'
                     : 'Quản trị viên thêm'}
               </p>
-              <p className="whitespace-pre-wrap break-words text-sm">
+              <p className="text-sm break-words whitespace-pre-wrap">
                 {review.comment}
               </p>
               {admin && (
@@ -136,7 +136,7 @@ export function ProductReviews({ id }: { id: string }) {
       {admin && (
         <form
           noValidate
-          className="space-y-4 rounded-lg bg-muted/40 p-4"
+          className="bg-muted/40 space-y-4 rounded-lg p-4"
           onSubmit={form.handleSubmit(async (input) => {
             form.clearErrors('root');
             try {

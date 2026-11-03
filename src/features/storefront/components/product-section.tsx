@@ -102,7 +102,7 @@ export function ProductSection({
               aria-controls={gridId}
               disabled={currentColumn === 0 || busy}
               onClick={() => setColumn(currentColumn - 1)}
-              className="absolute -left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-md hover:bg-green-50 cursor-pointer disabled:cursor-default disabled:opacity-40 sm:-left-5"
+              className="absolute top-1/2 -left-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-md hover:bg-green-50 disabled:cursor-default disabled:opacity-40 sm:-left-5"
             >
               <ChevronLeft size={20} />
             </button>
@@ -112,7 +112,7 @@ export function ProductSection({
               aria-controls={gridId}
               disabled={currentColumn >= lastColumn || busy}
               onClick={() => void moveNext()}
-              className="absolute -right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-md hover:bg-green-50 cursor-pointer disabled:cursor-default disabled:opacity-40 sm:-right-5"
+              className="absolute top-1/2 -right-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-md hover:bg-green-50 disabled:cursor-default disabled:opacity-40 sm:-right-5"
             >
               <ChevronRight size={20} />
             </button>

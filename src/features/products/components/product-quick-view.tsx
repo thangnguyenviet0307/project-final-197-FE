@@ -34,7 +34,7 @@ function ProductPreview({ id }: { id: string }) {
           alt={product.product_name}
           className="size-16 shrink-0 border"
         />
-        <p className="min-w-0 break-words font-medium">
+        <p className="min-w-0 font-medium break-words">
           {product.product_name}
         </p>
       </div>
@@ -59,7 +59,7 @@ function ProductPreview({ id }: { id: string }) {
         ].map(([label, value]) => (
           <div key={label} className="min-w-0">
             <dt className="text-muted-foreground">{label}</dt>
-            <dd className="break-words font-medium">{value}</dd>
+            <dd className="font-medium break-words">{value}</dd>
           </div>
         ))}
       </dl>
@@ -70,7 +70,7 @@ function ProductPreview({ id }: { id: string }) {
             {product.variants.map((variant) => (
               <li
                 key={variant._id ?? variant.sku}
-                className="break-words rounded border p-2 text-xs"
+                className="rounded border p-2 text-xs break-words"
               >
                 <p className="font-medium">
                   {variant.variant_name || variant.sku}
@@ -100,7 +100,7 @@ export function ProductQuickView({ id, name }: { id: string; name: string }) {
         render={
           <Button
             variant="link"
-            className="h-auto max-w-full justify-start whitespace-normal px-0 text-left"
+            className="h-auto max-w-full justify-start px-0 text-left whitespace-normal"
           />
         }
       >

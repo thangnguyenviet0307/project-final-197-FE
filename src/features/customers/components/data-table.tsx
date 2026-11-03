@@ -101,7 +101,7 @@ function DeleteCustomerDialog({
         type="button"
         variant="ghost"
         size="icon"
-        className="h-8 w-8 cursor-pointer text-destructive"
+        className="text-destructive h-8 w-8 cursor-pointer"
         aria-label={`Xóa ${customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()}`}
         onClick={() => setOpen(true)}
       >
@@ -123,7 +123,7 @@ function DeleteCustomerDialog({
         </AlertDialogHeader>
 
         {error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {error}
           </p>
         )}
@@ -137,7 +137,7 @@ function DeleteCustomerDialog({
               event.preventDefault();
               void handleDelete();
             }}
-            className="bg-destructive text-white hover:bg-destructive/90"
+            className="bg-destructive hover:bg-destructive/90 text-white"
           >
             {deleting ? 'Deleting...' : 'Xóa khách hàng'}
           </AlertDialogAction>
@@ -175,7 +175,7 @@ export function CustomerTable({
   return (
     <div className="w-full space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Tổng cộng: {total} khách hàng
         </p>
       </div>
@@ -206,7 +206,7 @@ export function CustomerTable({
           <FieldLabel htmlFor="customer-status">Trạng thái</FieldLabel>
           <select
             id="customer-status"
-            className="h-8 rounded-md border bg-background px-2 text-sm"
+            className="bg-background h-8 rounded-md border px-2 text-sm"
             value={status}
             onChange={(event) =>
               onStatusChange?.(
@@ -272,7 +272,7 @@ export function CustomerTable({
                           `${customer.last_name} ${customer.first_name}`.trim()}
                       </span>
                       {customer.customerType === 'guest' && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-muted-foreground text-xs">
                           Khách vãng lai · Không có tài khoản
                         </span>
                       )}
@@ -296,10 +296,10 @@ export function CustomerTable({
                   </TableCell>
 
                   {/* Địa chỉ */}
-                  <TableCell className="min-w-64 max-w-80 whitespace-normal wrap-break-word">
+                  <TableCell className="max-w-80 min-w-64 wrap-break-word whitespace-normal">
                     {customerAddress(customer)}
                   </TableCell>
-                  <TableCell className="min-w-40 max-w-64 whitespace-normal wrap-break-word">
+                  <TableCell className="max-w-64 min-w-40 wrap-break-word whitespace-normal">
                     {customer.shippingAddress?.deliveryTime || 'Chưa cung cấp'}
                   </TableCell>
 

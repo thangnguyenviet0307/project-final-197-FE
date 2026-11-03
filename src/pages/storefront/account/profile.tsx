@@ -112,7 +112,7 @@ function ProfileEditor({ user }: { user: User }) {
             <div className="flex flex-wrap gap-2">
               <select
                 aria-label="Năm sinh"
-                className="h-10 rounded-md border bg-background px-3 text-sm"
+                className="bg-background h-10 rounded-md border px-3 text-sm"
                 value={birthDate.slice(0, 4)}
                 onChange={(event) => {
                   const year = Number(event.target.value);

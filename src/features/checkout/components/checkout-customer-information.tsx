@@ -164,7 +164,7 @@ export function CheckoutCustomerInformation() {
           aria-invalid={!!errors.note}
           aria-describedby={errors.note ? 'checkout-note-error' : undefined}
           {...register('note')}
-          className="block w-full resize-y rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm placeholder:text-gray-400 focus:border-[#4d9210] focus:outline-none focus:ring-1 focus:ring-[#4d9210]"
+          className="block w-full resize-y rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm placeholder:text-gray-400 focus:border-[#4d9210] focus:ring-1 focus:ring-[#4d9210] focus:outline-none"
         />
         {fieldError('note')}
       </div>

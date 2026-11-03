@@ -37,7 +37,7 @@ export function CartVariantPicker({ item }: { item: CartItem }) {
         <ChevronRight size={16} className="shrink-0" />
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white p-5 text-gray-900 sm:max-w-md">
-        <DialogTitle className="border-b border-gray-100 pb-4 pr-8 text-base font-semibold leading-6">
+        <DialogTitle className="border-b border-gray-100 pr-8 pb-4 text-base leading-6 font-semibold">
           {item.name}
         </DialogTitle>
         <DialogDescription className="sr-only">
@@ -83,7 +83,7 @@ export function CartVariantPicker({ item }: { item: CartItem }) {
                     className="sr-only"
                   />
                   {selected === key && (
-                    <Check size={12} className="absolute left-0.5 top-0.5" />
+                    <Check size={12} className="absolute top-0.5 left-0.5" />
                   )}
                   {label}
                   {unavailable && (

@@ -194,7 +194,7 @@ export function StoreFooter() {
         type="button"
         onClick={backToTop}
         aria-label="Trở về đầu trang"
-        className="fixed bottom-6 right-6 z-40 flex size-11 items-center justify-center rounded-full bg-[#65b719] text-white shadow-lg transition hover:bg-[#4d9210]"
+        className="fixed right-6 bottom-6 z-40 flex size-11 items-center justify-center rounded-full bg-[#65b719] text-white shadow-lg transition hover:bg-[#4d9210]"
       >
         <ArrowUp size={20} />
       </button>

@@ -72,19 +72,19 @@ export default function ProductDetailPage() {
         ) : (
           <>
             {query.isFetching && (
-              <p role="status" className="text-sm text-muted-foreground">
+              <p role="status" className="text-muted-foreground text-sm">
                 Đang cập nhật sản phẩm…
               </p>
             )}
-            <div className="grid gap-6 rounded-xl border bg-card p-4 md:grid-cols-2 lg:gap-8 lg:p-6">
+            <div className="bg-card grid gap-6 rounded-xl border p-4 md:grid-cols-2 lg:gap-8 lg:p-6">
               <ProductDetailGallery key={product._id} product={product} />
               <div className="min-w-0 space-y-6">
                 <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     {catalogName(product.brand)} ·{' '}
                     {catalogName(product.category)}
                   </p>
-                  <h1 className="break-words text-2xl font-semibold tracking-tight lg:text-3xl">
+                  <h1 className="text-2xl font-semibold tracking-tight break-words lg:text-3xl">
                     {product.product_name}
                   </h1>
                   <div className="flex flex-wrap gap-2">
@@ -102,8 +102,8 @@ export default function ProductDetailPage() {
                     </Badge>
                   </div>
                 </div>
-                <div className="rounded-lg bg-muted/40 p-4">
-                  <p className="text-sm text-muted-foreground">
+                <div className="bg-muted/40 rounded-lg p-4">
+                  <p className="text-muted-foreground text-sm">
                     Giá sản phẩm (VND)
                   </p>
                   <p className="mt-1 text-3xl font-semibold">
@@ -122,7 +122,7 @@ export default function ProductDetailPage() {
                     </p>
                   )}
                   {!!product.variants?.length && (
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-2 text-xs">
                       Giá từng biến thể được hiển thị trong phần Biến thể bên
                       dưới.
                     </p>
@@ -152,7 +152,7 @@ export default function ProductDetailPage() {
                   ].map(([label, value]) => (
                     <div key={label} className="min-w-0">
                       <dt className="text-muted-foreground">{label}</dt>
-                      <dd className="break-words font-medium">
+                      <dd className="font-medium break-words">
                         {value ?? '—'}
                       </dd>
                     </div>
@@ -189,7 +189,7 @@ export default function ProductDetailPage() {
             <section className="space-y-4">
               <h2 className="text-lg font-semibold">Biến thể</h2>
               {!product.variants?.length && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Chưa có biến thể.
                 </p>
               )}

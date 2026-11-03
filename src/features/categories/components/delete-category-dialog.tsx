@@ -102,7 +102,7 @@ export function DeleteCategoryDialog({
             <p className="text-sm font-medium">
               {count} sản phẩm thuộc danh mục này. Chưa thể xóa danh mục.
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Chọn một sản phẩm để xem trước tại đây.
             </p>
             <ul className="divide-y rounded-lg border px-3">
@@ -141,14 +141,14 @@ export function DeleteCategoryDialog({
             )}
           </section>
         ) : (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Không tìm thấy sản phẩm liên quan.
           </p>
         )}
         {remove.error && (
           <p
             role="alert"
-            className="rounded bg-destructive/15 p-3 text-sm text-destructive"
+            className="bg-destructive/15 text-destructive rounded p-3 text-sm"
           >
             {getApiError(remove.error).message}
           </p>

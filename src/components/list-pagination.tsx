@@ -46,7 +46,7 @@ export function ListPagination({
         </Button>
         {pageNumbers(page, totalPages).map((number) =>
           typeof number === 'string' ? (
-            <span key={number} className="px-1 text-muted-foreground">
+            <span key={number} className="text-muted-foreground px-1">
               ...
             </span>
           ) : (

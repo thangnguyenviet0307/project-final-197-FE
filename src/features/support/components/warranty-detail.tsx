@@ -43,7 +43,11 @@ function WarrantyUpdateForm({
   const [error, setError] = useState('');
   const [conflict, setConflict] = useState(false);
   const mutation = useSupportMutations().update;
-  const navigation = useUnsavedForm(note.length > 0 || status !== (choices[0] ?? baseline.status) || mutation.isPending);
+  const navigation = useUnsavedForm(
+    note.length > 0 ||
+      status !== (choices[0] ?? baseline.status) ||
+      mutation.isPending
+  );
   const mayHandle =
     user?.role !== 'staff' ||
     baseline.status === 'submitted' ||
@@ -78,11 +82,11 @@ function WarrantyUpdateForm({
     <section className="mt-6 rounded-xl border p-4">
       <h4 className="font-semibold">Xử lý yêu cầu</h4>
       {!choices.length ? (
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-sm">
           Yêu cầu đã kết thúc.
         </p>
       ) : !mayHandle ? (
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-sm">
           Yêu cầu do nhân viên khác phụ trách. Bạn có thể xem lịch sử xử lý.
         </p>
       ) : (
@@ -106,7 +110,7 @@ function WarrantyUpdateForm({
               setStatus(event.target.value as WarrantyStatus)
             }
             disabled={mutation.isPending || conflict}
-            className="w-full rounded-lg border bg-background p-3 text-sm"
+            className="bg-background w-full rounded-lg border p-3 text-sm"
           >
             {choices.map((choice) => (
               <option key={choice} value={choice}>
@@ -126,14 +130,14 @@ function WarrantyUpdateForm({
             value={note}
             disabled={mutation.isPending}
             onChange={(event) => setNote(event.target.value)}
-            className="w-full rounded-lg border bg-background p-3 text-sm"
+            className="bg-background w-full rounded-lg border p-3 text-sm"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Phản hồi được hiển thị cho khách. Khi tiếp nhận, bạn trở thành người
             phụ trách yêu cầu.
           </p>
           {error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {error}
             </p>
           )}
@@ -172,8 +176,18 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
   const [error, setError] = useState('');
   const mutation = useSupportMutations().upload;
   const navigation = useUnsavedForm(file !== null || mutation.isPending);
-  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
-  function clearFile() { setFile(null); setPreview(null); setInputKey(value => value + 1); }
+  const canAddImage = detail.status === 'submitted';
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview]
+  );
+  function clearFile() {
+    setFile(null);
+    setPreview(null);
+    setInputKey((value) => value + 1);
+  }
   async function upload() {
     if (!file) return;
     const invalid = validateWarrantyImage(file);
@@ -195,7 +209,7 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
       <label htmlFor="warranty-image" className="block text-sm font-semibold">
         Bổ sung ảnh ({detail.images.length}/5)
       </label>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-muted-foreground text-xs">
         JPG, PNG, WebP; tối đa 5 MB/ảnh. Không tải ảnh chứa mật khẩu hoặc thông
         tin nhạy cảm.
       </p>
@@ -204,29 +218,61 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
         id="warranty-image"
         selectionText={file ? 'Đã chọn 1 ảnh' : 'Chưa chọn ảnh'}
         disabled={
-          mutation.isPending ||
-          detail.images.length >= 5 ||
-          detail.status !== 'submitted'
+          mutation.isPending || detail.images.length >= 5 || !canAddImage
         }
         onChange={(event) => {
           const selected = event.target.files?.[0] ?? null;
           const invalid = selected ? validateWarrantyImage(selected) : null;
           setMessage('');
-          if (invalid) { clearFile(); setError(invalid); return; }
+          if (invalid) {
+            clearFile();
+            setError(invalid);
+            return;
+          }
           setFile(selected);
           setPreview(selected ? URL.createObjectURL(selected) : null);
           setError('');
         }}
       />
-      {file && <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">{preview && <img src={preview} alt="Ảnh đang chọn để gửi bảo hành" className="size-24 rounded-lg object-cover" />}<div className="min-w-0 flex-1"><p className="break-all text-sm">{file.name}</p><p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB · Chưa xác nhận tải lên</p></div><Button variant="outline" disabled={mutation.isPending} onClick={() => { clearFile(); setError(''); }}>Bỏ ảnh đã chọn</Button></div>}
-      {message && <p role="status" className="text-sm text-green-700">{message}</p>}
-      {detail.status !== 'submitted' && (
-        <p className="text-sm text-muted-foreground">
-          Yêu cầu đã được tiếp nhận, không thể bổ sung ảnh.
+      {file && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">
+          {preview && (
+            <img
+              src={preview}
+              alt="Ảnh đang chọn để gửi bảo hành"
+              className="size-24 rounded-lg object-cover"
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm break-all">{file.name}</p>
+            <p className="text-muted-foreground text-xs">
+              {(file.size / 1024 / 1024).toFixed(2)} MB · Chưa xác nhận tải lên
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            disabled={mutation.isPending}
+            onClick={() => {
+              clearFile();
+              setError('');
+            }}
+          >
+            Bỏ ảnh đã chọn
+          </Button>
+        </div>
+      )}
+      {message && (
+        <p role="status" className="text-sm text-green-700">
+          {message}
+        </p>
+      )}
+      {!canAddImage && (
+        <p className="text-muted-foreground text-sm">
+          Chỉ có thể bổ sung ảnh khi yêu cầu đang chờ tiếp nhận.
         </p>
       )}
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           {error}
         </p>
       )}
@@ -236,7 +282,7 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
           !file ||
           mutation.isPending ||
           detail.images.length >= 5 ||
-          detail.status !== 'submitted'
+          !canAddImage
         }
         onClick={() => void upload()}
       >
@@ -249,9 +295,11 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
 export function WarrantyDetailPanel({
   id,
   admin,
+  onClose,
 }: {
   id: string;
   admin: boolean;
+  onClose?: () => void;
 }) {
   const query = useWarranty(admin, id);
   const [session, setSession] = useState(0);
@@ -274,12 +322,14 @@ export function WarrantyDetailPanel({
   const detail = query.data;
   return (
     <section
-      className="rounded-2xl border bg-background p-5 sm:p-6"
+      className="bg-background rounded-2xl border p-5 sm:p-6"
       aria-label="Chi tiết yêu cầu bảo hành"
     >
       <div className="flex flex-wrap justify-between gap-3">
         <h3 className="text-xl font-bold">Chi tiết bảo hành</h3>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${warrantyStatusStyles[detail.status]}`}>
+        <span
+          className={`rounded-full px-3 py-1 text-sm font-semibold ${warrantyStatusStyles[detail.status]}`}
+        >
           {warrantyLabels[detail.status]}
         </span>
       </div>
@@ -287,21 +337,21 @@ export function WarrantyDetailPanel({
         {detail.productName}
         {detail.variantName && ` · ${detail.variantName}`}
       </p>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-1 text-sm">
         Đơn {detail.orderCode} · {supportDate(detail.createdAt)}
       </p>
-      <p className="mt-1 break-all text-xs text-muted-foreground">
+      <p className="text-muted-foreground mt-1 text-xs break-all">
         Mã yêu cầu: {detail._id}
       </p>
       {admin && (
-        <div className="mt-4 rounded-lg bg-muted/30 p-3 text-sm">
+        <div className="bg-muted/30 mt-4 rounded-lg p-3 text-sm">
           <p>{detail.customerName}</p>
           <p className="break-all">{detail.customerEmail}</p>
           <p>{detail.customerPhone || 'Chưa có số điện thoại'}</p>
         </div>
       )}
       <h4 className="mt-5 font-semibold">Mô tả của khách hàng</h4>
-      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">
+      <p className="mt-2 text-sm leading-7 break-words whitespace-pre-wrap">
         {detail.description}
       </p>
       {!!detail.images.length && (
@@ -324,7 +374,7 @@ export function WarrantyDetailPanel({
         </div>
       )}
       {!!detail.images.length && (
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-2 text-xs">
           Liên kết ảnh có hiệu lực trong 1 giờ. Tải lại nếu ảnh không còn hiển
           thị.
         </p>
@@ -337,10 +387,10 @@ export function WarrantyDetailPanel({
             <p className="text-sm font-semibold">
               {warrantyLabels[entry.status]}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-xs">
               {supportDate(entry.createdAt)} · {entry.actorName}
             </p>
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">
+            <p className="mt-2 text-sm leading-6 break-words whitespace-pre-wrap">
               {entry.note}
             </p>
           </li>
@@ -366,6 +416,13 @@ export function WarrantyDetailPanel({
         >
           Tải lại yêu cầu
         </Button>
+      )}
+      {onClose && (
+        <div className="mt-5">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Đóng chi tiết
+          </Button>
+        </div>
       )}
     </section>
   );

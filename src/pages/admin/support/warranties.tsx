@@ -7,31 +7,47 @@ import { warrantyIdSchema } from '@/features/support/schemas/support-schema';
 export default function AdminWarrantiesPage() {
   const [params, setParams] = useSearchParams();
   const selected = params.get('request') ?? '';
+  function closeDetail() {
+    setParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.delete('request');
+      return next;
+    });
+  }
   return (
     <BaseLayout
       title="Yêu cầu bảo hành"
       description="Tiếp nhận, kiểm tra và cập nhật kết quả hỗ trợ khách hàng."
     >
-      <div className="grid items-start gap-6 px-4 lg:grid-cols-2 lg:px-6">
+      <div className="space-y-6 px-4 lg:px-6">
         <WarrantyList
           admin
           selectedId={selected}
           onSelect={(id) =>
             setParams((previous) => {
               const next = new URLSearchParams(previous);
-              next.set('request', id);
+              if (!id || id === selected) {
+                next.delete('request');
+              } else {
+                next.set('request', id);
+              }
               return next;
             })
           }
         />
         {selected ? (
           warrantyIdSchema.safeParse(selected).success ? (
-            <WarrantyDetailPanel key={selected} id={selected} admin />
+            <WarrantyDetailPanel
+              key={selected}
+              id={selected}
+              admin
+              onClose={closeDetail}
+            />
           ) : (
             <p role="alert">Mã yêu cầu không hợp lệ.</p>
           )
         ) : (
-          <div className="rounded-2xl border border-dashed p-10 text-center text-muted-foreground">
+          <div className="text-muted-foreground rounded-2xl border border-dashed p-10 text-center">
             Chọn một yêu cầu để xem chi tiết và xử lý.
           </div>
         )}

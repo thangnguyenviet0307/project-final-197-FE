@@ -81,7 +81,7 @@ export function HeroSlideForm({
             required={!slide || !!slide.category}
             aria-invalid={!!categoryError}
             aria-describedby={categoryError ? 'hero-category-error' : undefined}
-            className="h-10 rounded-md border bg-background px-3"
+            className="bg-background h-10 rounded-md border px-3"
             value={draft.category}
             onChange={(event) => {
               setDraft((previous) => ({
@@ -108,7 +108,7 @@ export function HeroSlideForm({
           <p
             id="hero-category-error"
             role="alert"
-            className="text-sm text-destructive"
+            className="text-destructive text-sm"
           >
             {categoryError}
           </p>
@@ -153,7 +153,7 @@ export function HeroSlideForm({
               }))
             }
           />
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             Để trống để dùng ảnh danh mục; nếu không có ảnh sẽ dùng nền tối.
           </span>
         </label>
@@ -187,7 +187,7 @@ export function HeroSlideForm({
           />
           Hiển thị slide
         </label>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Nút: Khám phá{' '}
           {choices.find((item) => item._id === draft.category)?.name ??
             'tên danh mục'}
@@ -206,7 +206,7 @@ export function HeroSlideForm({
         </p>
       )}
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           {error}
         </p>
       )}

@@ -166,7 +166,10 @@ export function CustomerAuthForm({
                   .join(' ') || undefined;
               return (
                 <Field key={name} data-invalid={!!form.formState.errors[name]}>
-                  <FieldLabel htmlFor={`customer-${name}`}>{label}<RequiredMark /></FieldLabel>
+                  <FieldLabel htmlFor={`customer-${name}`}>
+                    {label}
+                    <RequiredMark />
+                  </FieldLabel>
                   <div className="relative">
                     {!registration &&
                     (name === 'email' || name === 'password') ? (
@@ -252,7 +255,7 @@ export function CustomerAuthForm({
             })}
           </fieldset>
           {form.formState.errors.root && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {form.formState.errors.root.message}
             </p>
           )}

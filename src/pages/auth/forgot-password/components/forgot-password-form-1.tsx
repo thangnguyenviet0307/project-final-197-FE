@@ -17,7 +17,7 @@ export function ForgotPasswordForm1({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <ShieldCheck className="mx-auto mb-2 size-8 text-primary" />
+          <ShieldCheck className="text-primary mx-auto mb-2 size-8" />
           <CardTitle className="text-xl">Quên mật khẩu?</CardTitle>
           <CardDescription>
             Tài khoản của bạn do quản trị viên quản lý.

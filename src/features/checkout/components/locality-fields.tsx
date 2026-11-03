@@ -85,7 +85,7 @@ export function LocalityFields({
                 field === 'province' ? '' : event.target.value
               )
             }
-            className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-[#4d9210] focus:outline-none focus:ring-1 focus:ring-[#4d9210] aria-invalid:border-red-500 disabled:bg-gray-50 disabled:text-gray-400"
+            className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-[#4d9210] focus:ring-1 focus:ring-[#4d9210] focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 aria-invalid:border-red-500"
           >
             <option value="">Chọn {label.toLowerCase()}</option>
             {options.map((option) => (

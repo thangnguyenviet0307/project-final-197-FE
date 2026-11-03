@@ -64,7 +64,7 @@ function CategoryBranch({
         <Link
           to={`/shop?category=${category._id}`}
           onClick={onNavigate}
-          className="flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base font-normal leading-6 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]"
+          className="focus-visible:outline-inset flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base leading-6 font-normal focus-visible:outline-2 focus-visible:outline-[#55b000]"
         >
           {content}
         </Link>
@@ -75,7 +75,7 @@ function CategoryBranch({
             aria-expanded={expanded}
             aria-controls={submenuId}
             onClick={() => setExpanded((value) => !value)}
-            className="flex min-h-[52px] w-11 shrink-0 items-center justify-center hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]"
+            className="focus-visible:outline-inset flex min-h-[52px] w-11 shrink-0 items-center justify-center hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-[#55b000]"
           >
             <ChevronRight
               size={16}
@@ -90,7 +90,7 @@ function CategoryBranch({
           id={submenuId}
           className={
             isRoot
-              ? 'store-category-submenu ml-5 border-l border-[#e8e8e8] bg-white lg:absolute lg:left-full lg:top-0 lg:ml-0 lg:grid lg:max-h-[70vh] lg:min-h-full lg:w-[min(600px,calc(100vw-360px))] lg:grid-cols-2 lg:content-start lg:overflow-y-auto lg:border lg:p-4 lg:shadow-xl'
+              ? 'store-category-submenu ml-5 border-l border-[#e8e8e8] bg-white lg:absolute lg:top-0 lg:left-full lg:ml-0 lg:grid lg:max-h-[70vh] lg:min-h-full lg:w-[min(600px,calc(100vw-360px))] lg:grid-cols-2 lg:content-start lg:overflow-y-auto lg:border lg:p-4 lg:shadow-xl'
               : 'ml-5 border-l border-[#e8e8e8] bg-white'
           }
         >
@@ -163,7 +163,7 @@ export function StoreDepartmentsMenu() {
         aria-controls={panelId}
         className="flex h-14 w-full items-center justify-between rounded-t-lg bg-black px-5 text-white transition-colors hover:bg-[#171717]"
       >
-        <span className="text-sm font-bold uppercase tracking-wider">
+        <span className="text-sm font-bold tracking-wider uppercase">
           DANH MỤC SẢN PHẨM
         </span>
         <Menu size={23} />
@@ -172,7 +172,7 @@ export function StoreDepartmentsMenu() {
       {open && (
         <div
           id={panelId}
-          className="absolute left-0 top-full z-50 max-h-[70vh] w-full overflow-y-auto bg-white shadow-[0_3px_18px_rgba(0,0,0,0.08)] lg:max-h-none lg:overflow-visible"
+          className="absolute top-full left-0 z-50 max-h-[70vh] w-full overflow-y-auto bg-white shadow-[0_3px_18px_rgba(0,0,0,0.08)] lg:max-h-none lg:overflow-visible"
         >
           {isPending ? (
             <p role="status" className="px-5 py-4 text-sm text-gray-600">

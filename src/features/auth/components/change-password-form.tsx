@@ -76,7 +76,10 @@ export function ChangePasswordForm({
               ] as const
             ).map(([name, label, autocomplete]) => (
               <Field key={name} data-invalid={!!form.formState.errors[name]}>
-                <FieldLabel htmlFor={name}>{label}<RequiredMark /></FieldLabel>
+                <FieldLabel htmlFor={name}>
+                  {label}
+                  <RequiredMark />
+                </FieldLabel>
                 <Input
                   id={name}
                   aria-required="true"
@@ -88,12 +91,12 @@ export function ChangePasswordForm({
                 <FieldError errors={[form.formState.errors[name]]} />
               </Field>
             ))}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Mật khẩu mới cần ít nhất 6 ký tự, gồm chữ in hoa, chữ số và ký tự
               đặc biệt.
             </p>
             <ul
-              className="space-y-2 text-sm text-muted-foreground"
+              className="text-muted-foreground space-y-2 text-sm"
               aria-label={
                 storefront ? 'Yêu cầu mật khẩu' : 'Password requirements'
               }
@@ -120,7 +123,7 @@ export function ChangePasswordForm({
               ))}
             </ul>
             {form.formState.errors.root && (
-              <p role="alert" className="text-sm text-destructive">
+              <p role="alert" className="text-destructive text-sm">
                 {form.formState.errors.root.message}
               </p>
             )}

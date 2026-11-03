@@ -62,7 +62,7 @@ export function OrderNoteEditor({ order }: { order: Order }) {
       <label className="grid gap-2 text-sm">
         Order note
         <textarea
-          className="rounded-md border bg-background p-2"
+          className="bg-background rounded-md border p-2"
           value={draft.note}
           maxLength={2000}
           onChange={(event) => setDraft({ ...draft, note: event.target.value })}
@@ -111,7 +111,7 @@ export function OrderNoteEditor({ order }: { order: Order }) {
         </div>
       )}
       {mutation.isError && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           {getApiError(mutation.error).message}
         </p>
       )}

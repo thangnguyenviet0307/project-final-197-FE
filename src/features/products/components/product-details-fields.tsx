@@ -58,7 +58,7 @@ export function ProductDetailsFields({
           optional
         />
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-muted-foreground text-xs">
         Nhập đủ ba kích thước hoặc để trống tất cả.
       </p>
       <fieldset className="space-y-3">

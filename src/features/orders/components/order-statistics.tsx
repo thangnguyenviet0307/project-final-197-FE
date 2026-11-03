@@ -73,7 +73,7 @@ export function OrderStatistics() {
           return (
             <Card key={label}>
               <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-                <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+                <CardTitle className="text-muted-foreground text-xs font-medium uppercase">
                   {label}
                 </CardTitle>
                 <Icon className={`size-4 shrink-0 ${color}`} />

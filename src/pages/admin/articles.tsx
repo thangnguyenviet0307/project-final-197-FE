@@ -126,7 +126,7 @@ export default function AdminArticlesPage() {
           </form>
           <select
             aria-label="Lọc loại bài"
-            className="rounded-md border bg-background p-2"
+            className="bg-background rounded-md border p-2"
             value={type ?? ''}
             onChange={(e) => filter('type', e.target.value)}
           >
@@ -136,7 +136,7 @@ export default function AdminArticlesPage() {
           </select>
           <select
             aria-label="Lọc trạng thái"
-            className="rounded-md border bg-background p-2"
+            className="bg-background rounded-md border p-2"
             value={status ?? ''}
             onChange={(e) => filter('status', e.target.value)}
           >
@@ -149,7 +149,7 @@ export default function AdminArticlesPage() {
           </select>
           <select
             aria-label="Lọc danh mục bài"
-            className="rounded-md border bg-background p-2"
+            className="bg-background rounded-md border p-2"
             value={params.get('categoryId') ?? ''}
             onChange={(e) => filter('categoryId', e.target.value)}
           >
@@ -210,7 +210,7 @@ export default function AdminArticlesPage() {
                   <tbody>
                     {query.data.data.map((article) => (
                       <tr key={article._id} className="border-t">
-                        <td className="max-w-sm break-words p-3 font-medium">
+                        <td className="max-w-sm p-3 font-medium break-words">
                           {article.title}
                         </td>
                         <td className="p-3">
@@ -233,7 +233,7 @@ export default function AdminArticlesPage() {
                           {article.isFeatured ? 'Đã chọn' : 'Không chọn'} /{' '}
                           {article.sortOrder ?? 0}
                         </td>
-                        <td className="space-x-2 whitespace-nowrap p-3">
+                        <td className="space-x-2 p-3 whitespace-nowrap">
                           <Button
                             variant="outline"
                             disabled={loadingEditor || query.isFetching}

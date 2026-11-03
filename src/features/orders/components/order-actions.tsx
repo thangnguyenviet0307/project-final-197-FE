@@ -112,7 +112,7 @@ export function OrderActions({
               <label className="grid gap-2 text-sm">
                 Trạng thái mới
                 <select
-                  className="rounded-md border bg-background p-2"
+                  className="bg-background rounded-md border p-2"
                   value={next}
                   disabled={pending}
                   onChange={(event) =>
@@ -134,7 +134,7 @@ export function OrderActions({
                   Lý do hủy
                   <textarea
                     maxLength={1000}
-                    className="rounded-md border bg-background p-2"
+                    className="bg-background rounded-md border p-2"
                     value={reason}
                     required
                     disabled={pending}

@@ -99,11 +99,11 @@ export default function StorefrontArticleDetailPage() {
           Tất cả bài viết
         </Link>
         <header>
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-[#57952b]">
+          <p className="flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-[#57952b] uppercase">
             <Newspaper size={15} aria-hidden="true" />
             {post.category}
           </p>
-          <h1 className="mt-4 text-3xl font-bold leading-tight text-gray-950 sm:text-4xl">
+          <h1 className="mt-4 text-3xl leading-tight font-bold text-gray-950 sm:text-4xl">
             {post.title}
           </h1>
           <p className="mt-4 text-lg leading-8 text-gray-600">{post.excerpt}</p>
@@ -124,7 +124,7 @@ export default function StorefrontArticleDetailPage() {
             className="mt-8 aspect-[16/9] w-full rounded-lg object-cover"
           />
         )}
-        <div className="mt-8 whitespace-pre-wrap break-words text-base leading-8 text-gray-800">
+        <div className="mt-8 text-base leading-8 break-words whitespace-pre-wrap text-gray-800">
           {post.content}
         </div>
         {post.tags.length > 0 && (

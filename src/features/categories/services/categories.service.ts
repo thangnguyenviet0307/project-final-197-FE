@@ -49,7 +49,11 @@ export async function createCategory(
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
-  const { data } = await api.post<ApiResult<Category>>('/categories', catalogFormData(payload, input.image), { timeout: 60000 });
+  const { data } = await api.post<ApiResult<Category>>(
+    '/categories',
+    catalogFormData(payload, input.image),
+    { timeout: 60000 }
+  );
   return data.data;
 }
 

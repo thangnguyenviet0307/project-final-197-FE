@@ -54,14 +54,14 @@ export default function StorefrontAboutPage() {
       <section className="relative isolate overflow-hidden bg-[#223328] text-white">
         <div
           aria-hidden="true"
-          className="absolute -right-20 -top-32 size-96 rounded-full bg-[#55b000]/20 blur-3xl"
+          className="absolute -top-32 -right-20 size-96 rounded-full bg-[#55b000]/20 blur-3xl"
         />
         <div className="store-container relative py-16 sm:py-24 lg:py-28">
-          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
+          <p className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.24em] text-[#99df54] uppercase">
             <Sparkles size={15} aria-hidden="true" />
             {content.eyebrow}
           </p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 max-w-3xl text-4xl leading-tight font-black tracking-tight sm:text-5xl lg:text-6xl">
             {content.title}
             <span className="block text-[#99df54]">{content.highlight}</span>
           </h1>
@@ -89,10 +89,10 @@ export default function StorefrontAboutPage() {
       <section className="store-container py-16 sm:py-20">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#57952b] uppercase">
               {content.story.eyebrow}
             </p>
-            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            <h2 className="mt-4 text-3xl leading-tight font-bold tracking-tight sm:text-4xl">
               {content.story.title}
             </h2>
           </div>
@@ -107,7 +107,7 @@ export default function StorefrontAboutPage() {
       <section className="border-y border-gray-100 bg-[#f7faf5]">
         <div className="store-container py-16 sm:py-20">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#57952b] uppercase">
               BẠN CÓ THỂ LÀM GÌ?
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -138,7 +138,7 @@ export default function StorefrontAboutPage() {
       <section>
         <div className="store-container py-16 sm:py-20">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#57952b] uppercase">
               CÁCH CHÚNG TÔI LÀM
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -171,7 +171,7 @@ export default function StorefrontAboutPage() {
         <div className="store-container py-16 sm:py-20">
           <div className="mx-auto max-w-6xl">
             <div className="max-w-2xl">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#57952b]">
+              <p className="text-xs font-bold tracking-[0.2em] text-[#57952b] uppercase">
                 BẮT ĐẦU TỪ ĐÂU?
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">

@@ -62,7 +62,11 @@ export const brandsService = {
     data: CreateBrandInput
   ): Promise<BrandApiResponse<IBrand>> => {
     const { image, ...fields } = data;
-    const response = await api.post<BrandApiResponse<IBrand>>('/brands', catalogFormData(fields, image), { timeout: 60000 });
+    const response = await api.post<BrandApiResponse<IBrand>>(
+      '/brands',
+      catalogFormData(fields, image),
+      { timeout: 60000 }
+    );
 
     return response.data;
   },

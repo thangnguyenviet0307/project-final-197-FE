@@ -47,7 +47,7 @@ export function InventoryEditor({ product }: { product: Product }) {
       aria-label="Cập nhật tồn kho"
     >
       <h2 className="font-semibold">Cập nhật tồn kho</h2>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         Chỉ cập nhật số lượng; giá và thông tin sản phẩm được giữ nguyên.
       </p>
       {(original.variants?.length
@@ -57,7 +57,7 @@ export function InventoryEditor({ product }: { product: Product }) {
         <label key={label} className="grid gap-2 text-sm">
           Tồn kho {label}
           <input
-            className="rounded-md border bg-background p-2"
+            className="bg-background rounded-md border p-2"
             type="number"
             min="0"
             step="1"

@@ -41,7 +41,7 @@ export function DeleteUserConfirmation({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <TriangleAlert className="size-4 text-destructive" />
+            <TriangleAlert className="text-destructive size-4" />
             Xóa tài khoản?
           </DialogTitle>
           <DialogDescription>
@@ -50,7 +50,7 @@ export function DeleteUserConfirmation({
           </DialogDescription>
         </DialogHeader>
         {mutation.isError && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {getApiError(mutation.error).message}
           </p>
         )}

@@ -221,7 +221,7 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
       variant="outline"
       size="sm"
       onClick={onClick}
-      className="relative w-full justify-start font-normal text-muted-foreground sm:pr-12 md:w-36 lg:w-56"
+      className="text-muted-foreground relative w-full justify-start font-normal sm:pr-12 md:w-36 lg:w-56"
     >
       <Search data-icon="inline-start" />
       Tìm kiếm...

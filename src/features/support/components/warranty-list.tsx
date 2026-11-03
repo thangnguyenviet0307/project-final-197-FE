@@ -4,7 +4,11 @@ import { ListPagination } from '@/components/list-pagination';
 import { useWarranties } from '@/features/support/hooks/use-support';
 import { warrantyStatuses } from '@/features/support/schemas/support-schema';
 import type { WarrantyStatus } from '@/features/support/types/support';
-import { supportDate, warrantyLabels, warrantyStatusStyles } from '@/features/support/utils/support';
+import {
+  supportDate,
+  warrantyLabels,
+  warrantyStatusStyles,
+} from '@/features/support/utils/support';
 import { useAuthStore } from '@/stores/auth.store';
 
 export function WarrantyList({
@@ -19,9 +23,9 @@ export function WarrantyList({
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<WarrantyStatus | ''>('');
   const query = useWarranties(admin, page, status);
-  const userId = useAuthStore(state => state.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
   return (
-    <section className="rounded-2xl border bg-background p-5 sm:p-6">
+    <section className="bg-background rounded-2xl border p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-xl font-bold">
           {admin ? 'Danh sách yêu cầu' : 'Yêu cầu của tôi'}
@@ -33,7 +37,7 @@ export function WarrantyList({
             setStatus(event.target.value as WarrantyStatus | '');
             setPage(1);
           }}
-          className="rounded-lg border bg-background p-2 text-sm"
+          className="bg-background rounded-lg border p-2 text-sm"
         >
           <option value="">Tất cả trạng thái</option>
           {warrantyStatuses.map((value) => (
@@ -62,26 +66,38 @@ export function WarrantyList({
                 key={item._id}
                 type="button"
                 aria-pressed={selectedId === item._id}
-                onClick={() => onSelect(item._id)}
+                onClick={() =>
+                  onSelect(selectedId === item._id ? '' : item._id)
+                }
                 className={`block w-full rounded-xl border p-4 text-left transition hover:border-green-500 ${selectedId === item._id ? 'border-green-600 bg-green-50/50' : 'bg-background'}`}
               >
                 <span className="block text-sm font-semibold">
                   {item.productName}
                   {item.variantName && ` · ${item.variantName}`}
                 </span>
-                <span className="mt-2 block text-xs text-muted-foreground">
+                <span className="text-muted-foreground mt-2 block text-xs">
                   {item.orderCode} · {supportDate(item.createdAt)}
                   {admin && ` · ${item.customerName ?? ''}`}
                 </span>
-                {admin && <span className="mt-2 block text-xs text-muted-foreground">{item.handlerId ? item.handlerId === userId ? 'Bạn phụ trách' : 'Đã có người phụ trách' : 'Chưa phân công'}</span>}
-                <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${warrantyStatusStyles[item.status]}`}>
+                {admin && (
+                  <span className="text-muted-foreground mt-2 block text-xs">
+                    {item.handlerId
+                      ? item.handlerId === userId
+                        ? 'Bạn phụ trách'
+                        : 'Đã có người phụ trách'
+                      : 'Chưa phân công'}
+                  </span>
+                )}
+                <span
+                  className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${warrantyStatusStyles[item.status]}`}
+                >
                   {warrantyLabels[item.status]}
                 </span>
               </button>
             ))}
           </div>
           {!query.data.data.length && (
-            <p className="mt-5 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-5 text-sm">
               {page > 1
                 ? 'Không có yêu cầu ở trang này. Hãy chọn trang trước.'
                 : 'Chưa có yêu cầu phù hợp.'}

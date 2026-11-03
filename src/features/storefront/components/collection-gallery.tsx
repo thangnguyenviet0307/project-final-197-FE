@@ -27,7 +27,7 @@ export function CollectionGallery() {
                 <span className="mt-2 block text-sm text-white/75">
                   {collection.caption}
                 </span>
-                <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase">
                   Khám phá <ArrowUpRight size={15} />
                 </span>
               </span>

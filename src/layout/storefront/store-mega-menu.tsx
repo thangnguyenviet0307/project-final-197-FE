@@ -77,10 +77,10 @@ export function StoreMegaMenu() {
         id="store-mega-menu"
         aria-hidden={!open}
         inert={!open}
-        className={`absolute left-1/2 top-full z-50 w-[min(760px,calc(100vw-32px))] -translate-x-1/2 origin-top rounded-b-md border border-gray-200 bg-white p-6 text-gray-900 shadow-xl transition-[opacity,transform,visibility] duration-200 ${
+        className={`absolute top-full left-1/2 z-50 w-[min(760px,calc(100vw-32px))] origin-top -translate-x-1/2 rounded-b-md border border-gray-200 bg-white p-6 text-gray-900 shadow-xl transition-[opacity,transform,visibility] duration-200 ${
           open
             ? 'visible opacity-100'
-            : 'invisible pointer-events-none opacity-0'
+            : 'pointer-events-none invisible opacity-0'
         }`}
       >
         <div className="grid grid-cols-4 gap-6">

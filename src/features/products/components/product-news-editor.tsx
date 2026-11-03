@@ -59,7 +59,7 @@ function NewsSelectionForm({
   }
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         Chọn tối đa 5 tin, theo thứ tự hiển thị. Tin nháp, chưa đến lịch, bị ẩn
         hoặc thuộc danh mục không hoạt động sẽ không xuất hiện trên cửa hàng.
       </p>
@@ -70,7 +70,7 @@ function NewsSelectionForm({
               key={id}
               className="flex flex-wrap items-center gap-2 rounded-lg border p-3"
             >
-              <span className="min-w-0 flex-1 break-words text-sm">
+              <span className="min-w-0 flex-1 text-sm break-words">
                 {titles.get(id)?.title ?? `Tin không còn khả dụng (${id})`}
               </span>
               <Button
@@ -108,7 +108,7 @@ function NewsSelectionForm({
           ))}
         </ol>
         {!ids.length && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Chưa chọn tin tức nào cho sản phẩm.
           </p>
         )}
@@ -146,7 +146,7 @@ function NewsSelectionForm({
         ) : (
           <>
             {!choices.data.data.length && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Không tìm thấy tin tức.
               </p>
             )}
@@ -164,7 +164,7 @@ function NewsSelectionForm({
                   />
                   <span className="min-w-0 break-words">
                     {article.title}
-                    <span className="ml-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground ml-2 text-xs">
                       ({article.status})
                     </span>
                   </span>

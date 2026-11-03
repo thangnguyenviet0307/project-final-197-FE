@@ -74,7 +74,7 @@ function Editor({
         }}
         disabled={mutation.isPending}
       />
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {content.length}/30000 ký tự, bao gồm định dạng. FAQ có thể trình bày
         bằng tiêu đề câu hỏi và phần trả lời.
       </p>

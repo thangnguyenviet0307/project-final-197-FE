@@ -62,7 +62,7 @@ export function NavUser({
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="p-0 font-normal text-foreground">
+              <DropdownMenuLabel className="text-foreground p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <UserAvatar name={user.name} avatar={user.avatar} />
                   <div className="grid flex-1 text-left text-sm leading-tight">

@@ -26,16 +26,27 @@ export function CartClearConfirmation() {
       >
         Xóa sản phẩm
       </DialogTrigger>
-      <DialogContent overlayClassName="bg-black/40 supports-backdrop-filter:backdrop-blur-none" className="gap-0 overflow-hidden border border-gray-200 bg-white p-0 text-gray-900 shadow-xl sm:max-w-md">
+      <DialogContent
+        overlayClassName="bg-black/40 supports-backdrop-filter:backdrop-blur-none"
+        className="gap-0 overflow-hidden border border-gray-200 bg-white p-0 text-gray-900 shadow-xl sm:max-w-md"
+      >
         <DialogHeader className="p-6 pr-10">
-          <DialogTitle className="text-lg font-semibold">Xóa sản phẩm</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">
+            Xóa sản phẩm
+          </DialogTitle>
           <DialogDescription className="mt-2 text-gray-600">
             Bạn có chắc muốn xóa sản phẩm khỏi giỏ hàng?
           </DialogDescription>
-          <p className="mt-3 text-sm font-medium text-gray-900">Đã chọn {selectedCount} sản phẩm.</p>
+          <p className="mt-3 text-sm font-medium text-gray-900">
+            Đã chọn {selectedCount} sản phẩm.
+          </p>
         </DialogHeader>
         <DialogFooter className="m-0 rounded-none border-gray-200 bg-gray-50 p-4">
-          <Button variant="outline" className="border-gray-300 bg-white text-gray-700 hover:bg-gray-100" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            className="border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+            onClick={() => setOpen(false)}
+          >
             Hủy
           </Button>
           <button

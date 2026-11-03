@@ -110,7 +110,7 @@ export default function AdminOrdersPage() {
         )}
         <div>
           <h1 className="text-2xl font-semibold">Đơn hàng</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Xem lịch sử và quản lý xử lý đơn hàng. Đơn mới nhất hiển thị trước.
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
           <label className="grid gap-2 text-sm">
             Trạng thái
             <select
-              className="rounded-md border bg-background p-2"
+              className="bg-background rounded-md border p-2"
               value={isOrderStatus(status) ? status : ''}
               onChange={(event) => change('orderStatus', event.target.value)}
             >

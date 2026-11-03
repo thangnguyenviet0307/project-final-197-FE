@@ -37,7 +37,11 @@ export async function savePolicy(input: {
   );
   return data.data;
 }
-export async function eligibleOrders(page: number, signal?: AbortSignal, orderId?: string) {
+export async function eligibleOrders(
+  page: number,
+  signal?: AbortSignal,
+  orderId?: string
+) {
   const { data } = await api.get<SupportList<EligibleOrder>>(
     '/support/customer/eligible-orders',
     { params: { page, limit: 10, ...(orderId ? { orderId } : {}) }, signal }
@@ -48,11 +52,12 @@ export async function listWarranties(
   admin: boolean,
   page: number,
   status: WarrantyStatus | '',
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  limit = 10
 ) {
   const { data } = await api.get<SupportList<WarrantySummary>>(
     `/support/${admin ? 'admin' : 'customer'}/requests`,
-    { params: { page, limit: 10, ...(status ? { status } : {}) }, signal }
+    { params: { page, limit, ...(status ? { status } : {}) }, signal }
   );
   return data;
 }

@@ -42,7 +42,7 @@ export function StoreHeader() {
           className="hidden items-center gap-3 text-gray-800 transition-colors hover:text-[#55b000] xl:flex"
         >
           <Phone size={23} className="shrink-0" />
-          <div className="whitespace-nowrap leading-tight">
+          <div className="leading-tight whitespace-nowrap">
             <p className="text-xs font-medium">Hỗ trợ khách hàng</p>
             <p className="mt-1 text-sm font-semibold">Liên hệ</p>
           </div>
@@ -61,7 +61,7 @@ export function StoreHeader() {
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200">
               <ShoppingCart size={23} strokeWidth={1.8} />
 
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#55b000] px-1 text-[11px] font-bold text-white">
+              <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#55b000] px-1 text-[11px] font-bold text-white">
                 {count}
               </span>
             </div>

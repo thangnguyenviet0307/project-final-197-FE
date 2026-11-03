@@ -28,13 +28,13 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
         />
         {!!product.badges?.length && (
           <div
-            className="pointer-events-none absolute left-2 right-2 top-2 flex flex-wrap gap-1"
+            className="pointer-events-none absolute top-2 right-2 left-2 flex flex-wrap gap-1"
             aria-label="Nhãn sản phẩm"
           >
             {product.badges.map((badge) => (
               <span
                 key={badge.label}
-                className={`rounded-md px-2 py-1 text-[10px] font-bold leading-tight shadow-sm sm:text-xs ${badge.className}`}
+                className={`rounded-md px-2 py-1 text-[10px] leading-tight font-bold shadow-sm sm:text-xs ${badge.className}`}
               >
                 {badge.label}
               </span>
@@ -42,27 +42,27 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
           </div>
         )}
         {!product.badges?.length && product.badge && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#e9f5e0] px-3 py-1 text-xs font-semibold text-[#397a16]">
+          <span className="absolute top-3 left-3 rounded-full bg-[#e9f5e0] px-3 py-1 text-xs font-semibold text-[#397a16]">
             {product.badge}
           </span>
         )}
-        <span className="absolute bottom-3 right-3 flex size-9 translate-y-2 items-center justify-center rounded-full bg-white text-gray-900 opacity-0 shadow transition group-hover:translate-y-0 group-hover:opacity-100">
+        <span className="absolute right-3 bottom-3 flex size-9 translate-y-2 items-center justify-center rounded-full bg-white text-gray-900 opacity-0 shadow transition group-hover:translate-y-0 group-hover:opacity-100">
           <ArrowUpRight size={17} />
         </span>
       </Link>
       <div className="product-card-content flex min-h-0 flex-1 flex-col gap-2 p-4 sm:p-5">
-        <p className="product-card-meta line-clamp-2 break-words h-8 shrink-0 text-xs font-semibold uppercase leading-4 tracking-[0.15em] text-gray-400">
+        <p className="product-card-meta line-clamp-2 h-8 shrink-0 text-xs leading-4 font-semibold tracking-[0.15em] break-words text-gray-400 uppercase">
           {product.brand} <span className="px-1 text-gray-300">/</span>{' '}
           {product.category}
         </p>
         <Link
           to={`/shop/${encodeURIComponent(product.slug)}`}
           state={linkState}
-          className="product-card-title line-clamp-2 break-words h-12 shrink-0 font-semibold leading-6 text-gray-900 hover:text-[#4d9210]"
+          className="product-card-title line-clamp-2 h-12 shrink-0 leading-6 font-semibold break-words text-gray-900 hover:text-[#4d9210]"
         >
           {product.name}
         </Link>
-        <div className="product-card-prices *:whitespace-nowrap mt-auto flex min-h-14 shrink-0 flex-wrap content-start items-baseline gap-x-2 gap-y-1 pt-1">
+        <div className="product-card-prices mt-auto flex min-h-14 shrink-0 flex-wrap content-start items-baseline gap-x-2 gap-y-1 pt-1 *:whitespace-nowrap">
           <span className="font-bold text-[#397a16]" aria-label="Giá bán">
             {formatStorePrice(product.price)}
           </span>

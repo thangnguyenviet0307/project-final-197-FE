@@ -98,7 +98,7 @@ function getRoleIcon(role: ManagedUser['role']) {
   return (
     <Icon
       aria-hidden="true"
-      className="size-4.5 shrink-0 text-muted-foreground"
+      className="text-muted-foreground size-4.5 shrink-0"
     />
   );
 }
@@ -123,7 +123,7 @@ function FilterMenu<T extends string>({
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <select
         id={id}
-        className="h-8 rounded-md border bg-background px-2 text-sm"
+        className="bg-background h-8 rounded-md border px-2 text-sm"
         value={value}
         onChange={(event) => {
           const selected = options.find(
@@ -180,7 +180,7 @@ function ResetPasswordDialog({
             <Input id="reset-password-default" value={password} readOnly />
           </Field>
           {mutation.error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {getApiError(mutation.error).message}
             </p>
           )}
@@ -235,17 +235,17 @@ function UserProfileDialog({
             Thông tin tài khoản của {name || user.email}.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex min-w-0 items-center gap-4 rounded-lg bg-muted/50 p-4">
+        <div className="bg-muted/50 flex min-w-0 items-center gap-4 rounded-lg p-4">
           <UserAvatar
             name={name || getUsername(user)}
             avatar={user.avatar}
             className="size-14"
           />
           <div className="min-w-0">
-            <p className="wrap-break-word text-lg font-semibold">
+            <p className="text-lg font-semibold wrap-break-word">
               {name || getUsername(user)}
             </p>
-            <p className="break-all text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm break-all">
               {user.email}
             </p>
           </div>
@@ -253,21 +253,21 @@ function UserProfileDialog({
         <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
           {details.map(([label, value]) => (
             <div key={label} className="min-w-0">
-              <dt className="text-xs text-muted-foreground">{label}</dt>
-              <dd className="mt-1 wrap-break-word text-sm">
+              <dt className="text-muted-foreground text-xs">{label}</dt>
+              <dd className="mt-1 text-sm wrap-break-word">
                 {value?.trim() || 'Chưa cung cấp'}
               </dd>
             </div>
           ))}
           <div>
-            <dt className="text-xs text-muted-foreground">Vai trò</dt>
+            <dt className="text-muted-foreground text-xs">Vai trò</dt>
             <dd className="mt-1 flex items-center gap-2">
               {getRoleIcon(user.role)}
               {getRoleLabel(user.role)}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Trạng thái</dt>
+            <dt className="text-muted-foreground text-xs">Trạng thái</dt>
             <dd className="mt-1">
               <Badge variant={user.active ? 'secondary' : 'destructive'}>
                 {user.active ? 'Đang hoạt động' : 'Bị đình chỉ'}
@@ -275,8 +275,8 @@ function UserProfileDialog({
             </dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-xs text-muted-foreground">Giới thiệu</dt>
-            <dd className="mt-1 whitespace-pre-wrap wrap-break-word text-sm">
+            <dt className="text-muted-foreground text-xs">Giới thiệu</dt>
+            <dd className="mt-1 text-sm wrap-break-word whitespace-pre-wrap">
               {user.bio?.trim() || 'Chưa cung cấp'}
             </dd>
           </div>
@@ -399,7 +399,7 @@ export default function UsersPage() {
           {statistics.map(({ label, value, caption, Icon, color }) => (
             <Card key={label}>
               <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-                <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+                <CardTitle className="text-muted-foreground text-xs font-medium uppercase">
                   {label}
                 </CardTitle>
                 <Icon className={`size-4 shrink-0 ${color}`} />
@@ -414,13 +414,13 @@ export default function UsersPage() {
                     (value ?? '-')
                   )}
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{caption}</p>
+                <p className="text-muted-foreground mt-1 text-xs">{caption}</p>
               </CardContent>
             </Card>
           ))}
         </section>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {users.data
               ? `${users.data.pagination.total} tài khoản`
               : 'Tài khoản người dùng'}
@@ -458,7 +458,7 @@ export default function UsersPage() {
                     variant="ghost"
                     size="icon-sm"
                     aria-label="Xóa tìm kiếm tài khoản"
-                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    className="absolute top-1/2 right-1 -translate-y-1/2"
                     onClick={() => {
                       setSearchInput('');
                       setSearch('');
@@ -503,12 +503,12 @@ export default function UsersPage() {
               Đặt lại bộ lọc
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Vai trò, trạng thái và thứ tự sắp xếp được áp dụng cho tất cả các
             trang kết quả.
           </p>
         </div>
-        <p role="status" className="text-sm text-muted-foreground">
+        <p role="status" className="text-muted-foreground text-sm">
           {users.isFetching && !users.isLoading
             ? search
               ? 'Searching'
@@ -516,7 +516,7 @@ export default function UsersPage() {
             : ''}
         </p>
         {revokeSessions.error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {getApiError(revokeSessions.error).message}
           </p>
         )}
@@ -524,7 +524,7 @@ export default function UsersPage() {
         {users.isError && (
           <div
             role="alert"
-            className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm"
+            className="border-destructive/40 bg-destructive/10 mb-4 flex items-center justify-between gap-3 rounded-lg border p-3 text-sm"
           >
             <span>{getApiError(users.error).message}</span>
             <Button
@@ -537,7 +537,7 @@ export default function UsersPage() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-lg border border-border">
+        <div className="border-border overflow-hidden rounded-lg border">
           <Table
             className="w-full min-w-250 table-fixed"
             aria-label="Bảng danh sách người dùng"
@@ -567,7 +567,7 @@ export default function UsersPage() {
                         type="button"
                         aria-label="Sắp xếp theo tên đăng nhập"
                         title="Sắp xếp theo tên đăng nhập"
-                        className="inline-flex cursor-pointer items-center gap-3 rounded py-1 focus-visible:outline-2 focus-visible:outline-ring"
+                        className="focus-visible:outline-ring inline-flex cursor-pointer items-center gap-3 rounded py-1 focus-visible:outline-2"
                         onClick={() => {
                           setSortDirection((previous) =>
                             previous === 'asc' ? 'desc' : 'asc'
@@ -601,7 +601,7 @@ export default function UsersPage() {
                     tabIndex={0}
                     aria-haspopup="dialog"
                     aria-label={`Xem hồ sơ của ${user.email}`}
-                    className="cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+                    className="focus-visible:outline-ring cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2"
                     onClick={() => setProfileUser(user)}
                     onKeyDown={(event) => {
                       if (
@@ -738,7 +738,7 @@ export default function UsersPage() {
                 <TableRow className="hover:bg-transparent">
                   <TableCell
                     colSpan={columns.length + 1}
-                    className="h-64 text-center text-muted-foreground"
+                    className="text-muted-foreground h-64 text-center"
                   >
                     {users.isLoading ? (
                       <ContentSkeleton label="Đang tải người dùng..." />
@@ -815,7 +815,7 @@ export default function UsersPage() {
                   onChange={(event) =>
                     setEditRole(event.target.value as ManagedUser['role'])
                   }
-                  className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                  className="border-input bg-background h-10 rounded-lg border px-3 text-sm"
                 >
                   {roleOptions
                     .filter(
@@ -837,14 +837,14 @@ export default function UsersPage() {
                   onChange={(event) =>
                     setEditActive(event.target.value === 'active')
                   }
-                  className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
+                  className="border-input bg-background h-10 rounded-lg border px-3 text-sm"
                 >
                   <option value="active">Đang hoạt động</option>
                   <option value="suspended">Bị đình chỉ</option>
                 </select>
               </Field>
               {editError && (
-                <p role="alert" className="text-sm text-destructive">
+                <p role="alert" className="text-destructive text-sm">
                   {editError}
                 </p>
               )}

@@ -243,7 +243,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
             className="size-24 border"
           />
           {!product && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Lưu sản phẩm trước, sau đó tải ảnh lên từ trang chi tiết sản phẩm.
             </p>
           )}
@@ -256,7 +256,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                   0
                 )}
               </output>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Được tính từ tồn kho của các biến thể.
               </p>
             </Field>

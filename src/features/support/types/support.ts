@@ -21,6 +21,7 @@ export type WarrantyStatus =
   'submitted' | 'reviewing' | 'repairing' | 'resolved' | 'rejected';
 export interface WarrantySummary {
   _id: string;
+  orderId?: string;
   orderCode: string;
   productName: string;
   variantName: string;

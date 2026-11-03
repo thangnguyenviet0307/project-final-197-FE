@@ -21,7 +21,7 @@ export function ProductDetailGallery({ product }: { product: Product }) {
 
   return (
     <section aria-label="Hình ảnh sản phẩm" className="min-w-0 space-y-3">
-      <div className="overflow-hidden rounded-xl border bg-muted/20">
+      <div className="bg-muted/20 overflow-hidden rounded-xl border">
         <ProductImage
           src={active}
           alt={product.product_name}
@@ -38,7 +38,7 @@ export function ProductDetailGallery({ product }: { product: Product }) {
                 aria-label={`Xem ảnh ${index + 1}`}
                 aria-pressed={active === url}
                 onClick={() => setSelected(url)}
-                className={`size-20 shrink-0 overflow-hidden rounded-lg border-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${active === url ? 'border-primary' : 'border-transparent'}`}
+                className={`focus-visible:outline-ring size-20 shrink-0 overflow-hidden rounded-lg border-2 focus-visible:outline-2 focus-visible:outline-offset-2 ${active === url ? 'border-primary' : 'border-transparent'}`}
               >
                 <ProductImage
                   src={url}
@@ -48,12 +48,12 @@ export function ProductDetailGallery({ product }: { product: Product }) {
               </button>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {images.length} ảnh · Chọn ảnh để xem chi tiết
           </p>
         </>
       ) : (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Chưa có hình ảnh sản phẩm.
         </p>
       )}

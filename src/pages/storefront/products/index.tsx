@@ -167,7 +167,7 @@ function BrandLogo({ brand }: { brand: PublicBrand }) {
 
   return (
     <span
-      className={`flex min-w-0 items-center justify-center gap-2 h-[50px] px-4`}
+      className={`flex h-[50px] min-w-0 items-center justify-center gap-2 px-4`}
     >
       {showImage ? (
         <img
@@ -205,7 +205,7 @@ function FilterChoice({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`shrink-0 min-w-0 rounded-xl border text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] ${
+      className={`min-w-0 shrink-0 rounded-xl border text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] ${
         selected
           ? 'border-[#4d9210] bg-[#e9f5e0] text-[#397a16] ring-1 ring-[#4d9210]'
           : 'border-gray-200 bg-white text-gray-700 hover:border-[#9acb74]'
@@ -569,7 +569,7 @@ export default function StorefrontProductsPage() {
                   </DialogTitle>
                   <DialogClose
                     aria-label="Đóng bộ lọc"
-                    className="absolute right-4 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-600 hover:bg-gray-50"
+                    className="absolute top-1/2 right-4 inline-flex h-10 -translate-y-1/2 items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-600 hover:bg-gray-50"
                   >
                     <X size={16} /> Đóng
                   </DialogClose>
@@ -588,7 +588,7 @@ export default function StorefrontProductsPage() {
                     <section aria-labelledby="filter-brands-heading">
                       <h3
                         id="filter-brands-heading"
-                        className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700"
+                        className="mb-3 text-sm font-semibold tracking-[0.12em] text-gray-700 uppercase"
                       >
                         Thương hiệu
                       </h3>
@@ -633,7 +633,7 @@ export default function StorefrontProductsPage() {
                     <section aria-labelledby="filter-price-heading">
                       <h3
                         id="filter-price-heading"
-                        className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700"
+                        className="mb-3 text-sm font-semibold tracking-[0.12em] text-gray-700 uppercase"
                       >
                         Khoảng giá
                       </h3>
@@ -669,7 +669,7 @@ export default function StorefrontProductsPage() {
                     <section aria-labelledby="filter-categories-heading">
                       <h3
                         id="filter-categories-heading"
-                        className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-gray-700"
+                        className="mb-3 text-sm font-semibold tracking-[0.12em] text-gray-700 uppercase"
                       >
                         Danh mục sản phẩm
                       </h3>
@@ -756,7 +756,7 @@ export default function StorefrontProductsPage() {
                       type="submit"
                       disabled={!previewReady}
                       aria-busy={!previewReady && !preview.isError}
-                      className="min-w-56 disabled:cursor-not-allowed disabled:opacity-60 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]"
+                      className="inline-flex min-h-11 min-w-56 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {previewReady
                         ? `Xem ${preview.data} kết quả`

@@ -10,7 +10,7 @@ export function ForbiddenError() {
     getAuthArea() === 'admin' ? '/auth/login' : '/thanh-vien?act=login';
   return (
     <div className="mx-auto flex min-h-svh max-w-lg flex-col items-center justify-center gap-5 p-6 text-center">
-      <ShieldX className="size-16 text-destructive" />
+      <ShieldX className="text-destructive size-16" />
       <h1 className="text-4xl font-bold">403</h1>
       <h2 className="text-xl font-semibold">Truy cập bị từ chối</h2>
       <p className="text-muted-foreground">

@@ -38,7 +38,7 @@ export default function ProductEditPage() {
         ) : (
           <>
             {query.isError && (
-              <div role="alert" className="space-y-2 text-sm text-destructive">
+              <div role="alert" className="text-destructive space-y-2 text-sm">
                 <p>
                   Không thể làm mới dữ liệu sản phẩm. Các thay đổi chưa lưu được
                   giữ nguyên. {getApiError(query.error).message}

@@ -148,7 +148,7 @@ export default function AdminCategoriesPage() {
           {cards.map(({ label, value, Icon, color }) => (
             <Card key={label}>
               <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-                <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+                <CardTitle className="text-muted-foreground text-xs font-medium uppercase">
                   {label}
                 </CardTitle>
                 <Icon className={`size-4 shrink-0 ${color}`} />
@@ -163,7 +163,7 @@ export default function AdminCategoriesPage() {
                     value
                   )}
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-xs">
                   Tất cả danh mục
                 </p>
               </CardContent>
@@ -171,7 +171,7 @@ export default function AdminCategoriesPage() {
           ))}
         </section>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {filteredCategories.length} danh mục
           </p>
           {canManage && (
@@ -206,7 +206,7 @@ export default function AdminCategoriesPage() {
               <FieldLabel htmlFor="category-status">Trạng thái</FieldLabel>
               <select
                 id="category-status"
-                className="h-8 rounded-md border bg-background px-2 text-sm"
+                className="bg-background h-8 rounded-md border px-2 text-sm"
                 value={statusFilter}
                 onChange={(event) => {
                   const value = event.target.value;
@@ -251,13 +251,13 @@ export default function AdminCategoriesPage() {
         ) : (
           <>
             {isFetching && (
-              <p role="status" className="text-sm text-muted-foreground">
+              <p role="status" className="text-muted-foreground text-sm">
                 Đang cập nhật danh mục...
               </p>
             )}
             {!visibleCategories.length ? (
               <div className="grid justify-items-center gap-3 rounded-lg border py-12">
-                <FolderTree className="size-8 text-muted-foreground" />
+                <FolderTree className="text-muted-foreground size-8" />
                 <p>Không tìm thấy danh mục.</p>
               </div>
             ) : (
@@ -293,7 +293,7 @@ export default function AdminCategoriesPage() {
                       return (
                         <TableRow key={category._id}>
                           <TableCell>
-                            <div className="flex min-w-48 max-w-80 items-center gap-3">
+                            <div className="flex max-w-80 min-w-48 items-center gap-3">
                               <CatalogImage
                                 src={category.icon}
                                 alt={category.name}
@@ -310,7 +310,7 @@ export default function AdminCategoriesPage() {
                             {category.slug}
                           </TableCell>
                           <TableCell
-                            className="max-w-80 truncate text-muted-foreground"
+                            className="text-muted-foreground max-w-80 truncate"
                             title={category.description}
                           >
                             {category.description || '-'}
@@ -327,7 +327,7 @@ export default function AdminCategoriesPage() {
                                 : 'Ngừng hoạt động'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="whitespace-nowrap text-muted-foreground">
+                          <TableCell className="text-muted-foreground whitespace-nowrap">
                             {category.createdAt
                               ? new Date(category.createdAt).toLocaleDateString(
                                   'vi-VN'

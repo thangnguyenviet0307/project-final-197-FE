@@ -69,7 +69,7 @@ export function ProductFlags({
               </span>
             )}
             {field === 'on_sale' && failed && (
-              <div role="alert" className="min-w-40 text-xs text-destructive">
+              <div role="alert" className="text-destructive min-w-40 text-xs">
                 {getApiError(mutation.error).message}
                 <Button
                   variant="outline"

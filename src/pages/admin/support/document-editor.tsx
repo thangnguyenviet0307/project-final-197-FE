@@ -83,7 +83,7 @@ function Editor({
           {preview ? 'Tiếp tục soạn thảo' : 'Xem trước bản đang soạn'}
         </Button>
       </div>
-      <p className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+      <p className="bg-muted/30 text-muted-foreground rounded-lg border p-4 text-sm">
         Lưu và công bố chỉ áp dụng cho “{title}”. Ngày đăng được giữ nguyên khi
         cập nhật; ngày cập nhật chỉ đổi khi nội dung công bố thay đổi.
       </p>
@@ -104,7 +104,7 @@ function Editor({
           disabled={mutation.isPending}
         />
       )}
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         {content.length}/{maxLength} ký tự, bao gồm định dạng.
       </p>
       {error && (

@@ -116,7 +116,7 @@ export function OrderDateFilter({
         Xóa khoảng ngày
       </Button>
       {invalid && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           Nhập ngày hợp lệ, với ngày bắt đầu không sau ngày kết thúc.
         </p>
       )}

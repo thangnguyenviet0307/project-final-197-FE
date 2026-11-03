@@ -28,12 +28,32 @@ export function HandlerPicker({
 }) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const user = useAuthStore(state => state.user);
+  const user = useAuthStore((state) => state.user);
   const query = useOrderAssignees(page, search);
-  const candidates = query.data?.data.filter(person => person._id !== user?.id && (person.role === 'staff' || (user?.role === 'super_admin' && person.role === 'admin'))) ?? [];
+  const candidates =
+    query.data?.data.filter(
+      (person) =>
+        person._id !== user?.id &&
+        (person.role === 'staff' ||
+          (user?.role === 'super_admin' && person.role === 'admin'))
+    ) ?? [];
   return (
     <div className="min-w-0 space-y-3">
-      <label className="flex min-w-0 items-start gap-3 rounded-lg border bg-muted/30 p-3 text-sm"><input type="radio" name="order-handler" className="mt-1 shrink-0" checked={selected === user?.id} disabled={disabled} onChange={() => { if (user) onSelect(user.id); }} /><span className="min-w-0 break-words font-medium">Tự nhận đơn{user ? ` · ${user.lastName} ${user.firstName}` : ""}</span></label>
+      <label className="bg-muted/30 flex min-w-0 items-start gap-3 rounded-lg border p-3 text-sm">
+        <input
+          type="radio"
+          name="order-handler"
+          className="mt-1 shrink-0"
+          checked={selected === user?.id}
+          disabled={disabled}
+          onChange={() => {
+            if (user) onSelect(user.id);
+          }}
+        />
+        <span className="min-w-0 font-medium break-words">
+          Tự nhận đơn{user ? ` · ${user.lastName} ${user.firstName}` : ''}
+        </span>
+      </label>
       <label className="grid min-w-0 gap-1 text-sm">
         Tìm nhân viên xử lý
         <Input
@@ -62,24 +82,42 @@ export function HandlerPicker({
             aria-busy={query.isFetching}
           >
             {candidates.map((person) => (
-                <label
-                  key={person._id}
-                  className="flex min-w-0 items-start gap-3 rounded-lg border p-3 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name="order-handler"
-                    value={person._id}
-                    checked={selected === person._id}
-                    disabled={disabled || query.isFetching}
-                    onChange={() => onSelect(person._id)}
-                  />
-                  <span className="min-w-0 break-words"><span className="block font-medium">{[person.lastName, person.firstName].filter(Boolean).join(" ") || person.email}</span><span className="block break-all text-xs text-muted-foreground">{person.email} · {person.role === "admin" ? "Quản trị viên" : "Nhân viên"}</span></span>
-                </label>
-              ))}
+              <label
+                key={person._id}
+                className="flex min-w-0 items-start gap-3 rounded-lg border p-3 text-sm"
+              >
+                <input
+                  type="radio"
+                  name="order-handler"
+                  value={person._id}
+                  checked={selected === person._id}
+                  disabled={disabled || query.isFetching}
+                  onChange={() => onSelect(person._id)}
+                />
+                <span className="min-w-0 break-words">
+                  <span className="block font-medium">
+                    {[person.lastName, person.firstName]
+                      .filter(Boolean)
+                      .join(' ') || person.email}
+                  </span>
+                  <span className="text-muted-foreground block text-xs break-all">
+                    {person.email} ·{' '}
+                    {person.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}
+                  </span>
+                </span>
+              </label>
+            ))}
           </div>
-          {!candidates.length && <p>Không có nhân viên đang hoạt động trên trang này.</p>}
-          <ListPagination label="Phân trang người xử lý đơn" page={page} totalPages={Math.max(1, query.data?.pagination.totalPages ?? 1)} disabled={disabled || query.isFetching} onPageChange={setPage} />
+          {!candidates.length && (
+            <p>Không có nhân viên đang hoạt động trên trang này.</p>
+          )}
+          <ListPagination
+            label="Phân trang người xử lý đơn"
+            page={page}
+            totalPages={Math.max(1, query.data?.pagination.totalPages ?? 1)}
+            disabled={disabled || query.isFetching}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>
@@ -115,7 +153,7 @@ export function StartOrderAction({
           {mutation.isPending ? 'Starting…' : 'Nhận đơn & bắt đầu'}
         </Button>
         {mutation.error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {getApiError(mutation.error).message}
           </p>
         )}
@@ -140,7 +178,10 @@ export function StartOrderAction({
           if (!mutation.isPending) setOpen(value);
         }}
       >
-        <DialogContent className="sm:max-w-lg" showCloseButton={!mutation.isPending}>
+        <DialogContent
+          className="sm:max-w-lg"
+          showCloseButton={!mutation.isPending}
+        >
           <DialogHeader>
             <DialogTitle>Bắt đầu xử lý đơn hàng?</DialogTitle>
             <DialogDescription className="break-all">

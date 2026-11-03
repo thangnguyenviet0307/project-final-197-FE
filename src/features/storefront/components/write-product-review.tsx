@@ -107,7 +107,10 @@ export function WriteProductReview({
               {product.product_name}
             </p>
             <fieldset disabled={mutation.isPending}>
-              <legend className="mb-3 text-center text-sm font-medium">Chọn số sao<RequiredMark /></legend>
+              <legend className="mb-3 text-center text-sm font-medium">
+                Chọn số sao
+                <RequiredMark />
+              </legend>
               <div className="mx-auto flex max-w-md justify-center gap-2 sm:gap-5">
                 {labels.map((label, index) => (
                   <button
@@ -142,7 +145,8 @@ export function WriteProductReview({
                     htmlFor="store-review-comment"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Đánh giá của bạn<RequiredMark />
+                    Đánh giá của bạn
+                    <RequiredMark />
                   </label>
                   <textarea
                     id="store-review-comment"

@@ -23,7 +23,7 @@ export function CatalogImage({
         aria-label={`${alt}: ảnh không khả dụng`}
         className={cn(
           classes,
-          'inline-flex items-center justify-center bg-muted text-muted-foreground'
+          'bg-muted text-muted-foreground inline-flex items-center justify-center'
         )}
       >
         <ImageOff className="size-5" />

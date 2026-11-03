@@ -11,7 +11,7 @@ export function AdminStoreProductLink({
 }) {
   if (!product.slug || !product.is_active)
     return compact ? null : (
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         Sản phẩm chưa được hiển thị trên cửa hàng.
       </p>
     );

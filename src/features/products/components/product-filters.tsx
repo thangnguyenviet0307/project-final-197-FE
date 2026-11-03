@@ -66,7 +66,7 @@ export function ProductFilters({
             <FieldLabel htmlFor={`filter-${name}`}>{label}</FieldLabel>
             <select
               id={`filter-${name}`}
-              className="h-8 rounded-md border bg-background px-2 text-sm"
+              className="bg-background h-8 rounded-md border px-2 text-sm"
               disabled={query.isPending}
               value={draft[name]}
               onChange={(event) =>
@@ -100,7 +100,7 @@ export function ProductFilters({
           <FieldLabel htmlFor="filter-stock">Tồn kho</FieldLabel>
           <select
             id="filter-stock"
-            className="h-8 rounded-md border bg-background px-2 text-sm"
+            className="bg-background h-8 rounded-md border px-2 text-sm"
             value={draft.stockStatus}
             onChange={(event) =>
               setDraft((previous) => ({
@@ -120,7 +120,7 @@ export function ProductFilters({
             <FieldLabel htmlFor={`filter-${name}`}>{label}</FieldLabel>
             <select
               id={`filter-${name}`}
-              className="h-8 rounded-md border bg-background px-2 text-sm"
+              className="bg-background h-8 rounded-md border px-2 text-sm"
               value={draft[name] ?? ''}
               onChange={(event) =>
                 setDraft((previous) => ({

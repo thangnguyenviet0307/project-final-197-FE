@@ -18,7 +18,7 @@ export function ProductImage({
         role="img"
         aria-label={alt ? `${alt}: ảnh không khả dụng` : 'Ảnh không khả dụng'}
         className={cn(
-          'inline-flex shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground',
+          'bg-muted text-muted-foreground inline-flex shrink-0 items-center justify-center rounded-md',
           className
         )}
       >

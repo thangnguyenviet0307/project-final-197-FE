@@ -28,7 +28,7 @@ export function StorefrontBuyingGuide() {
       className="bg-[#f5f6f4] py-12 sm:py-16"
       aria-label="Hướng dẫn khám phá sản phẩm"
     >
-      <div className="store-container ">
+      <div className="store-container">
         <SectionHeading
           title="Cách chọn đúng phụ kiện"
           description="Một vài bước đơn giản giúp bạn tìm và chọn phụ kiện phù hợp với thiết bị đang sử dụng."
@@ -42,7 +42,7 @@ export function StorefrontBuyingGuide() {
               <div className="flex size-10 items-center justify-center rounded-full bg-[#edf6e6] text-[#57952b]">
                 <Icon size={19} />
               </div>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[#57952b]">
+              <p className="mt-5 text-xs font-bold tracking-[0.16em] text-[#57952b] uppercase">
                 Bước {index + 1}
               </p>
               <h3 className="mt-2 text-lg font-bold text-gray-950">{title}</h3>

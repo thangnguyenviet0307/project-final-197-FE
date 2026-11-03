@@ -44,7 +44,7 @@ export function ProductNewsSidebar({ slug }: { slug: string }) {
                   className="h-20 w-24 shrink-0 rounded-lg object-cover"
                 />
                 <div className="min-w-0">
-                  <h3 className="line-clamp-3 text-sm font-semibold leading-5 text-gray-900 group-hover:text-[#4d9210]">
+                  <h3 className="line-clamp-3 text-sm leading-5 font-semibold text-gray-900 group-hover:text-[#4d9210]">
                     {article.title}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-xs leading-5 text-gray-500">

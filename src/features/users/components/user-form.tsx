@@ -192,7 +192,7 @@ export function UserForm({
           </div>
         </fieldset>
         {form.formState.errors.root && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {form.formState.errors.root.message}
           </p>
         )}

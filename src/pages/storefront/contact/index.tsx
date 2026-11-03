@@ -81,7 +81,7 @@ export default function ContactPage() {
   return (
     <div className="w-full bg-white text-gray-900">
       {/* BREADCRUMB */}
-      <div className="store-container ">
+      <div className="store-container">
         <nav
           aria-label="Đường dẫn điều hướng"
           className="flex items-center gap-2 py-4 text-xs text-gray-500"
@@ -99,7 +99,7 @@ export default function ContactPage() {
       {/* HERO SECTION - NO IMAGE */}
       <section className="relative overflow-hidden bg-[#223328] text-white">
         <div className="store-container relative py-8 sm:py-10">
-          <span className="text-xs font-bold uppercase tracking-[0.24em] text-[#99df54]">
+          <span className="text-xs font-bold tracking-[0.24em] text-[#99df54] uppercase">
             HỖ TRỢ TỪ DEMO STORE
           </span>
 
@@ -305,7 +305,7 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#55b000] px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#55b000]"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#55b000] px-8 text-sm font-bold tracking-wider text-white uppercase transition-colors hover:bg-[#459000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#55b000]"
               >
                 <Send size={17} />
                 KIỂM TRA THÔNG TIN

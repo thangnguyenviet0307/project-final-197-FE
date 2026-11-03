@@ -9,9 +9,9 @@ function RouteProgress() {
     <div
       role="progressbar"
       aria-label="Đang tải trang"
-      className="route-progress fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden bg-primary/15"
+      className="route-progress bg-primary/15 fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden"
     >
-      <div className="route-progress-bar h-full w-1/3 bg-primary" />
+      <div className="route-progress-bar bg-primary h-full w-1/3" />
     </div>
   );
 }

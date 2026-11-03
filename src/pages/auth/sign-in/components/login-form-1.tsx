@@ -95,7 +95,7 @@ export function LoginForm1({
               <FieldError errors={[form.formState.errors.password]} />
             </Field>
             {form.formState.errors.root && (
-              <p role="alert" className="text-sm text-destructive">
+              <p role="alert" className="text-destructive text-sm">
                 {form.formState.errors.root.message}
               </p>
             )}

@@ -55,11 +55,11 @@ export function ArticleSidebar({
                   state={{ returnTo }}
                   className="group flex gap-3"
                 >
-                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-[#f0f6e9] text-base font-bold tabular-nums text-[#4d9210]">
+                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-[#f0f6e9] text-base font-bold text-[#4d9210] tabular-nums">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold leading-6 text-gray-800 group-hover:text-[#4d9210]">
+                    <h3 className="text-sm leading-6 font-semibold text-gray-800 group-hover:text-[#4d9210]">
                       {article.title}
                     </h3>
                     <div className="mt-2 text-xs text-gray-500">
@@ -111,10 +111,10 @@ export function ArticleSidebar({
                     className={
                       index === 0
                         ? 'mb-3 aspect-[16/10] w-full'
-                        : 'float-left mr-3 mt-1 h-16 w-20 rounded-xl'
+                        : 'float-left mt-1 mr-3 h-16 w-20 rounded-xl'
                     }
                   />
-                  <h3 className="text-sm font-semibold leading-6 text-gray-800 group-hover:text-[#4d9210]">
+                  <h3 className="text-sm leading-6 font-semibold text-gray-800 group-hover:text-[#4d9210]">
                     {article.title}
                   </h3>
                   <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#4d9210]">

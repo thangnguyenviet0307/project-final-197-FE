@@ -150,7 +150,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Loại bài
           <select
-            className="h-10 rounded-md border bg-background px-3"
+            className="bg-background h-10 rounded-md border px-3"
             value={draft.type}
             onChange={(e) =>
               patch({ type: e.target.value as typeof draft.type })
@@ -164,7 +164,7 @@ export function ArticleForm({
           Danh mục
           <select
             required={!article || !!article.categoryId}
-            className="h-10 rounded-md border bg-background px-3"
+            className="bg-background h-10 rounded-md border px-3"
             value={draft.categoryId}
             onChange={(e) =>
               patch({
@@ -220,7 +220,7 @@ export function ArticleForm({
             value={draft.content}
             onChange={(e) => patch({ content: e.target.value })}
           />
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             Nội dung hiển thị dạng văn bản, giữ xuống dòng.
           </span>
         </label>
@@ -236,7 +236,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Trạng thái
           <select
-            className="h-10 rounded-md border bg-background px-3"
+            className="bg-background h-10 rounded-md border px-3"
             value={draft.status}
             onChange={(e) =>
               patch({ status: e.target.value as typeof draft.status })
@@ -315,7 +315,7 @@ export function ArticleForm({
         >
           <h2 className="text-xl font-bold">{draft.title}</h2>
           <p>{draft.excerpt}</p>
-          <div className="whitespace-pre-wrap break-words">{draft.content}</div>
+          <div className="break-words whitespace-pre-wrap">{draft.content}</div>
         </article>
       )}
       {error && (

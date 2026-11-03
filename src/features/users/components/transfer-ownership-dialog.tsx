@@ -60,7 +60,7 @@ export function TransferOwnershipDialog({
             />
           </label>
           {mutation.error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {getApiError(mutation.error).message}
             </p>
           )}

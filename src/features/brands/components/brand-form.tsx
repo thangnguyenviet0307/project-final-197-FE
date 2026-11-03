@@ -46,7 +46,9 @@ export function BrandForm({
     },
   });
   const image = useSelectedImage();
-  const navigation = useUnsavedForm(form.formState.isDirty || !!image.selected || form.formState.isSubmitting);
+  const navigation = useUnsavedForm(
+    form.formState.isDirty || !!image.selected || form.formState.isSubmitting
+  );
   const busy = form.formState.isSubmitting;
   return (
     <>
@@ -57,7 +59,10 @@ export function BrandForm({
         onSubmit={form.handleSubmit(async (values) => {
           form.clearErrors();
           try {
-            await onSubmit({ ...values, ...(image.selected ? { image: image.selected.file } : {}) });
+            await onSubmit({
+              ...values,
+              ...(image.selected ? { image: image.selected.file } : {}),
+            });
             navigation.allowSavedNavigation();
             onSaved?.();
           } catch (error) {
@@ -75,7 +80,15 @@ export function BrandForm({
             />
             <FieldError errors={[form.formState.errors.name]} />
           </Field>
-          <ImageUploadField id="brand-logo" label="Ảnh thương hiệu" selected={image.selected} existingUrl={brand?.logoUrl} error={image.error} disabled={busy} onSelect={image.select} />
+          <ImageUploadField
+            id="brand-logo"
+            label="Ảnh thương hiệu"
+            selected={image.selected}
+            existingUrl={brand?.logoUrl}
+            error={image.error}
+            disabled={busy}
+            onSelect={image.select}
+          />
           <Field>
             <FieldLabel htmlFor="brand-description">Mô tả</FieldLabel>
             <Textarea
@@ -91,7 +104,7 @@ export function BrandForm({
           </label>
         </fieldset>
         {form.formState.errors.root && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {form.formState.errors.root.message}
           </p>
         )}

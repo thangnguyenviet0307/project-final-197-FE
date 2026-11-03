@@ -34,7 +34,7 @@ export default function AdminHeroSlidesPage() {
     >
       <div className="space-y-4 px-4 lg:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Tối đa 50 slide. Thứ tự nhỏ hiển thị trước.
           </p>
           <Button
@@ -75,7 +75,7 @@ export default function AdminHeroSlidesPage() {
                 {query.data.map((slide) => (
                   <tr key={slide._id} className="border-b last:border-0">
                     <td className="p-3">{slide.sortOrder}</td>
-                    <td className="max-w-md whitespace-pre-line break-words p-3 font-medium">
+                    <td className="max-w-md p-3 font-medium break-words whitespace-pre-line">
                       {slide.title}
                     </td>
                     <td className="p-3">
@@ -91,7 +91,7 @@ export default function AdminHeroSlidesPage() {
                         ? 'Đang hiển thị'
                         : 'Đã ẩn'}
                     </td>
-                    <td className="whitespace-nowrap p-3">
+                    <td className="p-3 whitespace-nowrap">
                       <Button
                         variant="outline"
                         disabled={query.isFetching}

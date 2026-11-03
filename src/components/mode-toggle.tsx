@@ -50,13 +50,13 @@ export function ModeToggle({ variant = 'outline' }: ModeToggleProps) {
       variant={variant}
       size="icon"
       onClick={handleToggle}
-      className="cursor-pointer mode-toggle-button relative overflow-hidden"
+      className="mode-toggle-button relative cursor-pointer overflow-hidden"
     >
       {/* Show the icon for the mode you can switch TO */}
       {isDarkMode ? (
-        <Sun className="size-[1.2rem] transition-transform duration-300 rotate-0 scale-100" />
+        <Sun className="size-[1.2rem] scale-100 rotate-0 transition-transform duration-300" />
       ) : (
-        <Moon className="size-[1.2rem] transition-transform duration-300 rotate-0 scale-100" />
+        <Moon className="size-[1.2rem] scale-100 rotate-0 transition-transform duration-300" />
       )}
       <span className="sr-only">
         Chuyển sang chế độ {isDarkMode ? 'sáng' : 'tối'}

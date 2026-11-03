@@ -75,10 +75,10 @@ export default function DocumentsPage() {
             <Card key={title}>
               <CardContent className="flex items-center justify-between pt-5">
                 <div>
-                  <p className="text-sm text-muted-foreground">{title}</p>
+                  <p className="text-muted-foreground text-sm">{title}</p>
                   <p className="mt-1 text-2xl font-semibold">{value}</p>
                 </div>
-                <Icon className="size-6 text-muted-foreground" />
+                <Icon className="text-muted-foreground size-6" />
               </CardContent>
             </Card>
           ))}
@@ -93,7 +93,7 @@ export default function DocumentsPage() {
           />
           <select
             aria-label="Trạng thái"
-            className="rounded-lg border bg-background px-3 text-sm"
+            className="bg-background rounded-lg border px-3 text-sm"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
           >
@@ -238,7 +238,7 @@ export default function DocumentsPage() {
             </Table>
           </div>
         )}
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Chọn “Thêm” ở mục chưa có nội dung để soạn bài mới. Xóa sẽ gỡ bài công
           khai, bản nháp và đặt lại thống kê của mục đó; các mục khác được giữ
           nguyên.

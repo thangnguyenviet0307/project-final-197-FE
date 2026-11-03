@@ -189,7 +189,7 @@ export function StoreProductReviews({ product }: { product: Product }) {
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h3 className="break-words font-semibold">
+                        <h3 className="font-semibold break-words">
                           {review.reviewerName}
                         </h3>
                         <RatingStars rating={review.rating} />
@@ -205,7 +205,7 @@ export function StoreProductReviews({ product }: { product: Product }) {
                             ? 'Nhập từ DummyJSON'
                             : 'Quản trị viên ghi nhận'}
                       </p>
-                      <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-gray-600">
+                      <p className="mt-3 text-sm leading-7 break-words whitespace-pre-wrap text-gray-600">
                         {review.comment}
                       </p>
                     </div>

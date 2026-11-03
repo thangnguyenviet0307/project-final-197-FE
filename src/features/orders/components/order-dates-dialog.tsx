@@ -112,7 +112,7 @@ export function OrderDatesDialog({
               Thời điểm hoàn tất
               <input
                 type="datetime-local"
-                className="rounded-md border bg-background p-2"
+                className="bg-background rounded-md border p-2"
                 value={completed}
                 min={localTimestamp(order.orderDate)}
                 max={localTimestamp(new Date().toISOString())}
@@ -122,12 +122,12 @@ export function OrderDatesDialog({
             </label>
           )}
           {invalidCompletion && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               Chọn thời điểm hoàn tất từ lúc tạo đơn đến hiện tại.
             </p>
           )}
           {mutation.error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {getApiError(mutation.error).message}
             </p>
           )}

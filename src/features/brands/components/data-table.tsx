@@ -86,7 +86,7 @@ function DeleteBrandDialog({
         type="button"
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-destructive"
+        className="text-destructive h-8 w-8"
         aria-label={`Xóa ${brand.name}`}
         onClick={() => setOpen(true)}
       >
@@ -104,7 +104,7 @@ function DeleteBrandDialog({
         </AlertDialogHeader>
 
         {error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {error}
           </p>
         )}
@@ -118,7 +118,7 @@ function DeleteBrandDialog({
               event.preventDefault();
               void handleDelete();
             }}
-            className="bg-destructive text-white hover:bg-destructive/90"
+            className="bg-destructive hover:bg-destructive/90 text-white"
           >
             {deleting ? 'Deleting...' : 'Xóa thương hiệu'}
           </AlertDialogAction>
@@ -163,7 +163,7 @@ export function BrandTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {filtered.length} thương hiệu
         </p>
         {admin && (
@@ -198,7 +198,7 @@ export function BrandTable({
             <FieldLabel htmlFor="brand-status">Trạng thái</FieldLabel>
             <select
               id="brand-status"
-              className="h-8 rounded-md border bg-background px-2 text-sm"
+              className="bg-background h-8 rounded-md border px-2 text-sm"
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -227,7 +227,7 @@ export function BrandTable({
       </section>
       {!visible.length ? (
         <div className="grid justify-items-center gap-3 rounded-lg border py-12">
-          <Tags className="size-8 text-muted-foreground" />
+          <Tags className="text-muted-foreground size-8" />
           <p>Không tìm thấy thương hiệu.</p>
         </div>
       ) : (
@@ -250,7 +250,7 @@ export function BrandTable({
               {visible.map((brand) => (
                 <TableRow key={brand._id}>
                   <TableCell>
-                    <div className="flex min-w-48 max-w-80 items-center gap-3">
+                    <div className="flex max-w-80 min-w-48 items-center gap-3">
                       <CatalogImage src={brand.logoUrl} alt={brand.name} />
                       <span className="truncate font-medium" title={brand.name}>
                         {brand.name}
@@ -261,7 +261,7 @@ export function BrandTable({
                     {brand.slug}
                   </TableCell>
                   <TableCell
-                    className="max-w-80 truncate text-muted-foreground"
+                    className="text-muted-foreground max-w-80 truncate"
                     title={brand.description}
                   >
                     {brand.description || '-'}

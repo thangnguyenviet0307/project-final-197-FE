@@ -98,7 +98,7 @@ function ProductDetails({ product }: { product: Product }) {
               </div>
               <div className="min-w-0 space-y-6 lg:py-3">
                 <div className="space-y-4">
-                  <h1 className="break-words text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                  <h1 className="text-3xl leading-tight font-bold tracking-tight break-words sm:text-4xl">
                     {product.product_name}
                   </h1>
                   <nav
@@ -281,7 +281,7 @@ function ProductDetails({ product }: { product: Product }) {
                   <Icon size={20} className="mt-0.5 shrink-0 text-[#57952b]" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{title}</p>
-                    <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-5 text-gray-500">
+                    <p className="mt-1 text-xs leading-5 break-words whitespace-pre-wrap text-gray-500">
                       {text || 'Liên hệ cửa hàng để được tư vấn.'}
                     </p>
                   </div>
@@ -422,11 +422,11 @@ function ProductDetails({ product }: { product: Product }) {
                     >
                       <th
                         scope="row"
-                        className="w-2/5 break-words bg-gray-50 px-4 py-3 align-top font-medium text-gray-500"
+                        className="w-2/5 bg-gray-50 px-4 py-3 align-top font-medium break-words text-gray-500"
                       >
                         {label}
                       </th>
-                      <td className="whitespace-pre-wrap break-words px-4 py-3 align-top text-gray-700">
+                      <td className="px-4 py-3 align-top break-words whitespace-pre-wrap text-gray-700">
                         {value ?? 'Chưa có thông tin'}
                       </td>
                     </tr>
@@ -485,7 +485,7 @@ export default function StorefrontProductDetailPage() {
                 <li aria-hidden="true">/</li>
                 <li
                   aria-current="page"
-                  className="break-words font-medium text-gray-800"
+                  className="font-medium break-words text-gray-800"
                 >
                   {query.data.product_name}
                 </li>

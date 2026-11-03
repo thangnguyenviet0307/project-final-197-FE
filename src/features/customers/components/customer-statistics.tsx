@@ -24,10 +24,10 @@ export function CustomerStatistics() {
         {cards.map(({ label, Icon }, index) => (
           <Card key={label}>
             <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
                 {label}
               </CardTitle>
-              <Icon className="size-5 text-muted-foreground" />
+              <Icon className="text-muted-foreground size-5" />
             </CardHeader>
             <CardContent>
               {queries[index].isPending ? (

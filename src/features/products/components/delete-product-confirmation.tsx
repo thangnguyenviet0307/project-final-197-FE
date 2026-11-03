@@ -31,7 +31,7 @@ export function DeleteProductConfirmation({
       <DialogContent showCloseButton={!mutation.isPending}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <TriangleAlert className="size-4 text-destructive" />
+            <TriangleAlert className="text-destructive size-4" />
             Xóa sản phẩm?
           </DialogTitle>
           <DialogDescription>

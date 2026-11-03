@@ -46,7 +46,7 @@ export function StoreSearchCategory({
       {open && (
         <div
           id="store-search-category-list"
-          className="absolute left-0 top-full z-50 mt-1 max-h-64 w-48 overflow-y-auto rounded-md border border-gray-200 bg-white py-2 shadow-xl"
+          className="absolute top-full left-0 z-50 mt-1 max-h-64 w-48 overflow-y-auto rounded-md border border-gray-200 bg-white py-2 shadow-xl"
         >
           {['', ...storefrontCategories.map((category) => category.name)].map(
             (category) => (

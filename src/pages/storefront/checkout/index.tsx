@@ -269,7 +269,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                                 className="size-16 shrink-0 bg-gray-50 sm:size-20"
                               />
                               <div className="min-w-0 flex-1 space-y-2">
-                                <p className="break-words text-sm font-semibold">
+                                <p className="text-sm font-semibold break-words">
                                   {item.name}
                                 </p>
                                 {item.variantLabel && (

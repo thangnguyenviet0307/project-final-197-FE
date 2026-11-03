@@ -48,14 +48,14 @@ export function ProductDetailsInfo({ product }: { product: Product }) {
         ].map(([label, value]) => (
           <div key={label}>
             <dt className="text-muted-foreground">{label}</dt>
-            <dd className="mt-1 whitespace-pre-wrap break-words font-medium">
+            <dd className="mt-1 font-medium break-words whitespace-pre-wrap">
               {value === '' || value == null ? 'Chưa có thông tin' : value}
             </dd>
           </div>
         ))}
       </dl>
       <div className="flex flex-wrap gap-2">
-        <span className="text-sm text-muted-foreground">Nhãn:</span>
+        <span className="text-muted-foreground text-sm">Nhãn:</span>
         {product.tags?.length ? (
           product.tags.map((tag, index) => (
             <Badge key={`${tag}-${index}`} variant="secondary">
@@ -92,7 +92,7 @@ export function ProductDetailsInfo({ product }: { product: Product }) {
           </dl>
           {!!product.sourceImages?.length && (
             <div>
-              <p className="mb-2 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mb-2 text-sm">
                 Ảnh từ nguồn nhập
               </p>
               <div className="flex flex-wrap gap-2">

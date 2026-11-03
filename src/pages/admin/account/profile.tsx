@@ -53,10 +53,10 @@ function ProfileDetail({
 }) {
   return (
     <div className="flex gap-3">
-      <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+      <Icon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
       <div className="min-w-0">
-        <dt className="text-xs text-muted-foreground">{label}</dt>
-        <dd className="break-words text-sm">{displayValue(value)}</dd>
+        <dt className="text-muted-foreground text-xs">{label}</dt>
+        <dd className="text-sm break-words">{displayValue(value)}</dd>
       </div>
     </div>
   );
@@ -140,7 +140,7 @@ export default function UserProfilePage() {
         ) : profile.isError ? (
           <Card>
             <CardContent className="flex flex-col items-start gap-3 py-6">
-              <p role="alert" className="text-sm text-destructive">
+              <p role="alert" className="text-destructive text-sm">
                 {getApiError(profile.error).message}
               </p>
               <Button variant="outline" onClick={() => void profile.refetch()}>
@@ -152,7 +152,7 @@ export default function UserProfilePage() {
           <Card>
             <CardHeader className="border-b">
               <div className="flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg">
                   <CircleUserRound className="size-5" />
                 </div>
                 <div className="space-y-1">
@@ -175,7 +175,7 @@ export default function UserProfilePage() {
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-sm font-medium">Ảnh hồ sơ</h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         JPG, PNG hoặc GIF, tối đa 800 KB.
                       </p>
                     </div>
@@ -215,7 +215,7 @@ export default function UserProfilePage() {
                       />
                     </div>
                     {avatarError && (
-                      <p role="alert" className="text-sm text-destructive">
+                      <p role="alert" className="text-destructive text-sm">
                         {avatarError}
                       </p>
                     )}
@@ -284,14 +284,14 @@ export default function UserProfilePage() {
                       />
                       <div className="flex items-center justify-between gap-2">
                         <FieldError errors={[form.formState.errors.bio]} />
-                        <span className="ml-auto text-xs text-muted-foreground">
+                        <span className="text-muted-foreground ml-auto text-xs">
                           {bio.length}/1000
                         </span>
                       </div>
                     </Field>
                   </div>
                   {form.formState.errors.root && (
-                    <p role="alert" className="text-sm text-destructive">
+                    <p role="alert" className="text-destructive text-sm">
                       {form.formState.errors.root.message}
                     </p>
                   )}
@@ -321,12 +321,12 @@ export default function UserProfilePage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <div className="h-2 bg-gradient-to-r from-primary/80 via-primary/40 to-primary/10" />
+            <div className="from-primary/80 via-primary/40 to-primary/10 h-2 bg-gradient-to-r" />
             <CardHeader className="flex flex-col gap-5 sm:flex-row sm:items-center">
               <UserAvatar
                 name={current?.name || current?.email || 'User'}
                 avatar={current?.avatar}
-                className="size-24 ring-4 ring-background shadow-sm"
+                className="ring-background size-24 shadow-sm ring-4"
               />
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
@@ -339,14 +339,14 @@ export default function UserProfilePage() {
                     </Badge>
                   )}
                 </div>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <p className="text-muted-foreground flex items-center gap-2 text-sm">
                   <Mail className="size-4 shrink-0" />{' '}
                   <span className="break-all">
                     {displayValue(current?.email, 'Chưa có email tài khoản')}
                   </span>
                 </p>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <ShieldCheck className="size-4 shrink-0 text-primary" /> Tài
+                <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <ShieldCheck className="text-primary size-4 shrink-0" /> Tài
                   khoản do quản trị viên quản lý
                 </p>
               </div>
@@ -360,7 +360,7 @@ export default function UserProfilePage() {
               <section className="space-y-4">
                 <div>
                   <h2 className="font-semibold">Thông tin cá nhân</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Thông tin liên hệ và hồ sơ hiển thị với đội ngũ của bạn.
                   </p>
                 </div>
@@ -385,7 +385,7 @@ export default function UserProfilePage() {
               <Separator />
               <section className="space-y-2">
                 <h2 className="font-semibold">Giới thiệu</h2>
-                <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm break-words whitespace-pre-wrap">
                   {displayValue(current?.bio, 'Chưa có nội dung giới thiệu.')}
                 </p>
               </section>
@@ -393,16 +393,16 @@ export default function UserProfilePage() {
               <section className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <h2 className="font-semibold">Email tài khoản</h2>
-                  <p className="mt-1 break-all text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-sm break-all">
                     {displayValue(current?.email)}
                   </p>
                 </div>
                 <div>
                   <h2 className="font-semibold">Vai trò tài khoản</h2>
-                  <p className="mt-1 capitalize text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-sm capitalize">
                     {displayValue(current?.role)}
                   </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Vai trò của bạn do quản trị viên chỉ định.
                   </p>
                 </div>

@@ -23,7 +23,8 @@ export function useEligibleWarrantyOrders(page: number, orderId?: string) {
 export function useWarranties(
   admin: boolean,
   page: number,
-  status: WarrantyStatus | ''
+  status: WarrantyStatus | '',
+  limit = 10
 ) {
   return useQuery({
     queryKey: [
@@ -32,9 +33,10 @@ export function useWarranties(
       admin ? 'admin' : 'customer',
       page,
       status,
+      limit,
     ],
     queryFn: ({ signal }) =>
-      service.listWarranties(admin, page, status, signal),
+      service.listWarranties(admin, page, status, signal, limit),
   });
 }
 export function useWarranty(admin: boolean, id: string) {

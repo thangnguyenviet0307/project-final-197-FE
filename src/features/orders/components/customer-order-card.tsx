@@ -6,12 +6,27 @@ import { CustomerOrderCancel } from '@/features/orders/components/customer-order
 import { orderDate } from '@/features/orders/utils/order-status';
 import { orderItemSubtotal } from '@/features/orders/utils/order-price';
 import { formatPrice } from '@/features/products/types/products';
+import { useWarranties } from '@/features/support/hooks/use-support';
+import { isWarrantyRequestEligible } from '@/features/support/utils/warranty-eligibility';
 
 export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
+  const existingRequests = useWarranties(false, 1, '', 200);
+  const existingRequestOrderIds = new Set(
+    (existingRequests.data?.data ?? [])
+      .map((item) => item.orderId ?? '')
+      .filter(Boolean)
+  );
   const quantity = order.orderItems.reduce(
     (total, item) => total + item.quantity,
     0
   );
+  const canCreateWarranty =
+    order.orderStatus === 4 &&
+    isWarrantyRequestEligible(
+      order._id,
+      order.orderDate,
+      existingRequestOrderIds
+    );
   return (
     <article
       aria-label={`Đơn hàng ${order.orderCode ?? order._id}`}
@@ -23,7 +38,7 @@ export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
             <Package aria-hidden="true" className="size-5" />
           </div>
           <div className="min-w-0">
-            <h3 className="break-all text-sm font-bold text-gray-900">
+            <h3 className="text-sm font-bold break-all text-gray-900">
               {order.orderCode ?? order._id}
             </h3>
             <p className="mt-1 text-xs text-gray-500">
@@ -43,7 +58,7 @@ export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
               className="flex flex-wrap items-start justify-between gap-3 py-5 text-sm"
             >
               <div className="min-w-0 flex-1 basis-40">
-                <p className="break-words font-semibold text-gray-900">
+                <p className="font-semibold break-words text-gray-900">
                   {item.productName || 'Sản phẩm chưa có tên lưu trong đơn'}
                 </p>
                 {item.variantName && (
@@ -60,7 +75,14 @@ export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
                     <> · Đơn giá: {formatPrice(unitPrice)} ₫</>
                   )}
                 </p>
-                {order.orderStatus === 4 && <Link to={`/account/warranty?new=1&order=${encodeURIComponent(order._id)}&item=${index}`} className="mt-3 inline-flex min-h-9 items-center rounded-lg border border-green-600 px-3 text-xs font-semibold text-green-700 hover:bg-green-50">Yêu cầu bảo hành</Link>}
+                {canCreateWarranty && (
+                  <Link
+                    to={`/account/warranty?new=1&order=${encodeURIComponent(order._id)}&item=${index}`}
+                    className="mt-3 inline-flex min-h-9 items-center rounded-lg border border-green-600 px-3 text-xs font-semibold text-green-700 hover:bg-green-50"
+                  >
+                    Yêu cầu bảo hành
+                  </Link>
+                )}
               </div>
               <p className="font-semibold text-gray-900">
                 {subtotal === null

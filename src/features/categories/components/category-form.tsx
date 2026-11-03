@@ -41,7 +41,9 @@ export function CategoryForm({
     },
   });
   const image = useSelectedImage();
-  const navigation = useUnsavedForm(form.formState.isDirty || !!image.selected || form.formState.isSubmitting);
+  const navigation = useUnsavedForm(
+    form.formState.isDirty || !!image.selected || form.formState.isSubmitting
+  );
   const busy = form.formState.isSubmitting;
   return (
     <>
@@ -52,7 +54,10 @@ export function CategoryForm({
         onSubmit={form.handleSubmit(async (values) => {
           form.clearErrors();
           try {
-            await onSubmit({ ...values, ...(image.selected ? { image: image.selected.file } : {}) });
+            await onSubmit({
+              ...values,
+              ...(image.selected ? { image: image.selected.file } : {}),
+            });
             navigation.allowSavedNavigation();
             onSaved?.();
           } catch (error) {
@@ -70,7 +75,15 @@ export function CategoryForm({
             />
             <FieldError errors={[form.formState.errors.name]} />
           </Field>
-          <ImageUploadField id="category-icon" label="Ảnh danh mục" selected={image.selected} existingUrl={category?.icon} error={image.error} disabled={busy} onSelect={image.select} />
+          <ImageUploadField
+            id="category-icon"
+            label="Ảnh danh mục"
+            selected={image.selected}
+            existingUrl={category?.icon}
+            error={image.error}
+            disabled={busy}
+            onSelect={image.select}
+          />
           <Field>
             <FieldLabel htmlFor="category-description">Mô tả</FieldLabel>
             <Textarea
@@ -84,7 +97,7 @@ export function CategoryForm({
             <FieldLabel htmlFor="category-parent">Danh mục cha</FieldLabel>
             <select
               id="category-parent"
-              className="h-8 rounded-md border bg-background px-2 text-sm"
+              className="bg-background h-8 rounded-md border px-2 text-sm"
               {...form.register('parent', {
                 setValueAs: (value) => value || null,
               })}
@@ -118,14 +131,19 @@ export function CategoryForm({
           </label>
         </fieldset>
         {form.formState.errors.root && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-destructive text-sm">
             {form.formState.errors.root.message}
           </p>
         )}
         <div className="flex gap-2">
           <Button
             type="submit"
-            disabled={busy || !!image.error || categories.isPending || categories.isError}
+            disabled={
+              busy ||
+              !!image.error ||
+              categories.isPending ||
+              categories.isError
+            }
           >
             {busy ? 'Saving...' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
           </Button>

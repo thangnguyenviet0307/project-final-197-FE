@@ -38,7 +38,7 @@ export function ProductGallery({ product }: { product: Product }) {
       aria-label="Quản lý ảnh sản phẩm"
     >
       <h2 className="font-semibold">Ảnh sản phẩm ({images.length}/8)</h2>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm">
         Tải ảnh JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh. Ảnh mới được lưu trên
         Cloudinary.
       </p>
@@ -104,7 +104,7 @@ export function ProductGallery({ product }: { product: Product }) {
         />
       )}
       {(error || upload.error) && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           {error || getApiError(upload.error).message}
         </p>
       )}
@@ -116,7 +116,7 @@ export function ProductGallery({ product }: { product: Product }) {
         </p>
       )}
       {images.length >= 8 && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Thư viện ảnh đã đầy. Hãy xóa một ảnh trước khi tải ảnh mới.
         </p>
       )}
@@ -158,7 +158,7 @@ export function ProductGallery({ product }: { product: Product }) {
             </DialogDescription>
           </DialogHeader>
           {remove.error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-destructive text-sm">
               {getApiError(remove.error).message}
             </p>
           )}

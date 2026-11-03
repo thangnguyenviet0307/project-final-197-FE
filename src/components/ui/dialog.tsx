@@ -35,7 +35,7 @@ function DialogOverlay({
       data-slot="dialog-overlay"
       data-storefront-overlay={storefront ? '' : undefined}
       className={cn(
-        'fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0',
+        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs',
         className
       )}
       {...props}
@@ -61,7 +61,7 @@ function DialogContent({
         data-slot="dialog-content"
         data-storefront-dialog={storefront ? '' : undefined}
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full min-w-0 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm [&>*]:min-w-0 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          'bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100vw-2rem)] min-w-0 -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl p-4 text-sm ring-1 duration-100 outline-none sm:max-w-sm [&>*]:min-w-0',
           className
         )}
         {...props}
@@ -109,7 +109,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        '-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:flex-wrap sm:justify-end [&>button]:min-w-0 [&>button]:h-auto [&>button]:min-h-8 [&>button]:whitespace-normal [&>button]:break-words [&>button]:py-1.5',
+        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:flex-wrap sm:justify-end [&>button]:h-auto [&>button]:min-h-8 [&>button]:min-w-0 [&>button]:py-1.5 [&>button]:break-words [&>button]:whitespace-normal',
         className
       )}
       {...props}
@@ -128,7 +128,10 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('break-words pr-6 text-base leading-snug font-medium', className)}
+      className={cn(
+        'pr-6 text-base leading-snug font-medium break-words',
+        className
+      )}
       {...props}
     />
   );
@@ -142,7 +145,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        'break-words text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground',
+        'text-muted-foreground *:[a]:hover:text-foreground text-sm break-words *:[a]:underline *:[a]:underline-offset-3',
         className
       )}
       {...props}

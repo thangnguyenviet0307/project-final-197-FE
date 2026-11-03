@@ -29,7 +29,7 @@ export default function CartPage() {
           aria-label="Breadcrumb"
           className="rounded-2xl border border-gray-100 bg-white p-4 sm:px-6"
         >
-          <ol className="flex items-center gap-2 whitespace-nowrap text-sm leading-5">
+          <ol className="flex items-center gap-2 text-sm leading-5 whitespace-nowrap">
             <li className="flex items-center">
               <Link
                 to="/"
@@ -115,7 +115,7 @@ export default function CartPage() {
                           aria-hidden="true"
                           size={14}
                           strokeWidth={3}
-                          className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-white peer-checked:block"
+                          className="pointer-events-none absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-white peer-checked:block"
                         />
                       </label>
                       <Link to={`/shop/${item.slug}`}>
@@ -129,7 +129,7 @@ export default function CartPage() {
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
                       <Link
                         to={`/shop/${item.slug}`}
-                        className="break-words font-semibold hover:text-[#4d9210]"
+                        className="font-semibold break-words hover:text-[#4d9210]"
                       >
                         {item.name}
                       </Link>

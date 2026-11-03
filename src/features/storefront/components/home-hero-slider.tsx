@@ -42,7 +42,7 @@ function HeroSlides({ slides }: { slides: PublicHeroSlide[] }) {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#12170f]/95 via-[#12170f]/75 to-[#12170f]/10" />
         <div className="store-container flex min-h-[420px] items-center pt-12 pb-24 sm:min-h-[500px]">
           <div className="grid w-full max-w-2xl grid-cols-1 grid-rows-[auto_auto_auto_auto]">
-            <p className="col-start-1 row-start-1 text-xs font-bold uppercase tracking-[0.22em] text-[#c5ee80]">
+            <p className="col-start-1 row-start-1 text-xs font-bold tracking-[0.22em] text-[#c5ee80] uppercase">
               Khám phá danh mục
             </p>
             {slides.map((item, index) => {
@@ -52,14 +52,14 @@ function HeroSlides({ slides }: { slides: PublicHeroSlide[] }) {
                   <h1
                     aria-hidden={hidden}
                     style={{ visibility: hidden ? 'hidden' : 'visible' }}
-                    className="col-start-1 row-start-2 mt-5 whitespace-pre-line break-words text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-6xl"
+                    className="col-start-1 row-start-2 mt-5 text-4xl leading-[1.08] font-bold tracking-tight break-words whitespace-pre-line text-white sm:text-6xl"
                   >
                     {item.title}
                   </h1>
                   <p
                     aria-hidden={hidden}
                     style={{ visibility: hidden ? 'hidden' : 'visible' }}
-                    className="col-start-1 row-start-3 mt-5 min-h-7 max-w-lg whitespace-pre-line break-words text-sm leading-7 text-white/75 sm:text-base"
+                    className="col-start-1 row-start-3 mt-5 min-h-7 max-w-lg text-sm leading-7 break-words whitespace-pre-line text-white/75 sm:text-base"
                   >
                     {item.description}
                   </p>
@@ -69,7 +69,7 @@ function HeroSlides({ slides }: { slides: PublicHeroSlide[] }) {
                     tabIndex={hidden ? -1 : undefined}
                     style={{ visibility: hidden ? 'hidden' : 'visible' }}
                     to={`/shop?category=${encodeURIComponent(item.category._id)}`}
-                    className="col-start-1 row-start-4 mt-7 inline-flex min-h-12 max-w-full items-center justify-self-start gap-3 rounded-lg bg-[#69ad27] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#57951f]"
+                    className="col-start-1 row-start-4 mt-7 inline-flex min-h-12 max-w-full items-center gap-3 justify-self-start rounded-lg bg-[#69ad27] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#57951f]"
                   >
                     Khám phá {item.category.name}
                     <ArrowRight size={17} className="shrink-0" />
@@ -111,7 +111,7 @@ function WelcomeHero() {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 top-1/2 -z-10 size-[460px] -translate-y-1/2 rounded-full border border-lime-200/15 bg-lime-200/5 sm:right-[8%] sm:size-[560px]"
+        className="pointer-events-none absolute top-1/2 -right-24 -z-10 size-[460px] -translate-y-1/2 rounded-full border border-lime-200/15 bg-lime-200/5 sm:right-[8%] sm:size-[560px]"
       >
         <div className="absolute inset-12 rounded-full border border-lime-200/15" />
         <div className="absolute inset-24 rounded-full border border-lime-200/20 bg-lime-200/5" />
@@ -119,10 +119,10 @@ function WelcomeHero() {
       </div>
       <div className="store-container flex min-h-[420px] items-center py-12 sm:min-h-[500px] sm:py-20">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#c5ee80]">
+          <p className="text-xs font-bold tracking-[0.22em] text-[#c5ee80] uppercase">
             Chào mừng đến cửa hàng
           </p>
-          <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-6xl">
+          <h1 className="mt-5 text-4xl leading-[1.08] font-bold tracking-tight text-white sm:text-6xl">
             Khám phá sản phẩm
             <br />
             cho nhu cầu của bạn.

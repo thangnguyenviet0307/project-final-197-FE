@@ -64,18 +64,18 @@ export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
           </DialogDescription>
         </DialogHeader>
         {customer.contactSource === 'guest' && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Thông tin nhận hàng cập nhật từ đơn không đăng nhập, chưa xác minh
             danh tính. Hồ sơ đăng nhập được giữ riêng.
           </p>
         )}
-        <div className="flex min-w-0 items-center gap-4 rounded-lg bg-muted/50 p-4">
+        <div className="bg-muted/50 flex min-w-0 items-center gap-4 rounded-lg p-4">
           <UserAvatar name={name || customer.email} className="size-14" />
           <div className="min-w-0">
-            <p className="wrap-break-word text-lg font-semibold">
+            <p className="text-lg font-semibold wrap-break-word">
               {name || 'Chưa cung cấp'}
             </p>
-            <p className="break-all text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm break-all">
               {customer.email}
             </p>
           </div>
@@ -83,14 +83,14 @@ export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
         <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
           {details.map(([label, value]) => (
             <div key={label} className="min-w-0">
-              <dt className="text-xs text-muted-foreground">{label}</dt>
-              <dd className="mt-1 wrap-break-word text-sm">
+              <dt className="text-muted-foreground text-xs">{label}</dt>
+              <dd className="mt-1 text-sm wrap-break-word">
                 {value?.trim() || 'Chưa cung cấp'}
               </dd>
             </div>
           ))}
           <div>
-            <dt className="text-xs text-muted-foreground">Trạng thái</dt>
+            <dt className="text-muted-foreground text-xs">Trạng thái</dt>
             <dd className="mt-1">
               <Badge
                 variant={

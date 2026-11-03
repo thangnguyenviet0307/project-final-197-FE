@@ -71,7 +71,7 @@ export function StoreInformationLayout({
           <div className="min-w-0 space-y-6">
             <header className="rounded-3xl bg-[#253529] p-7 text-white sm:p-10">
               <ShieldCheck className="mb-5 size-9 text-[#9ddd66]" />
-              <p className="text-sm font-semibold uppercase tracking-widest text-[#9ddd66]">
+              <p className="text-sm font-semibold tracking-widest text-[#9ddd66] uppercase">
                 Thông tin dành cho khách hàng
               </p>
               <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{title}</h1>

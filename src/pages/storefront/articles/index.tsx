@@ -94,7 +94,7 @@ export default function StorefrontArticlesPage() {
               <Search
                 size={17}
                 aria-hidden="true"
-                className="absolute left-3.5 top-3.5 text-gray-400"
+                className="absolute top-3.5 left-3.5 text-gray-400"
               />
               <input
                 key={`${type}:${search}`}
@@ -102,7 +102,7 @@ export default function StorefrontArticlesPage() {
                 name="search"
                 maxLength={120}
                 placeholder="Tìm bài viết…"
-                className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-[#4d9210] focus:ring-2 focus:ring-[#4d9210]/15 sm:w-64"
+                className="w-full rounded-xl border border-gray-200 bg-white py-3 pr-3 pl-10 text-sm outline-none focus:border-[#4d9210] focus:ring-2 focus:ring-[#4d9210]/15 sm:w-64"
                 defaultValue={search}
               />
             </div>
@@ -194,11 +194,11 @@ export default function StorefrontArticlesPage() {
                           />
                           <div className="min-w-0 space-y-3">
                             {article.category && (
-                              <p className="text-xs font-semibold uppercase tracking-wide text-[#4d9210]">
+                              <p className="text-xs font-semibold tracking-wide text-[#4d9210] uppercase">
                                 {article.category}
                               </p>
                             )}
-                            <h2 className="text-xl font-bold leading-snug text-gray-900 transition-colors group-hover:text-[#4d9210]">
+                            <h2 className="text-xl leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#4d9210]">
                               {article.title}
                             </h2>
                             {article.excerpt && (
