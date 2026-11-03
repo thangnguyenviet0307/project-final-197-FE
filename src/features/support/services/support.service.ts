@@ -37,10 +37,10 @@ export async function savePolicy(input: {
   );
   return data.data;
 }
-export async function eligibleOrders(page: number, signal?: AbortSignal) {
+export async function eligibleOrders(page: number, signal?: AbortSignal, orderId?: string) {
   const { data } = await api.get<SupportList<EligibleOrder>>(
     '/support/customer/eligible-orders',
-    { params: { page, limit: 10 }, signal }
+    { params: { page, limit: 10, ...(orderId ? { orderId } : {}) }, signal }
   );
   return data;
 }

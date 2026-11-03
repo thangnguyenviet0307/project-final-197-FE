@@ -1,11 +1,12 @@
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
-import { CatalogImage } from '@/components/catalog-image';
+import { ImageUploadField } from '@/components/image-upload-field';
+import { useSelectedImage } from '@/hooks/use-selected-image';
 import {
   categorySchema,
   type CategoryFormInput,
@@ -21,7 +22,7 @@ export function CategoryForm({
   onCancel,
 }: {
   category?: Category;
-  onSubmit: (values: CategoryFormInput) => Promise<unknown>;
+  onSubmit: (values: CategoryFormInput & { image?: File }) => Promise<unknown>;
   onSaved?: () => void;
   onCancel: () => void;
 }) {
@@ -39,8 +40,8 @@ export function CategoryForm({
       isActive: category?.isActive ?? true,
     },
   });
-  const icon = useWatch({ control: form.control, name: 'icon' });
-  const navigation = useUnsavedForm(form.formState.isDirty);
+  const image = useSelectedImage();
+  const navigation = useUnsavedForm(form.formState.isDirty || !!image.selected || form.formState.isSubmitting);
   const busy = form.formState.isSubmitting;
   return (
     <>
@@ -51,7 +52,7 @@ export function CategoryForm({
         onSubmit={form.handleSubmit(async (values) => {
           form.clearErrors();
           try {
-            await onSubmit(values);
+            await onSubmit({ ...values, ...(image.selected ? { image: image.selected.file } : {}) });
             navigation.allowSavedNavigation();
             onSaved?.();
           } catch (error) {
@@ -69,25 +70,7 @@ export function CategoryForm({
             />
             <FieldError errors={[form.formState.errors.name]} />
           </Field>
-          <Field>
-            <FieldLabel htmlFor="category-icon">
-              Đường dẫn ảnh đại diện
-            </FieldLabel>
-            <div className="flex items-center gap-3">
-              <Input
-                id="category-icon"
-                type="url"
-                placeholder="https://example.com/category.png"
-                className="min-w-0 flex-1"
-                {...form.register('icon')}
-                aria-invalid={!!form.formState.errors.icon}
-              />
-              <div className="size-8 shrink-0 [&>*]:size-full">
-                <CatalogImage src={icon} alt="Xem trước ảnh danh mục" />
-              </div>
-            </div>
-            <FieldError errors={[form.formState.errors.icon]} />
-          </Field>
+          <ImageUploadField id="category-icon" label="Ảnh danh mục" selected={image.selected} existingUrl={category?.icon} error={image.error} disabled={busy} onSelect={image.select} />
           <Field>
             <FieldLabel htmlFor="category-description">Mô tả</FieldLabel>
             <Textarea
@@ -142,7 +125,7 @@ export function CategoryForm({
         <div className="flex gap-2">
           <Button
             type="submit"
-            disabled={busy || categories.isPending || categories.isError}
+            disabled={busy || !!image.error || categories.isPending || categories.isError}
           >
             {busy ? 'Saving...' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
           </Button>

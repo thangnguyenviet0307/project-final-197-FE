@@ -1,6 +1,7 @@
 import type { ApiEnvelope } from '@/types/api';
 import { api, authApi } from '@/services/api';
 import type { Brand } from '@/features/brands/types/brands';
+import { catalogFormData } from '@/utils/catalog-form-data';
 
 import type {
   IBrand,
@@ -60,7 +61,8 @@ export const brandsService = {
   createBrand: async (
     data: CreateBrandInput
   ): Promise<BrandApiResponse<IBrand>> => {
-    const response = await api.post<BrandApiResponse<IBrand>>('/brands', data);
+    const { image, ...fields } = data;
+    const response = await api.post<BrandApiResponse<IBrand>>('/brands', catalogFormData(fields, image), { timeout: 60000 });
 
     return response.data;
   },
@@ -70,9 +72,11 @@ export const brandsService = {
     id: string,
     data: UpdateBrandInput
   ): Promise<BrandApiResponse<IBrand>> => {
+    const { image, ...fields } = data;
     const response = await api.put<BrandApiResponse<IBrand>>(
       `/brands/${encodeURIComponent(id)}`,
-      data
+      catalogFormData(fields, image),
+      { timeout: 60000 }
     );
 
     return response.data;

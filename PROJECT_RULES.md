@@ -1,5 +1,35 @@
 # Project rules for AI Agents
 
+## Image picker labels and Cloudinary folders (2026-11-03)
+
+- Warranty file selection uses an accessible Vietnamese “Chọn ảnh” button and explicit selection summary instead of native English file-control text, for both initial and subsequent attachments. Disabled states still enforce request status, capacity and in-flight uploads.
+- Backend resolves validated independent CLOUDINARY_PRODUCT_FOLDER, CLOUDINARY_BRAND_FOLDER, CLOUDINARY_CATEGORY_FOLDER and CLOUDINARY_WARRANTY_FOLDER paths. Existing default folders are preserved when unset; products/warranty append their record ID. Config changes affect new uploads only, never migrate/delete existing images automatically. Local .env remains untracked.
+
+## Catalog uploads and warranty photos during creation (2026-11-03)
+
+- Brand/category forms replace editable URL inputs with file selection and preview. POST/PUT accept multipart `image` and existing JSON contracts; file-only PUT works. Admin/Super Admin catalog permissions run before Multer. JPG/PNG/WebP, 5 MB, signature checks and Cloudinary use existing product-image conventions. URLs remain logoUrl/icon; imagePublicId is server-owned cleanup metadata, not client input. Failed saves clean new assets; successful replacement/deletion cleans only previous managed assets or queues retries. No external URL asset is destroyed or migrated automatically.
+- Initial warranty photos are optional, max five at 5 MB each. The form confirms the existing idempotent JSON create request, then sequentially uploads selected Files with the existing authenticated image API. Keep created ID, Files and confirmed-upload indexes on partial failure; retry only remaining files, never recreate a confirmed request. Leaving for an already-created request requires draft-discard confirmation. Post-submit attachments remain unchanged and share the same server limit/status checks. Local file selections cannot survive forced reload/tab close.
+
+## Removed standalone payment/support documents (2026-11-03)
+
+- The payment and support entries, standalone editor/public routes and per-document API keys are removed. Managed documents now contain warranty/privacy/shipping/returns plus introduction/terms/FAQ only. Legacy main policy snapshot fields and stored data remain intact; no database deletion/migration is performed. Checkout, order cancellation, contact and warranty requests retain their existing behavior. This supersedes earlier rules describing dedicated payment/support document routes.
+
+## Order assignment hierarchy and admin popup bounds (2026-11-03)
+
+- Super Admin may assign orders to itself, Admin and Staff. Admin may assign to itself or Staff, never a peer Admin or Super Admin. Staff retains its existing self-claim behavior. The same Backend assignee scope applies to creation, explicit status-payload assignments, start and reassignment. Existing unchanged handlers are validated as active employees without treating a status update as a new assignment. Order capacity, guest expiration checks, transaction locking and status rules are preserved.
+- GET `/orders/assignees` requires OrderAssign and returns only active eligible accounts with id/name/email/role, bounded search and pagination. The picker uses this scoped endpoint rather than the user-management list, offers self explicitly and preserves the original selection. Starting without userId now means authenticated self for every eligible role. Shared Dialog popups bound viewport height/width and allow body scrolling, child shrinking, wrapped descriptions and footer buttons; handler selectors use wrapping labels and compact pagination.
+
+## Storefront popup colors (2026-11-03)
+
+- StoreLayout supplies StorefrontUiContext so shared Dialog popups and backdrops retain storefront styling across React portals. Storefront dialogs use a light palette even when the administrative theme sets `.dark` on the root. Scoped CSS gives footer, input, destructive, outline and close buttons readable colors; destructive actions use solid red with white text. Shared Button exposes data-variant for scoped styles. Administrative dialogs retain their selected theme. This covers cart removal/variants, Customer order cancellation, review/filter dialogs and unsaved-draft confirmations without route-specific fixes.
+
+## Completed-order warranty entry and attachments (2026-11-03)
+
+- Each item in a Completed Customer order links to `/account/warranty?new=1&order=<id>&item=<index>`. Eligible-orders supports optional orderId, always combined with the authenticated Customer and Completed status. Invalid URL targets are rejected in FE; preselection uses only the returned owned item. The general request form remains available for selecting another completed order.
+- Successful creation opens its detail before the list and explains image attachment/review. Requests remain applications for review, never automatic warranty approval. Existing durable create replay and local uncertain-retry behavior are preserved; no draft persistence across forced reload is added.
+- Warranty image selection shows a local preview, validates type/size, retains the File on failure for an explicit retry and permits clearing it even if processing subsequently closes attachments. Preview object URLs are revoked on replacement/unmount. A success message follows server confirmation only. Existing five-image, submitted-only and signed-media Backend restrictions remain authoritative.
+- Store handlers retain the original status/version/note on background refetch and errors. Status-only edits and pending writes also guard navigation. Status badges distinguish waiting/review/repair/resolved/rejected; administrative lists indicate assigned requests. No stock/order/payment or policy changes occur during warranty handling.
+
 ## Policy management list and publication metadata (2026-11-03; supersedes shared-editor rules below)
 
 - `/auth/policies` is a management table with search/status filters and view, add-content/edit and confirmed delete actions. Each fixed section opens `/auth/policies/:key`; the list does not contain a rich text editor. Payment/support retain dedicated editor/public routes alongside the seven sidebar documents. Adding means authoring an empty fixed section, not creating arbitrary route names.

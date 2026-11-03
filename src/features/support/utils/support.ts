@@ -53,6 +53,13 @@ export const warrantyTransitions: Record<WarrantyStatus, WarrantyStatus[]> = {
   resolved: [],
   rejected: [],
 };
+export const warrantyStatusStyles: Record<WarrantyStatus, string> = {
+  submitted: 'bg-amber-50 text-amber-800',
+  reviewing: 'bg-blue-50 text-blue-800',
+  repairing: 'bg-violet-50 text-violet-800',
+  resolved: 'bg-green-50 text-green-800',
+  rejected: 'bg-red-50 text-red-800',
+};
 export function supportDate(value: string) {
   return new Date(value).toLocaleString('vi-VN');
 }

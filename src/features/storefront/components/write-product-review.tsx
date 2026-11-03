@@ -1,3 +1,4 @@
+import { RequiredMark } from '@/components/required-mark';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -106,7 +107,7 @@ export function WriteProductReview({
               {product.product_name}
             </p>
             <fieldset disabled={mutation.isPending}>
-              <legend className="sr-only">Chọn số sao</legend>
+              <legend className="mb-3 text-center text-sm font-medium">Chọn số sao<RequiredMark /></legend>
               <div className="mx-auto flex max-w-md justify-center gap-2 sm:gap-5">
                 {labels.map((label, index) => (
                   <button
@@ -141,10 +142,11 @@ export function WriteProductReview({
                     htmlFor="store-review-comment"
                     className="mb-2 block text-sm font-medium"
                   >
-                    Đánh giá của bạn <span className="text-red-500">*</span>
+                    Đánh giá của bạn<RequiredMark />
                   </label>
                   <textarea
                     id="store-review-comment"
+                    aria-required="true"
                     rows={4}
                     maxLength={2000}
                     placeholder="Mời bạn chia sẻ thêm cảm nhận…"
@@ -184,6 +186,7 @@ export function WriteProductReview({
                         className="mb-2 block text-sm font-medium"
                       >
                         {label}
+                        {field === 'reviewerName' && <RequiredMark />}
                       </label>
                       <input
                         id={`store-review-${field}`}

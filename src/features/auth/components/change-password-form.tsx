@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { RequiredMark } from '@/components/required-mark';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useChangePassword } from '@/features/auth/hooks/use-change-password';
 import { Check, LoaderCircle } from 'lucide-react';
@@ -75,9 +76,10 @@ export function ChangePasswordForm({
               ] as const
             ).map(([name, label, autocomplete]) => (
               <Field key={name} data-invalid={!!form.formState.errors[name]}>
-                <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                <FieldLabel htmlFor={name}>{label}<RequiredMark /></FieldLabel>
                 <Input
                   id={name}
+                  aria-required="true"
                   type="password"
                   autoComplete={autocomplete}
                   aria-invalid={!!form.formState.errors[name]}

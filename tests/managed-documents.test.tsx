@@ -25,6 +25,8 @@ beforeEach(() => {
 const wrap = (page: React.ReactNode, path = "/auth/policies") => <MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>
 it("lists policies with view/edit/add actions and no content editor", () => {
   render(wrap(<DocumentsPage />))
+  expect(screen.queryByText('Thanh toán và hủy đơn')).toBeNull()
+  expect(screen.queryByText('Liên hệ và tiếp nhận hỗ trợ')).toBeNull()
   expect(screen.queryByRole("textbox", { name: "Chính sách bảo mật" })).toBeNull()
   expect(screen.getByRole("link", { name: "Sửa Chính sách bảo mật" }).getAttribute("href")).toBe("/auth/policies/privacy")
   expect(screen.getByRole("link", { name: "Xem Chính sách bảo mật" }).getAttribute("href")).toBe("/chinh-sach-bao-mat")

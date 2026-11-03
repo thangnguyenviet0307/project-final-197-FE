@@ -168,11 +168,11 @@ it("admin selects an active staff handler and starts the order", async () => {
   const writes: unknown[] = []
   api.defaults.adapter = async config => {
     if (config.method === "patch") writes.push(JSON.parse(config.data))
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/users" ? [{ _id: handlerId, firstName: "Handler", lastName: "Staff", email: "staff@example.com", active: true, role: "staff" }] : config.url === "/orders" ? [order] : order, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: config.url === "/orders/assignees" ? [{ _id: handlerId, firstName: "Handler", lastName: "Staff", email: "staff@example.com", role: "staff" }] : config.url === "/orders" ? [order] : order, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
   }
   setup()
   fireEvent.click(await screen.findByRole("button", { name: "Phân công và bắt đầu" }))
-  fireEvent.click(await screen.findByRole("radio", { name: /Handler Staff/ }))
+  fireEvent.click(await screen.findByRole("radio", { name: /Staff Handler/ }))
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận bắt đầu" }))
   await waitFor(() => expect(writes).toEqual([{ userId: handlerId }]))
 })
@@ -253,12 +253,12 @@ it("reassigns a Processing order without changing its status", async () => {
   let current: Order = { ...order, orderStatus: 2, userId: "d".repeat(24) }
   api.defaults.adapter = async config => {
     if (config.method === "patch") { writes(config.url, JSON.parse(config.data)); current = { ...current, userId: nextHandler } }
-    const data = config.url === "/users" ? [{ _id: nextHandler, firstName: "New", lastName: "Handler", email: "handler@example.com", active: true, role: "staff" }] : current
+    const data = config.url === "/orders/assignees" ? [{ _id: nextHandler, firstName: "New", lastName: "Handler", email: "handler@example.com", role: "staff" }] : current
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } } }
   }
   setup("admin", `/auth/orders/${id}`)
   fireEvent.click(await screen.findByRole("button", { name: "Đổi người xử lý" }))
-  fireEvent.click(await screen.findByRole("radio", { name: "New Handler (handler@example.com)" }))
+  fireEvent.click(await screen.findByRole("radio", { name: /Handler New/ }))
   fireEvent.click(screen.getByRole("button", { name: "Xác nhận đổi nhân viên" }))
   await waitFor(() => expect(writes).toHaveBeenCalledWith(`/orders/${id}/assignee`, { userId: nextHandler }))
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())

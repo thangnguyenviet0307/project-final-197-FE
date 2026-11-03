@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { RequiredMark } from '@/components/required-mark';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -45,6 +46,7 @@ export function CustomerOrderCancel({ order }: { order: CustomerOrder }) {
             className="text-sm font-medium"
           >
             Lý do hủy đơn
+            <RequiredMark />
           </label>
           <textarea
             id={`cancel-reason-${order._id}`}

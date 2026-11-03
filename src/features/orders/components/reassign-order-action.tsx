@@ -50,7 +50,7 @@ export function ReassignOrderAction({
           if (!mutation.isPending) setOpen(value);
         }}
       >
-        <DialogContent showCloseButton={!mutation.isPending}>
+        <DialogContent className="sm:max-w-lg" showCloseButton={!mutation.isPending}>
           <DialogHeader>
             <DialogTitle>Đổi nhân viên xử lý đơn hàng</DialogTitle>
             <DialogDescription>

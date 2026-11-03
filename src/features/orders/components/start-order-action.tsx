@@ -10,7 +10,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useAuthStore } from '@/stores/auth.store';
-import { useUsers } from '@/features/users/hooks/use-users';
+import { useOrderAssignees } from '@/features/orders/hooks/use-order-assignees';
+import { Input } from '@/components/ui/input';
+import { ListPagination } from '@/components/list-pagination';
 import { useStartOrder } from '@/features/orders/hooks/use-orders';
 import { getApiError } from '@/services/api';
 import type { Order } from '@/features/orders/types/orders';
@@ -26,13 +28,16 @@ export function HandlerPicker({
 }) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const query = useUsers(page, search, 10, { role: 'staff', active: true });
+  const user = useAuthStore(state => state.user);
+  const query = useOrderAssignees(page, search);
+  const candidates = query.data?.data.filter(person => person._id !== user?.id && (person.role === 'staff' || (user?.role === 'super_admin' && person.role === 'admin'))) ?? [];
   return (
-    <div className="space-y-2">
-      <label className="grid gap-1 text-sm">
+    <div className="min-w-0 space-y-3">
+      <label className="flex min-w-0 items-start gap-3 rounded-lg border bg-muted/30 p-3 text-sm"><input type="radio" name="order-handler" className="mt-1 shrink-0" checked={selected === user?.id} disabled={disabled} onChange={() => { if (user) onSelect(user.id); }} /><span className="min-w-0 break-words font-medium">Tự nhận đơn{user ? ` · ${user.lastName} ${user.firstName}` : ""}</span></label>
+      <label className="grid min-w-0 gap-1 text-sm">
         Tìm nhân viên xử lý
-        <input
-          className="rounded-md border bg-background p-2"
+        <Input
+          className="w-full min-w-0"
           value={search}
           disabled={disabled}
           onChange={(event) => {
@@ -56,12 +61,10 @@ export function HandlerPicker({
             className="max-h-48 space-y-2 overflow-y-auto"
             aria-busy={query.isFetching}
           >
-            {query.data?.data
-              .filter((person) => person.active && person.role === 'staff')
-              .map((person) => (
+            {candidates.map((person) => (
                 <label
                   key={person._id}
-                  className="flex items-center gap-2 text-sm"
+                  className="flex min-w-0 items-start gap-3 rounded-lg border p-3 text-sm"
                 >
                   <input
                     type="radio"
@@ -71,36 +74,12 @@ export function HandlerPicker({
                     disabled={disabled || query.isFetching}
                     onChange={() => onSelect(person._id)}
                   />
-                  {person.firstName} {person.lastName} ({person.email})
+                  <span className="min-w-0 break-words"><span className="block font-medium">{[person.lastName, person.firstName].filter(Boolean).join(" ") || person.email}</span><span className="block break-all text-xs text-muted-foreground">{person.email} · {person.role === "admin" ? "Quản trị viên" : "Nhân viên"}</span></span>
                 </label>
               ))}
           </div>
-          {!query.data?.data.some(
-            (person) => person.active && person.role === 'staff'
-          ) && <p>Không có nhân viên đang hoạt động trên trang này.</p>}
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={disabled || page <= 1 || query.isFetching}
-              onClick={() => setPage(page - 1)}
-            >
-              Trang nhân viên trước
-            </Button>
-            <span className="text-xs">Trang {page}</span>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={
-                disabled ||
-                page >= (query.data?.pagination.totalPages ?? 1) ||
-                query.isFetching
-              }
-              onClick={() => setPage(page + 1)}
-            >
-              Trang nhân viên tiếp theo
-            </Button>
-          </div>
+          {!candidates.length && <p>Không có nhân viên đang hoạt động trên trang này.</p>}
+          <ListPagination label="Phân trang người xử lý đơn" page={page} totalPages={Math.max(1, query.data?.pagination.totalPages ?? 1)} disabled={disabled || query.isFetching} onPageChange={setPage} />
         </>
       )}
     </div>
@@ -127,7 +106,7 @@ export function StartOrderAction({
   if (!eligible || !user) return null;
   if (!admin)
     return (
-      <div className="space-y-2">
+      <div className="min-w-0 space-y-3">
         <Button
           size="sm"
           disabled={disabled || mutation.isPending}
@@ -148,7 +127,7 @@ export function StartOrderAction({
         size="sm"
         disabled={disabled || mutation.isPending}
         onClick={() => {
-          setHandler('');
+          setHandler(user.id);
           mutation.reset();
           setOpen(true);
         }}
@@ -161,7 +140,7 @@ export function StartOrderAction({
           if (!mutation.isPending) setOpen(value);
         }}
       >
-        <DialogContent showCloseButton={!mutation.isPending}>
+        <DialogContent className="sm:max-w-lg" showCloseButton={!mutation.isPending}>
           <DialogHeader>
             <DialogTitle>Bắt đầu xử lý đơn hàng?</DialogTitle>
             <DialogDescription className="break-all">

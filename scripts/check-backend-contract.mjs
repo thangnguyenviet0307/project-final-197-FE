@@ -32,7 +32,7 @@ function evaluate(file, resolve) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText
   const exports = {}
-  vm.runInNewContext(code, { exports, require: resolve, crypto: webcrypto }, { filename: file })
+  vm.runInNewContext(code, { exports, require: resolve, crypto: webcrypto, FormData, File }, { filename: file })
   return exports
 }
 function loadValidation(relative) {
@@ -56,6 +56,14 @@ const users = loadValidation("validations/users.validation.ts")
 const id = "a".repeat(24)
 const requests = []
 const customer = { _id: id, firstName: "An", lastName: "Nguyen", email: "an@example.com", phone: "0901234567", address: { street: "One", city: "City", state: "State" }, isActive: true }
+function catalogBody(body) {
+  if (!(body instanceof FormData)) return body
+  assert.ok(body.get("image") instanceof File)
+  const fields = Object.fromEntries([...body.entries()].filter(([key]) => key !== "image"))
+  if (fields.isActive === "true" || fields.isActive === "false") fields.isActive = fields.isActive === "true"
+  if (fields.parent === "null" || fields.parent === "") fields.parent = null
+  return fields
+}
 const api = {
   async get(url, config) {
     customers.getCustomersQuerySchema.parse(config.params)
@@ -63,6 +71,7 @@ const api = {
     return { data: { success: true, data: [customer], pagination: { page: config.params.page, limit: 10, total: 101, totalPages: 11 } } }
   },
   async post(url, body) {
+    body = catalogBody(body)
     const schema = url === "/customers" ? customers.createCustomerSchema : url === "/brands" ? brands.createBrandSchema : url === "/categories" ? categories.createCategoriesSchema : users.createUserSchema
     const parsed = schema.parse(body)
     assert.ok(Object.keys(body).every(key => Object.hasOwn(parsed, key)), `Backend would discard unsupported fields for ${url}`)
@@ -70,6 +79,7 @@ const api = {
     return { data: { success: true, data: url === "/customers" ? customer : { _id: id, ...body } } }
   },
   async put(url, body) {
+    body = catalogBody(body)
     const schema = url.startsWith("/customers/") ? customers.updateCustomerSchema : url.startsWith("/brands/") ? brands.updateBrandSchema : url.startsWith("/categories/") ? categories.updateCategoriesSchema : users.updateUserSchema
     schema.parse(body)
     requests.push({ method: "PUT", url, body })
@@ -82,6 +92,7 @@ function loadService(relative) {
     if (specifier === "@/services/api") return { api }
     if (specifier === "@/features/auth/schemas/auth-schemas") return evaluate(path.join(root, "src/features/auth/schemas/auth-schemas.ts"), require)
     if (specifier === "@/utils/image-url") return evaluate(path.join(root, "src/utils/image-url.ts"), require)
+    if (specifier === "@/utils/catalog-form-data") return evaluate(path.join(root, "src/utils/catalog-form-data.ts"), require)
     if (specifier === "zod") return require("zod")
     throw new Error(`Unsupported service import: ${specifier}`)
   })
@@ -103,6 +114,11 @@ await brandService.deleteById(id)
 await categoryService.createCategory({ name: "Phones", description: "Devices", parent: null, isActive: true })
 await categoryService.updateCategory({ id, input: { name: "Cases", icon: "https://example.com/category.png" } })
 await categoryService.deleteCategory(id)
+const catalogImage = new File([new Uint8Array([137,80,78,71,13,10,26,10])], "photo.png", { type: "image/png" })
+await brandService.createBrand({ name: "Uploaded brand", isActive: false, image: catalogImage })
+await brandService.updateById(id, { image: catalogImage, name: "Uploaded logo" })
+await categoryService.createCategory({ name: "Uploaded category", parent: null, isActive: false, image: catalogImage })
+await categoryService.updateCategory({ id, input: { image: catalogImage, name: "Uploaded icon" } })
 const temporary = userService.getTemporaryPassword("staff")
 assert.equal(temporary, "Staff123")
 assert.equal(userService.getTemporaryPassword("admin"), "Admin123")
@@ -296,7 +312,8 @@ const supportService = evaluate(path.join(root, "src/features/support/services/s
     },
     async get(url, config) {
       assert.ok(["/support/customer/eligible-orders", "/support/customer/requests", "/support/admin/requests"].includes(url))
-      supportValidation.supportListSchema.parse(config.params)
+      if (url === "/support/customer/eligible-orders") supportValidation.eligibleWarrantyOrdersSchema.parse(config.params)
+      else supportValidation.supportListSchema.parse(config.params)
       requests.push({ method: "GET", url, query: config.params }); return { data: { data: [], pagination: {} } }
     },
   } }
@@ -307,6 +324,7 @@ await supportService.savePolicy({ content: policyContent, publish: true, expecte
 await supportService.createWarranty({ requestId: webcrypto.randomUUID(), orderId: id, itemIndex: 0, description: "Product will not turn on" })
 await supportService.updateWarranty({ id, expectedVersion: 0, status: "reviewing", note: "Received for inspection" })
 await supportService.eligibleOrders(1)
+await supportService.eligibleOrders(1, undefined, id)
 await supportService.listWarranties(false, 1, "")
 await supportService.listWarranties(true, 2, "reviewing")
 const informationValidation = loadValidation("validations/information.validation.ts")
@@ -355,4 +373,15 @@ for (const key of managedValidation.documentKeys) {
   await managedService.deleteDocument({ key, expectedVersion: 3 })
   await managedService.recordDocumentView(key)
 }
+const assigneesService = evaluate(path.join(root, "src/features/orders/services/order-assignees.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: { async get(url, config) {
+    assert.equal(url, "/orders/assignees")
+    loadValidation("validations/orders.validation.ts").orderAssigneesQuerySchema.parse(config.params)
+    requests.push({ method: "GET", url, query: config.params })
+    return { data: { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } }
+  } } }
+  throw new Error(`Unsupported order assignees import: ${specifier}`)
+})
+await assigneesService.getOrderAssignees(1, "")
+await assigneesService.getOrderAssignees(2, " Nguyen ")
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)

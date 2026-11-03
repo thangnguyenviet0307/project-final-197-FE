@@ -26,6 +26,7 @@ export interface Category {
 }
 
 export interface CreateCategoryInput {
+  image?: File;
   icon?: string;
   name: string;
   description?: string;
@@ -34,6 +35,7 @@ export interface CreateCategoryInput {
 }
 
 export interface UpdateCategoryInput {
+  image?: File;
   icon?: string;
   name?: string;
   description?: string;

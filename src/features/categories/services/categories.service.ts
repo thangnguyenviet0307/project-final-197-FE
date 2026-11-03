@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { catalogFormData } from '@/utils/catalog-form-data';
 import type {
   Category,
   CreateCategoryInput,
@@ -48,7 +49,7 @@ export async function createCategory(
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
-  const { data } = await api.post<ApiResult<Category>>('/categories', payload);
+  const { data } = await api.post<ApiResult<Category>>('/categories', catalogFormData(payload, input.image), { timeout: 60000 });
   return data.data;
 }
 
@@ -69,7 +70,8 @@ export async function updateCategory({
 
   const { data } = await api.put<ApiResult<Category>>(
     `/categories/${encodeURIComponent(id)}`,
-    payload
+    catalogFormData(payload, input.image),
+    { timeout: 60000 }
   );
   return data.data;
 }

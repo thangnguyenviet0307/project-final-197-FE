@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { RequiredMark } from '@/components/required-mark';
+import { ImageFilePicker } from '@/components/image-file-picker';
 import { Button } from '@/components/ui/button';
 import {
   useSupportMutations,
@@ -16,6 +18,7 @@ import {
   warrantyLabels,
   warrantyTransitions,
   supportDate,
+  warrantyStatusStyles,
 } from '@/features/support/utils/support';
 import { getApiError } from '@/services/api';
 import { useAuthStore } from '@/stores/auth.store';
@@ -40,7 +43,7 @@ function WarrantyUpdateForm({
   const [error, setError] = useState('');
   const [conflict, setConflict] = useState(false);
   const mutation = useSupportMutations().update;
-  const navigation = useUnsavedForm(note.length > 0);
+  const navigation = useUnsavedForm(note.length > 0 || status !== (choices[0] ?? baseline.status) || mutation.isPending);
   const mayHandle =
     user?.role !== 'staff' ||
     baseline.status === 'submitted' ||
@@ -84,6 +87,7 @@ function WarrantyUpdateForm({
         </p>
       ) : (
         <form
+          noValidate
           className="mt-3 space-y-3"
           onSubmit={(event) => {
             event.preventDefault();
@@ -92,9 +96,11 @@ function WarrantyUpdateForm({
         >
           <label htmlFor="warranty-status" className="block text-sm">
             Trạng thái tiếp theo
+            <RequiredMark />
           </label>
           <select
             id="warranty-status"
+            aria-required="true"
             value={status}
             onChange={(event) =>
               setStatus(event.target.value as WarrantyStatus)
@@ -110,6 +116,7 @@ function WarrantyUpdateForm({
           </select>
           <label htmlFor="warranty-note" className="block text-sm">
             Phản hồi cho khách hàng
+            <RequiredMark />
           </label>
           <textarea
             id="warranty-note"
@@ -159,10 +166,14 @@ function WarrantyUpdateForm({
 }
 function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
   const [inputKey, setInputKey] = useState(0);
   const [error, setError] = useState('');
   const mutation = useSupportMutations().upload;
-  const navigation = useUnsavedForm(file !== null);
+  const navigation = useUnsavedForm(file !== null || mutation.isPending);
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+  function clearFile() { setFile(null); setPreview(null); setInputKey(value => value + 1); }
   async function upload() {
     if (!file) return;
     const invalid = validateWarrantyImage(file);
@@ -172,9 +183,9 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
     }
     try {
       await mutation.mutateAsync({ id: detail._id, file });
-      setFile(null);
-      setInputKey((value) => value + 1);
+      clearFile();
       setError('');
+      setMessage('Đã bổ sung ảnh vào yêu cầu bảo hành.');
     } catch (failure) {
       setError(getApiError(failure).message);
     }
@@ -188,22 +199,27 @@ function WarrantyImageForm({ detail }: { detail: WarrantyDetail }) {
         JPG, PNG, WebP; tối đa 5 MB/ảnh. Không tải ảnh chứa mật khẩu hoặc thông
         tin nhạy cảm.
       </p>
-      <input
+      <ImageFilePicker
         key={inputKey}
         id="warranty-image"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
+        selectionText={file ? 'Đã chọn 1 ảnh' : 'Chưa chọn ảnh'}
         disabled={
           mutation.isPending ||
           detail.images.length >= 5 ||
           detail.status !== 'submitted'
         }
         onChange={(event) => {
-          setFile(event.target.files?.[0] ?? null);
+          const selected = event.target.files?.[0] ?? null;
+          const invalid = selected ? validateWarrantyImage(selected) : null;
+          setMessage('');
+          if (invalid) { clearFile(); setError(invalid); return; }
+          setFile(selected);
+          setPreview(selected ? URL.createObjectURL(selected) : null);
           setError('');
         }}
-        className="block w-full text-sm"
       />
+      {file && <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">{preview && <img src={preview} alt="Ảnh đang chọn để gửi bảo hành" className="size-24 rounded-lg object-cover" />}<div className="min-w-0 flex-1"><p className="break-all text-sm">{file.name}</p><p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB · Chưa xác nhận tải lên</p></div><Button variant="outline" disabled={mutation.isPending} onClick={() => { clearFile(); setError(''); }}>Bỏ ảnh đã chọn</Button></div>}
+      {message && <p role="status" className="text-sm text-green-700">{message}</p>}
       {detail.status !== 'submitted' && (
         <p className="text-sm text-muted-foreground">
           Yêu cầu đã được tiếp nhận, không thể bổ sung ảnh.
@@ -263,7 +279,7 @@ export function WarrantyDetailPanel({
     >
       <div className="flex flex-wrap justify-between gap-3">
         <h3 className="text-xl font-bold">Chi tiết bảo hành</h3>
-        <span className="rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-900">
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${warrantyStatusStyles[detail.status]}`}>
           {warrantyLabels[detail.status]}
         </span>
       </div>

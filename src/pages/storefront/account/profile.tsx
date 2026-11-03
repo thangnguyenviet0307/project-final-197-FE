@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { RequiredMark } from '@/components/required-mark';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfile } from '@/features/profile/hooks/use-profile';
@@ -92,9 +93,11 @@ function ProfileEditor({ user }: { user: User }) {
             <Field key={name}>
               <FieldLabel htmlFor={`customer-profile-${name}`}>
                 {label}
+                <RequiredMark />
               </FieldLabel>
               <Input
                 id={`customer-profile-${name}`}
+                aria-required="true"
                 autoComplete={
                   name === 'lastName' ? 'family-name' : 'given-name'
                 }

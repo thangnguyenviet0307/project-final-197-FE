@@ -306,15 +306,18 @@ it.each(["categories", "brands"] as const)("paginates %s with fixed page size an
 })
 
 it.each(["categories", "brands"] as const)("creates %s on the new route and renders its saved thumbnail", async resource => {
+  URL.createObjectURL = vi.fn(() => 'blob:catalog-preview')
+  URL.revokeObjectURL = vi.fn()
   const categories = resource === "categories"
   const imageField = categories ? "icon" : "logoUrl"
   let record: Record<string, unknown> = categories ? { ...category } : { ...brand }
   const writes = vi.fn()
   api.defaults.adapter = async config => {
     if (config.method === "post") {
-      const input = JSON.parse(config.data)
+      expect(config.data).toBeInstanceOf(FormData)
+      const input = Object.fromEntries((config.data as FormData).entries())
       writes(input)
-      record = { ...record, ...input }
+      record = { ...record, ...input, [imageField]: 'https://example.com/thumbnail.png' }
     }
     return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { success: true, data: config.method === "get" ? [record] : record } }
   }
@@ -322,13 +325,14 @@ it.each(["categories", "brands"] as const)("creates %s on the new route and rend
   fireEvent.click(await screen.findByRole("link", { name: categories ? "Thêm danh mục" : "Thêm thương hiệu" }))
   const form = await screen.findByRole("form", { name: categories ? "Tạo danh mục" : "Tạo thương hiệu" })
   fireEvent.change(within(form).getByLabelText(categories ? "Tên danh mục" : "Tên thương hiệu"), { target: { value: "New Thumbnail" } })
-  fireEvent.change(within(form).getByLabelText("Đường dẫn ảnh đại diện"), { target: { value: "javascript:alert(1)" } })
+  fireEvent.change(within(form).getByLabelText(categories ? 'Ảnh danh mục' : 'Ảnh thương hiệu'), { target: { files: [new File(['bad'], 'bad.txt', { type: 'text/plain' })] } })
   fireEvent.click(within(form).getByRole("button", { name: categories ? "Tạo danh mục" : "Tạo thương hiệu" }))
-  expect(await within(form).findByText("Vui lòng nhập đường dẫn ảnh HTTP hoặc HTTPS hợp lệ.")).toBeTruthy()
+  expect(await within(form).findByText('Chọn ảnh JPG, PNG hoặc WebP.')).toBeTruthy()
   expect(writes).not.toHaveBeenCalled()
-  fireEvent.change(within(form).getByLabelText("Đường dẫn ảnh đại diện"), { target: { value: "https://example.com/thumbnail.png" } })
+  const file = new File(['picture'], 'thumbnail.png', { type: 'image/png' })
+  fireEvent.change(within(form).getByLabelText(categories ? 'Ảnh danh mục' : 'Ảnh thương hiệu'), { target: { files: [file] } })
   fireEvent.click(within(form).getByRole("button", { name: categories ? "Tạo danh mục" : "Tạo thương hiệu" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith(expect.objectContaining({ [imageField]: "https://example.com/thumbnail.png" })))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith(expect.objectContaining({ image: file })))
   const image = await screen.findByRole("img", { name: "New Thumbnail" })
   expect(image.getAttribute("src")).toBe("https://example.com/thumbnail.png")
   fireEvent.error(image)

@@ -27,6 +27,7 @@ export interface IBrandOption {
 }
 
 export interface CreateBrandInput {
+  image?: File;
   isActive?: boolean;
   logoUrl?: string;
   name: string;
@@ -34,6 +35,7 @@ export interface CreateBrandInput {
 }
 
 export interface UpdateBrandInput {
+  image?: File;
   isActive?: boolean;
   logoUrl?: string;
   name?: string;

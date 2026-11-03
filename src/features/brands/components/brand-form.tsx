@@ -1,12 +1,13 @@
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
-import { CatalogImage } from '@/components/catalog-image';
+import { ImageUploadField } from '@/components/image-upload-field';
+import { useSelectedImage } from '@/hooks/use-selected-image';
 import { imageUrlSchema } from '@/utils/image-url';
 import { getApiError } from '@/services/api';
 import type { IBrand, CreateBrandInput } from '@/features/brands/types/brands';
@@ -44,8 +45,8 @@ export function BrandForm({
       isActive: brand?.isActive ?? true,
     },
   });
-  const logoUrl = useWatch({ control: form.control, name: 'logoUrl' });
-  const navigation = useUnsavedForm(form.formState.isDirty);
+  const image = useSelectedImage();
+  const navigation = useUnsavedForm(form.formState.isDirty || !!image.selected || form.formState.isSubmitting);
   const busy = form.formState.isSubmitting;
   return (
     <>
@@ -56,7 +57,7 @@ export function BrandForm({
         onSubmit={form.handleSubmit(async (values) => {
           form.clearErrors();
           try {
-            await onSubmit(values);
+            await onSubmit({ ...values, ...(image.selected ? { image: image.selected.file } : {}) });
             navigation.allowSavedNavigation();
             onSaved?.();
           } catch (error) {
@@ -74,23 +75,7 @@ export function BrandForm({
             />
             <FieldError errors={[form.formState.errors.name]} />
           </Field>
-          <Field>
-            <FieldLabel htmlFor="brand-logo">Đường dẫn ảnh đại diện</FieldLabel>
-            <div className="flex items-center gap-3">
-              <Input
-                id="brand-logo"
-                type="url"
-                placeholder="https://example.com/brand.png"
-                className="min-w-0 flex-1"
-                {...form.register('logoUrl')}
-                aria-invalid={!!form.formState.errors.logoUrl}
-              />
-              <div className="size-8 shrink-0 [&>*]:size-full">
-                <CatalogImage src={logoUrl} alt="Xem trước ảnh thương hiệu" />
-              </div>
-            </div>
-            <FieldError errors={[form.formState.errors.logoUrl]} />
-          </Field>
+          <ImageUploadField id="brand-logo" label="Ảnh thương hiệu" selected={image.selected} existingUrl={brand?.logoUrl} error={image.error} disabled={busy} onSelect={image.select} />
           <Field>
             <FieldLabel htmlFor="brand-description">Mô tả</FieldLabel>
             <Textarea
@@ -111,7 +96,7 @@ export function BrandForm({
           </p>
         )}
         <div className="flex gap-2">
-          <Button type="submit" disabled={busy}>
+          <Button type="submit" disabled={busy || !!image.error}>
             {busy ? 'Saving...' : submitLabel}
           </Button>
           <Button

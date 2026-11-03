@@ -7,14 +7,14 @@ export function StoreTopBar() {
   const user = useAuthStore((state) => state.user);
 
   return (
-    <div className="flex items-center gap-3 text-gray-800">
+    <div className="flex min-w-0 items-center gap-3 text-gray-800">
       <UserRoundPlus
         size={30}
         strokeWidth={1.8}
         className="shrink-0"
         aria-hidden="true"
       />
-      <div className="flex flex-col items-start gap-1 min-w-0 text-sm font-semibold">
+      <div className="flex min-w-0 flex-col items-start gap-1 text-sm font-semibold">
         <Link
           to={
             user?.accountType === 'customer'

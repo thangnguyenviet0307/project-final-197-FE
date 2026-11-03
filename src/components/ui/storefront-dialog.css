@@ -1,0 +1,58 @@
+[data-storefront-dialog] {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #4b5563;
+  --primary: #4d9210;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #1f2937;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: #4d9210;
+  --destructive: #b91c1c;
+}
+
+[data-storefront-overlay] {
+  background-color: rgb(0 0 0 / 40%);
+  backdrop-filter: none;
+}
+
+[data-storefront-dialog] [data-slot='dialog-footer'] {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+/* Explicit variants also override dark:* utilities inherited from the app root. */
+[data-storefront-dialog] [data-slot='button'][data-variant='destructive'] {
+  background-color: #b91c1c;
+  color: #ffffff;
+}
+[data-storefront-dialog] [data-slot='button'][data-variant='destructive']:hover:not(:disabled) {
+  background-color: #991b1b;
+}
+[data-storefront-dialog] [data-slot='button'][data-variant='outline'] {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+[data-storefront-dialog] [data-slot='button'][data-variant='outline']:hover:not(:disabled),
+[data-storefront-dialog] [data-slot='button'][data-variant='ghost']:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+[data-storefront-dialog] [data-slot='button'][data-variant='ghost'] {
+  color: #374151;
+}
+[data-storefront-dialog] [data-slot='input'],
+[data-storefront-dialog] [data-slot='textarea'] {
+  background-color: #ffffff;
+  color: #111827;
+}

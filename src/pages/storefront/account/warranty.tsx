@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { WarrantyCreateForm } from '@/features/support/components/warranty-create-form';
 import { WarrantyList } from '@/features/support/components/warranty-list';
@@ -9,11 +10,18 @@ export default function CustomerWarrantyPage() {
   const [params, setParams] = useSearchParams();
   const creating = params.get('new') === '1';
   const selected = params.get('request') ?? '';
+  const [message, setMessage] = useState('');
+  const orderId = params.get('order') ?? '';
+  const item = params.get('item') ?? '';
+  const hasTarget = params.has('order') || params.has('item');
+  const validTarget = warrantyIdSchema.safeParse(orderId).success && /^\d{1,4}$/.test(item) && Number(item) <= 9999;
   function select(id: string) {
+    setMessage('');
     setParams((previous) => {
       const next = new URLSearchParams(previous);
       next.set('request', id);
       next.delete('new');
+      next.delete('order'); next.delete('item');
       return next;
     });
   }
@@ -46,19 +54,24 @@ export default function CustomerWarrantyPage() {
           Tạo yêu cầu bảo hành
         </Button>
       )}
-      {creating && (
+      {creating && hasTarget && !validTarget && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">Thông tin sản phẩm trên đường dẫn không hợp lệ. <Link to="/account/warranty?new=1" className="underline">Chọn sản phẩm từ đơn đã mua</Link></div>}
+      {creating && (!hasTarget || validTarget) && (
         <WarrantyCreateForm
-          onCreated={select}
+          key={`${orderId}:${item}`}
+          initialOrderId={hasTarget ? orderId : undefined}
+          initialItemIndex={hasTarget ? Number(item) : undefined}
+          onCreated={id => { select(id); setMessage('Đã gửi yêu cầu bảo hành. Bạn có thể bổ sung ảnh bên dưới và theo dõi phản hồi của cửa hàng tại đây.'); }}
           onCancel={() =>
             setParams((previous) => {
               const next = new URLSearchParams(previous);
               next.delete('new');
+              next.delete('order'); next.delete('item');
               return next;
             })
           }
         />
       )}
-      <WarrantyList admin={false} selectedId={selected} onSelect={select} />
+      {message && <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-900">{message}</p>}
       {!creating &&
         selected &&
         (warrantyIdSchema.safeParse(selected).success ? (
@@ -69,6 +82,7 @@ export default function CustomerWarrantyPage() {
             sách.
           </p>
         ))}
+      <WarrantyList admin={false} selectedId={selected} onSelect={select} />
     </div>
   );
 }

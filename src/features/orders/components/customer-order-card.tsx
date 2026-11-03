@@ -1,4 +1,5 @@
 import { Banknote, MapPin, Package, UserRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { CustomerOrder } from '@/features/orders/types/customer-orders';
 import { CustomerOrderStatus } from '@/features/orders/components/customer-order-status';
 import { CustomerOrderCancel } from '@/features/orders/components/customer-order-cancel';
@@ -59,6 +60,7 @@ export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
                     <> · Đơn giá: {formatPrice(unitPrice)} ₫</>
                   )}
                 </p>
+                {order.orderStatus === 4 && <Link to={`/account/warranty?new=1&order=${encodeURIComponent(order._id)}&item=${index}`} className="mt-3 inline-flex min-h-9 items-center rounded-lg border border-green-600 px-3 text-xs font-semibold text-green-700 hover:bg-green-50">Yêu cầu bảo hành</Link>}
               </div>
               <p className="font-semibold text-gray-900">
                 {subtotal === null

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { RequiredMark } from '@/components/required-mark';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useLocation } from 'react-router-dom';
@@ -165,7 +166,7 @@ export function CustomerAuthForm({
                   .join(' ') || undefined;
               return (
                 <Field key={name} data-invalid={!!form.formState.errors[name]}>
-                  <FieldLabel htmlFor={`customer-${name}`}>{label}</FieldLabel>
+                  <FieldLabel htmlFor={`customer-${name}`}>{label}<RequiredMark /></FieldLabel>
                   <div className="relative">
                     {!registration &&
                     (name === 'email' || name === 'password') ? (
@@ -178,6 +179,7 @@ export function CustomerAuthForm({
                             area="customer"
                             credential={name}
                             id={`customer-${name}`}
+                            aria-required="true"
                             type={
                               type === 'password' && passwordVisible
                                 ? 'text'
@@ -196,6 +198,7 @@ export function CustomerAuthForm({
                     ) : (
                       <Input
                         id={`customer-${name}`}
+                        aria-required="true"
                         type={
                           type === 'password' && passwordVisible ? 'text' : type
                         }

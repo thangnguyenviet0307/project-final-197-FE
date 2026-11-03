@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { validateImageFile } from '@/utils/image-file';
 
 export const policyContentSchema = z
   .object({
@@ -61,8 +62,5 @@ export const updateWarrantySchema = z
   })
   .strict();
 export function validateWarrantyImage(file: File): string | null {
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type))
-    return 'Chọn ảnh JPG, PNG hoặc WebP.';
-  if (file.size > 5 * 1024 * 1024) return 'Mỗi ảnh không được vượt quá 5 MB.';
-  return null;
+  return validateImageFile(file);
 }

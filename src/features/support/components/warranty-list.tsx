@@ -4,7 +4,8 @@ import { ListPagination } from '@/components/list-pagination';
 import { useWarranties } from '@/features/support/hooks/use-support';
 import { warrantyStatuses } from '@/features/support/schemas/support-schema';
 import type { WarrantyStatus } from '@/features/support/types/support';
-import { supportDate, warrantyLabels } from '@/features/support/utils/support';
+import { supportDate, warrantyLabels, warrantyStatusStyles } from '@/features/support/utils/support';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function WarrantyList({
   admin,
@@ -18,6 +19,7 @@ export function WarrantyList({
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<WarrantyStatus | ''>('');
   const query = useWarranties(admin, page, status);
+  const userId = useAuthStore(state => state.user?.id);
   return (
     <section className="rounded-2xl border bg-background p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -71,7 +73,8 @@ export function WarrantyList({
                   {item.orderCode} · {supportDate(item.createdAt)}
                   {admin && ` · ${item.customerName ?? ''}`}
                 </span>
-                <span className="mt-2 block text-sm font-medium text-green-700">
+                {admin && <span className="mt-2 block text-xs text-muted-foreground">{item.handlerId ? item.handlerId === userId ? 'Bạn phụ trách' : 'Đã có người phụ trách' : 'Chưa phân công'}</span>}
+                <span className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${warrantyStatusStyles[item.status]}`}>
                   {warrantyLabels[item.status]}
                 </span>
               </button>
