@@ -1,3 +1,4 @@
+vi.mock("@/features/support/components/content", async importOriginal => ({ ...await importOriginal<typeof import("@/features/support/components/content")>(), ContentEditor: ({ value, onChange, label, disabled }: { value: string; onChange: (value: string) => void; label: string; disabled: boolean }) => <textarea aria-label={label} value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, expect, it, vi } from "vitest"
 import { MemoryRouter } from "react-router-dom"
@@ -35,7 +36,7 @@ it("unpublished public policy shows an honest empty state and warranty entry poi
 it("public policy renders text safely rather than injecting HTML", () => {
   mocks.publicPolicy.data = { content: { ...content, warranty: '<script>alert("x")</script>' }, publishedAt: "2026-11-01T00:00:00Z" }
   const { container } = render(wrap(<PolicyPage />))
-  expect(screen.getByText('<script>alert("x")</script>')).toBeTruthy()
+  expect(container.textContent).not.toContain('alert("x")')
   expect(container.querySelector("script")).toBeNull()
   expect(screen.queryByText(content.shipping)).toBeNull()
   expect(screen.queryByText(content.returns)).toBeNull()

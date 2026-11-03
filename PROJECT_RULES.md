@@ -1,5 +1,18 @@
 # Project rules for AI Agents
 
+## Policy management list and publication metadata (2026-11-03; supersedes shared-editor rules below)
+
+- `/auth/policies` is a management table with search/status filters and view, add-content/edit and confirmed delete actions. Each fixed section opens `/auth/policies/:key`; the list does not contain a rich text editor. Payment/support retain dedicated editor/public routes alongside the seven sidebar documents. Adding means authoring an empty fixed section, not creating arbitrary route names.
+- Admin/Super Admin GET `/support/admin/documents`, GET/PUT/DELETE `/support/admin/documents/:key` manage each document independently. Public GET `/support/documents/:key` returns only published content and metadata. Policies remain in store_policies; information remains in store_information. Every content write/delete requires expectedVersion; policies retain their shared document version. Conflicts preserve drafts and require explicit reload. Deletion keeps a version tombstone and clears only that section, its public content and statistics.
+- Publication metadata is stored per policy section in publications and per information page in publication: publishedAt is the first publication date, updatedAt changes only when already published text changes, views counts public navigations. Drafts do not change public metadata. Delete/republication resets date/counts. Legacy reads use their stored publication date and zero views without migration. Public dates/counts appear below the body, with update date on a separate line.
+- POST `/support/documents/:key/views` atomically increments only published sections without incrementing __v or changing timestamps; it is rate limited per API process. FE records once per successful mounted navigation, protects StrictMode/refetch replays and never blocks reading on metric failure. These are page views, not unique visitors. Legacy APIs remain available; the current admin/public routes use the per-document APIs.
+
+## Managed information pages (2026-11-03; supersedes placeholder rules below)
+
+- Introduction, terms and FAQ now use GET `/support/pages/:slug` and Admin/Super Admin GET/PUT `/support/admin/pages/:slug`, with slugs `gioi-thieu`, `dieu-khoan-su-dung`, `cau-hoi-thuong-gap`. Each document has an independent draft, published snapshot and expectedVersion; conflicts preserve the local draft and require explicit reload. Content is limited to 30,000 characters including HTML. Public reads expose published content only or null; nothing is auto-published.
+- Existing policies retain their shared six-section versioned snapshot and 30,000-character section limits (including HTML); the support JSON request budget is 2 MiB to accommodate all six sections with escaped Unicode. Both editors use the installed React 19 compatible `react-quill-new`; public rich text uses DOMPurify allowlist sanitization and supports legacy plain text. Empty Quill markup cannot satisfy publication validation. FAQ is authored as question headings and answer paragraphs.
+- `/about` and `/faq` redirect to the Vietnamese managed pages. Existing static storefront page-content APIs are retained for compatibility, but canonical information navigation reads managed content. No production data or historical content is migrated automatically.
+
 ## Policies and warranty requests (2026-11-01)
 
 - Public introduction, terms and FAQ placeholder routes share `StoreInformationLayout` with policy detail pages: common breadcrumb, grouped sidebar with active link, hero, contact and shopping links. FAQ is included in the shared customer-support navigation. These three pages still do not fetch a content API or persist content.

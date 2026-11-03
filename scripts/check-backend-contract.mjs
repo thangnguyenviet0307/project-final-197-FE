@@ -23,6 +23,8 @@ const allowed = new Set([
   "validations/articles.validation.ts", "validations/post-categories.validation.ts",
   "validations/product-news.validation.ts",
   "validations/support.validation.ts",
+  "validations/information.validation.ts",
+  "validations/managed-document.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -307,4 +309,50 @@ await supportService.updateWarranty({ id, expectedVersion: 0, status: "reviewing
 await supportService.eligibleOrders(1)
 await supportService.listWarranties(false, 1, "")
 await supportService.listWarranties(true, 2, "reviewing")
+const informationValidation = loadValidation("validations/information.validation.ts")
+const informationService = evaluate(path.join(root, "src/features/support/services/information.service.ts"), specifier => {
+  if (specifier === "@/services/api") return { api: {
+    async put(url, body) {
+      informationValidation.informationParams.parse({ slug: url.split("/").at(-1) })
+      informationValidation.saveInformationSchema.parse(body)
+      requests.push({ method: "PUT", url, body })
+      return { data: { data: { content: body.content, __v: body.expectedVersion + 1, publishedAt: null } } }
+    },
+    async get(url) {
+      informationValidation.informationParams.parse({ slug: url.split("/").at(-1) })
+      requests.push({ method: "GET", url })
+      return { data: { data: null } }
+    },
+  } }
+  throw new Error(`Unsupported information service import: ${specifier}`)
+})
+for (const slug of ["gioi-thieu", "dieu-khoan-su-dung", "cau-hoi-thuong-gap"]) {
+  await informationService.getInformation(slug)
+  await informationService.getAdminInformation(slug)
+  await informationService.saveInformation({ slug, content: "<h2>Title</h2><p>Content</p>", expectedVersion: 2, publish: true })
+}
+const managedValidation = loadValidation("validations/managed-document.validation.ts")
+const managedService = evaluate(path.join(root, "src/features/support/services/managed-document.service.ts"), specifier => {
+  if (specifier === "@/services/api") {
+    const check = (url, method, body) => {
+      const parts = url.split("/")
+      const key = parts.at(-1) === "views" ? parts.at(-2) : parts.at(-1)
+      if (url !== "/support/admin/documents") managedValidation.documentParams.parse({ key })
+      if (method === "PUT") managedValidation.documentInput.parse(body)
+      if (method === "DELETE") managedValidation.documentVersion.parse(body)
+      requests.push({ method, url, body })
+      return { data: { data: method === "POST" ? { views: 1 } : null } }
+    }
+    return { api: { get: async url => check(url, "GET"), put: async (url, body) => check(url, "PUT", body), delete: async (url, options) => check(url, "DELETE", options.data), post: async url => check(url, "POST") } }
+  }
+  throw new Error(`Unsupported managed document import: ${specifier}`)
+})
+await managedService.listDocuments()
+for (const key of managedValidation.documentKeys) {
+  await managedService.getDocument(key)
+  await managedService.getPublicDocument(key)
+  await managedService.saveDocument({ key, content: "<p>Content</p>", expectedVersion: 2, publish: true })
+  await managedService.deleteDocument({ key, expectedVersion: 3 })
+  await managedService.recordDocumentView(key)
+}
 console.log(`Backend schema contract checks passed: ${requests.length} service requests validated; no HTTP or database connections.`)
