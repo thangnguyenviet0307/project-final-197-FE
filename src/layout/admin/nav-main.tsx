@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,7 +17,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 export function NavMain({
   label,
@@ -79,12 +79,7 @@ export function NavMain({
                         <SidebarMenuSubButton
                           className="cursor-pointer"
                           isActive={location.pathname === subItem.url}
-                          render={
-                            <Link
-                              to={subItem.url}
-
-                            />
-                          }
+                          render={<Link to={subItem.url} />}
                         >
                           <span>{subItem.title}</span>
                         </SidebarMenuSubButton>
@@ -103,8 +98,8 @@ export function NavMain({
                     to={item.url}
                     target={item.target}
                     rel={
-                      item.target === "_blank"
-                        ? "noopener noreferrer"
+                      item.target === '_blank'
+                        ? 'noopener noreferrer'
                         : undefined
                     }
                   />

@@ -1,20 +1,19 @@
-
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 
 interface StoreModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  description?: string
-  children: ReactNode
-  className?: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
 }
 
 export function StoreModal({
@@ -23,7 +22,7 @@ export function StoreModal({
   title,
   description,
   children,
-  className = "",
+  className = '',
 }: StoreModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,13 +32,11 @@ export function StoreModal({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
 
-          {description && (
-            <DialogDescription>{description}</DialogDescription>
-          )}
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
         <div className="py-3">{children}</div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

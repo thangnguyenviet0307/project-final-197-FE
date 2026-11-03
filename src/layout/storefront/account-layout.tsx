@@ -1,50 +1,58 @@
-
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   UserRound,
   Package,
   MapPin,
   LockKeyhole,
   ChevronRight,
-} from "lucide-react"
-import "@/layout/storefront/account-layout.css"
+} from 'lucide-react';
+import '@/layout/storefront/account-layout.css';
 
 const accountMenus = [
-  { label: "Bảo hành của tôi", path: "/account/warranty", icon: Package },
+  { label: 'Bảo hành của tôi', path: '/account/warranty', icon: Package },
   {
-    label: "Hồ sơ của tôi",
-    path: "/account/profile",
+    label: 'Hồ sơ của tôi',
+    path: '/account/profile',
     icon: UserRound,
   },
   {
-    label: "Đơn hàng của tôi",
-    path: "/account/orders",
+    label: 'Đơn hàng của tôi',
+    path: '/account/orders',
     icon: Package,
   },
   {
-    label: "Địa chỉ của tôi",
-    path: "/account/addresses",
+    label: 'Địa chỉ của tôi',
+    path: '/account/addresses',
     icon: MapPin,
   },
   {
-    label: "Đổi mật khẩu",
-    path: "/account/change-password",
+    label: 'Đổi mật khẩu',
+    path: '/account/change-password',
     icon: LockKeyhole,
   },
-]
+];
 
 export function AccountLayout() {
-  const { pathname } = useLocation()
-  const breadcrumbLabel = pathname.replace(/\/$/, "") === "/account/profile"
-    ? "Hồ sơ người dùng"
-    : "Tài khoản của tôi"
+  const { pathname } = useLocation();
+  const breadcrumbLabel =
+    pathname.replace(/\/$/, '') === '/account/profile'
+      ? 'Hồ sơ người dùng'
+      : 'Tài khoản của tôi';
 
   return (
     <div className="store-account min-h-[65vh] bg-[#fafafa] text-gray-900">
       <div className="store-container py-8 sm:py-12">
         <div className="mb-8">
-          <nav aria-label="Đường dẫn" className="flex items-center gap-1 text-sm text-gray-500">
-            <Link to="/" className="font-semibold text-gray-900 hover:underline">Trang chủ</Link>
+          <nav
+            aria-label="Đường dẫn"
+            className="flex items-center gap-1 text-sm text-gray-500"
+          >
+            <Link
+              to="/"
+              className="font-semibold text-gray-900 hover:underline"
+            >
+              Trang chủ
+            </Link>
             <span aria-hidden="true">/</span>
             <span aria-current="page">{breadcrumbLabel}</span>
           </nav>
@@ -60,9 +68,7 @@ export function AccountLayout() {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#55b000]">
                 <UserRound size={28} />
               </div>
-              <h2 className="mt-4 text-lg font-bold">
-                Tài khoản của tôi
-              </h2>
+              <h2 className="mt-4 text-lg font-bold">Tài khoản của tôi</h2>
               <p className="mt-1 text-xs text-gray-300">
                 Quản lý tài khoản khách hàng
               </p>
@@ -70,7 +76,7 @@ export function AccountLayout() {
 
             <nav aria-label="Điều hướng tài khoản" className="p-3">
               {accountMenus.map((item) => {
-                const Icon = item.icon
+                const Icon = item.icon;
 
                 return (
                   <NavLink
@@ -79,8 +85,8 @@ export function AccountLayout() {
                     className={({ isActive }) =>
                       `mb-1 flex items-center gap-3 rounded-md px-4 py-3.5 text-sm transition-colors ${
                         isActive
-                          ? "bg-[#55b000]/10 font-bold text-[#459000]"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-[#55b000]"
+                          ? 'bg-[#55b000]/10 font-bold text-[#459000]'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-[#55b000]'
                       }`
                     }
                   >
@@ -88,16 +94,19 @@ export function AccountLayout() {
                     <span className="flex-1">{item.label}</span>
                     <ChevronRight size={16} />
                   </NavLink>
-                )
+                );
               })}
             </nav>
           </aside>
 
-          <section className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-8" aria-label="Nội dung tài khoản">
+          <section
+            className="min-w-0 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-8"
+            aria-label="Nội dung tài khoản"
+          >
             <Outlet />
           </section>
         </div>
       </div>
     </div>
-  )
+  );
 }

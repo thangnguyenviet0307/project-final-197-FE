@@ -1,60 +1,60 @@
-"use client"
+'use client';
 
-import { useRef, useCallback } from "react"
-import { useTheme } from "@/hooks/theme/use-theme"
+import { useRef, useCallback } from 'react';
+import { useTheme } from '@/hooks/theme/use-theme';
 
 interface CircularTransitionHook {
   startTransition: (
     coords: { x: number; y: number },
     callback: () => void
-  ) => void
-  toggleTheme: (event: React.MouseEvent) => void
-  isTransitioning: () => boolean
+  ) => void;
+  toggleTheme: (event: React.MouseEvent) => void;
+  isTransitioning: () => boolean;
 }
 
 export function useCircularTransition(): CircularTransitionHook {
-  const { theme, setTheme } = useTheme()
-  const isTransitioningRef = useRef(false)
+  const { theme, setTheme } = useTheme();
+  const isTransitioningRef = useRef(false);
 
   const startTransition = useCallback(
     (coords: { x: number; y: number }, callback: () => void) => {
-      if (isTransitioningRef.current) return
+      if (isTransitioningRef.current) return;
 
-      isTransitioningRef.current = true
+      isTransitioningRef.current = true;
 
       // Set CSS variables for the circular reveal animation - exactly like tweakcn
-      const x = (coords.x / window.innerWidth) * 100
-      const y = (coords.y / window.innerHeight) * 100
+      const x = (coords.x / window.innerWidth) * 100;
+      const y = (coords.y / window.innerHeight) * 100;
 
       // Set the CSS variables on document element
-      document.documentElement.style.setProperty("--x", `${x}%`)
-      document.documentElement.style.setProperty("--y", `${y}%`)
+      document.documentElement.style.setProperty('--x', `${x}%`);
+      document.documentElement.style.setProperty('--y', `${y}%`);
 
       // Check if View Transitions API is supported
-      if ("startViewTransition" in document) {
+      if ('startViewTransition' in document) {
         const transition = (
           document as Document & {
             startViewTransition: (callback: () => void) => {
-              finished: Promise<void>
-            }
+              finished: Promise<void>;
+            };
           }
         ).startViewTransition(() => {
-          callback()
-        })
+          callback();
+        });
 
         transition.finished.finally(() => {
-          isTransitioningRef.current = false
-        })
+          isTransitioningRef.current = false;
+        });
       } else {
         // Fallback for browsers without View Transitions API
-        callback()
+        callback();
         setTimeout(() => {
-          isTransitioningRef.current = false
-        }, 400)
+          isTransitioningRef.current = false;
+        }, 400);
       }
     },
     []
-  )
+  );
 
   const toggleTheme = useCallback(
     (event: React.MouseEvent) => {
@@ -62,22 +62,22 @@ export function useCircularTransition(): CircularTransitionHook {
       const coords = {
         x: event.clientX,
         y: event.clientY,
-      }
+      };
 
       startTransition(coords, () => {
-        setTheme(theme === "dark" ? "light" : "dark")
-      })
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+      });
     },
     [theme, setTheme, startTransition]
-  )
+  );
 
   const isTransitioning = useCallback(() => {
-    return isTransitioningRef.current
-  }, [])
+    return isTransitioningRef.current;
+  }, []);
 
   return {
     startTransition,
     toggleTheme,
     isTransitioning,
-  }
+  };
 }

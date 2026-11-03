@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Check, ChevronLeft, ShoppingCart } from "lucide-react";
-import { CartVariantPicker } from "@/features/cart/components/cart-variant-picker";
-import { CartQuantity } from "@/features/cart/components/cart-quantity";
-import { CartRemoveConfirmation } from "@/features/cart/components/cart-remove-confirmation";
-import { CartClearConfirmation } from "@/features/cart/components/cart-clear-confirmation";
-import { useCartStore } from "@/stores/cart.store";
-import { ProductImage } from "@/features/products/components/product-image";
-import { formatPrice } from "@/features/products/types/products";
-import { cartTotal } from "@/features/cart/utils/cart-total";
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Check, ChevronLeft, ShoppingCart } from 'lucide-react';
+import { CartVariantPicker } from '@/features/cart/components/cart-variant-picker';
+import { CartQuantity } from '@/features/cart/components/cart-quantity';
+import { CartRemoveConfirmation } from '@/features/cart/components/cart-remove-confirmation';
+import { CartClearConfirmation } from '@/features/cart/components/cart-clear-confirmation';
+import { useCartStore } from '@/stores/cart.store';
+import { ProductImage } from '@/features/products/components/product-image';
+import { formatPrice } from '@/features/products/types/products';
+import { cartTotal } from '@/features/cart/utils/cart-total';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -76,7 +76,7 @@ export default function CartPage() {
                     aria-label="Chọn tất cả sản phẩm"
                     aria-pressed={selectedItems.length === items.length}
                     onClick={selectAll}
-                    className={`flex size-5 shrink-0 items-center justify-center rounded-full border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black ${selectedItems.length === items.length ? "border-black bg-black text-white" : "border-gray-400 bg-white"}`}
+                    className={`flex size-5 shrink-0 items-center justify-center rounded-full border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black ${selectedItems.length === items.length ? 'border-black bg-black text-white' : 'border-gray-400 bg-white'}`}
                   >
                     {selectedItems.length === items.length && (
                       <Check aria-hidden="true" size={14} strokeWidth={3} />
@@ -100,13 +100,13 @@ export default function CartPage() {
                       <label className="relative mt-1 flex size-5 shrink-0 cursor-pointer">
                         <input
                           type="checkbox"
-                          aria-label={`Chọn mua ${item.name}${item.variantLabel ? ` · ${item.variantLabel}` : ""}`}
+                          aria-label={`Chọn mua ${item.name}${item.variantLabel ? ` · ${item.variantLabel}` : ''}`}
                           checked={item.selected}
                           onChange={(event) =>
                             setSelected(
                               item.productId,
                               item.variantKey,
-                              event.target.checked,
+                              event.target.checked
                             )
                           }
                           className="peer size-5 cursor-pointer appearance-none rounded-full border border-gray-400 bg-white checked:border-black checked:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
@@ -186,7 +186,7 @@ export default function CartPage() {
               <button
                 type="button"
                 disabled={selectedItems.length === 0}
-                onClick={() => navigate("/checkout")}
+                onClick={() => navigate('/checkout')}
                 className="block w-full rounded-xl bg-[#4d9210] px-4 py-3 text-center text-sm font-semibold text-white hover:bg-[#3d750c] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Mua hàng ({selectedItems.length})

@@ -1,1 +1,1 @@
-export { default } from "@/pages/admin/account/profile"
+export { default } from '@/pages/admin/account/profile';

@@ -1,5 +1,5 @@
-import type { z } from "zod";
-import type { createUserSchema } from "@/features/users/schemas/user-schema";
+import type { z } from 'zod';
+import type { createUserSchema } from '@/features/users/schemas/user-schema';
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
@@ -8,7 +8,7 @@ export interface ManagedUser {
   firstName: string;
   lastName: string;
   email: string;
-  role: "super_admin" | "admin" | "staff";
+  role: 'super_admin' | 'admin' | 'staff';
   active: boolean;
   mustChangePassword?: boolean;
   personalEmail?: string;
@@ -18,4 +18,9 @@ export interface ManagedUser {
   bio?: string;
 }
 
-export interface UsersFilters { role?: ManagedUser["role"]; active?: boolean; sortBy?: "username"; sortOrder?: "asc" | "desc" }
+export interface UsersFilters {
+  role?: ManagedUser['role'];
+  active?: boolean;
+  sortBy?: 'username';
+  sortOrder?: 'asc' | 'desc';
+}

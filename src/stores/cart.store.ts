@@ -1,20 +1,20 @@
-import { useAuthStore } from "@/stores/auth.store";
-import { create } from "zustand";
-import type { CartItem } from "@/features/cart/types/cart";
-import type { Product } from "@/features/products/types/products";
-import { discountedPrice } from "@/features/products/utils/product-price";
-import { buildCartItem } from "@/features/cart/utils/cart-item";
+import { useAuthStore } from '@/stores/auth.store';
+import { create } from 'zustand';
+import type { CartItem } from '@/features/cart/types/cart';
+import type { Product } from '@/features/products/types/products';
+import { discountedPrice } from '@/features/products/utils/product-price';
+import { buildCartItem } from '@/features/cart/utils/cart-item';
 import {
   CART_STORAGE_KEY,
   cartStorageKey,
   parseStoredCart,
   serializeCart,
-} from "@/features/cart/utils/cart-storage";
+} from '@/features/cart/utils/cart-storage';
 import {
   appendCartOperation,
   readCartJournal,
   CART_OPERATION_PREFIX,
-} from "@/features/cart/utils/cart-journal";
+} from '@/features/cart/utils/cart-journal';
 
 let operationId: string | undefined;
 let pendingOperations: { before: CartItem[]; after: CartItem[]; id: string }[] =
@@ -24,7 +24,7 @@ interface CartState {
   refreshProducts: (products: Product[], missingSlugs?: string[]) => void;
   consumePurchasedItems: (
     purchased: { productId: string; variantId?: string; quantity: number }[],
-    requestId?: string,
+    requestId?: string
   ) => void;
   items: CartItem[];
   removeSelected: () => void;
@@ -33,23 +33,23 @@ interface CartState {
   setSelected: (
     productId: string,
     variantKey: string,
-    selected: boolean,
+    selected: boolean
   ) => void;
   addItem: (
     product: Product,
     variantKey: string,
-    quantity: number,
+    quantity: number
   ) => string | null;
   removeItem: (productId: string, variantKey: string) => void;
   changeVariant: (
     productId: string,
     currentKey: string,
-    nextKey: string,
+    nextKey: string
   ) => string | null;
   setQuantity: (
     productId: string,
     variantKey: string,
-    quantity: number,
+    quantity: number
   ) => string | null;
 }
 
@@ -58,22 +58,22 @@ export const useCartStore = create<CartState>((set, get) => ({
     set((state) => ({
       items: state.items.map((item) => {
         const product = products.find(
-          (current) => current._id === item.productId,
+          (current) => current._id === item.productId
         );
         if (missingSlugs.includes(item.slug))
-          return { ...item, unavailableReason: "Sản phẩm không còn khả dụng." };
+          return { ...item, unavailableReason: 'Sản phẩm không còn khả dụng.' };
         if (!product) return item;
         if (
           item.variantKey &&
           !product.variants?.some(
-            (variant) => (variant._id ?? variant.sku) === item.variantKey,
+            (variant) => (variant._id ?? variant.sku) === item.variantKey
           )
         ) {
           return {
             ...item,
             product,
             unavailableReason:
-              "Biến thể không còn khả dụng. Vui lòng chọn lại hoặc xóa sản phẩm.",
+              'Biến thể không còn khả dụng. Vui lòng chọn lại hoặc xóa sản phẩm.',
           };
         }
         return (
@@ -81,11 +81,11 @@ export const useCartStore = create<CartState>((set, get) => ({
             product,
             item.variantKey,
             item.quantity,
-            item.selected,
+            item.selected
           ) ?? {
             ...item,
             product,
-            unavailableReason: "Vui lòng chọn lại biến thể hợp lệ.",
+            unavailableReason: 'Vui lòng chọn lại biến thể hợp lệ.',
           }
         );
       }),
@@ -107,7 +107,7 @@ export const useCartStore = create<CartState>((set, get) => ({
           const bought = purchased.find(
             (line) =>
               line.productId === item.productId &&
-              (line.variantId ?? "") === item.variantKey,
+              (line.variantId ?? '') === item.variantKey
           );
           if (!bought) return [item];
           const quantity = item.quantity - bought.quantity;
@@ -135,26 +135,26 @@ export const useCartStore = create<CartState>((set, get) => ({
       items: state.items.map((item) =>
         item.productId === productId && item.variantKey === variantKey
           ? { ...item, selected }
-          : item,
+          : item
       ),
     })),
   setQuantity: (productId, variantKey, quantity) => {
     const item = get().items.find(
       (current) =>
-        current.productId === productId && current.variantKey === variantKey,
+        current.productId === productId && current.variantKey === variantKey
     );
-    if (!item) return "Không tìm thấy sản phẩm trong giỏ hàng.";
+    if (!item) return 'Không tìm thấy sản phẩm trong giỏ hàng.';
     const minimum = item.product.minimumOrderQuantity ?? 1;
     if (!Number.isSafeInteger(quantity) || quantity < minimum)
       return `Vui lòng chọn ít nhất ${minimum} sản phẩm.`;
     const variant = item.product.variants?.find(
-      (current) => (current._id ?? current.sku) === variantKey,
+      (current) => (current._id ?? current.sku) === variantKey
     );
     const stock = item.product.variants?.length
       ? (variant?.stock ?? 0)
       : (item.product.stock ?? 0);
     if (quantity > stock)
-      return "Số lượng trong giỏ vượt quá tồn kho hiện tại.";
+      return 'Số lượng trong giỏ vượt quá tồn kho hiện tại.';
     set((state) => ({
       items: state.items.map((current) =>
         current === item
@@ -162,48 +162,48 @@ export const useCartStore = create<CartState>((set, get) => ({
               current.product,
               current.variantKey,
               quantity,
-              current.selected,
+              current.selected
             ) ?? current)
-          : current,
+          : current
       ),
     }));
     return null;
   },
   addItem: (product, variantKey, quantity) => {
     const variant = product.variants?.find(
-      (item) => (item._id ?? item.sku) === variantKey,
+      (item) => (item._id ?? item.sku) === variantKey
     );
     if (product.variants?.length && !variant)
-      return "Vui lòng chọn biến thể sản phẩm.";
+      return 'Vui lòng chọn biến thể sản phẩm.';
     if (
       product.on_sale === false ||
       product.is_active === false ||
       !product.slug
     )
-      return "Sản phẩm hiện không thể thêm vào giỏ.";
-    const key = variant ? (variant._id ?? variant.sku) : "";
+      return 'Sản phẩm hiện không thể thêm vào giỏ.';
+    const key = variant ? (variant._id ?? variant.sku) : '';
     const minimum = product.minimumOrderQuantity ?? 1;
     if (!Number.isSafeInteger(quantity) || quantity < minimum)
       return `Vui lòng chọn ít nhất ${minimum} sản phẩm.`;
     const unitPrice = discountedPrice(
       variant?.price ?? product.price ?? NaN,
-      product.discount,
+      product.discount
     );
-    if (unitPrice === null) return "Sản phẩm chưa có giá hợp lệ.";
+    if (unitPrice === null) return 'Sản phẩm chưa có giá hợp lệ.';
     const items = get().items;
     const existing = items.find(
-      (item) => item.productId === product._id && item.variantKey === key,
+      (item) => item.productId === product._id && item.variantKey === key
     );
     const nextQuantity = (existing?.quantity ?? 0) + quantity;
     if (nextQuantity > (variant ? (variant.stock ?? 0) : (product.stock ?? 0)))
-      return "Số lượng trong giỏ vượt quá tồn kho hiện tại.";
+      return 'Số lượng trong giỏ vượt quá tồn kho hiện tại.';
     const item = buildCartItem(
       product,
       key,
       nextQuantity,
-      existing?.selected ?? true,
+      existing?.selected ?? true
     );
-    if (!item) return "Sản phẩm chưa có thông tin hợp lệ.";
+    if (!item) return 'Sản phẩm chưa có thông tin hợp lệ.';
     set({
       items: existing
         ? items.map((current) => (current === existing ? item : current))
@@ -214,33 +214,32 @@ export const useCartStore = create<CartState>((set, get) => ({
   removeItem: (productId, variantKey) =>
     set((state) => ({
       items: state.items.filter(
-        (item) =>
-          item.productId !== productId || item.variantKey !== variantKey,
+        (item) => item.productId !== productId || item.variantKey !== variantKey
       ),
     })),
   changeVariant: (productId, currentKey, nextKey) => {
     const item = get().items.find(
       (current) =>
-        current.productId === productId && current.variantKey === currentKey,
+        current.productId === productId && current.variantKey === currentKey
     );
-    if (!item) return "Không tìm thấy sản phẩm trong giỏ hàng.";
+    if (!item) return 'Không tìm thấy sản phẩm trong giỏ hàng.';
     if (currentKey === nextKey) return null;
     if (
       !item.product.variants?.some(
-        (variant) => (variant._id ?? variant.sku) === nextKey,
+        (variant) => (variant._id ?? variant.sku) === nextKey
       )
     )
-      return "Biến thể không hợp lệ.";
+      return 'Biến thể không hợp lệ.';
     const target = get().items.find(
       (current) =>
-        current.productId === productId && current.variantKey === nextKey,
+        current.productId === productId && current.variantKey === nextKey
     );
     const error = get().addItem(item.product, nextKey, item.quantity);
     if (error) return error;
     get().setSelected(
       productId,
       nextKey,
-      item.selected || (target?.selected ?? false),
+      item.selected || (target?.selected ?? false)
     );
     get().removeItem(productId, currentKey);
     return null;
@@ -253,7 +252,7 @@ const memoryCarts = new Map<string, CartItem[]>();
 const scopedPending = new Map<string, typeof pendingOperations>();
 function currentCartKey() {
   const user = useAuthStore.getState().user;
-  return cartStorageKey(user?.accountType === "customer" ? user.id : null);
+  return cartStorageKey(user?.accountType === 'customer' ? user.id : null);
 }
 let activeCartKey = currentCartKey();
 function currentOperationPrefix() {
@@ -272,7 +271,7 @@ function applyItems(items: CartItem[]) {
           previous.find(
             (current) =>
               current.productId === item.productId &&
-              current.variantKey === item.variantKey,
+              current.variantKey === item.variantKey
           )?.selected ?? false,
       })),
     });
@@ -309,7 +308,7 @@ function syncCartStorage() {
       operation.before,
       operation.after,
       operation.id,
-      currentOperationPrefix(),
+      currentOperationPrefix()
     );
     pendingOperations.shift();
   }
@@ -320,7 +319,7 @@ function syncCartStorage() {
   if (localStorage.getItem(activeCartKey) !== value)
     localStorage.setItem(activeCartKey, value);
 }
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   try {
     const journal = readCartJournal(localStorage, currentOperationPrefix());
     if (journal) applyItems(journal);
@@ -329,7 +328,7 @@ if (typeof window !== "undefined") {
       pendingOperations.push({
         before: [],
         after: useCartStore.getState().items,
-        id: "legacy-import",
+        id: 'legacy-import',
       });
       syncCartStorage();
     }
@@ -387,7 +386,7 @@ if (typeof window !== "undefined") {
         pendingOperations.push({
           before: [],
           after: useCartStore.getState().items,
-          id: "legacy-import",
+          id: 'legacy-import',
         });
         syncCartStorage();
       }
@@ -395,7 +394,7 @@ if (typeof window !== "undefined") {
       /* Keep each identity's in-memory cart isolated when storage is unavailable. */
     }
   });
-  window.addEventListener("storage", (event) => {
+  window.addEventListener('storage', (event) => {
     try {
       if (event.storageArea !== localStorage) return;
       if (
@@ -411,7 +410,7 @@ if (typeof window !== "undefined") {
       /* Ignore unavailable storage. */
     }
   });
-  window.addEventListener("focus", () => {
+  window.addEventListener('focus', () => {
     try {
       syncCartStorage();
     } catch {

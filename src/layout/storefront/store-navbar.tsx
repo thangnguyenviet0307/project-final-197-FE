@@ -1,17 +1,16 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Menu, X } from "lucide-react"
-
-import { StoreDepartmentsMenu } from "./store-departments-menu"
-import { StoreTopBar } from "./store-top-bar"
+import { StoreDepartmentsMenu } from './store-departments-menu';
+import { StoreTopBar } from './store-top-bar';
 
 export function StoreNavbar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeMobileMenu = () => {
-    setMobileOpen(false)
-  }
+    setMobileOpen(false);
+  };
 
   return (
     <nav
@@ -36,13 +35,19 @@ export function StoreNavbar() {
 
             <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
-            <Link to="/shop" className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black">
+            <Link
+              to="/shop"
+              className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black"
+            >
               KHÁM PHÁ
             </Link>
 
             <span aria-hidden="true" className="h-4 w-px bg-white/40" />
 
-            <Link to="/bai-viet?type=news" className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black">
+            <Link
+              to="/bai-viet?type=news"
+              className="flex h-full min-w-0 items-center justify-center text-center text-sm font-semibold text-white/90 hover:text-black"
+            >
               TIN TỨC
             </Link>
 
@@ -66,7 +71,7 @@ export function StoreNavbar() {
               type="button"
               onClick={() => setMobileOpen((previous) => !previous)}
               aria-label={
-                mobileOpen ? "Đóng menu điều hướng" : "Mở menu điều hướng"
+                mobileOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'
               }
               aria-expanded={mobileOpen}
               className="rounded-md p-2 text-white hover:bg-white/15"
@@ -95,11 +100,19 @@ export function StoreNavbar() {
                 <StoreDepartmentsMenu />
               </div>
 
-              <Link to="/shop" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15">
+              <Link
+                to="/shop"
+                onClick={closeMobileMenu}
+                className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15"
+              >
                 KHÁM PHÁ
               </Link>
 
-              <Link to="/bai-viet?type=news" onClick={closeMobileMenu} className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15">
+              <Link
+                to="/bai-viet?type=news"
+                onClick={closeMobileMenu}
+                className="block rounded-md px-4 py-3 text-center text-sm font-semibold text-white/80 hover:bg-white/15"
+              >
                 TIN TỨC
               </Link>
 
@@ -123,5 +136,5 @@ export function StoreNavbar() {
         )}
       </div>
     </nav>
-  )
+  );
 }

@@ -5,15 +5,15 @@ import {
   Lightbulb,
   PackageSearch,
   Sparkles,
-} from "lucide-react"
-import { Link } from "react-router-dom"
-import { useAboutPageContent } from "@/features/storefront/hooks/use-storefront-page-content"
-import { getApiError } from "@/services/api"
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAboutPageContent } from '@/features/storefront/hooks/use-storefront-page-content';
+import { getApiError } from '@/services/api';
 
-const principleIcons = [Eye, Compass, Lightbulb]
+const principleIcons = [Eye, Compass, Lightbulb];
 
 export default function StorefrontAboutPage() {
-  const query = useAboutPageContent()
+  const query = useAboutPageContent();
 
   if (query.isPending) {
     return (
@@ -22,7 +22,7 @@ export default function StorefrontAboutPage() {
           Đang tải thông tin DemoStore...
         </p>
       </main>
-    )
+    );
   }
 
   if (query.isError) {
@@ -44,10 +44,10 @@ export default function StorefrontAboutPage() {
           </button>
         </div>
       </main>
-    )
+    );
   }
 
-  const content = query.data
+  const content = query.data;
 
   return (
     <div className="bg-white text-gray-900">
@@ -121,7 +121,7 @@ export default function StorefrontAboutPage() {
                 className="flex gap-4 rounded-xl border border-gray-100 bg-white p-5 sm:p-6"
               >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#55b000]/10 text-sm font-bold text-[#4d9210]">
-                  {String(index + 1).padStart(2, "0")}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
                 <div>
                   <h3 className="font-bold">{item.title}</h3>
@@ -147,7 +147,7 @@ export default function StorefrontAboutPage() {
           </div>
           <div className="mx-auto mt-10 grid max-w-6xl gap-5 md:grid-cols-3">
             {content.principles.map((item, index) => {
-              const Icon = principleIcons[index % principleIcons.length]
+              const Icon = principleIcons[index % principleIcons.length];
               return (
                 <article
                   key={item.title}
@@ -161,7 +161,7 @@ export default function StorefrontAboutPage() {
                     {item.description}
                   </p>
                 </article>
-              )
+              );
             })}
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function StorefrontAboutPage() {
                   className="rounded-xl border border-gray-200 bg-white p-6 sm:p-7"
                 >
                   <span className="text-sm font-extrabold tracking-widest text-[#57952b]">
-                    {String(index + 1).padStart(2, "0")}
+                    {String(index + 1).padStart(2, '0')}
                   </span>
                   <h3 className="mt-4 text-lg font-bold">{step.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-gray-600">
@@ -219,5 +219,5 @@ export default function StorefrontAboutPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

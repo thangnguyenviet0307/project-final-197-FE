@@ -37,7 +37,9 @@
 
 .store-filter-dialog {
   animation: none;
-  transition: opacity 180ms ease-out, transform 180ms ease-out;
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
 }
 
 .store-filter-overlay[data-starting-style],

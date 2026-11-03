@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import type { CSSProperties, ReactNode } from "react";
-import { AppSidebar } from "@/layout/admin/app-sidebar";
-import { SiteHeader } from "@/layout/admin/site-header";
-import { SiteFooter } from "@/layout/admin/site-footer";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import type { CSSProperties, ReactNode } from 'react';
+import { AppSidebar } from '@/layout/admin/app-sidebar';
+import { SiteHeader } from '@/layout/admin/site-header';
+import { SiteFooter } from '@/layout/admin/site-footer';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 interface BaseLayoutProps {
   children: ReactNode;
@@ -14,11 +14,15 @@ interface BaseLayoutProps {
 
 export function BaseLayout({ children, title, description }: BaseLayoutProps) {
   return (
-    <SidebarProvider style={{
-      "--sidebar-width": "16rem",
-      "--sidebar-width-icon": "3rem",
-      "--header-height": "calc(var(--spacing) * 14)",
-    } as CSSProperties}>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': '16rem',
+          '--sidebar-width-icon': '3rem',
+          '--header-height': 'calc(var(--spacing) * 14)',
+        } as CSSProperties
+      }
+    >
       <AppSidebar variant="inset" collapsible="offcanvas" side="left" />
       <SidebarInset>
         <SiteHeader />

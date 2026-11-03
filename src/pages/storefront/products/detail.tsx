@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { useCartStore } from "@/stores/cart.store";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { useStoreProduct } from "@/features/storefront/hooks/use-store-products";
-import { ProductDetailGallery } from "@/features/products/components/product-detail-gallery";
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useCartStore } from '@/stores/cart.store';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { useStoreProduct } from '@/features/storefront/hooks/use-store-products';
+import { ProductDetailGallery } from '@/features/products/components/product-detail-gallery';
 import {
   catalogId,
   catalogName,
   formatPrice,
   type Product,
-} from "@/features/products/types/products";
-import { discountedPrice } from "@/features/products/utils/product-price";
-import { descriptionToHtml } from "@/features/products/utils/product-description";
-import { getApiError } from "@/services/api";
+} from '@/features/products/types/products';
+import { discountedPrice } from '@/features/products/utils/product-price';
+import { descriptionToHtml } from '@/features/products/utils/product-description';
+import { getApiError } from '@/services/api';
 import {
   Check,
   Minus,
@@ -21,36 +21,36 @@ import {
   ShoppingBag,
   Truck,
   RotateCcw,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   StoreRatingSummary,
   StoreProductReviews,
-} from "@/features/storefront/components/store-product-feedback";
-import { RelatedProducts } from "@/features/storefront/components/related-products";
-import { ProductNewsSidebar } from "@/features/storefront/components/product-news-sidebar";
-import "@/features/products/components/product-description.css";
+} from '@/features/storefront/components/store-product-feedback';
+import { RelatedProducts } from '@/features/storefront/components/related-products';
+import { ProductNewsSidebar } from '@/features/storefront/components/product-news-sidebar';
+import '@/features/products/components/product-description.css';
 
 const attributeLabel = (name: string) =>
-  name.charAt(0).toLocaleUpperCase("vi") + name.slice(1);
+  name.charAt(0).toLocaleUpperCase('vi') + name.slice(1);
 
 function ProductDetails({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
-  const [activeTab, setActiveTab] = useState<"description" | "details">(
-    "description",
+  const [activeTab, setActiveTab] = useState<'description' | 'details'>(
+    'description'
   );
   const [quantity, setQuantity] = useState(product.minimumOrderQuantity ?? 1);
   const [selected, setSelected] = useState(() => {
     const cheapest = product.variants?.reduce<
-      NonNullable<Product["variants"]>[number] | undefined
+      NonNullable<Product['variants']>[number] | undefined
     >(
       (current, item) =>
         !current || item.price < current.price ? item : current,
-      undefined,
+      undefined
     );
-    return cheapest?._id ?? cheapest?.sku ?? "";
+    return cheapest?._id ?? cheapest?.sku ?? '';
   });
   const variant = product.variants?.find(
-    (item) => (item._id ?? item.sku) === selected,
+    (item) => (item._id ?? item.sku) === selected
   );
   const needsVariant = !!product.variants?.length && !variant;
   const basePrice = product.variants?.length ? variant?.price : product.price;
@@ -65,17 +65,17 @@ function ProductDetails({ product }: { product: Product }) {
   const minimum = product.minimumOrderQuantity ?? 1;
   const displayQuantity = Math.min(
     Math.max(minimum, quantity),
-    Math.max(minimum, stock),
+    Math.max(minimum, stock)
   );
   const handleAddToCart = () => {
     if (needsVariant) return;
     const error = addItem(
       product,
-      variant ? (variant._id ?? variant.sku) : "",
-      displayQuantity,
+      variant ? (variant._id ?? variant.sku) : '',
+      displayQuantity
     );
     if (error) toast.error(error);
-    else toast.success("Đã thêm sản phẩm vào giỏ hàng.");
+    else toast.success('Đã thêm sản phẩm vào giỏ hàng.');
   };
   return (
     <div className="space-y-12 sm:space-y-16">
@@ -116,14 +116,19 @@ function ProductDetails({ product }: { product: Product }) {
                     </Link>
                   </nav>
                   <p className="text-sm text-gray-500">
-                    Thương hiệu:{" "}
+                    Thương hiệu:{' '}
                     <span className="font-semibold text-gray-800">
                       {catalogName(product.brand)}
                     </span>
                   </p>
                 </div>
-                <StoreRatingSummary slug={product.slug ?? ""} />
-                <Link to="/chinh-sach-bao-hanh" className="inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline"><ShieldCheck size={18} /> Chính sách & hướng dẫn bảo hành</Link>
+                <StoreRatingSummary slug={product.slug ?? ''} />
+                <Link
+                  to="/chinh-sach-bao-hanh"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#4d9210] hover:underline"
+                >
+                  <ShieldCheck size={18} /> Chính sách & hướng dẫn bảo hành
+                </Link>
                 <div className="rounded-2xl border border-[#e5eedf] bg-[#f0f6eb] p-5">
                   <p className="text-xs font-medium text-gray-500">
                     Giá bán · VND
@@ -133,7 +138,7 @@ function ProductDetails({ product }: { product: Product }) {
                     aria-live="polite"
                     className="mt-2 text-3xl font-bold text-[#4d9210] sm:text-4xl"
                   >
-                    {price === null ? "Chưa có giá" : formatPrice(price) + " ₫"}
+                    {price === null ? 'Chưa có giá' : formatPrice(price) + ' ₫'}
                   </p>
                   {!!product.discount && basePrice !== undefined && (
                     <p className="mt-3 flex items-center gap-3 text-sm">
@@ -158,14 +163,14 @@ function ProductDetails({ product }: { product: Product }) {
                           type="button"
                           aria-pressed={selected === (item._id ?? item.sku)}
                           onClick={() => setSelected(item._id ?? item.sku)}
-                          className={`rounded-lg border px-4 py-2 ${selected === (item._id ?? item.sku) ? "border-green-700 bg-green-50" : "border-gray-200"}`}
+                          className={`rounded-lg border px-4 py-2 ${selected === (item._id ?? item.sku) ? 'border-green-700 bg-green-50' : 'border-gray-200'}`}
                         >
                           {item.variant_name || item.sku}
                           {[item.color, item.size].filter(Boolean).length > 0 &&
-                            " · " +
+                            ' · ' +
                               [item.color, item.size]
                                 .filter(Boolean)
-                                .join(" / ")}
+                                .join(' / ')}
                         </button>
                       ))}
                     </div>
@@ -180,10 +185,10 @@ function ProductDetails({ product }: { product: Product }) {
                 <p className="flex items-center gap-2 text-sm font-medium text-[#4d9210]">
                   <Check size={16} />
                   {needsVariant
-                    ? "Chưa chọn biến thể hợp lệ"
+                    ? 'Chưa chọn biến thể hợp lệ'
                     : !stopped && stock > 0
-                      ? "Còn " + stock + " sản phẩm"
-                      : "Hết hàng"}
+                      ? 'Còn ' + stock + ' sản phẩm'
+                      : 'Hết hàng'}
                 </p>
                 {variant && (
                   <dl className="grid gap-2 text-sm">
@@ -193,9 +198,9 @@ function ProductDetails({ product }: { product: Product }) {
                           <dt className="text-gray-500">
                             {attributeLabel(name)}
                           </dt>
-                          <dd>{value === null ? "—" : String(value)}</dd>
+                          <dd>{value === null ? '—' : String(value)}</dd>
                         </div>
-                      ),
+                      )
                     )}
                   </dl>
                 )}
@@ -242,8 +247,8 @@ function ProductDetails({ product }: { product: Product }) {
                   >
                     <ShoppingBag size={18} />
                     {stopped || stock < minimum
-                      ? "Tạm hết hàng"
-                      : "Thêm vào giỏ hàng"}
+                      ? 'Tạm hết hàng'
+                      : 'Thêm vào giỏ hàng'}
                   </button>
                 </div>
               </div>
@@ -255,17 +260,17 @@ function ProductDetails({ product }: { product: Product }) {
               {[
                 {
                   Icon: Truck,
-                  title: "Giao hàng",
+                  title: 'Giao hàng',
                   text: product.shippingInformation,
                 },
                 {
                   Icon: ShieldCheck,
-                  title: "Bảo hành",
+                  title: 'Bảo hành',
                   text: product.warrantyInformation,
                 },
                 {
                   Icon: RotateCcw,
-                  title: "Đổi trả",
+                  title: 'Đổi trả',
                   text: product.returnPolicy,
                 },
               ].map(({ Icon, title, text }) => (
@@ -277,7 +282,7 @@ function ProductDetails({ product }: { product: Product }) {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{title}</p>
                     <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-5 text-gray-500">
-                      {text || "Liên hệ cửa hàng để được tư vấn."}
+                      {text || 'Liên hệ cửa hàng để được tư vấn.'}
                     </p>
                   </div>
                 </div>
@@ -295,8 +300,8 @@ function ProductDetails({ product }: { product: Product }) {
             >
               {(
                 [
-                  ["description", "Mô tả sản phẩm"],
-                  ["details", "Thông tin chi tiết"],
+                  ['description', 'Mô tả sản phẩm'],
+                  ['details', 'Thông tin chi tiết'],
                 ] as const
               ).map(([tab, label]) => (
                 <button
@@ -309,25 +314,25 @@ function ProductDetails({ product }: { product: Product }) {
                   onClick={() => setActiveTab(tab)}
                   onKeyDown={(event) => {
                     if (
-                      ["ArrowLeft", "ArrowRight", "Home", "End"].includes(
-                        event.key,
+                      ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(
+                        event.key
                       )
                     ) {
                       event.preventDefault();
                       const next =
-                        event.key === "Home"
-                          ? "description"
-                          : event.key === "End"
-                            ? "details"
-                            : tab === "description"
-                              ? "details"
-                              : "description";
+                        event.key === 'Home'
+                          ? 'description'
+                          : event.key === 'End'
+                            ? 'details'
+                            : tab === 'description'
+                              ? 'details'
+                              : 'description';
                       setActiveTab(next);
                       document.getElementById(`tab-${next}`)?.focus();
                     }
                   }}
                   tabIndex={activeTab === tab ? 0 : -1}
-                  className={`shrink-0 border-b-2 px-4 py-5 text-sm font-semibold ${activeTab === tab ? "border-[#57952b] text-[#4d9210]" : "border-transparent text-gray-400"}`}
+                  className={`shrink-0 border-b-2 px-4 py-5 text-sm font-semibold ${activeTab === tab ? 'border-[#57952b] text-[#4d9210]' : 'border-transparent text-gray-400'}`}
                 >
                   {label}
                 </button>
@@ -337,7 +342,7 @@ function ProductDetails({ product }: { product: Product }) {
               role="tabpanel"
               id="panel-description"
               aria-labelledby="tab-description"
-              hidden={activeTab !== "description"}
+              hidden={activeTab !== 'description'}
               className="p-6 sm:p-8"
             >
               {product.description ? (
@@ -373,7 +378,7 @@ function ProductDetails({ product }: { product: Product }) {
               role="tabpanel"
               id="panel-details"
               aria-labelledby="tab-details"
-              hidden={activeTab !== "details"}
+              hidden={activeTab !== 'details'}
               className="p-4 sm:p-6"
             >
               <table className="w-full table-fixed border-collapse text-left text-sm">
@@ -382,33 +387,33 @@ function ProductDetails({ product }: { product: Product }) {
                 </caption>
                 <tbody>
                   {[
-                    ["Danh mục", catalogName(product.category)],
-                    ["Thương hiệu", catalogName(product.brand)],
-                    ["SKU", variant?.sku ?? product.sku],
-                    ["Năm sản xuất", product.model_year],
-                    ["Mã vạch", product.barcode],
-                    ["Số lượng đặt tối thiểu", minimum],
-                    ["Màu sắc", variant?.color],
-                    ["Kích thước phiên bản", variant?.size],
+                    ['Danh mục', catalogName(product.category)],
+                    ['Thương hiệu', catalogName(product.brand)],
+                    ['SKU', variant?.sku ?? product.sku],
+                    ['Năm sản xuất', product.model_year],
+                    ['Mã vạch', product.barcode],
+                    ['Số lượng đặt tối thiểu', minimum],
+                    ['Màu sắc', variant?.color],
+                    ['Kích thước phiên bản', variant?.size],
                     [
-                      "Khối lượng",
-                      product.weight == null ? null : product.weight + " kg",
+                      'Khối lượng',
+                      product.weight == null ? null : product.weight + ' kg',
                     ],
                     [
-                      "Kích thước",
+                      'Kích thước',
                       product.dimensions
                         ? [
                             product.dimensions.width,
                             product.dimensions.height,
                             product.dimensions.depth,
-                          ].join(" × ") + " cm"
+                          ].join(' × ') + ' cm'
                         : null,
                     ],
                     ...Object.entries(variant?.attributes ?? {}).map(
                       ([name, value]) => [
                         attributeLabel(name),
-                        value === null ? "—" : String(value),
-                      ],
+                        value === null ? '—' : String(value),
+                      ]
                     ),
                   ].map(([label, value], index) => (
                     <tr
@@ -422,7 +427,7 @@ function ProductDetails({ product }: { product: Product }) {
                         {label}
                       </th>
                       <td className="whitespace-pre-wrap break-words px-4 py-3 align-top text-gray-700">
-                        {value ?? "Chưa có thông tin"}
+                        {value ?? 'Chưa có thông tin'}
                       </td>
                     </tr>
                   ))}
@@ -432,25 +437,25 @@ function ProductDetails({ product }: { product: Product }) {
           </section>
           <StoreProductReviews key={product._id} product={product} />
         </div>
-        <ProductNewsSidebar slug={product.slug ?? ""} />
+        <ProductNewsSidebar slug={product.slug ?? ''} />
       </div>
-      <RelatedProducts slug={product.slug ?? ""} />
+      <RelatedProducts slug={product.slug ?? ''} />
     </div>
   );
 }
 
 export default function StorefrontProductDetailPage() {
-  const { slug = "" } = useParams();
+  const { slug = '' } = useParams();
   const location = useLocation();
   const state: unknown = location.state;
   const candidate =
-    state && typeof state === "object" && "returnTo" in state
+    state && typeof state === 'object' && 'returnTo' in state
       ? state.returnTo
       : undefined;
   const returnTo =
-    typeof candidate === "string" && /^\/shop(?:\?|$)/.test(candidate)
+    typeof candidate === 'string' && /^\/shop(?:\?|$)/.test(candidate)
       ? candidate
-      : "/shop";
+      : '/shop';
   const query = useStoreProduct(slug, location.key);
   return (
     <div className="bg-[#fbfcfa] text-gray-950">
@@ -502,7 +507,7 @@ export default function StorefrontProductDetailPage() {
           <div role="alert">
             <p>
               {getApiError(query.error).statusCode === 404
-                ? "Không tìm thấy sản phẩm hoặc sản phẩm đã ngừng hoạt động."
+                ? 'Không tìm thấy sản phẩm hoặc sản phẩm đã ngừng hoạt động.'
                 : getApiError(query.error).message}
             </p>
             <button onClick={() => void query.refetch()}>Thử lại</button>

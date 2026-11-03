@@ -1,46 +1,37 @@
-
-import { useState, type SubmitEvent } from "react"
-import { Link } from "react-router-dom"
-import { companyInformationLinks as companyLinks, customerSupportLinks } from "@/features/support/utils/policy-documents"
+import { useState, type SubmitEvent } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  ArrowUp,
-  Mail,
-  MapPin,
-  Phone,
-  Send,
-} from "lucide-react"
+  companyInformationLinks as companyLinks,
+  customerSupportLinks,
+} from '@/features/support/utils/policy-documents';
+import { ArrowUp, Mail, MapPin, Phone, Send } from 'lucide-react';
 
-import {
-  Facebook,
-  Instagram,
-  Youtube,
-} from "@/components/icons/brand-icons"
+import { Facebook, Instagram, Youtube } from '@/components/icons/brand-icons';
 
 const supportLinks: readonly { label: string; path?: string }[] = [
   ...customerSupportLinks,
-]
+];
 
 export function StoreFooter() {
-  const [email, setEmail] = useState("")
-  const [message, setMessage] = useState("")
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
   function handleSubscribe(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    if (!email.trim()) return
+    if (!email.trim()) return;
 
-    setMessage("Tính năng đăng ký nhận tin đang được phát triển.")
+    setMessage('Tính năng đăng ký nhận tin đang được phát triển.');
   }
 
   function backToTop() {
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
     <footer className="bg-[#111111] text-gray-300">
       <div className="store-container py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-
           {/* Store information */}
           <section>
             <Link
@@ -51,7 +42,8 @@ export function StoreFooter() {
             </Link>
 
             <p className="mt-5 text-sm leading-7 text-gray-400">
-              Khám phá các nhóm phụ kiện công nghệ với hình ảnh sản phẩm và thông tin rõ ràng.
+              Khám phá các nhóm phụ kiện công nghệ với hình ảnh sản phẩm và
+              thông tin rõ ràng.
             </p>
 
             <div className="mt-5 space-y-3 text-sm">
@@ -81,12 +73,18 @@ export function StoreFooter() {
             <ul className="space-y-3 text-sm">
               {companyLinks.map((item) => (
                 <li key={item.label}>
-                  {item.path ? <Link
-                    to={item.path}
-                    className="transition-colors hover:text-[#65b719]"
-                  >
-                    {item.label}
-                  </Link> : <span aria-disabled="true" title="Đang cập nhật">{item.label}</span>}
+                  {item.path ? (
+                    <Link
+                      to={item.path}
+                      className="transition-colors hover:text-[#65b719]"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span aria-disabled="true" title="Đang cập nhật">
+                      {item.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -101,12 +99,18 @@ export function StoreFooter() {
             <ul className="space-y-3 text-sm">
               {supportLinks.map((item) => (
                 <li key={item.label}>
-                  {item.path ? <a
-                    href={item.path}
-                    className="transition-colors hover:text-[#65b719]"
-                  >
-                    {item.label}
-                  </a> : <span aria-disabled="true" title="Đang cập nhật">{item.label}</span>}
+                  {item.path ? (
+                    <a
+                      href={item.path}
+                      className="transition-colors hover:text-[#65b719]"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span aria-disabled="true" title="Đang cập nhật">
+                      {item.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -119,7 +123,8 @@ export function StoreFooter() {
             </h3>
 
             <p className="mb-5 text-sm leading-7 text-gray-400">
-              Chế độ xem trước: tính năng nhận tin chưa khả dụng. Email chưa được gửi hoặc lưu lại.
+              Chế độ xem trước: tính năng nhận tin chưa khả dụng. Email chưa
+              được gửi hoặc lưu lại.
             </p>
 
             <form onSubmit={handleSubscribe} className="flex">
@@ -129,8 +134,8 @@ export function StoreFooter() {
                 required
                 value={email}
                 onChange={(event) => {
-                  setEmail(event.target.value)
-                  setMessage("")
+                  setEmail(event.target.value);
+                  setMessage('');
                 }}
                 placeholder="Địa chỉ email..."
                 aria-label="Địa chỉ email nhận tin"
@@ -159,9 +164,9 @@ export function StoreFooter() {
 
             <div className="flex gap-3">
               {[
-                { name: "Facebook", Icon: Facebook },
-                { name: "Instagram", Icon: Instagram },
-                { name: "YouTube", Icon: Youtube },
+                { name: 'Facebook', Icon: Facebook },
+                { name: 'Instagram', Icon: Instagram },
+                { name: 'YouTube', Icon: Youtube },
               ].map(({ name, Icon }) => (
                 <span
                   key={name}
@@ -194,5 +199,5 @@ export function StoreFooter() {
         <ArrowUp size={20} />
       </button>
     </footer>
-  )
+  );
 }

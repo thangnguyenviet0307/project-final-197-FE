@@ -1,23 +1,36 @@
-import { api } from "@/services/api";
+import { api } from '@/services/api';
 import type {
   Category,
   CreateCategoryInput,
   UpdateCategoryInput,
-} from "@/features/categories/types/categories";
-import type { ApiResult } from "@/types/api";
-import type { PublicCategory } from "@/features/categories/types/categories";
+} from '@/features/categories/types/categories';
+import type { ApiResult } from '@/types/api';
+import type { PublicCategory } from '@/features/categories/types/categories';
 
-export async function listPublicCategories(signal?: AbortSignal): Promise<PublicCategory[]> {
-  const { data } = await api.get<ApiResult<PublicCategory[]>>("/categories/public", { signal });
+export async function listPublicCategories(
+  signal?: AbortSignal
+): Promise<PublicCategory[]> {
+  const { data } = await api.get<ApiResult<PublicCategory[]>>(
+    '/categories/public',
+    { signal }
+  );
   return data.data;
 }
 
-export async function listCategories(signal?: AbortSignal): Promise<Category[]> {
-  const { data } = await api.get<ApiResult<Category[]> & { count: number }>("/categories", { signal });
+export async function listCategories(
+  signal?: AbortSignal
+): Promise<Category[]> {
+  const { data } = await api.get<ApiResult<Category[]> & { count: number }>(
+    '/categories',
+    { signal }
+  );
   return data.data || [];
 }
 
-export async function getCategoryById(id: string, signal?: AbortSignal): Promise<Category> {
+export async function getCategoryById(
+  id: string,
+  signal?: AbortSignal
+): Promise<Category> {
   const { data } = await api.get<ApiResult<Category>>(
     `/categories/${encodeURIComponent(id)}`,
     { signal }
@@ -25,15 +38,17 @@ export async function getCategoryById(id: string, signal?: AbortSignal): Promise
   return data.data;
 }
 
-export async function createCategory(input: CreateCategoryInput): Promise<Category> {
+export async function createCategory(
+  input: CreateCategoryInput
+): Promise<Category> {
   const payload = {
     name: input.name,
     ...(input.icon !== undefined ? { icon: input.icon.trim() } : {}),
-    description: input.description || "",
+    description: input.description || '',
     parent: input.parent ? input.parent : null,
     isActive: input.isActive ?? true,
   };
-  const { data } = await api.post<ApiResult<Category>>("/categories", payload);
+  const { data } = await api.post<ApiResult<Category>>('/categories', payload);
   return data.data;
 }
 
@@ -48,7 +63,8 @@ export async function updateCategory({
   if (input.name !== undefined) payload.name = input.name;
   if (input.description !== undefined) payload.description = input.description;
   if (input.icon !== undefined) payload.icon = input.icon.trim();
-  if (input.parent !== undefined) payload.parent = input.parent ? input.parent : null;
+  if (input.parent !== undefined)
+    payload.parent = input.parent ? input.parent : null;
   if (input.isActive !== undefined) payload.isActive = input.isActive;
 
   const { data } = await api.put<ApiResult<Category>>(

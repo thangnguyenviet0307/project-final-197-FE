@@ -18,7 +18,7 @@ import {
   sortFn_datetime,
   sortFn_text,
   tableFeatures,
-} from "@tanstack/react-table"
+} from '@tanstack/react-table';
 
 /**
  * The TanStack Table v9 features every data table in the template uses:
@@ -49,6 +49,6 @@ export const dataTableFeatures = tableFeatures({
     datetime: sortFn_datetime,
     text: sortFn_text,
   },
-})
+});
 
-export type DataTableFeatures = typeof dataTableFeatures
+export type DataTableFeatures = typeof dataTableFeatures;

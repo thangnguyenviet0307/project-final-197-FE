@@ -1,10 +1,10 @@
-import { useEffect, useId, useRef, useState } from "react"
-import { ChevronRight, Menu } from "lucide-react"
-import { Link } from "react-router-dom"
-import { CatalogImage } from "@/components/catalog-image"
-import { usePublicCategories } from "@/features/categories/hooks/use-public-categories"
-import type { PublicCategory } from "@/features/categories/types/categories"
-import "./store-departments-menu.css"
+import { useEffect, useId, useRef, useState } from 'react';
+import { ChevronRight, Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CatalogImage } from '@/components/catalog-image';
+import { usePublicCategories } from '@/features/categories/hooks/use-public-categories';
+import type { PublicCategory } from '@/features/categories/types/categories';
+import './store-departments-menu.css';
 
 function CategoryBranch({
   category,
@@ -12,17 +12,17 @@ function CategoryBranch({
   ancestors = [],
   onNavigate,
 }: {
-  category: PublicCategory
-  categories: PublicCategory[]
-  ancestors?: string[]
-  onNavigate: () => void
+  category: PublicCategory;
+  categories: PublicCategory[];
+  ancestors?: string[];
+  onNavigate: () => void;
 }) {
-  const [expanded, setExpanded] = useState(false)
-  const submenuId = useId()
-  const isRoot = ancestors.length === 0
+  const [expanded, setExpanded] = useState(false);
+  const submenuId = useId();
+  const isRoot = ancestors.length === 0;
   const children = categories.filter(
-    (item) => item.parent === category._id && !ancestors.includes(item._id),
-  )
+    (item) => item.parent === category._id && !ancestors.includes(item._id)
+  );
 
   const content = (
     <>
@@ -33,7 +33,7 @@ function CategoryBranch({
       />
       <span className="min-w-0 flex-1 break-words">{category.name}</span>
     </>
-  )
+  );
 
   return (
     <li
@@ -42,25 +42,30 @@ function CategoryBranch({
         if (
           isRoot &&
           children.length &&
-          window.matchMedia("(min-width: 1024px) and (hover: hover)").matches
+          window.matchMedia('(min-width: 1024px) and (hover: hover)').matches
         ) {
-          setExpanded(true)
+          setExpanded(true);
         }
       }}
       onMouseLeave={() => {
         if (
           isRoot &&
-          window.matchMedia("(min-width: 1024px) and (hover: hover)").matches
+          window.matchMedia('(min-width: 1024px) and (hover: hover)').matches
         ) {
-          setExpanded(false)
+          setExpanded(false);
         }
       }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setExpanded(false)
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setExpanded(false);
       }}
     >
       <div className="flex items-stretch bg-white text-[#666] hover:bg-gray-50 hover:text-[#55b000]">
-        <Link to={`/shop?category=${category._id}`} onClick={onNavigate} className="flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base font-normal leading-6 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]">
+        <Link
+          to={`/shop?category=${category._id}`}
+          onClick={onNavigate}
+          className="flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base font-normal leading-6 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#55b000]"
+        >
           {content}
         </Link>
         {children.length > 0 && (
@@ -75,7 +80,7 @@ function CategoryBranch({
             <ChevronRight
               size={16}
               strokeWidth={1.5}
-              className={`shrink-0 text-[#b5b5b5] transition-transform ${expanded ? "rotate-90" : ""}`}
+              className={`shrink-0 text-[#b5b5b5] transition-transform ${expanded ? 'rotate-90' : ''}`}
             />
           </button>
         )}
@@ -85,8 +90,8 @@ function CategoryBranch({
           id={submenuId}
           className={
             isRoot
-              ? "store-category-submenu ml-5 border-l border-[#e8e8e8] bg-white lg:absolute lg:left-full lg:top-0 lg:ml-0 lg:grid lg:max-h-[70vh] lg:min-h-full lg:w-[min(600px,calc(100vw-360px))] lg:grid-cols-2 lg:content-start lg:overflow-y-auto lg:border lg:p-4 lg:shadow-xl"
-              : "ml-5 border-l border-[#e8e8e8] bg-white"
+              ? 'store-category-submenu ml-5 border-l border-[#e8e8e8] bg-white lg:absolute lg:left-full lg:top-0 lg:ml-0 lg:grid lg:max-h-[70vh] lg:min-h-full lg:w-[min(600px,calc(100vw-360px))] lg:grid-cols-2 lg:content-start lg:overflow-y-auto lg:border lg:p-4 lg:shadow-xl'
+              : 'ml-5 border-l border-[#e8e8e8] bg-white'
           }
         >
           {children.map((child) => (
@@ -101,50 +106,58 @@ function CategoryBranch({
         </ul>
       )}
     </li>
-  )
+  );
 }
 
 export function StoreDepartmentsMenu() {
-  const [open, setOpen] = useState(false)
-  const { data: categories = [], isPending, isError, refetch, isFetching } =
-    usePublicCategories(open)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const panelId = useId()
-  const categoryIds = new Set(categories.map((category) => category._id))
+  const [open, setOpen] = useState(false);
+  const {
+    data: categories = [],
+    isPending,
+    isError,
+    refetch,
+    isFetching,
+  } = usePublicCategories(open);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const panelId = useId();
+  const categoryIds = new Set(categories.map((category) => category._id));
   const roots = categories.filter(
-    (category) => !category.parent || !categoryIds.has(category.parent),
-  )
+    (category) => !category.parent || !categoryIds.has(category.parent)
+  );
 
   useEffect(() => {
     const closeMenu = () => {
-      setOpen(false)
-    }
+      setOpen(false);
+    };
     const handleOutsideClick = (event: MouseEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        closeMenu()
+        closeMenu();
       }
-    }
+    };
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeMenu()
-    }
+      if (event.key === 'Escape') closeMenu();
+    };
 
-    document.addEventListener("mousedown", handleOutsideClick)
-    document.addEventListener("keydown", handleEscape)
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick)
-      document.removeEventListener("keydown", handleEscape)
-    }
-  }, [])
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   return (
-    <div ref={containerRef} className="relative z-50 w-full lg:w-[280px] xl:w-[320px]">
+    <div
+      ref={containerRef}
+      className="relative z-50 w-full lg:w-[280px] xl:w-[320px]"
+    >
       <button
         type="button"
         onClick={() => {
-          setOpen((value) => !value)
+          setOpen((value) => !value);
         }}
         aria-expanded={open}
         aria-controls={panelId}
@@ -196,5 +209,5 @@ export function StoreDepartmentsMenu() {
         </div>
       )}
     </div>
-  )
+  );
 }

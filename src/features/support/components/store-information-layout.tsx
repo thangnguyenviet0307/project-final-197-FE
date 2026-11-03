@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import {
   companyInformationLinks,
   customerSupportLinks,
-} from "@/features/support/utils/policy-documents";
+} from '@/features/support/utils/policy-documents';
 
 export function StoreInformationLayout({
   title,
@@ -37,8 +37,8 @@ export function StoreInformationLayout({
         <div className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6">
             {[
-              { title: "Về chúng tôi", items: companyInformationLinks },
-              { title: "Hỗ trợ khách hàng", items: customerSupportLinks },
+              { title: 'Về chúng tôi', items: companyInformationLinks },
+              { title: 'Hỗ trợ khách hàng', items: customerSupportLinks },
             ].map((group) => (
               <section key={group.title}>
                 <h2 className="font-bold">{group.title}</h2>
@@ -48,8 +48,8 @@ export function StoreInformationLayout({
                       <Link
                         key={item.label}
                         to={item.path}
-                        aria-current={item.path === path ? "page" : undefined}
-                        className={`block rounded-lg px-3 py-3 text-sm ${item.path === path ? "bg-green-50 font-semibold text-green-800" : "text-gray-600 hover:bg-gray-50"}`}
+                        aria-current={item.path === path ? 'page' : undefined}
+                        className={`block rounded-lg px-3 py-3 text-sm ${item.path === path ? 'bg-green-50 font-semibold text-green-800' : 'text-gray-600 hover:bg-gray-50'}`}
                       >
                         {item.label}
                       </Link>
@@ -62,7 +62,7 @@ export function StoreInformationLayout({
                       >
                         {item.label}
                       </span>
-                    ),
+                    )
                   )}
                 </nav>
               </section>

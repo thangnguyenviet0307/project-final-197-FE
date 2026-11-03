@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { EllipsisVertical, LogOut, CircleUser, KeyRound } from "lucide-react";
-import { Link } from "react-router-dom";
+import { EllipsisVertical, LogOut, CircleUser, KeyRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-import { useLogout } from "@/features/auth/hooks/use-logout";
-import { UserAvatar } from "@/components/user-avatar";
+import { useLogout } from '@/features/auth/hooks/use-logout';
+import { UserAvatar } from '@/components/user-avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +13,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 export function NavUser({
   user,
@@ -57,7 +57,7 @@ export function NavUser({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--anchor-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >

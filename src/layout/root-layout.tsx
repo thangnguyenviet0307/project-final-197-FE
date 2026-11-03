@@ -1,7 +1,7 @@
-import { Outlet, useNavigation } from "react-router-dom";
+import { Outlet, useNavigation } from 'react-router-dom';
 
-import { StoreSkeleton } from "@/layout/storefront/store-skeleton";
-import { PageSkeleton } from "@/components/page-skeleton";
+import { StoreSkeleton } from '@/layout/storefront/store-skeleton';
+import { PageSkeleton } from '@/components/page-skeleton';
 
 /** Thin top bar shown while the next route's code is loading. */
 function RouteProgress() {
@@ -20,7 +20,7 @@ export function RootLayout() {
   const navigation = useNavigation();
   return (
     <>
-      {navigation.state === "loading" && <RouteProgress />}
+      {navigation.state === 'loading' && <RouteProgress />}
       <Outlet />
     </>
   );

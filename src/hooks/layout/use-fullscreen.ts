@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { useSyncExternalStore } from "react"
+import { useSyncExternalStore } from 'react';
 
 function subscribe(onChange: () => void) {
-  document.addEventListener("fullscreenchange", onChange)
-  return () => document.removeEventListener("fullscreenchange", onChange)
+  document.addEventListener('fullscreenchange', onChange);
+  return () => document.removeEventListener('fullscreenchange', onChange);
 }
 
 export function useFullscreen() {
@@ -12,32 +12,32 @@ export function useFullscreen() {
     subscribe,
     () => !!document.fullscreenElement,
     () => false
-  )
+  );
 
   const enterFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(console.error)
+      document.documentElement.requestFullscreen().catch(console.error);
     }
-  }
+  };
 
   const exitFullscreen = () => {
     if (document.fullscreenElement) {
-      document.exitFullscreen().catch(console.error)
+      document.exitFullscreen().catch(console.error);
     }
-  }
+  };
 
   const toggleFullscreen = () => {
     if (isFullscreen) {
-      exitFullscreen()
+      exitFullscreen();
     } else {
-      enterFullscreen()
+      enterFullscreen();
     }
-  }
+  };
 
   return {
     isFullscreen,
     enterFullscreen,
     exitFullscreen,
     toggleFullscreen,
-  }
+  };
 }

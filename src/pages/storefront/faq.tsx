@@ -1,41 +1,35 @@
-import { useMemo, useState } from "react"
-import { Link } from "react-router-dom"
-import {
-  ArrowRight,
-  ChevronDown,
-  CircleHelp,
-  Search,
-} from "lucide-react"
-import { useFAQPageContent } from "@/features/storefront/hooks/use-storefront-page-content"
-import { getApiError } from "@/services/api"
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, ChevronDown, CircleHelp, Search } from 'lucide-react';
+import { useFAQPageContent } from '@/features/storefront/hooks/use-storefront-page-content';
+import { getApiError } from '@/services/api';
 
-const allCategories = { id: "all", label: "Tất cả" }
+const allCategories = { id: 'all', label: 'Tất cả' };
 
 export default function StorefrontFAQPage() {
-  const query = useFAQPageContent()
-  const [activeCategory, setActiveCategory] = useState(allCategories.id)
-  const [search, setSearch] = useState("")
+  const query = useFAQPageContent();
+  const [activeCategory, setActiveCategory] = useState(allCategories.id);
+  const [search, setSearch] = useState('');
 
   const visibleCategories = useMemo(() => {
-    const categories = query.data?.categories ?? []
-    const normalizedQuery = search.trim().toLocaleLowerCase("vi")
+    const categories = query.data?.categories ?? [];
+    const normalizedQuery = search.trim().toLocaleLowerCase('vi');
 
     return categories
       .filter(
         (category) =>
-          activeCategory === allCategories.id ||
-          category.id === activeCategory
+          activeCategory === allCategories.id || category.id === activeCategory
       )
       .map((category) => ({
         ...category,
         questions: category.questions.filter((item) =>
           `${item.question} ${item.answer}`
-            .toLocaleLowerCase("vi")
+            .toLocaleLowerCase('vi')
             .includes(normalizedQuery)
         ),
       }))
-      .filter((category) => category.questions.length > 0)
-  }, [query.data?.categories, activeCategory, search])
+      .filter((category) => category.questions.length > 0);
+  }, [query.data?.categories, activeCategory, search]);
 
   if (query.isPending) {
     return (
@@ -44,7 +38,7 @@ export default function StorefrontFAQPage() {
           Đang tải câu hỏi thường gặp...
         </p>
       </main>
-    )
+    );
   }
 
   if (query.isError) {
@@ -66,14 +60,14 @@ export default function StorefrontFAQPage() {
           </button>
         </div>
       </main>
-    )
+    );
   }
 
-  const content = query.data
+  const content = query.data;
   const visibleQuestionCount = visibleCategories.reduce(
     (total, category) => total + category.questions.length,
     0
-  )
+  );
 
   return (
     <div className="bg-white text-gray-900">
@@ -119,7 +113,7 @@ export default function StorefrontFAQPage() {
             aria-label="Lọc câu hỏi theo chủ đề"
           >
             {[allCategories, ...content.categories].map((category) => {
-              const isActive = activeCategory === category.id
+              const isActive = activeCategory === category.id;
               return (
                 <button
                   key={category.id}
@@ -128,26 +122,29 @@ export default function StorefrontFAQPage() {
                   onClick={() => setActiveCategory(category.id)}
                   className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                     isActive
-                      ? "border-[#55b000] bg-[#55b000] text-white"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-[#55b000] hover:text-[#4d9210]"
+                      ? 'border-[#55b000] bg-[#55b000] text-white'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-[#55b000] hover:text-[#4d9210]'
                   }`}
                 >
                   {category.label}
                 </button>
-              )
+              );
             })}
           </div>
 
           <p className="mt-5 text-sm text-gray-500" aria-live="polite">
             {visibleQuestionCount > 0
               ? `${visibleQuestionCount} câu hỏi`
-              : "Không tìm thấy câu hỏi phù hợp"}
+              : 'Không tìm thấy câu hỏi phù hợp'}
           </p>
 
           {visibleCategories.length > 0 ? (
             <div className="mt-8 space-y-10">
               {visibleCategories.map((category) => (
-                <section key={category.id} aria-labelledby={`faq-${category.id}`}>
+                <section
+                  key={category.id}
+                  aria-labelledby={`faq-${category.id}`}
+                >
                   <h2
                     id={`faq-${category.id}`}
                     className="mb-4 text-xl font-bold sm:text-2xl"
@@ -185,8 +182,8 @@ export default function StorefrontFAQPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearch("")
-                  setActiveCategory(allCategories.id)
+                  setSearch('');
+                  setActiveCategory(allCategories.id);
                 }}
                 className="mt-4 text-sm font-bold text-[#4d9210] hover:underline"
               >
@@ -221,5 +218,5 @@ export default function StorefrontFAQPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

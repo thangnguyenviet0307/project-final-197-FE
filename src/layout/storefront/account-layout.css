@@ -14,7 +14,7 @@
   --primary-foreground: #fff;
 }
 
-.store-account [data-slot="input"],
+.store-account [data-slot='input'],
 .store-account select,
 .store-account textarea {
   min-height: 44px;
@@ -26,7 +26,7 @@
   padding: 10px 12px;
 }
 
-.store-account [data-slot="input"]:focus-visible,
+.store-account [data-slot='input']:focus-visible,
 .store-account select:focus-visible,
 .store-account textarea:focus-visible {
   outline: 2px solid #55b000;
@@ -34,15 +34,15 @@
   border-color: #459000;
 }
 
-.store-account [aria-invalid="true"] {
+.store-account [aria-invalid='true'] {
   border-color: #b91c1c;
 }
 
-.store-account [data-slot="input"]:read-only,
-.store-account [data-slot="input"]:disabled {
+.store-account [data-slot='input']:read-only,
+.store-account [data-slot='input']:disabled {
   background: #f9fafb;
 }
 
-.store-account input[type="password"]::-ms-reveal {
+.store-account input[type='password']::-ms-reveal {
   display: none;
 }

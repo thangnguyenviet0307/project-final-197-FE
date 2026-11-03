@@ -1,1 +1,1 @@
-﻿export { default } from "./information"
+﻿export { default } from './information';

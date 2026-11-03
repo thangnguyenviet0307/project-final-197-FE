@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FormProvider } from "react-hook-form";
+import { useState } from 'react';
+import { FormProvider } from 'react-hook-form';
 import {
   ArrowRight,
   Banknote,
@@ -7,20 +7,20 @@ import {
   ChevronLeft,
   LoaderCircle,
   Wallet,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { ProductImage } from "@/features/products/components/product-image";
-import { formatPrice } from "@/features/products/types/products";
-import { useCartStore } from "@/stores/cart.store";
-import { CheckoutCustomerInformation } from "@/features/checkout/components/checkout-customer-information";
-import { useAuthStore } from "@/stores/auth.store";
-import type { User } from "@/features/auth/types/auth";
-import { useCheckoutForm } from "@/features/checkout/hooks/use-checkout-form";
-import { cartTotal } from "@/features/cart/utils/cart-total";
-import { useUnsavedForm } from "@/hooks/use-unsaved-form";
-import { useRefreshCheckoutProducts } from "@/features/checkout/hooks/use-checkout";
-import { getApiError } from "@/services/api";
-import { useProfile } from "@/features/profile/hooks/use-profile";
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ProductImage } from '@/features/products/components/product-image';
+import { formatPrice } from '@/features/products/types/products';
+import { useCartStore } from '@/stores/cart.store';
+import { CheckoutCustomerInformation } from '@/features/checkout/components/checkout-customer-information';
+import { useAuthStore } from '@/stores/auth.store';
+import type { User } from '@/features/auth/types/auth';
+import { useCheckoutForm } from '@/features/checkout/hooks/use-checkout-form';
+import { cartTotal } from '@/features/cart/utils/cart-total';
+import { useUnsavedForm } from '@/hooks/use-unsaved-form';
+import { useRefreshCheckoutProducts } from '@/features/checkout/hooks/use-checkout';
+import { getApiError } from '@/services/api';
+import { useProfile } from '@/features/profile/hooks/use-profile';
 
 export default function CheckoutPage() {
   const user = useAuthStore((state) => state.user);
@@ -31,7 +31,7 @@ export default function CheckoutPage() {
         Đang tải thông tin khách hàng…
       </p>
     );
-  return user?.accountType === "customer" ? (
+  return user?.accountType === 'customer' ? (
     <CustomerCheckout key={user.id} customer={user} />
   ) : (
     <CheckoutScreen key="guest" customer={null} />
@@ -60,14 +60,14 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
       (form.formState.isDirty ||
         mutation.isPending ||
         needsRecovery ||
-        !!storageProblem),
+        !!storageProblem)
   );
   const [showAllProducts, setShowAllProducts] = useState(false);
   const items = useCartStore((state) => state.items);
   const selectedItems = items.filter((item) => item.selected);
   const selectedQuantity = selectedItems.reduce(
     (total, item) => total + item.quantity,
-    0,
+    0
   );
   const merchandiseTotal = cartTotal(selectedItems);
 
@@ -84,7 +84,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
               Mã đơn hàng: <strong>{mutation.data.orderCode}</strong>
             </p>
             <p>
-              Tổng tiền:{" "}
+              Tổng tiền:{' '}
               <strong className="text-red-600">
                 {formatPrice(mutation.data.totalAmount)} ₫
               </strong>
@@ -126,9 +126,9 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
           Chưa thể kiểm tra yêu cầu đặt hàng trước đó
         </h1>
         <p role="alert">
-          {storageProblem === "invalid"
-            ? "Dữ liệu khôi phục đơn hàng chưa hợp lệ. Yêu cầu cũ được giữ nguyên; vui lòng liên hệ cửa hàng để xác nhận trước khi tạo đơn khác."
-            : "Không đọc được bộ nhớ phiên. Vui lòng bật lại bộ nhớ phiên rồi bấm Kiểm tra lại để tránh tạo trùng đơn."}
+          {storageProblem === 'invalid'
+            ? 'Dữ liệu khôi phục đơn hàng chưa hợp lệ. Yêu cầu cũ được giữ nguyên; vui lòng liên hệ cửa hàng để xác nhận trước khi tạo đơn khác.'
+            : 'Không đọc được bộ nhớ phiên. Vui lòng bật lại bộ nhớ phiên rồi bấm Kiểm tra lại để tránh tạo trùng đơn.'}
         </p>
         <button
           type="button"
@@ -158,7 +158,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
             tại không thay đổi yêu cầu này.
           </p>
           <p>
-            Người nhận: {recoveryRequest.recipientName} ·{" "}
+            Người nhận: {recoveryRequest.recipientName} ·{' '}
             {recoveryRequest.phone}
           </p>
           <p>Địa chỉ nhà: {recoveryRequest.street}</p>
@@ -167,13 +167,13 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
               const current = items.find(
                 (item) =>
                   item.productId === line.productId &&
-                  item.variantKey === (line.variantId ?? ""),
+                  item.variantKey === (line.variantId ?? '')
               );
               return (
                 <li key={index}>
-                  {current?.name ?? `Sản phẩm ${line.productId}`}{" "}
-                  {current?.variantLabel || line.variantId || ""} · Số lượng:{" "}
-                  {line.quantity} · Đơn giá đã gửi:{" "}
+                  {current?.name ?? `Sản phẩm ${line.productId}`}{' '}
+                  {current?.variantLabel || line.variantId || ''} · Số lượng:{' '}
+                  {line.quantity} · Đơn giá đã gửi:{' '}
                   {formatPrice(line.expectedUnitPrice)} ₫
                 </li>
               );
@@ -186,7 +186,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
               disabled={mutation.isPending}
               className="rounded-lg bg-red-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
             >
-              {mutation.isPending ? "Đang kiểm tra…" : "Thử lại"}
+              {mutation.isPending ? 'Đang kiểm tra…' : 'Thử lại'}
             </button>
           </form>
           {form.formState.errors.root && (
@@ -257,11 +257,11 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                           ])}
                           aria-hidden={index > 0 && !showAllProducts}
                           inert={index > 0 && !showAllProducts}
-                          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out motion-reduce:transition-none ${index === 0 || showAllProducts ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out motion-reduce:transition-none ${index === 0 || showAllProducts ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                         >
                           <div className="min-h-0 overflow-hidden">
                             <div
-                              className={`flex items-start gap-4 p-4 sm:px-6 ${index > 0 ? "border-t border-gray-100" : ""}`}
+                              className={`flex items-start gap-4 p-4 sm:px-6 ${index > 0 ? 'border-t border-gray-100' : ''}`}
                             >
                               <ProductImage
                                 src={item.image}
@@ -291,7 +291,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                                     {formatPrice(item.unitPrice)} ₫
                                   </p>
                                   <p className="text-gray-600">
-                                    Số lượng:{" "}
+                                    Số lượng:{' '}
                                     <span className="font-medium text-gray-900">
                                       {item.quantity}
                                     </span>
@@ -321,7 +321,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                           </span>
                         )}
                         <span className="font-medium text-[#4d9210] underline underline-offset-4">
-                          {showAllProducts ? "Thu gọn" : "Xem chi tiết"}
+                          {showAllProducts ? 'Thu gọn' : 'Xem chi tiết'}
                         </span>
                       </button>
                     </div>
@@ -419,7 +419,7 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                       (!needsRecovery &&
                         (selectedItems.length === 0 ||
                           selectedItems.some(
-                            (item) => item.unavailableReason,
+                            (item) => item.unavailableReason
                           ) ||
                           !locations.data)) ||
                       mutation.isPending ||
@@ -428,10 +428,10 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                     className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 text-base font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {mutation.isPending
-                      ? "Đang đặt hàng…"
+                      ? 'Đang đặt hàng…'
                       : needsRecovery
-                        ? "Thử lại"
-                        : "Thanh toán"}
+                        ? 'Thử lại'
+                        : 'Thanh toán'}
                     {mutation.isPending ? (
                       <LoaderCircle
                         aria-hidden="true"
@@ -443,14 +443,14 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                   </button>
                   {!customer && (
                     <p className="text-sm text-gray-600">
-                      Bạn có thể đặt hàng không cần tài khoản, hoặc{" "}
+                      Bạn có thể đặt hàng không cần tài khoản, hoặc{' '}
                       <Link
                         to="/thanh-vien?act=login"
-                        state={{ from: "/checkout" }}
+                        state={{ from: '/checkout' }}
                         className="text-[#4d9210] underline"
                       >
                         đăng nhập
-                      </Link>{" "}
+                      </Link>{' '}
                       để sử dụng thông tin đã lưu.
                     </p>
                   )}
@@ -472,8 +472,8 @@ function CheckoutScreen({ customer }: { customer: User | null }) {
                       className="block text-sm font-medium text-[#4d9210] underline disabled:opacity-60"
                     >
                       {refreshProducts.isPending
-                        ? "Đang cập nhật…"
-                        : "Cập nhật giá và tồn kho để xem lại"}
+                        ? 'Đang cập nhật…'
+                        : 'Cập nhật giá và tồn kho để xem lại'}
                     </button>
                   )}
                   {refreshProducts.isSuccess && (

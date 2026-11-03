@@ -1,11 +1,11 @@
-"use client";
-import { isAdministrator } from "@/features/auth/utils/roles";
+'use client';
+import { isAdministrator } from '@/features/auth/utils/roles';
 import {
   pendingInformationPages,
   policyDocuments,
-} from "@/features/support/utils/policy-documents";
+} from '@/features/support/utils/policy-documents';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   Newspaper,
   LayoutDashboard,
@@ -18,13 +18,13 @@ import {
   FolderTree,
   Package,
   ShoppingBag,
-} from "lucide-react";
-import { useAuthStore } from "@/stores/auth.store";
-import { Link } from "react-router-dom";
-import { Logo } from "@/components/logo";
+} from 'lucide-react';
+import { useAuthStore } from '@/stores/auth.store';
+import { Link } from 'react-router-dom';
+import { Logo } from '@/components/logo';
 
-import { NavMain } from "@/layout/admin/nav-main";
-import { NavUser } from "@/layout/admin/nav-user";
+import { NavMain } from '@/layout/admin/nav-main';
+import { NavUser } from '@/layout/admin/nav-user';
 import {
   Sidebar,
   SidebarContent,
@@ -33,66 +33,66 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 const data = {
   user: {
-    name: "ShadcnStore",
-    email: "store@example.com",
-    avatar: "",
+    name: 'ShadcnStore',
+    email: 'store@example.com',
+    avatar: '',
   },
   navGroups: [
     {
-      label: "Tổng quan",
+      label: 'Tổng quan',
       items: [
         {
-          title: "Bảng điều khiển",
-          url: "/auth/dashboard",
+          title: 'Bảng điều khiển',
+          url: '/auth/dashboard',
           icon: LayoutDashboard,
         },
       ],
     },
     {
-      label: "Ứng dụng",
+      label: 'Ứng dụng',
       items: [
         {
-          title: "Danh mục",
-          url: "/auth/categories",
+          title: 'Danh mục',
+          url: '/auth/categories',
           icon: FolderTree,
         },
         {
-          title: "Thương hiệu",
-          url: "/auth/brands",
+          title: 'Thương hiệu',
+          url: '/auth/brands',
           icon: Tags,
         },
 
-        { title: "Sản phẩm", url: "/auth/products", icon: Package },
+        { title: 'Sản phẩm', url: '/auth/products', icon: Package },
         {
-          title: "Người dùng",
-          url: "/auth/users",
+          title: 'Người dùng',
+          url: '/auth/users',
           icon: Users,
         },
         {
-          title: "Khách hàng",
-          url: "/auth/customers",
+          title: 'Khách hàng',
+          url: '/auth/customers',
           icon: UserRound,
         },
-        { title: "Đơn hàng", url: "/auth/orders", icon: ShoppingBag },
+        { title: 'Đơn hàng', url: '/auth/orders', icon: ShoppingBag },
         {
-          title: "Tin tức & Blog",
-          url: "/auth/articles",
+          title: 'Tin tức & Blog',
+          url: '/auth/articles',
           icon: Newspaper,
           items: [
-            { title: "Bài viết", url: "/auth/articles" },
-            { title: "Danh mục bài viết", url: "/auth/post-categories" },
+            { title: 'Bài viết', url: '/auth/articles' },
+            { title: 'Danh mục bài viết', url: '/auth/post-categories' },
           ],
         },
         {
-          title: "Chính sách cửa hàng",
-          url: "/auth/policies",
+          title: 'Chính sách cửa hàng',
+          url: '/auth/policies',
           icon: Shield,
           items: [
-            { title: "Tất cả chính sách", url: "/auth/policies" },
+            { title: 'Tất cả chính sách', url: '/auth/policies' },
             ...policyDocuments.map((document) => ({
               title: document.title,
               url: `/auth/policies/${document.key}`,
@@ -103,26 +103,26 @@ const data = {
             })),
           ],
         },
-        { title: "Yêu cầu bảo hành", url: "/auth/warranties", icon: Shield },
+        { title: 'Yêu cầu bảo hành', url: '/auth/warranties', icon: Shield },
       ],
     },
     {
-      label: "Các trang",
+      label: 'Các trang',
       items: [
         {
-          title: "Trang Bán hàng",
-          url: "/",
-          target: "_blank",
+          title: 'Trang Bán hàng',
+          url: '/',
+          target: '_blank',
           icon: LayoutTemplate,
         },
         {
-          title: "Cài đặt",
-          url: "#",
+          title: 'Cài đặt',
+          url: '#',
           icon: Settings,
           items: [
             {
-              title: "Hồ sơ người dùng",
-              url: "/auth/settings/user",
+              title: 'Hồ sơ người dùng',
+              url: '/auth/settings/user',
             },
           ],
         },
@@ -139,25 +139,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     items: group.items
       .filter(
         (item) =>
-          (![
-            "/auth/users",
-            "/auth/hero-slides",
-            "/auth/articles",
-            "/auth/post-categories",
-            "/auth/policies",
-          ].includes(item.url) ||
-            isAdministrator(user?.role)),
+          ![
+            '/auth/users',
+            '/auth/hero-slides',
+            '/auth/articles',
+            '/auth/post-categories',
+            '/auth/policies',
+          ].includes(item.url) || isAdministrator(user?.role)
       )
       .map((item) =>
-        item.url === "/auth/categories" && isAdministrator(user?.role)
+        item.url === '/auth/categories' && isAdministrator(user?.role)
           ? {
               ...item,
               items: [
-                { title: "Danh sách danh mục", url: "/auth/categories" },
-                { title: "Hero trang chủ", url: "/auth/hero-slides" },
+                { title: 'Danh sách danh mục', url: '/auth/categories' },
+                { title: 'Hero trang chủ', url: '/auth/hero-slides' },
               ],
             }
-          : item,
+          : item
       ),
   }));
 
@@ -189,7 +188,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             user={{
               name: user.name,
               email: user.email,
-              avatar: user.avatar || "",
+              avatar: user.avatar || '',
             }}
           />
         )}

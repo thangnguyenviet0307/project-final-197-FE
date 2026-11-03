@@ -1,32 +1,59 @@
-import type { PolicyContent } from "@/features/support/types/support"
+import type { PolicyContent } from '@/features/support/types/support';
 
-interface StoreInformationLink { label: string; path?: string }
+interface StoreInformationLink {
+  label: string;
+  path?: string;
+}
 
 export const pendingInformationPages = [
-  { slug: "gioi-thieu", title: "Giới thiệu" },
-  { slug: "dieu-khoan-su-dung", title: "Điều khoản sử dụng" },
-  { slug: "cau-hoi-thuong-gap", title: "Câu hỏi thường gặp" },
-] as const
+  { slug: 'gioi-thieu', title: 'Giới thiệu' },
+  { slug: 'dieu-khoan-su-dung', title: 'Điều khoản sử dụng' },
+  { slug: 'cau-hoi-thuong-gap', title: 'Câu hỏi thường gặp' },
+] as const;
 
 export const companyInformationLinks: readonly StoreInformationLink[] = [
-  { label: "Giới thiệu", path: "/gioi-thieu" },
-  { label: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },
-  { label: "Điều khoản sử dụng", path: "/dieu-khoan-su-dung" },
-]
+  { label: 'Giới thiệu', path: '/gioi-thieu' },
+  { label: 'Chính sách bảo mật', path: '/chinh-sach-bao-mat' },
+  { label: 'Điều khoản sử dụng', path: '/dieu-khoan-su-dung' },
+];
 
 export const customerSupportLinks: readonly Required<StoreInformationLink>[] = [
-  { label: "Chính sách đổi trả", path: "/chinh-sach-doi-tra" },
-  { label: "Chính sách giao hàng", path: "/chinh-sach-giao-hang" },
-  { label: "Chính sách bảo hành", path: "/chinh-sach-bao-hanh" },
-  { label: "Câu hỏi thường gặp", path: "/cau-hoi-thuong-gap" },
-]
+  { label: 'Chính sách đổi trả', path: '/chinh-sach-doi-tra' },
+  { label: 'Chính sách giao hàng', path: '/chinh-sach-giao-hang' },
+  { label: 'Chính sách bảo hành', path: '/chinh-sach-bao-hanh' },
+  { label: 'Câu hỏi thường gặp', path: '/cau-hoi-thuong-gap' },
+];
 
 export const policyDocuments = [
-  { key: "warranty", path: "/chinh-sach-bao-hanh", title: "Chính sách bảo hành", description: "Điều kiện bảo hành sản phẩm và cách gửi yêu cầu hỗ trợ sau mua hàng." },
-  { key: "privacy", path: "/chinh-sach-bao-mat", title: "Chính sách bảo mật", description: "Thông tin về dữ liệu cá nhân, mục đích sử dụng và cách liên hệ khi cần hỗ trợ." },
-  { key: "shipping", path: "/chinh-sach-giao-hang", title: "Chính sách giao hàng", description: "Thông tin vận chuyển, nhận hàng và xử lý các vấn đề trong quá trình giao hàng." },
-  { key: "returns", path: "/chinh-sach-doi-tra", title: "Chính sách đổi trả", description: "Điều kiện tiếp nhận, quy trình đổi trả và phương án giải quyết sau mua hàng." },
-] as const
+  {
+    key: 'warranty',
+    path: '/chinh-sach-bao-hanh',
+    title: 'Chính sách bảo hành',
+    description:
+      'Điều kiện bảo hành sản phẩm và cách gửi yêu cầu hỗ trợ sau mua hàng.',
+  },
+  {
+    key: 'privacy',
+    path: '/chinh-sach-bao-mat',
+    title: 'Chính sách bảo mật',
+    description:
+      'Thông tin về dữ liệu cá nhân, mục đích sử dụng và cách liên hệ khi cần hỗ trợ.',
+  },
+  {
+    key: 'shipping',
+    path: '/chinh-sach-giao-hang',
+    title: 'Chính sách giao hàng',
+    description:
+      'Thông tin vận chuyển, nhận hàng và xử lý các vấn đề trong quá trình giao hàng.',
+  },
+  {
+    key: 'returns',
+    path: '/chinh-sach-doi-tra',
+    title: 'Chính sách đổi trả',
+    description:
+      'Điều kiện tiếp nhận, quy trình đổi trả và phương án giải quyết sau mua hàng.',
+  },
+] as const;
 
 // Suggestions are inserted only by an explicit editor action, never used as public fallback content.
 export const policySuggestions: Partial<PolicyContent> = {
@@ -72,4 +99,4 @@ Cửa hàng tiếp nhận thông tin, kiểm tra đơn hàng và tình trạng s
 
 Đổi hàng, hoàn tiền và chi phí
 Phương án đổi hàng hoặc hoàn tiền, cách thức thực hiện, thời gian xử lý và bên chịu phí vận chuyển cần được hai bên xác nhận sau khi kiểm tra. Không tự gửi hàng đến địa chỉ chưa được cửa hàng xác nhận.`,
-}
+};

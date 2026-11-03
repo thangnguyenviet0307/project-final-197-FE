@@ -1,9 +1,14 @@
-import type { QueryClient } from "@tanstack/react-query"
+import type { QueryClient } from '@tanstack/react-query';
 
-export function invalidateCatalog(client: QueryClient, catalog: "categories" | "brands") {
+export function invalidateCatalog(
+  client: QueryClient,
+  catalog: 'categories' | 'brands'
+) {
   return Promise.all([
     client.invalidateQueries({ queryKey: [catalog] }),
-    client.invalidateQueries({ queryKey: ["products"] }),
-    ...(catalog === "categories" ? [client.invalidateQueries({ queryKey: ["hero-slides"] })] : []),
-  ])
+    client.invalidateQueries({ queryKey: ['products'] }),
+    ...(catalog === 'categories'
+      ? [client.invalidateQueries({ queryKey: ['hero-slides'] })]
+      : []),
+  ]);
 }

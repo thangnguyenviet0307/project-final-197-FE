@@ -1,19 +1,18 @@
-
-import type { ReactNode } from "react"
-import { Link } from "react-router-dom"
-import { ChevronRight } from "lucide-react"
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
 interface BreadcrumbItem {
-  label: string
-  path?: string
+  label: string;
+  path?: string;
 }
 
 interface PageLayoutProps {
-  title: string
-  description?: string
-  breadcrumbs?: BreadcrumbItem[]
-  children: ReactNode
-  className?: string
+  title: string;
+  description?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  children: ReactNode;
+  className?: string;
 }
 
 export function PageLayout({
@@ -21,7 +20,7 @@ export function PageLayout({
   description,
   breadcrumbs = [],
   children,
-  className = "",
+  className = '',
 }: PageLayoutProps) {
   return (
     <div className="min-h-[60vh] bg-white">
@@ -31,10 +30,7 @@ export function PageLayout({
           <nav aria-label="Đường dẫn điều hướng">
             <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <li>
-                <Link
-                  to="/"
-                  className="transition hover:text-[#55b000]"
-                >
+                <Link to="/" className="transition hover:text-[#55b000]">
                   Trang chủ
                 </Link>
               </li>
@@ -74,11 +70,9 @@ export function PageLayout({
       </header>
 
       {/* Content provided by other team members */}
-      <div
-        className={`store-container py-8 sm:py-12 ${className}`}
-      >
+      <div className={`store-container py-8 sm:py-12 ${className}`}>
         {children}
       </div>
     </div>
-  )
+  );
 }

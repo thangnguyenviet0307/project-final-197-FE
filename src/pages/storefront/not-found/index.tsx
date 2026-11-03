@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { ArrowRight, SearchX } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { ArrowRight, SearchX } from 'lucide-react';
 
 export default function StoreNotFoundPage() {
   return (

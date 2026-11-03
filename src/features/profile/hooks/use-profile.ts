@@ -1,12 +1,12 @@
-import { useQuery } from "@tanstack/react-query"
-import { getProfile } from "@/features/auth/services/auth.service"
-import { useAuthStore } from "@/stores/auth.store"
+import { useQuery } from '@tanstack/react-query';
+import { getProfile } from '@/features/auth/services/auth.service';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function useProfile() {
-  const version = useAuthStore((state) => state.sessionVersion)
+  const version = useAuthStore((state) => state.sessionVersion);
   return useQuery({
-    queryKey: ["auth", "me", version],
+    queryKey: ['auth', 'me', version],
     queryFn: ({ signal }) => getProfile(signal),
     staleTime: 0,
-  })
+  });
 }

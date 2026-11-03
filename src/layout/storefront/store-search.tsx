@@ -1,19 +1,19 @@
-import { useState, type SubmitEvent } from "react"
-import { Search } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useState, type SubmitEvent } from 'react';
+import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function StoreSearch() {
-  const [keyword, setKeyword] = useState("")
-  const navigate = useNavigate()
+  const [keyword, setKeyword] = useState('');
+  const navigate = useNavigate();
 
   const handleSearch = (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const value = keyword.trim()
-    if (!value) return
+    const value = keyword.trim();
+    if (!value) return;
 
-    navigate(`/shop?search=${encodeURIComponent(value)}`)
-  }
+    navigate(`/shop?search=${encodeURIComponent(value)}`);
+  };
 
   return (
     <form
@@ -38,5 +38,5 @@ export function StoreSearch() {
         <Search size={20} />
       </button>
     </form>
-  )
+  );
 }

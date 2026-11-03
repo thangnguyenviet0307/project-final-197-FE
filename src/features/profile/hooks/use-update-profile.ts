@@ -1,23 +1,28 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { updateProfile } from "@/features/auth/services/auth.service"
-import { useAuthStore } from "@/stores/auth.store"
-import type { MutationCallbacks } from "@/types/mutation"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateProfile } from '@/features/auth/services/auth.service';
+import { useAuthStore } from '@/stores/auth.store';
+import type { MutationCallbacks } from '@/types/mutation';
 
-export function useUpdateProfile(options: MutationCallbacks<Awaited<ReturnType<typeof updateProfile>>, Parameters<typeof updateProfile>[0]> = {}) {
-  const queryClient = useQueryClient()
+export function useUpdateProfile(
+  options: MutationCallbacks<
+    Awaited<ReturnType<typeof updateProfile>>,
+    Parameters<typeof updateProfile>[0]
+  > = {}
+) {
+  const queryClient = useQueryClient();
   return useMutation({
     ...options,
     mutationFn: updateProfile,
-    meta: { successMessage: "Đã cập nhật hồ sơ." },
+    meta: { successMessage: 'Đã cập nhật hồ sơ.' },
     onSuccess: async (...args) => {
-      const version = useAuthStore.getState().sessionVersion
-      queryClient.setQueryData(["auth", "me", version], args[0])
+      const version = useAuthStore.getState().sessionVersion;
+      queryClient.setQueryData(['auth', 'me', version], args[0]);
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["users"] }),
-        queryClient.invalidateQueries({ queryKey: ["orders"] }),
-        queryClient.invalidateQueries({ queryKey: ["customers"] }),
-      ])
-      await options.onSuccess?.(...args)
+        queryClient.invalidateQueries({ queryKey: ['users'] }),
+        queryClient.invalidateQueries({ queryKey: ['orders'] }),
+        queryClient.invalidateQueries({ queryKey: ['customers'] }),
+      ]);
+      await options.onSuccess?.(...args);
     },
-  })
+  });
 }

@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import { getAuthArea } from "@/stores/auth.store"
+import { getAuthArea } from '@/stores/auth.store';
 
-import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export function UnauthorizedError() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="mx-auto flex min-h-dvh flex-col items-center justify-center gap-8 p-8 md:gap-12 md:p-16">
@@ -19,24 +19,27 @@ export function UnauthorizedError() {
         <h1 className="mb-4 text-3xl font-bold">401</h1>
         <h2 className="mb-3 text-2xl font-semibold">Chưa xác thực</h2>
         <p>
-          Bạn không có quyền truy cập nội dung này. Vui lòng đăng nhập hoặc liên hệ quản trị viên.
+          Bạn không có quyền truy cập nội dung này. Vui lòng đăng nhập hoặc liên
+          hệ quản trị viên.
         </p>
         <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
           <Button
             className="cursor-pointer"
-            onClick={() => navigate(getAuthArea() === "admin" ? "/auth/dashboard" : "/")}
+            onClick={() =>
+              navigate(getAuthArea() === 'admin' ? '/auth/dashboard' : '/')
+            }
           >
             Về trang chính
           </Button>
           <Button
             variant="outline"
             className="flex cursor-pointer items-center gap-1"
-            onClick={() => navigate("#")}
+            onClick={() => navigate('#')}
           >
             Liên hệ
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

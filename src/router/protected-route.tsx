@@ -1,7 +1,7 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuthStore } from "@/stores/auth.store";
-import { RootFallback } from "@/layout/root-layout";
-import type { Role } from "@/features/auth/types/auth";
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/stores/auth.store';
+import { RootFallback } from '@/layout/root-layout';
+import type { Role } from '@/features/auth/types/auth';
 
 export function ProtectedRoute({
   allowedRoles,
@@ -16,20 +16,20 @@ export function ProtectedRoute({
   if (!isAuthenticated || !user)
     return (
       <Navigate
-        to={storefront ? "/thanh-vien?act=login" : "/auth/login"}
+        to={storefront ? '/thanh-vien?act=login' : '/auth/login'}
         state={{ from: location }}
         replace
       />
     );
   if (
-    (storefront && user.accountType !== "customer") ||
-    (!storefront && user.accountType === "customer") ||
+    (storefront && user.accountType !== 'customer') ||
+    (!storefront && user.accountType === 'customer') ||
     (allowedRoles && (!user.role || !allowedRoles.includes(user.role)))
   )
-    return <Navigate to={storefront ? "/403" : "/auth/403"} replace />;
+    return <Navigate to={storefront ? '/403' : '/auth/403'} replace />;
   const passwordPath = storefront
-    ? "/account/change-password"
-    : "/auth/change-password";
+    ? '/account/change-password'
+    : '/auth/change-password';
   if (user.mustChangePassword && location.pathname !== passwordPath) {
     return <Navigate to={passwordPath} replace />;
   }

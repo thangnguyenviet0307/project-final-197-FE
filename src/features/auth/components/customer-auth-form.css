@@ -6,7 +6,7 @@
   --destructive: #b91c1c;
 }
 
-.customer-auth-form [data-slot="input"] {
+.customer-auth-form [data-slot='input'] {
   height: 2.75rem;
   border-color: #d1d5db;
   background-color: #fff;
@@ -14,7 +14,7 @@
   padding-inline: 0.875rem;
 }
 
-.customer-auth-form [data-slot="input"].customer-auth-password {
+.customer-auth-form [data-slot='input'].customer-auth-password {
   padding-right: 3rem;
 }
 
@@ -23,14 +23,14 @@
   display: none;
 }
 
-.customer-auth-form [data-slot="input"]:focus-visible {
+.customer-auth-form [data-slot='input']:focus-visible {
   border-color: #459000;
 }
 
-.customer-auth-form [data-slot="input"][aria-invalid="true"] {
+.customer-auth-form [data-slot='input'][aria-invalid='true'] {
   border-color: #b91c1c;
 }
 
-.customer-auth-form [data-slot="input"]:disabled {
+.customer-auth-form [data-slot='input']:disabled {
   background-color: #f3f4f6;
 }

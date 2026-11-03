@@ -1,11 +1,11 @@
-"use client";
-import { isAdministrator } from "@/features/auth/utils/roles";
+'use client';
+import { isAdministrator } from '@/features/auth/utils/roles';
 import {
   pendingInformationPages,
   policyDocuments,
-} from "@/features/support/utils/policy-documents";
+} from '@/features/support/utils/policy-documents';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Package,
@@ -14,9 +14,9 @@ import {
   Users,
   User,
   type LucideIcon,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandDialog,
@@ -25,9 +25,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { Kbd } from "@/components/ui/kbd";
-import { useAuthStore } from "@/stores/auth.store";
+} from '@/components/ui/command';
+import { Kbd } from '@/components/ui/kbd';
+import { useAuthStore } from '@/stores/auth.store';
 
 interface SearchItem {
   title: string;
@@ -47,104 +47,104 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
   const searchItems: SearchItem[] = [
     {
-      title: "Chính sách cửa hàng",
-      url: "/auth/policies",
-      group: "Ứng dụng",
+      title: 'Chính sách cửa hàng',
+      url: '/auth/policies',
+      group: 'Ứng dụng',
       icon: Shield,
     },
     ...policyDocuments.map((document) => ({
       title: document.title,
       url: `/auth/policies/${document.key}`,
-      group: "Chính sách cửa hàng",
+      group: 'Chính sách cửa hàng',
       icon: Shield,
     })),
     ...pendingInformationPages.map((document) => ({
       title: document.title,
       url: `/auth/policies/${document.slug}`,
-      group: "Chính sách cửa hàng",
+      group: 'Chính sách cửa hàng',
       icon: Shield,
     })),
     {
-      title: "Yêu cầu bảo hành",
-      url: "/auth/warranties",
-      group: "Ứng dụng",
+      title: 'Yêu cầu bảo hành',
+      url: '/auth/warranties',
+      group: 'Ứng dụng',
       icon: Shield,
     },
     // Overview
     {
-      title: "Bảng điều khiển",
-      url: "/auth/dashboard",
-      group: "Tổng quan",
+      title: 'Bảng điều khiển',
+      url: '/auth/dashboard',
+      group: 'Tổng quan',
       icon: LayoutDashboard,
     },
 
     // Apps
     {
-      title: "Tin tức & Blog",
-      url: "/auth/articles",
-      group: "Ứng dụng",
+      title: 'Tin tức & Blog',
+      url: '/auth/articles',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Danh mục bài viết",
-      url: "/auth/post-categories",
-      group: "Ứng dụng",
+      title: 'Danh mục bài viết',
+      url: '/auth/post-categories',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Danh mục: Hero trang chủ",
-      url: "/auth/hero-slides",
-      group: "Ứng dụng",
+      title: 'Danh mục: Hero trang chủ',
+      url: '/auth/hero-slides',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Sản phẩm",
-      url: "/auth/products",
-      group: "Ứng dụng",
+      title: 'Sản phẩm',
+      url: '/auth/products',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Đơn hàng",
-      url: "/auth/orders",
-      group: "Ứng dụng",
+      title: 'Đơn hàng',
+      url: '/auth/orders',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Danh mục",
-      url: "/auth/categories",
-      group: "Ứng dụng",
+      title: 'Danh mục',
+      url: '/auth/categories',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Thương hiệu",
-      url: "/auth/brands",
-      group: "Ứng dụng",
+      title: 'Thương hiệu',
+      url: '/auth/brands',
+      group: 'Ứng dụng',
       icon: Package,
     },
     {
-      title: "Khách hàng",
-      url: "/auth/customers",
-      group: "Ứng dụng",
+      title: 'Khách hàng',
+      url: '/auth/customers',
+      group: 'Ứng dụng',
       icon: Users,
     },
     {
-      title: "Quản lý người dùng",
-      url: "/auth/users",
-      group: "Ứng dụng",
+      title: 'Quản lý người dùng',
+      url: '/auth/users',
+      group: 'Ứng dụng',
       icon: Users,
     },
     {
-      title: "Đổi mật khẩu",
-      url: "/auth/change-password",
-      group: "Cài đặt",
+      title: 'Đổi mật khẩu',
+      url: '/auth/change-password',
+      group: 'Cài đặt',
       icon: Shield,
     },
 
     // Settings
     {
-      title: "Hồ sơ người dùng",
-      url: "/auth/settings/user",
-      group: "Cài đặt",
+      title: 'Hồ sơ người dùng',
+      url: '/auth/settings/user',
+      group: 'Cài đặt',
       icon: User,
     },
 
@@ -154,15 +154,15 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const groupedItems = searchItems
     .filter(
       (item) =>
-        (!item.url.startsWith("/auth/policies/") || isAdministrator(role)) &&
+        (!item.url.startsWith('/auth/policies/') || isAdministrator(role)) &&
         (![
-          "/auth/users",
-          "/auth/hero-slides",
-          "/auth/articles",
-          "/auth/post-categories",
-          "/auth/policies",
+          '/auth/users',
+          '/auth/hero-slides',
+          '/auth/articles',
+          '/auth/post-categories',
+          '/auth/policies',
         ].includes(item.url) ||
-          isAdministrator(role)),
+          isAdministrator(role))
     )
     .reduce(
       (acc, item) => {
@@ -172,7 +172,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
         acc[item.group].push(item);
         return acc;
       },
-      {} as Record<string, SearchItem[]>,
+      {} as Record<string, SearchItem[]>
     );
 
   const handleSelect = (url: string) => {

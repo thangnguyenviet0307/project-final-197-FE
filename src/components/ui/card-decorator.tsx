@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react';
 
 export const CardDecorator = ({ children }: { children: ReactNode }) => (
   <div className="relative mx-auto h-36 w-36">
@@ -17,4 +17,4 @@ export const CardDecorator = ({ children }: { children: ReactNode }) => (
       {children}
     </div>
   </div>
-)
+);

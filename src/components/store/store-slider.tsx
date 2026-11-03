@@ -1,31 +1,25 @@
-
-import { useState, type ReactNode } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useState, type ReactNode } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface StoreSliderProps {
-  children: ReactNode[]
-  className?: string
+  children: ReactNode[];
+  className?: string;
 }
 
-export function StoreSlider({
-  children,
-  className = "",
-}: StoreSliderProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
+export function StoreSlider({ children, className = '' }: StoreSliderProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const totalSlides = children.length
+  const totalSlides = children.length;
 
-  if (totalSlides === 0) return null
+  if (totalSlides === 0) return null;
 
   const nextSlide = () => {
-    setActiveIndex((current) => (current + 1) % totalSlides)
-  }
+    setActiveIndex((current) => (current + 1) % totalSlides);
+  };
 
   const previousSlide = () => {
-    setActiveIndex(
-      (current) => (current - 1 + totalSlides) % totalSlides
-    )
-  }
+    setActiveIndex((current) => (current - 1 + totalSlides) % totalSlides);
+  };
 
   return (
     <section
@@ -35,11 +29,7 @@ export function StoreSlider({
       {/* Slide content */}
       <div className="relative">
         {children.map((slide, index) => (
-          <div
-            key={index}
-            hidden={index !== activeIndex}
-            className="w-full"
-          >
+          <div key={index} hidden={index !== activeIndex} className="w-full">
             {slide}
           </div>
         ))}
@@ -77,16 +67,14 @@ export function StoreSlider({
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`Chuyển đến slide ${index + 1}`}
-              aria-current={activeIndex === index ? "true" : undefined}
+              aria-current={activeIndex === index ? 'true' : undefined}
               className={`h-2.5 rounded-full transition-all ${
-                activeIndex === index
-                  ? "w-7 bg-[#55b000]"
-                  : "w-2.5 bg-white/80"
+                activeIndex === index ? 'w-7 bg-[#55b000]' : 'w-2.5 bg-white/80'
               }`}
             />
           ))}
         </div>
       )}
     </section>
-  )
+  );
 }
