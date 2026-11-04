@@ -69,7 +69,7 @@ export function LoginForm1({
                     credential="email"
                     id="login-email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="Nhập địa chỉ email"
                     aria-invalid={!!form.formState.errors.email}
                   />
                 )}
@@ -83,6 +83,7 @@ export function LoginForm1({
                 name="password"
                 render={({ field }) => (
                   <LoginCredentialInput
+                    placeholder="Nhập mật khẩu"
                     {...field}
                     area="admin"
                     credential="password"

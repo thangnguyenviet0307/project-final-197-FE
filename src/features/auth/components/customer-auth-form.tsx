@@ -21,6 +21,14 @@ import './customer-auth-form.css';
 
 type FormValues = z.infer<typeof customerRegistrationSchema>;
 
+const fieldPlaceholders: Record<keyof FormValues, string> = {
+  firstName: 'Nhập tên của bạn',
+  lastName: 'Nhập họ của bạn',
+  email: 'Nhập địa chỉ email',
+  password: 'Nhập mật khẩu',
+  confirmPassword: 'Nhập lại mật khẩu',
+};
+
 export function CustomerAuthForm({
   registration = false,
 }: {
@@ -178,6 +186,7 @@ export function CustomerAuthForm({
                         name={name}
                         render={({ field }) => (
                           <LoginCredentialInput
+                            placeholder={fieldPlaceholders[name]}
                             {...field}
                             area="customer"
                             credential={name}
@@ -200,6 +209,7 @@ export function CustomerAuthForm({
                       />
                     ) : (
                       <Input
+                        placeholder={fieldPlaceholders[name]}
                         id={`customer-${name}`}
                         aria-required="true"
                         type={

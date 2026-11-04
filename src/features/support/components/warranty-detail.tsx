@@ -123,6 +123,7 @@ function WarrantyUpdateForm({
             <RequiredMark />
           </label>
           <textarea
+            placeholder="Nhập nội dung phản hồi và hướng xử lý bảo hành"
             id="warranty-note"
             required
             maxLength={1000}

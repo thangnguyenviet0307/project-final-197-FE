@@ -446,6 +446,7 @@ export default function UsersPage() {
               </FieldLabel>
               <div className="relative">
                 <Input
+                  placeholder="Tìm tài khoản theo tên hoặc email"
                   id="users-search"
                   aria-label="Tìm tài khoản theo tên hoặc email"
                   maxLength={200}

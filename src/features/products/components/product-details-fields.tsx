@@ -106,6 +106,7 @@ export function ProductDetailsFields({
               <Field>
                 <FieldLabel htmlFor={name}>{label}</FieldLabel>
                 <Textarea
+                  placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
                   {...field}
                   id={name}
                   value={field.value ?? ''}

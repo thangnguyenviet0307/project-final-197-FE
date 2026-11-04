@@ -239,6 +239,15 @@ export default function UserProfilePage() {
                           {label}
                         </FieldLabel>
                         <Input
+                          placeholder={
+                            {
+                              firstName: 'Nhập tên của bạn',
+                              lastName: 'Nhập họ của bạn',
+                              personalEmail: 'Nhập email cá nhân',
+                              phone: 'Nhập số điện thoại',
+                              location: 'Nhập địa điểm của bạn',
+                            }[name]
+                          }
                           id={`profile-${name}`}
                           type={type}
                           aria-invalid={!!form.formState.errors[name]}

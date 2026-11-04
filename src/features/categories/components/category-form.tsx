@@ -69,6 +69,7 @@ export function CategoryForm({
           <Field>
             <FieldLabel htmlFor="category-name">Tên danh mục</FieldLabel>
             <Input
+              placeholder="Nhập tên danh mục"
               id="category-name"
               {...form.register('name')}
               aria-invalid={!!form.formState.errors.name}
@@ -87,6 +88,7 @@ export function CategoryForm({
           <Field>
             <FieldLabel htmlFor="category-description">Mô tả</FieldLabel>
             <Textarea
+              placeholder="Nhập mô tả danh mục"
               id="category-description"
               rows={5}
               {...form.register('description')}

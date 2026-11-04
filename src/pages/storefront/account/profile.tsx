@@ -96,6 +96,15 @@ function ProfileEditor({ user }: { user: User }) {
                 <RequiredMark />
               </FieldLabel>
               <Input
+                placeholder={
+                  {
+                    firstName: 'Nhập tên của bạn',
+                    lastName: 'Nhập họ của bạn',
+                    personalEmail: 'Nhập email cá nhân',
+                    phone: 'Nhập số điện thoại',
+                    location: 'Nhập địa điểm của bạn',
+                  }[name]
+                }
                 id={`customer-profile-${name}`}
                 aria-required="true"
                 autoComplete={
@@ -185,6 +194,7 @@ function ProfileEditor({ user }: { user: User }) {
           <Field>
             <FieldLabel htmlFor="customer-phone">Số điện thoại</FieldLabel>
             <Input
+              placeholder="Nhập số điện thoại"
               id="customer-phone"
               type="tel"
               autoComplete="tel"

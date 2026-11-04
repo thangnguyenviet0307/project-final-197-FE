@@ -58,6 +58,7 @@ export function PostCategoryForm({
         <label className="grid gap-1">
           Tên danh mục
           <Input
+            placeholder="Nhập tên danh mục bài viết"
             required
             maxLength={80}
             value={draft.name}
@@ -77,6 +78,7 @@ export function PostCategoryForm({
         <label className="grid gap-1">
           Mô tả danh mục
           <Input
+            placeholder="Nhập mô tả danh mục bài viết"
             maxLength={500}
             value={draft.description}
             onChange={(e) =>

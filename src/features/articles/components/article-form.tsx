@@ -140,6 +140,7 @@ export function ArticleForm({
         <label className="grid gap-1 sm:col-span-2">
           Tiêu đề
           <Input
+            placeholder="Nhập tiêu đề bài viết"
             required
             minLength={3}
             maxLength={200}
@@ -195,6 +196,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Tác giả
           <Input
+            placeholder="Nhập tên tác giả"
             required
             maxLength={120}
             value={draft.authorName}
@@ -204,6 +206,7 @@ export function ArticleForm({
         <label className="grid gap-1 sm:col-span-2">
           Tóm tắt
           <Textarea
+            placeholder="Nhập mô tả ngắn cho bài viết"
             required
             maxLength={1000}
             value={draft.excerpt}
@@ -213,6 +216,7 @@ export function ArticleForm({
         <label className="grid gap-1 sm:col-span-2">
           Nội dung
           <Textarea
+            placeholder="Nhập nội dung bài viết"
             aria-label="Nội dung"
             required
             rows={12}
@@ -227,6 +231,7 @@ export function ArticleForm({
         <label className="grid gap-1 sm:col-span-2">
           URL ảnh bìa
           <Input
+            placeholder="https://example.com/anh-bai-viet.jpg"
             type="url"
             maxLength={2048}
             value={draft.imageUrl}
@@ -260,6 +265,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Thẻ (cách nhau bằng dấu phẩy)
           <Input
+            placeholder="Ví dụ: điện thoại, công nghệ"
             value={draft.tags}
             onChange={(e) => patch({ tags: e.target.value })}
           />
@@ -287,6 +293,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Tiêu đề SEO
           <Input
+            placeholder="Nhập tiêu đề SEO"
             maxLength={70}
             value={draft.seoTitle}
             onChange={(e) => patch({ seoTitle: e.target.value })}
@@ -295,6 +302,7 @@ export function ArticleForm({
         <label className="grid gap-1">
           Mô tả SEO
           <Textarea
+            placeholder="Nhập mô tả SEO"
             maxLength={160}
             value={draft.seoDescription}
             onChange={(e) => patch({ seoDescription: e.target.value })}

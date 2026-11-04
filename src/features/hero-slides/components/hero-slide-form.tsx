@@ -116,6 +116,7 @@ export function HeroSlideForm({
         <label className="grid gap-2 text-sm">
           Tiêu đề
           <Textarea
+            placeholder="Nhập tiêu đề banner"
             required
             maxLength={200}
             value={draft.title}
@@ -130,6 +131,7 @@ export function HeroSlideForm({
         <label className="grid gap-2 text-sm">
           Mô tả
           <Textarea
+            placeholder="Nhập mô tả banner"
             maxLength={1000}
             value={draft.description}
             onChange={(event) =>
@@ -143,6 +145,7 @@ export function HeroSlideForm({
         <label className="grid gap-2 text-sm">
           URL ảnh nền
           <Input
+            placeholder="https://example.com/banner.jpg"
             type="url"
             maxLength={2048}
             value={draft.imageUrl}

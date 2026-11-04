@@ -57,6 +57,7 @@ export function HandlerPicker({
       <label className="grid min-w-0 gap-1 text-sm">
         Tìm nhân viên xử lý
         <Input
+          placeholder="Tìm theo tên hoặc email nhân viên"
           className="w-full min-w-0"
           value={search}
           disabled={disabled}

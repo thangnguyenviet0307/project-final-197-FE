@@ -75,6 +75,7 @@ export function CancelCustomerOrder({
           <label className="grid gap-2 text-sm">
             Lý do khác
             <textarea
+              placeholder="Nhập lý do hủy đơn hàng"
               className="rounded-md border p-2"
               maxLength={1000}
               value={other}

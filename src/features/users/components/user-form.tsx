@@ -89,6 +89,7 @@ export function UserForm({
             <Field data-invalid={!!form.formState.errors.firstName}>
               <FieldLabel htmlFor="create-first-name">Nhập tên</FieldLabel>
               <Input
+                placeholder="Nhập tên"
                 id="create-first-name"
                 autoComplete="off"
                 aria-invalid={!!form.formState.errors.firstName}
@@ -99,6 +100,7 @@ export function UserForm({
             <Field data-invalid={!!form.formState.errors.lastName}>
               <FieldLabel htmlFor="create-last-name">Nhập họ</FieldLabel>
               <Input
+                placeholder="Nhập họ"
                 id="create-last-name"
                 autoComplete="off"
                 aria-invalid={!!form.formState.errors.lastName}
@@ -111,6 +113,7 @@ export function UserForm({
           <Field data-invalid={!!form.formState.errors.email}>
             <FieldLabel htmlFor="create-email">Email</FieldLabel>
             <Input
+              placeholder="Nhập email tài khoản"
               id="create-email"
               type="email"
               autoComplete="off"

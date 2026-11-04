@@ -32,6 +32,10 @@ export function LoginCredentialInput({
   return (
     <Input
       {...props}
+      placeholder={
+        props.placeholder ??
+        (credential === 'email' ? 'Nhập địa chỉ email' : 'Nhập mật khẩu')
+      }
       name={`${area}-sign-in-${credential}`}
       autoComplete="off"
       readOnly={!editable}

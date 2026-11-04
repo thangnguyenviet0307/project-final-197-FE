@@ -193,6 +193,13 @@ export function WriteProductReview({
                         {field === 'reviewerName' && <RequiredMark />}
                       </label>
                       <input
+                        placeholder={
+                          field === 'reviewerName'
+                            ? 'Nhập họ tên của bạn'
+                            : field === 'email'
+                              ? 'Nhập địa chỉ email (không bắt buộc)'
+                              : 'Nhập số điện thoại (không bắt buộc)'
+                        }
                         id={`store-review-${field}`}
                         type={type}
                         autoComplete={autoComplete}

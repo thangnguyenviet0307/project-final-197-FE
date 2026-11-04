@@ -29,6 +29,7 @@ export function ProductInputField({
     <Field>
       <FieldLabel htmlFor={name}>{label}</FieldLabel>
       <Input
+        placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
         id={name}
         type={numeric ? 'number' : 'text'}
         step={numeric ? 'any' : undefined}

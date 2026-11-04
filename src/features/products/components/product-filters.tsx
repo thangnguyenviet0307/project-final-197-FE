@@ -46,6 +46,7 @@ export function ProductFilters({
         <Field>
           <FieldLabel htmlFor="filter-search">Tên sản phẩm</FieldLabel>
           <Input
+            placeholder="Tìm theo tên hoặc mã sản phẩm"
             id="filter-search"
             value={draft.search}
             onChange={(event) =>

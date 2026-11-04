@@ -50,6 +50,7 @@ export function TransferOwnershipDialog({
           <label className="grid gap-2 text-sm">
             Mật khẩu hiện tại của bạn
             <Input
+              placeholder="Nhập mật khẩu hiện tại để xác nhận"
               type="password"
               autoComplete="current-password"
               maxLength={1024}

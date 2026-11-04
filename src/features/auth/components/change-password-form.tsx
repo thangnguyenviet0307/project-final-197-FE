@@ -81,6 +81,13 @@ export function ChangePasswordForm({
                   <RequiredMark />
                 </FieldLabel>
                 <Input
+                  placeholder={
+                    name === 'currentPassword'
+                      ? 'Nhập mật khẩu hiện tại'
+                      : name === 'newPassword'
+                        ? 'Nhập mật khẩu mới'
+                        : 'Nhập lại mật khẩu mới'
+                  }
                   id={name}
                   aria-required="true"
                   type="password"

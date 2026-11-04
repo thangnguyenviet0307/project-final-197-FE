@@ -158,6 +158,7 @@ export function ProductReviews({ id }: { id: string }) {
             <Field>
               <FieldLabel htmlFor="reviewerName">Người đánh giá</FieldLabel>
               <Input
+                placeholder="Nhập tên người đánh giá"
                 id="reviewerName"
                 maxLength={100}
                 aria-invalid={!!form.formState.errors.reviewerName}
@@ -168,6 +169,7 @@ export function ProductReviews({ id }: { id: string }) {
             <Field>
               <FieldLabel htmlFor="rating">Số sao (1–5)</FieldLabel>
               <Input
+                placeholder="Nhập tên người đánh giá"
                 id="rating"
                 type="number"
                 min={1}
@@ -183,6 +185,7 @@ export function ProductReviews({ id }: { id: string }) {
                 Nội dung đánh giá
               </FieldLabel>
               <Textarea
+                placeholder="Nhập nội dung đánh giá sản phẩm"
                 id="review-comment"
                 maxLength={2000}
                 aria-invalid={!!form.formState.errors.comment}

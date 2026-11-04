@@ -62,6 +62,7 @@ export function OrderNoteEditor({ order }: { order: Order }) {
       <label className="grid gap-2 text-sm">
         Order note
         <textarea
+          placeholder="Nhập ghi chú cho đơn hàng"
           className="bg-background rounded-md border p-2"
           value={draft.note}
           maxLength={2000}

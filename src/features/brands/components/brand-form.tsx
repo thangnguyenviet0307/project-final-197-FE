@@ -74,6 +74,7 @@ export function BrandForm({
           <Field>
             <FieldLabel htmlFor="brand-name">Tên thương hiệu</FieldLabel>
             <Input
+              placeholder="Nhập tên thương hiệu"
               id="brand-name"
               {...form.register('name')}
               aria-invalid={!!form.formState.errors.name}
@@ -92,6 +93,7 @@ export function BrandForm({
           <Field>
             <FieldLabel htmlFor="brand-description">Mô tả</FieldLabel>
             <Textarea
+              placeholder="Nhập mô tả thương hiệu"
               id="brand-description"
               rows={5}
               {...form.register('description')}

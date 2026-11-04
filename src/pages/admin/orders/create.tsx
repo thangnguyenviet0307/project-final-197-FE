@@ -266,6 +266,7 @@ export default function CreateOrderPage() {
             <div className="flex flex-wrap items-center gap-2" key={index}>
               <span>{item.label}</span>
               <Input
+                placeholder="Nhập số lượng"
                 className="w-24"
                 aria-label={`Quantity ${index + 1}`}
                 type="number"
@@ -310,6 +311,13 @@ export default function CreateOrderPage() {
             <label className="grid gap-2 text-sm capitalize" key={name}>
               {name}
               <Input
+                placeholder={
+                  name === 'street'
+                    ? 'Nhập số nhà, tên đường'
+                    : name === 'city'
+                      ? 'Nhập thành phố'
+                      : 'Nhập tỉnh/thành'
+                }
                 name={name}
                 maxLength={name === 'street' ? 255 : 50}
                 required
@@ -320,6 +328,7 @@ export default function CreateOrderPage() {
         <label className="grid gap-2 text-sm">
           Order note
           <Input
+            placeholder="Nhập ghi chú đơn hàng (không bắt buộc)"
             name="orderNote"
             maxLength={2000}
             disabled={mutation.isPending}

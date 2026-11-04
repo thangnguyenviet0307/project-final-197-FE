@@ -133,6 +133,7 @@ export function OrderActions({
                 <label className="grid gap-2 text-sm">
                   Lý do hủy
                   <textarea
+                    placeholder="Nhập lý do thay đổi trạng thái đơn hàng"
                     maxLength={1000}
                     className="bg-background rounded-md border p-2"
                     value={reason}
