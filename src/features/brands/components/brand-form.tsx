@@ -83,6 +83,7 @@ export function BrandForm({
           </Field>
           <ImageUploadField
             id="brand-logo"
+            guidance="Lưu ý: Logo trên web store hiển thị trong khung vuông 36 × 36 px. Nên dùng ảnh vuông tỷ lệ 1:1 (ví dụ 256 × 256 px), đặt logo ở giữa và hạn chế khoảng trắng thừa. Ảnh ngang hoặc dọc sẽ có khoảng trống để giữ trọn ảnh, không bị cắt hay kéo méo."
             label="Ảnh thương hiệu"
             selected={image.selected}
             existingUrl={brand?.logoUrl}

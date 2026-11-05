@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CatalogImage } from '@/components/catalog-image';
+import { CatalogOptionContent } from '@/features/storefront/components/catalog-filter-option';
 import { usePublicCategories } from '@/features/categories/hooks/use-public-categories';
 
 export function HomeCategoryLinks() {
@@ -21,12 +21,9 @@ export function HomeCategoryLinks() {
               <Link
                 key={category._id}
                 to={`/shop?category=${category._id}`}
-                className="flex items-center gap-3 rounded-lg border bg-white p-3"
+                className="flex h-16 min-w-0 items-center rounded-xl border border-gray-200 bg-white px-3 text-gray-800 hover:border-[#9acb74]"
               >
-                <CatalogImage src={category.icon} alt="" className="size-12" />
-                <span className="text-sm font-semibold text-gray-800">
-                  {category.name}
-                </span>
+                <CatalogOptionContent name={category.name} image={category.icon} />
               </Link>
             ))}
         </div>

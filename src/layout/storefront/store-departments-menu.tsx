@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronRight, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CatalogImage } from '@/components/catalog-image';
+import { CatalogOptionContent } from '@/features/storefront/components/catalog-filter-option';
 import { usePublicCategories } from '@/features/categories/hooks/use-public-categories';
 import type { PublicCategory } from '@/features/categories/types/categories';
 import './store-departments-menu.css';
@@ -24,16 +24,7 @@ function CategoryBranch({
     (item) => item.parent === category._id && !ancestors.includes(item._id)
   );
 
-  const content = (
-    <>
-      <CatalogImage
-        src={category.icon}
-        alt={category.name}
-        className="size-[18px] rounded-none border-0 bg-transparent text-[#666] [&>svg]:size-4"
-      />
-      <span className="min-w-0 flex-1 break-words">{category.name}</span>
-    </>
-  );
+  const content = <CatalogOptionContent name={category.name} image={category.icon} />;
 
   return (
     <li

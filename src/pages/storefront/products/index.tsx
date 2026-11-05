@@ -1,3 +1,4 @@
+import { CatalogFilterOption, catalogOptionGrid } from '@/features/storefront/components/catalog-filter-option';
 import { memo, useState, type SubmitEvent } from 'react';
 import './catalog-filters.css';
 import {
@@ -49,14 +50,14 @@ function FilterOptionsLoading({ label }: { label: string }) {
   return (
     <div
       role="status"
-      className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+      className={catalogOptionGrid}
     >
       <span className="sr-only">{label}</span>
       {Array.from({ length: 12 }, (_, index) => (
         <div
           key={index}
           aria-hidden="true"
-          className="h-[52px] rounded-xl bg-gray-100 motion-safe:animate-pulse"
+          className="h-16 rounded-xl bg-gray-100 motion-safe:animate-pulse"
         />
       ))}
     </div>
@@ -159,36 +160,6 @@ function filterDraftFromParams(params: URLSearchParams): FilterDraft {
     minPrice: params.get('minPrice') ?? '',
     maxPrice: params.get('maxPrice') ?? '',
   };
-}
-
-function BrandLogo({ brand }: { brand: PublicBrand }) {
-  const [imageFailed, setImageFailed] = useState(false);
-  const showImage = Boolean(brand.logoUrl && !imageFailed);
-
-  return (
-    <span
-      className={`flex h-[50px] min-w-0 items-center justify-center gap-2 px-4`}
-    >
-      {showImage ? (
-        <img
-          src={brand.logoUrl}
-          alt=""
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          onError={() => setImageFailed(true)}
-          className={`max-h-8 max-w-28 object-contain`}
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className={`text-base font-semibold tracking-wide text-gray-800`}
-        >
-          {brand.name}
-        </span>
-      )}
-      <span className="sr-only">{brand.name}</span>
-    </span>
-  );
 }
 
 function FilterChoice({
@@ -606,10 +577,12 @@ export default function StorefrontProductsPage() {
                           </button>
                         </div>
                       ) : filterBrands.length ? (
-                        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                        <div className={catalogOptionGrid}>
                           {filterBrands.map((item) => (
-                            <FilterChoice
+                            <CatalogFilterOption
                               key={item._id}
+                              name={item.name}
+                              image={item.logoUrl}
                               selected={selectionIds(draft.brand).includes(
                                 item._id
                               )}
@@ -618,9 +591,7 @@ export default function StorefrontProductsPage() {
                                   brand: toggleSelection(draft.brand, item._id),
                                 })
                               }
-                            >
-                              <BrandLogo brand={item} />
-                            </FilterChoice>
+                            />
                           ))}
                         </div>
                       ) : (
@@ -687,18 +658,19 @@ export default function StorefrontProductsPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-2.5">
-                          <FilterChoice
+                        <div className={catalogOptionGrid}>
+                          <CatalogFilterOption
+                            name="Tất cả danh mục"
+                            all
                             selected={!draft.category}
                             onClick={() => updateDraft({ category: '' })}
-                          >
-                            <span className="inline-flex min-h-11 items-center px-4">
-                              Tất cả danh mục
-                            </span>
-                          </FilterChoice>
+                          />
+
                           {categories.data?.map((item) => (
-                            <FilterChoice
+                            <CatalogFilterOption
                               key={item._id}
+                              name={categoryLabel(item)}
+                              image={item.icon}
                               selected={selectionIds(draft.category).includes(
                                 item._id
                               )}
@@ -710,11 +682,7 @@ export default function StorefrontProductsPage() {
                                   ),
                                 })
                               }
-                            >
-                              <span className="inline-flex min-h-11 items-center px-4">
-                                {categoryLabel(item)}
-                              </span>
-                            </FilterChoice>
+                            />
                           ))}
                         </div>
                       )}

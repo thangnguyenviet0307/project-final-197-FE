@@ -1,6 +1,8 @@
 # AGENTS.md
 
-Read [PROJECT_RULES.md](PROJECT_RULES.md) before making changes. It records the implemented business rules and pnpm verification commands.
+Read [PROJECT_RULES.md](docs/PROJECT_RULES.md) before making changes. It records the implemented business rules and pnpm verification commands.
+
+- Keep project Markdown documentation under this repository's `docs/`; retain every `AGENTS.md` in its original location and update relative links when moving documents.
 
 ## 1. Project Overview
 

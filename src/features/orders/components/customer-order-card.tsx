@@ -6,27 +6,18 @@ import { CustomerOrderCancel } from '@/features/orders/components/customer-order
 import { orderDate } from '@/features/orders/utils/order-status';
 import { orderItemSubtotal } from '@/features/orders/utils/order-price';
 import { formatPrice } from '@/features/products/types/products';
-import { useWarranties } from '@/features/support/hooks/use-support';
-import { isWarrantyRequestEligible } from '@/features/support/utils/warranty-eligibility';
+import { useEligibleWarrantyOrders } from '@/features/support/hooks/use-support';
 
 export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
-  const existingRequests = useWarranties(false, 1, '', 200);
-  const existingRequestOrderIds = new Set(
-    (existingRequests.data?.data ?? [])
-      .map((item) => item.orderId ?? '')
-      .filter(Boolean)
-  );
+  const eligible = useEligibleWarrantyOrders(1, order._id, order.orderStatus === 4);
   const quantity = order.orderItems.reduce(
     (total, item) => total + item.quantity,
     0
   );
   const canCreateWarranty =
     order.orderStatus === 4 &&
-    isWarrantyRequestEligible(
-      order._id,
-      order.orderDate,
-      existingRequestOrderIds
-    );
+    !eligible.isError &&
+    !!eligible.data?.data.some((item) => item._id === order._id);
   return (
     <article
       aria-label={`Đơn hàng ${order.orderCode ?? order._id}`}

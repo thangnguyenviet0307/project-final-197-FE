@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   refetch: vi.fn(),
   list: vi.fn(),
   totalPages: 1,
+  eligibilityError: false,
   detail: null as WarrantyDetail | null,
   existing: [] as Array<{ orderId: string }>,
 }));
@@ -25,12 +26,13 @@ vi.mock('@/features/orders/components/customer-order-cancel', () => ({
   CustomerOrderCancel: () => null,
 }));
 vi.mock('@/features/support/hooks/use-support', () => ({
-  useEligibleWarrantyOrders: (page: number, orderId?: string) => {
+  useEligibleWarrantyOrders: (page: number, orderId?: string, enabled = true) => {
     mocks.eligible(page, orderId);
     return {
       isPending: false,
+      isError: mocks.eligibilityError,
       data: {
-        data: [
+        data: !enabled || mocks.existing.some(item => item.orderId === (orderId ?? 'a'.repeat(24))) ? [] : [
           {
             _id: 'a'.repeat(24),
             orderDate: '2026-11-03T00:00:00Z',
@@ -72,6 +74,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   useAuthStore.setState({ user: null });
   mocks.existing = [];
+  mocks.eligibilityError = false;
   mocks.totalPages = 1;
   mocks.detail = {
     _id: 'b'.repeat(24),
@@ -381,4 +384,22 @@ it('prevents staff from updating another employees accepted request', () => {
   render(wrap(<WarrantyDetailPanel id={'b'.repeat(24)} admin />));
   expect(screen.queryByLabelText('Phản hồi cho khách hàng')).toBeNull();
   expect(screen.getByText(/Yêu cầu do nhân viên khác phụ trách/)).toBeTruthy();
+});
+
+it('uses server eligibility instead of fetching an oversized request history', () => {
+  render(wrap(<WarrantyCreateForm onCreated={() => {}} onCancel={() => {}} />));
+  expect(mocks.eligible).toHaveBeenCalledWith(1, undefined);
+  expect(mocks.list).not.toHaveBeenCalled();
+});
+
+it('does not offer a warranty action when server eligibility fails', () => {
+  mocks.eligibilityError = true;
+  const order: CustomerOrder = {
+    _id: 'a'.repeat(24), orderDate: '2026-11-01', orderStatus: 4,
+    totalAmount: 100, street: '', city: '', state: '',
+    orderItems: [{ productName: 'Phone', quantity: 1, price: 100, discount: 0 }],
+  };
+  render(wrap(<CustomerOrderCard order={order} />));
+  expect(screen.queryByRole('link', { name: 'Yêu cầu bảo hành' })).toBeNull();
+  expect(mocks.list).not.toHaveBeenCalled();
 });

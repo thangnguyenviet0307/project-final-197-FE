@@ -8,13 +8,11 @@ import { ListPagination } from '@/components/list-pagination';
 import {
   useEligibleWarrantyOrders,
   useSupportMutations,
-  useWarranties,
 } from '@/features/support/hooks/use-support';
 import { createWarrantySchema } from '@/features/support/schemas/support-schema';
 import type { CreateWarrantyInput } from '@/features/support/types/support';
 import { getApiError } from '@/services/api';
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
-import { isWarrantyRequestEligible } from '@/features/support/utils/warranty-eligibility';
 
 export function WarrantyCreateForm({
   onCreated,
@@ -29,19 +27,7 @@ export function WarrantyCreateForm({
 }) {
   const [page, setPage] = useState(1);
   const query = useEligibleWarrantyOrders(page, initialOrderId);
-  const existingRequests = useWarranties(false, 1, '', 200);
-  const existingRequestOrderIds = new Set(
-    (existingRequests.data?.data ?? [])
-      .map((item) => item.orderId ?? '')
-      .filter(Boolean)
-  );
-  const eligibleOrders = (query.data?.data ?? []).filter((order) =>
-    isWarrantyRequestEligible(
-      order._id,
-      order.orderDate,
-      existingRequestOrderIds
-    )
-  );
+  const eligibleOrders = query.data?.data ?? [];
   const [manualSelection, setSelection] = useState<{
     orderId: string;
     itemIndex: number;

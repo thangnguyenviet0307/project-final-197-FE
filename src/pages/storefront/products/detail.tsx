@@ -86,7 +86,7 @@ function ProductDetails({ product }: { product: Product }) {
             className="overflow-hidden rounded-3xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6"
           >
             <div className="grid gap-8 md:grid-cols-2">
-              <div className="min-w-0 [&_section>div:first-child]:rounded-3xl [&_section>div:first-child]:border-gray-100 [&_section>div:first-child]:bg-white [&_section>div:first-child]:p-4 [&_section>div:first-child]:shadow-sm">
+              <div className="min-w-0 [&_section>div:first-child]:rounded-3xl [&_section>div:first-child]:border-gray-100 [&_section>div:first-child]:bg-white [&_section>div:first-child]:shadow-sm">
                 <ProductDetailGallery
                   key={variant?._id ?? variant?.sku ?? product._id}
                   product={
