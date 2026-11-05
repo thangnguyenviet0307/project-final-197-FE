@@ -14,6 +14,9 @@ export interface User {
   accountType?: 'user' | 'customer';
   role?: Role;
   mustChangePassword: boolean;
+  onboardingRequired?: boolean;
+  personalEmailVerified?: boolean;
+  temporaryPasswordExpiresAt?: string;
   personalEmail?: string;
   phone?: string;
   location?: string;

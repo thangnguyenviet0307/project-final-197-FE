@@ -28,6 +28,15 @@ function session(role: Role | "customer", mustChangePassword = false) {
 }
 beforeEach(() => { useAuthStore.getState().clearSession() })
 
+it('redirects incomplete employees to Profile after changing password and signing in again', async () => {
+  session('staff')
+  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, onboardingRequired: true } : null }))
+  const router = createMemoryRouter(replacePages(routes), { initialEntries: ['/auth/dashboard'] })
+  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  expect(await screen.findByText('Trang /auth/settings/user')).toBeTruthy()
+  expect(router.state.location.pathname).toBe('/auth/settings/user')
+})
+
 it.each(["/auth/sign-in-2", "/auth/sign-in-3", "/auth/sign-up", "/auth/sign-up-2", "/auth/sign-up-3", "/auth/forgot-password-2", "/auth/forgot-password-3", "/auth/settings/account", "/auth/settings/billing"])("removed template route %s reaches the admin not-found page", async path => {
   session("admin")
   const router = createMemoryRouter(replacePages(routes), { initialEntries: [path] })

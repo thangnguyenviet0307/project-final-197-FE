@@ -151,7 +151,7 @@ function PolicyEditor({
         </p>
       )}
       {message && (
-        <p role="status" className="text-green-700">
+        <p role="status" className="text-emerald-700 dark:text-emerald-400">
           {message}
         </p>
       )}

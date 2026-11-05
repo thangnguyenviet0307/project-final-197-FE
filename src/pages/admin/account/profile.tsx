@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { onboardingProfileSchema } from '@/features/profile/schemas/profile-schema';
+import { RequiredMark } from '@/components/required-mark';
+import { PersonalEmailVerification } from '@/features/auth/components/personal-email-verification';
+import { useEffect, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import {
@@ -66,7 +69,8 @@ export default function UserProfilePage() {
   const user = useAuthStore((state) => state.user);
   const profile = useProfile();
   const current = profile.data ?? user;
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(user?.onboardingRequired === true);
+  const sendingEmail = useRef(false);
   const {
     fileInput,
     avatar,
@@ -79,12 +83,13 @@ export default function UserProfilePage() {
     resetPhoto,
   } = useAvatarUpload();
   const form = useForm<ProfileValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(current?.onboardingRequired ? onboardingProfileSchema : profileSchema),
     defaultValues: valuesFromUser(current),
   });
   const { reset } = form;
   const dirty = form.formState.isDirty;
   const bio = useWatch({ control: form.control, name: 'bio' }) ?? '';
+  const personalEmail = useWatch({ control: form.control, name: 'personalEmail' }) ?? '';
   useEffect(() => {
     if (profile.data && !dirty) reset(valuesFromUser(profile.data));
   }, [profile.data, reset, dirty]);
@@ -93,7 +98,7 @@ export default function UserProfilePage() {
     onSuccess: (saved) => {
       reset(valuesFromUser(saved));
       clearPhotoChanges();
-      setIsEditing(false);
+      setIsEditing(saved.onboardingRequired === true || sendingEmail.current);
     },
     onError: (error) => {
       const failure = getApiError(error);
@@ -131,6 +136,7 @@ export default function UserProfilePage() {
       description="Xem và quản lý thông tin tài khoản cá nhân."
     >
       <div className="space-y-6 px-4 lg:px-6">
+        {current?.onboardingRequired && <p role="status" className="rounded-lg border p-4 text-sm">Hoàn tất hồ sơ và xác nhận email cá nhân để sử dụng hệ thống.</p>}
         {profile.isPending ? (
           <Card>
             <CardContent>
@@ -171,7 +177,7 @@ export default function UserProfilePage() {
                   mutation.mutate({ profile: values, avatar, removeAvatar });
                 })}
               >
-                <fieldset disabled={mutation.isPending} className="space-y-6">
+                <fieldset disabled={mutation.isPending} className="space-y-6 [&_input]:caret-current [&_textarea]:caret-current">
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-sm font-medium">Ảnh hồ sơ</h3>
@@ -236,7 +242,7 @@ export default function UserProfilePage() {
                         data-invalid={!!form.formState.errors[name]}
                       >
                         <FieldLabel htmlFor={`profile-${name}`}>
-                          {label}
+                          {label}{(['firstName', 'lastName', 'personalEmail'].includes(name)) && <RequiredMark />}
                         </FieldLabel>
                         <Input
                           placeholder={
@@ -250,10 +256,21 @@ export default function UserProfilePage() {
                           }
                           id={`profile-${name}`}
                           type={type}
+                          required={['firstName', 'lastName', 'personalEmail'].includes(name)}
                           aria-invalid={!!form.formState.errors[name]}
                           {...form.register(name)}
                         />
                         <FieldError errors={[form.formState.errors[name]]} />
+                        {name === 'personalEmail' && <PersonalEmailVerification
+                          email={personalEmail}
+                          verified={current?.personalEmailVerified && personalEmail.trim().toLowerCase() === current.personalEmail}
+                          beforeSend={async () => {
+                            if (!(await form.trigger())) throw new Error('Vui lòng kiểm tra các trường thông tin hồ sơ.');
+                            sendingEmail.current = true;
+                            try { await mutation.mutateAsync({ profile: form.getValues(), avatar, removeAvatar }); }
+                            finally { sendingEmail.current = false; }
+                          }}
+                        />}
                       </Field>
                     ))}
                     <Field>
@@ -321,7 +338,7 @@ export default function UserProfilePage() {
                       {(mutation.isPending || isReading) && (
                         <LoaderCircle className="animate-spin" />
                       )}
-                      {mutation.isPending ? 'Saving…' : 'Lưu thông tin'}
+                      {mutation.isPending ? 'Đang lưu…' : 'Lưu thông tin'}
                     </Button>
                   </div>
                 </fieldset>

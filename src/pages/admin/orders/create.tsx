@@ -120,7 +120,7 @@ export default function CreateOrderPage() {
           />
           {customerId && <p>Selected customer: {customerLabel}</p>}
           {customers.isPending ? (
-            <p>Loading customers...</p>
+            <p>Đang tải khách hàng…</p>
           ) : customers.isError ? (
             <p role="alert">{getApiError(customers.error).message}</p>
           ) : (
@@ -183,7 +183,7 @@ export default function CreateOrderPage() {
             }}
           />
           {products.isPending ? (
-            <p>Loading products...</p>
+            <p>Đang tải sản phẩm…</p>
           ) : products.isError ? (
             <p role="alert">{getApiError(products.error).message}</p>
           ) : (

@@ -112,7 +112,7 @@ export function BrandForm({
         )}
         <div className="flex gap-2">
           <Button type="submit" disabled={busy || !!image.error}>
-            {busy ? 'Saving...' : submitLabel}
+            {busy ? 'Đang lưu…' : submitLabel}
           </Button>
           <Button
             type="button"

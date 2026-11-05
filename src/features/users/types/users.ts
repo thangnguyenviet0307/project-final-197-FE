@@ -11,6 +11,8 @@ export interface ManagedUser {
   role: 'super_admin' | 'admin' | 'staff';
   active: boolean;
   mustChangePassword?: boolean;
+  onboardingRequired?: boolean;
+  personalEmailVerified?: boolean;
   personalEmail?: string;
   phone?: string;
   avatar?: string;

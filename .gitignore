@@ -40,3 +40,6 @@ Desktop.ini
 
 reports
 docs
+
+# Isolated local browser profile, screenshots and UI audit fixtures.
+.local-backups/ui-audit/

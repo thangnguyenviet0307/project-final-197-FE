@@ -22,13 +22,26 @@ function setup() {
   </Routes></MemoryRouter></QueryClientProvider>)
 }
 
-function submitRegistration(confirmPassword = "Customer123") {
+function submitRegistration(confirmPassword = "Customer123", acceptTerms = true) {
   for (const [label, value] of [
     ["Họ", " Nguyễn "], ["Tên", " An "], ["Email", " BUYER@example.com "],
     ["Mật khẩu", "Customer123"], ["Xác nhận mật khẩu", confirmPassword],
   ]) fireEvent.change(screen.getByLabelText(label), { target: { value } })
+  const agreement = screen.getByRole('checkbox') as HTMLInputElement
+  if (acceptTerms && !agreement.checked) fireEvent.click(agreement)
   fireEvent.click(screen.getByRole("button", { name: "Đăng ký" }))
 }
+
+it('requires an explicit terms agreement before submitting registration', async () => {
+  const adapter = vi.fn<AxiosAdapter>()
+  authApi.defaults.adapter = adapter
+  setup()
+  expect(screen.getByRole('checkbox')).toHaveProperty('checked', false)
+  submitRegistration('Customer123', false)
+  expect(await screen.findByText('Vui lòng đồng ý với điều khoản sử dụng và chính sách bảo mật.')).toBeTruthy()
+  expect(adapter).not.toHaveBeenCalled()
+  expect(screen.getByRole('link', { name: 'Điều khoản sử dụng' }).getAttribute('href')).toBe('/dieu-khoan-su-dung')
+})
 
 it("registers, asks the customer to sign in, then opens the storefront homepage", async () => {
   const requests: string[] = []

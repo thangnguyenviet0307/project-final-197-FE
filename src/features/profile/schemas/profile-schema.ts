@@ -43,4 +43,8 @@ export const profileSchema = z.object({
     .max(1000, 'Giới thiệu không được vượt quá 1000 ký tự.'),
 });
 
+export const onboardingProfileSchema = profileSchema.extend({
+  personalEmail: z.string().trim().check(z.email()).toLowerCase(),
+});
+
 export type ProfileValues = z.infer<typeof profileSchema>;

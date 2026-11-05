@@ -147,7 +147,7 @@ export function CategoryForm({
               categories.isError
             }
           >
-            {busy ? 'Saving...' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
+            {busy ? 'Đang lưu…' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
           </Button>
           <Button
             type="button"

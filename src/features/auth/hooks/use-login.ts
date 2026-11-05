@@ -11,7 +11,7 @@ export function useLogin(onError?: (error: Error) => void) {
       login(credentials),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: (user) => {
-      if (user.mustChangePassword) {
+      if (user.mustChangePassword || user.onboardingRequired) {
         navigate(authRedirect(user), { replace: true });
         return;
       }

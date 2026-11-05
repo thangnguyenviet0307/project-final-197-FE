@@ -3,9 +3,11 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { StoreLayout } from '@/layout/storefront/store-layout';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { readFileSync } from 'node:fs';
 const css = readFileSync('src/components/ui/storefront-dialog.css', 'utf8');
+const surfaceCss = readFileSync('src/layout/storefront/storefront-ui.css', 'utf8');
 
 vi.mock('@/layout/storefront/store-header', () => ({ StoreHeader: () => null }));
 vi.mock('@/layout/storefront/store-navbar', () => ({ StoreNavbar: () => null }));
@@ -15,6 +17,22 @@ afterEach(() => document.documentElement.classList.remove('dark'));
 function Popup() {
   return <Dialog defaultOpen><DialogContent><DialogTitle>Hủy đơn hàng</DialogTitle><DialogDescription>Xác nhận hủy đơn?</DialogDescription><DialogFooter><Button variant="outline">Giữ đơn hàng</Button><Button variant="destructive">Xác nhận hủy</Button></DialogFooter></DialogContent></Dialog>;
 }
+it('isolates storefront form and button colors from a dark administrative root', () => {
+  document.documentElement.classList.add('dark');
+  const { container } = render(<>
+    <style>{surfaceCss}</style>
+    <Button variant="outline">Admin action</Button>
+    <MemoryRouter><Routes><Route element={<StoreLayout />}><Route path="/" element={<>
+      <Button variant="outline">Store action</Button><Input aria-label="Store email" placeholder="Email" />
+    </>} /></Route></Routes></MemoryRouter>
+  </>);
+  expect(getComputedStyle(screen.getByRole('button', { name: 'Store action' })).backgroundColor).toBe('rgb(255, 255, 255)');
+  expect(getComputedStyle(screen.getByRole('button', { name: 'Store action' })).color).toBe('rgb(55, 65, 81)');
+  expect(getComputedStyle(screen.getByLabelText('Store email')).color).toBe('rgb(17, 24, 39)');
+  expect(screen.getByRole('button', { name: 'Admin action' }).closest('.storefront-ui')).toBeNull();
+  expect(getComputedStyle(container.querySelector('.storefront-ui')!).getPropertyValue('--primary')).toBe('#55b000');
+  expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
+});
 it('applies high-contrast storefront styling through the portal even when the app root is dark', async () => {
   document.documentElement.classList.add('dark');
   const { container } = render(<><style>{css}</style><MemoryRouter><Routes><Route element={<StoreLayout />}><Route path="/" element={<Popup />} /></Route></Routes></MemoryRouter></>);

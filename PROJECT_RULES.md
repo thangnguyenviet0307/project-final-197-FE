@@ -1,5 +1,26 @@
 # Project rules for AI Agents
 
+## Separate Admin and Storefront UI scopes (2026-11-05)
+
+- StoreLayout owns `.storefront-ui` and its light/green tokens in `layout/storefront/storefront-ui.css`. Storefront inputs, buttons and account pagination remain readable when the document's saved admin theme is dark. These selectors never target :root, body or administrative surfaces. Storefront dialogs retain their portal-specific scope; shared business hooks do not imply a shared visual theme.
+- Administrative warranty selections use semantic accent/ring tokens, with a separate light/dark badge palette matching admin order badges. Customer warranty badges keep their light storefront palette. Admin forms use Vietnamese loading/saving/deleting labels.
+- Storefront account navigation becomes a compact horizontally scrollable strip below lg; desktop keeps the account sidebar. Toasts use the storefront light theme or the active admin theme according to the configured auth area, without changing theme preference or authentication state.
+
+## Warranty acceptor visibility (2026-11-05)
+
+- Warranty lists and detail show Người tiếp nhận for every authorized viewer: Super Admin/Admin/Staff and the Customer owning the request. Backend exposes handlerName without employee contact data or expanding access to other customers' requests. Acceptance stores a Vietnamese-order name snapshot; legacy reads resolve existing handler IDs in one batch without database migration. Unassigned requests explicitly say Chưa có người tiếp nhận; unavailable legacy names use Nhân viên cửa hàng. Existing mutation permissions and staff ownership remain unchanged.
+- Admin and Customer warranty lists both use server pagination at ten requests per page. Pagination remains visible on a single page, disables unavailable navigation, preserves the status filter on page changes and resets to page one when the filter changes. Customer queries remain owner-scoped.
+
+## Email recovery and issued accounts (2026-11-05)
+
+- Personal-email OTP controls live immediately below the editable Profile email field, without a separate panel or nested form. Sending validates/saves the profile before requesting OTP, retains the editor and uses a disabled gray sixty-second resend countdown. Recovery shares the light storefront auth-card styling and explicit placeholders/caret colors. Customer registration requires an initially unchecked agreement to the existing terms/privacy pages; this is frontend submission validation, not a persisted consent/audit record.
+
+- Customer recovery uses `/quen-mat-khau` and `/api/v1/customer-auth/send-otp`, `/verify-otp`, `/reset-password`. OTP is six digits, valid five minutes, with a sixty-second resend cooldown and five guesses per code. Store only purpose-bound HMACs; reset grants last five minutes and are consumed atomically with password replacement/session revocation. Public send responses conceal account existence. Customer registration/login does not require email verification.
+- New provisioned User accounts must change their initial password within thirty minutes of issuance. Administrative reset generates a random password on the Backend and emails only the target's verified personalEmail; no password is returned. The same thirty-minute deadline applies, and logging in never extends it. Backend blocks business access and checks expiry on login/refresh/protected access/final password write. Successful change replaces the temporary hash, removes temporary state, revokes sessions and requires login again.
+- After the next login, new accounts are sent to `/auth/settings/user` to save required firstName/lastName/personalEmail and verify that personalEmail by OTP. These profile steps have no thirty-minute deadline; business APIs remain blocked until complete. Required fields have red marks and frontend/backend validation. Email changes invalidate verification and pending challenges. Existing accounts are not automatically migrated or locked in bulk.
+- Reset uses `/users/:id/reset-password` with an empty body and existing UserUpdate/managed-role restrictions. Ordinary user updates reject password writes. Incomplete accounts without verified personalEmail can have initial credentials reissued through `/users/:id/reissue-initial-password`; the administrator hands over unpredictable initial credentials, and the API never returns a password. It cannot reset completed/verified accounts through that path. This supersedes role-based demo defaults for newly issued credentials.
+- Nodemailer uses Brevo SMTP through server environment variables, verified sender and TLS. SMTP failures leave the current employee password intact; pending activation uses identity/version predicates. Automated tests mock delivery; real mailbox acceptance requires configured credentials. Configuration and contracts: sibling Backend `ACCOUNT_SECURITY.md`. No production migration is authorized by this implementation.
+
 ## Image picker labels and Cloudinary folders (2026-11-03)
 
 - Warranty file selection uses an accessible Vietnamese “Chọn ảnh” button and explicit selection summary instead of native English file-control text, for both initial and subsequent attachments. Disabled states still enforce request status, capacity and in-flight uploads.

@@ -65,6 +65,9 @@ const userSchema = z
       .object({ street: z.string(), city: z.string(), state: z.string() })
       .optional(),
     mustChangePassword: z.boolean().default(false),
+    onboardingRequired: z.boolean().optional(),
+    personalEmailVerified: z.boolean().optional(),
+    temporaryPasswordExpiresAt: z.string().optional(),
   })
   .superRefine((user, ctx) => {
     if (

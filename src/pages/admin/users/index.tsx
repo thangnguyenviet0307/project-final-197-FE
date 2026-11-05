@@ -48,12 +48,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getTemporaryPassword } from '@/features/users/services/users.service';
 import type { ManagedUser } from '@/features/users/types/users';
 import { getApiError } from '@/services/api';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUsers } from '@/features/users/hooks/use-users';
-import { useResetUserPassword } from '@/features/users/hooks/use-reset-user-password';
+import { useResetUserPassword, useReissueInitialPassword } from '@/features/users/hooks/use-reset-user-password';
+import { getTemporaryPassword } from '@/features/users/services/users.service';
 import { DeleteUserConfirmation } from '@/features/users/components/delete-user-confirmation';
 import { useUpdateUser } from '@/features/users/hooks/use-update-user';
 import { canManageUser, isAdministrator } from '@/features/auth/utils/roles';
@@ -150,35 +150,38 @@ function ResetPasswordDialog({
   onClose: () => void;
 }) {
   const mutation = useResetUserPassword(user._id, { onSuccess: onClose });
-  const [password] = useState(() => getTemporaryPassword(user.role));
+  const initial = user.onboardingRequired && !user.personalEmailVerified;
+  const reissue = useReissueInitialPassword(user._id, onClose);
+  const [initialPassword] = useState(() => initial ? getTemporaryPassword(user.role) : '');
+  const pending = mutation.isPending || reissue.isPending;
   return (
     <Dialog
       open
       onOpenChange={(open) => {
-        if (!open && !mutation.isPending) onClose();
+        if (!open && !pending) onClose();
       }}
     >
       <DialogContent className="users-surface sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Đặt lại mật khẩu</DialogTitle>
           <DialogDescription>
-            Đặt mật khẩu tạm thời cho {user.email}. Người dùng cần đổi mật khẩu
-            trong lần đăng nhập tiếp theo.
+            {initial ? 'Cấp lại mật khẩu ban đầu cho tài khoản chưa hoàn tất. Quản trị viên cần chuyển mật khẩu này cho đúng nhân viên.'
+              : `Gửi mật khẩu ngẫu nhiên đến email cá nhân đã xác nhận của ${user.email}.`}
+            {' '}Người dùng phải đăng nhập và đổi mật khẩu trong 30 phút từ lúc kích hoạt.
           </DialogDescription>
         </DialogHeader>
         <form
           className="space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
-            mutation.mutate({ password });
+            if (initial) reissue.mutate(initialPassword);
+            else mutation.mutate();
           }}
         >
-          <Field>
-            <FieldLabel htmlFor="reset-password-default">
-              Mật khẩu tạm thời mới
-            </FieldLabel>
-            <Input id="reset-password-default" value={password} readOnly />
-          </Field>
+          <p className="text-sm">Email: {user.personalEmail || '—'}</p>
+          {initial && <Field><FieldLabel htmlFor="reissued-password">Mật khẩu cấp lại</FieldLabel>
+            <Input id="reissued-password" readOnly value={initialPassword} /></Field>}
+          {reissue.error && <p role="alert" className="text-destructive text-sm">{getApiError(reissue.error).message}</p>}
           {mutation.error && (
             <p role="alert" className="text-destructive text-sm">
               {getApiError(mutation.error).message}
@@ -188,13 +191,13 @@ function ResetPasswordDialog({
             <Button
               type="button"
               variant="outline"
-              disabled={mutation.isPending}
+              disabled={pending}
               onClick={onClose}
             >
               Hủy
             </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending && <LoaderCircle className="animate-spin" />}
+            <Button type="submit" disabled={pending}>
+              {pending && <LoaderCircle className="animate-spin" />}
               Lưu thay đổi
             </Button>
           </div>
@@ -512,8 +515,8 @@ export default function UsersPage() {
         <p role="status" className="text-muted-foreground text-sm">
           {users.isFetching && !users.isLoading
             ? search
-              ? 'Searching'
-              : 'Updating'
+              ? 'Đang tìm kiếm…'
+              : 'Đang cập nhật…'
             : ''}
         </p>
         {revokeSessions.error && (

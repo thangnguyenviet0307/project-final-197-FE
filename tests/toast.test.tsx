@@ -3,10 +3,20 @@ import { act, fireEvent, render, screen } from "@testing-library/react"
 import { toast, Toaster } from "@/components/ui/toast"
 import { ThemeProvider } from "@/context/theme-provider"
 import { queryClient } from "@/services/query-client"
+import { configureAuthArea } from '@/stores/auth.store'
 
 beforeEach(() => {
+  configureAuthArea('admin')
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
 })
+
+it.each(['storefront', 'admin'] as const)('uses the correct notification theme for %s', async area => {
+  configureAuthArea(area)
+  render(<ThemeProvider defaultTheme="dark" storageKey="toast-area-test"><Toaster /></ThemeProvider>)
+  act(() => { toast.success('Area notification') })
+  await screen.findByText('Area notification')
+  expect(document.querySelector('[data-sonner-toaster]')?.getAttribute('data-sonner-theme')).toBe(area === 'storefront' ? 'light' : 'dark')
+});
 afterEach(() => { toast.dismiss(); queryClient.clear(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 it("shows compact, centered notifications without a close button in the bottom-left corner", async () => {

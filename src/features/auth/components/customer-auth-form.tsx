@@ -37,6 +37,8 @@ export function CustomerAuthForm({
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState('');
   const form = useForm<FormValues>({
     resolver: zodResolver(
       registration
@@ -141,6 +143,7 @@ export function CustomerAuthForm({
           onSubmit={form.handleSubmit((values) => {
             form.clearErrors('root');
             if (registration) {
+              if (!acceptedTerms) { setTermsError('Vui lòng đồng ý với điều khoản sử dụng và chính sách bảo mật.'); return; }
               registerMutation.mutate({
                 email: values.email,
                 password: values.password,
@@ -263,6 +266,18 @@ export function CustomerAuthForm({
                 </Field>
               );
             })}
+            {registration && <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <input id="customer-accept-terms" type="checkbox" required checked={acceptedTerms}
+                  aria-invalid={!!termsError} aria-describedby={termsError ? 'customer-terms-error' : undefined}
+                  className="mt-1 size-4 shrink-0 cursor-pointer accent-[#55b000]"
+                  onChange={(event) => { setAcceptedTerms(event.target.checked); setTermsError(''); }} />
+                <label htmlFor="customer-accept-terms" className="text-sm leading-6 text-gray-600">
+                  Tôi đã đọc và đồng ý với <Link to="/dieu-khoan-su-dung" target="_blank" rel="noopener noreferrer" className="font-medium text-[#459000] underline">Điều khoản sử dụng</Link> và <Link to="/chinh-sach-bao-mat" target="_blank" rel="noopener noreferrer" className="font-medium text-[#459000] underline">Chính sách bảo mật</Link> của cửa hàng.<RequiredMark />
+                </label>
+              </div>
+              {termsError && <p id="customer-terms-error" role="alert" className="text-sm text-red-700">{termsError}</p>}
+            </div>}
           </fieldset>
           {form.formState.errors.root && (
             <p role="alert" className="text-destructive text-sm">
@@ -284,6 +299,7 @@ export function CustomerAuthForm({
                 : 'Đăng nhập'}
           </Button>
         </form>
+        {!registration && <Link to="/quen-mat-khau" className="mt-4 block text-center text-sm font-medium text-[#459000] underline">Quên mật khẩu?</Link>}
         <p className="mt-6 text-center text-sm text-gray-600">
           {registration ? 'Đã có tài khoản? ' : 'Chưa có tài khoản? '}
           <Link
