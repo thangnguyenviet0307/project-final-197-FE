@@ -1,0 +1,2512 @@
+[
+  {
+    "path": "/",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Khám phá sản phẩmcho nhu cầu của bạn.",
+      "Sản phẩm",
+      "Best Seller",
+      "Cách chọn đúng phụ kiện",
+      "Bắt đầu từ nhu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Trang chủ",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.448 0.119 151.328)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Mới",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nổi bật",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/"
+  },
+  {
+    "path": "/",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Khám phá sản phẩmcho nhu cầu của bạn.",
+      "Sản phẩm",
+      "Best Seller",
+      "Cách chọn đúng phụ kiện",
+      "Bắt đầu từ nhu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Trang chủ",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.448 0.119 151.328)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Mới",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nổi bật",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/"
+  },
+  {
+    "path": "/shop",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Khám phá sản phẩm",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Lọc",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Tất cả",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(77, 146, 16)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nổi bật",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Mới",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Bán chạy",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "% giảm giá",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Giá",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/shop"
+  },
+  {
+    "path": "/shop",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Khám phá sản phẩm",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Lọc",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Tất cả",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(77, 146, 16)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nổi bật",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Mới",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Bán chạy",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "% giảm giá",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Giá",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/shop"
+  },
+  {
+    "path": "/bai-viet",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Tin tức mới nhất",
+      "Bạn đọc xem nhiều",
+      "Tin mới nhất",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Tìm tin tức",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Tìm kiếm",
+        "bg": "rgb(77, 146, 16)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/bai-viet"
+  },
+  {
+    "path": "/bai-viet",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tin tức mới nhất",
+      "Bạn đọc xem nhiều",
+      "Tin mới nhất",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Tìm tin tức",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Tìm kiếm",
+        "bg": "rgb(77, 146, 16)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/bai-viet"
+  },
+  {
+    "path": "/cart",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Giỏ hàng",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/cart"
+  },
+  {
+    "path": "/cart",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Giỏ hàng",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/cart"
+  },
+  {
+    "path": "/checkout",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Thông tin thanh toán",
+      "Sản phẩm đã chọn",
+      "Thông tin khách hàng",
+      "Địa chỉ nhận hàng",
+      "Thông tin đơn hàng"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ và tên người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập số điện thoại người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập email nhận thông tin đơn hàng",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Chọn tỉnh/thành phố",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Chọn phường/xã",
+        "bg": "oklch(0.985 0.002 247.839)",
+        "color": "oklch(0.707 0.022 261.325)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập địa chỉ nhà",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.21 0.034 264.665)"
+      },
+      {
+        "text": "Thanh toán",
+        "bg": "oklch(0.577 0.245 27.325)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/checkout"
+  },
+  {
+    "path": "/checkout",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Thông tin thanh toán",
+      "Sản phẩm đã chọn",
+      "Thông tin khách hàng",
+      "Địa chỉ nhận hàng",
+      "Thông tin đơn hàng"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ và tên người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập số điện thoại người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập email nhận thông tin đơn hàng",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Chọn tỉnh/thành phố",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Chọn phường/xã",
+        "bg": "oklch(0.985 0.002 247.839)",
+        "color": "oklch(0.707 0.022 261.325)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "Nhập địa chỉ nhà",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.872 0.01 258.338)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.21 0.034 264.665)"
+      },
+      {
+        "text": "Thanh toán",
+        "bg": "oklch(0.577 0.245 27.325)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/checkout"
+  },
+  {
+    "path": "/contact",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "LIÊN HỆ",
+      "Gửi lời nhắn cho chúng tôi",
+      "Thông tin cửa hàng",
+      "Địa chỉ",
+      "Email"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ và tên",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Nhập chủ đề bạn muốn trao đổi",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "KIỂM TRA THÔNG TIN",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/contact"
+  },
+  {
+    "path": "/contact",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "LIÊN HỆ",
+      "Gửi lời nhắn cho chúng tôi",
+      "Thông tin cửa hàng",
+      "Địa chỉ",
+      "Email"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ và tên",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "Nhập chủ đề bạn muốn trao đổi",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.278 0.033 256.848)",
+        "border": "oklch(0.928 0.006 264.531)"
+      },
+      {
+        "text": "KIỂM TRA THÔNG TIN",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgb(229, 231, 235)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/contact"
+  },
+  {
+    "path": "/thanh-vien",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Đăng nhập",
+      "Chào mừng bạn trở lại",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Đăng nhập",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/thanh-vien?act=login"
+  },
+  {
+    "path": "/thanh-vien",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Đăng nhập",
+      "Chào mừng bạn trở lại",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Đăng nhập",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/thanh-vien?act=login"
+  },
+  {
+    "path": "/thanh-vien",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Đăng ký tài khoản",
+      "Chào mừng đến DEMO STORE",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập tên của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nhập lại mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu xác nhận",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.21 0.034 264.665)"
+      },
+      {
+        "text": "Đăng ký",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/thanh-vien?act=register"
+  },
+  {
+    "path": "/thanh-vien",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Đăng ký tài khoản",
+      "Chào mừng đến DEMO STORE",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập tên của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập địa chỉ email",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Nhập lại mật khẩu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Hiện mật khẩu xác nhận",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.551 0.027 264.364)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "oklch(0.21 0.034 264.665)"
+      },
+      {
+        "text": "Đăng ký",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/thanh-vien?act=register"
+  },
+  {
+    "path": "/quen-mat-khau",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Quên mật khẩu",
+      "Khôi phục mật khẩu",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập địa chỉ email đã đăng ký",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Gửi mã",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/quen-mat-khau"
+  },
+  {
+    "path": "/quen-mat-khau",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Quên mật khẩu",
+      "Khôi phục mật khẩu",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập địa chỉ email đã đăng ký",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Gửi mã",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/quen-mat-khau"
+  },
+  {
+    "path": "/account/profile",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Hồ sơ của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập tên của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chọn năm2026202520242023202220212020201920182",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chưa chọnNamNữKhác",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "",
+        "bg": "rgb(249, 250, 251)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập số điện thoại",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu thay đổi",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/profile"
+  },
+  {
+    "path": "/account/profile",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Hồ sơ của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Nhập họ của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập tên của bạn",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chọn năm2026202520242023202220212020201920182",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chưa chọnNamNữKhác",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "",
+        "bg": "rgb(249, 250, 251)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập số điện thoại",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu thay đổi",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/profile"
+  },
+  {
+    "path": "/account/addresses",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Địa chỉ của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Chọn tỉnh/thành phố",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chọn phường/xã",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập họ và tên người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập email nhận thông tin giao hàng",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Số nhà, tên đường, tòa nhà…",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Ví dụ: Giờ hành chính, thứ Hai đến thứ Sáu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu địa chỉ",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/addresses"
+  },
+  {
+    "path": "/account/addresses",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Địa chỉ của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [
+      {
+        "text": "Chọn tỉnh/thành phố",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Chọn phường/xã",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập họ và tên người nhận",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập email nhận thông tin giao hàng",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Số nhà, tên đường, tòa nhà…",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Ví dụ: Giờ hành chính, thứ Hai đến thứ Sáu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu địa chỉ",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/addresses"
+  },
+  {
+    "path": "/account/warranty",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Bảo hành của tôi",
+      "Yêu cầu của tôi",
+      "Về chúng tôi"
+    ],
+    "controls": [
+      {
+        "text": "Tạo yêu cầu bảo hành",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  },
+  {
+    "path": "/account/warranty",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Bảo hành của tôi",
+      "Yêu cầu của tôi",
+      "Về chúng tôi"
+    ],
+    "controls": [
+      {
+        "text": "Tạo yêu cầu bảo hành",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  },
+  {
+    "path": "/account/change-password",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập mật khẩu hiện tại",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu mới",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập lại mật khẩu mới",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu mật khẩu mới",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Đăng xuất",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/change-password"
+  },
+  {
+    "path": "/account/change-password",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Nhận tin khuyến mãi"
+    ],
+    "controls": [
+      {
+        "text": "Nhập mật khẩu hiện tại",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập mật khẩu mới",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Nhập lại mật khẩu mới",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Lưu mật khẩu mới",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Đăng xuất",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/change-password"
+  },
+  {
+    "path": "/chinh-sach-bao-hanh",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Chính sách bảo hành",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/chinh-sach-bao-hanh"
+  },
+  {
+    "path": "/chinh-sach-bao-hanh",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng",
+      "Chính sách bảo hành",
+      "Về chúng tôi",
+      "Hỗ trợ khách hàng"
+    ],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/chinh-sach-bao-hanh"
+  },
+  {
+    "path": "/auth/login",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [],
+    "controls": [],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/login"
+  },
+  {
+    "path": "/auth/login",
+    "width": 390,
+    "scroll": 390,
+    "heading": [],
+    "controls": [],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/login"
+  },
+  {
+    "path": "/auth/products",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Sản phẩm"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên hoặc mã sản phẩm",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả danh mục",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cả thương hiệu",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cả tồn khoCòn hàng (> 0)Sắp hết hàng (1–5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảĐang bánKhông bán",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/products"
+  },
+  {
+    "path": "/auth/products",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Sản phẩm"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên hoặc mã sản phẩm",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả danh mục",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cả thương hiệu",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cả tồn khoCòn hàng (> 0)Sắp hết hàng (1–5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảĐang bánKhông bán",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Tất cảCóKhông",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/products"
+  },
+  {
+    "path": "/auth/categories",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Danh mục"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên, đường dẫn hoặc mô tả",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngNgừng hoạt độn",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/categories"
+  },
+  {
+    "path": "/auth/categories",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Danh mục"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên, đường dẫn hoặc mô tả",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngNgừng hoạt độn",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/categories"
+  },
+  {
+    "path": "/auth/brands",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Thương hiệu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên, đường dẫn hoặc mô tả",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngNgừng hoạt độn",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/brands"
+  },
+  {
+    "path": "/auth/brands",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Thương hiệu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm theo tên, đường dẫn hoặc mô tả",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngNgừng hoạt độn",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/brands"
+  },
+  {
+    "path": "/auth/orders",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Đơn hàng",
+      "Đơn hàng"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "ORD-A7K9M2 hoặc 0901234567",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm kiếm",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Xóa tìm kiếm",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Chọn ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chọn ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Áp dụng khoảng ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Xóa khoảng ngày",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ xử lýĐang xử lýBị từ chố",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/orders"
+  },
+  {
+    "path": "/auth/orders",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Đơn hàng",
+      "Đơn hàng"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "ORD-A7K9M2 hoặc 0901234567",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm kiếm",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Xóa tìm kiếm",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Chọn ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chọn ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Áp dụng khoảng ngày",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Xóa khoảng ngày",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ xử lýĐang xử lýBị từ chố",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/orders"
+  },
+  {
+    "path": "/auth/users",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Người dùng"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm tài khoản theo tên hoặc email",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngBị đình chỉ",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Super AdminTất cả vai tròQuản trị viênNhân vi",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tên đăng nhập",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/users"
+  },
+  {
+    "path": "/auth/users",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Người dùng"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tìm tài khoản theo tên hoặc email",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiĐang hoạt độngBị đình chỉ",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Super AdminTất cả vai tròQuản trị viênNhân vi",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Đặt lại bộ lọc",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tên đăng nhập",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/users"
+  },
+  {
+    "path": "/auth/warranties",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Yêu cầu bảo hành",
+      "Danh sách yêu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/warranties"
+  },
+  {
+    "path": "/auth/warranties",
+    "width": 390,
+    "scroll": 390,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Yêu cầu bảo hành",
+      "Danh sách yêu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/warranties"
+  },
+  {
+    "path": "/auth/settings/user",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Hồ sơ người dùng",
+      "Thông tin cá nhân",
+      "Giới thiệu",
+      "Email tài khoản"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Cập nhật thông tin cá nhân",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/settings/user"
+  },
+  {
+    "path": "/auth/settings/user",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Hồ sơ người dùng",
+      "Thông tin cá nhân",
+      "Giới thiệu",
+      "Email tài khoản"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Cập nhật thông tin cá nhân",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/settings/user"
+  }
+]

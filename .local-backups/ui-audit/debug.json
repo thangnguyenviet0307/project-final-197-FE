@@ -1,0 +1,20 @@
+[
+  {
+    "path": "/account/warranty",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  },
+  {
+    "path": "/account/warranty",
+    "width": 390,
+    "scroll": 390,
+    "heading": [],
+    "controls": [],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  }
+]

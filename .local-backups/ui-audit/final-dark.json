@@ -1,0 +1,278 @@
+[
+  {
+    "path": "/account/warranty",
+    "width": 1365,
+    "scroll": 1350,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Bảo hành của tôi",
+      "Yêu cầu của tôi",
+      "Về chúng tôi"
+    ],
+    "controls": [
+      {
+        "text": "Tạo yêu cầu bảo hành",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  },
+  {
+    "path": "/account/warranty",
+    "width": 390,
+    "scroll": 375,
+    "heading": [
+      "TÀI KHOẢN CỦA TÔI",
+      "Tài khoản của tôi",
+      "Bảo hành của tôi",
+      "Yêu cầu của tôi",
+      "Về chúng tôi"
+    ],
+    "controls": [
+      {
+        "text": "Tạo yêu cầu bảo hành",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(17, 24, 39)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "rgb(255, 255, 255)",
+        "color": "oklch(0.21 0.034 264.665)",
+        "border": "rgb(229, 231, 235)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trước",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "1",
+        "bg": "rgb(85, 176, 0)",
+        "color": "rgb(255, 255, 255)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "rgb(255, 255, 255)",
+        "color": "rgb(55, 65, 81)",
+        "border": "rgb(209, 213, 219)"
+      }
+    ],
+    "surface": "rgba(0, 0, 0, 0)",
+    "route": "/account/warranty"
+  },
+  {
+    "path": "/auth/warranties",
+    "width": 1365,
+    "scroll": 1365,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Yêu cầu bảo hành",
+      "Danh sách yêu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/warranties"
+  },
+  {
+    "path": "/auth/warranties",
+    "width": 390,
+    "scroll": 390,
+    "heading": [
+      "Tìm kiếm nhanh",
+      "Yêu cầu bảo hành",
+      "Danh sách yêu cầu"
+    ],
+    "controls": [
+      {
+        "text": "Ẩn/hiện thanh bên",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tìm kiếm...⌘K",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.708 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Chuyển sang chế độ sáng",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Tất cả trạng tháiChờ tiếp nhậnĐang kiểm traĐa",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Warranty product · BlueORD-AUDIT · 08:00:00 5",
+        "bg": "oklch(0.145 0 0)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.1)"
+      },
+      {
+        "text": "Trang đầu",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trước",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "1",
+        "bg": "oklch(0.922 0 0)",
+        "color": "oklch(0.205 0 0)",
+        "border": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "text": "Tiếp",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      },
+      {
+        "text": "Trang cuối",
+        "bg": "oklab(1 0 0 / 0.045)",
+        "color": "oklch(0.985 0 0)",
+        "border": "oklch(1 0 0 / 0.15)"
+      }
+    ],
+    "surface": "oklch(0.145 0 0)",
+    "route": "/auth/warranties"
+  }
+]
