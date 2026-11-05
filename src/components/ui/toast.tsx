@@ -1,6 +1,7 @@
 import { useEffect, type CSSProperties, type ReactNode } from 'react';
 import { Toaster as SonnerToaster, toast, useSonner } from 'sonner';
 import { useTheme } from '@/hooks/theme/use-theme';
+import { getAuthArea } from '@/stores/auth.store';
 
 export { toast } from 'sonner';
 
@@ -17,7 +18,7 @@ export function Toaster({ children }: { children?: ReactNode }) {
       <SonnerToaster
         className="app-toaster"
         position="bottom-left"
-        theme={theme}
+        theme={getAuthArea() === 'storefront' ? 'light' : theme}
         richColors
         closeButton={false}
         duration={5000}

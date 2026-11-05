@@ -1,14 +1,20 @@
 # Frontend architecture
 
+Email recovery is implemented in `features/auth/` with dedicated schemas, HTTP services, mutation hooks and components. `/quen-mat-khau` composes the Customer recovery flow; reset grants remain in component memory. Issued administrative accounts change password, sign in again, then complete `/auth/settings/user` with the existing Profile form and personal-email OTP verification. Route guards and Backend gates enforce the same onboarding state. User management requests server-generated email resets; only initial provisioning/reissue shows locally generated credentials for administrator handover. See sibling Backend `../../project-final-197-BE/docs/ACCOUNT_SECURITY.md` and shared `PROJECT_RULES.md`.
+
+Personal-email verification is inline beneath the editable email field. Its send callback validates and saves Profile before sending, preserves the editor, and disables resend with a sixty-second countdown. Recovery uses the shared storefront auth CSS for light colors, input borders, placeholders and visible carets. Registration adds an unchecked required terms/privacy agreement as a frontend submission guard; it does not persist a consent record.
+
 Policies and warranty live in `features/support/` (types, schemas, HTTP services, query/mutation hooks and shared request components). Pages are `/chinh-sach-bao-hanh`, `/account/warranty`, `/auth/policies` and `/auth/warranties`. Policy editor sessions retain their original version during refetch; public content uses only the published Backend snapshot. Warranty requests use completed owned order items and separate attachment uploads, with private media URLs and a customer-visible status history.
 
-Usage, API contracts and deployment acceptance: [POLICY_WARRANTY.md](../POLICY_WARRANTY.md).
+Usage, API contracts and deployment acceptance: [POLICY_WARRANTY.md](POLICY_WARRANTY.md).
 
 Dedicated privacy, shipping and returns routes (`/chinh-sach-bao-mat`, `/chinh-sach-giao-hang`, `/chinh-sach-doi-tra`) compose the shared public policy detail page. `policy-documents.ts` owns their navigation metadata and explicitly inserted editorial draft suggestions; suggestions never become public fallback content. Legacy policy reads normalize the new privacy field without overwriting existing content.
 
-This document describes the current application. Detailed business rules and verification commands live in [PROJECT_RULES.md](../PROJECT_RULES.md); the sibling Backend defines the API contract.
+This document describes the current application. Detailed business rules and verification commands live in [PROJECT_RULES.md](PROJECT_RULES.md); the sibling Backend defines the API contract.
 
 ## Responsibilities
+
+Storefront visual tokens and form/button overrides belong to `layout/storefront/storefront-ui.css`, attached only to StoreLayout. Administrative surfaces continue using the existing semantic theme tokens and light/dark mode. Shared warranty views choose an area-specific badge/selection palette; notifications choose the configured auth area. Account navigation is compact on mobile and a sidebar on desktop. The UI audit and its limits are recorded in [UI_REVIEW.md](UI_REVIEW.md).
 
 - `router/`: routes, permission guards and separate Admin/Customer session bootstrap.
 - `pages/admin/`: dashboard, catalog, inventory, orders, users, customers, profile, hero, articles and post categories.

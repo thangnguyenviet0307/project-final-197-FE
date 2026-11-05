@@ -120,7 +120,7 @@ function DeleteBrandDialog({
             }}
             className="bg-destructive hover:bg-destructive/90 text-white"
           >
-            {deleting ? 'Deleting...' : 'Xóa thương hiệu'}
+            {deleting ? 'Đang xóa…' : 'Xóa thương hiệu'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

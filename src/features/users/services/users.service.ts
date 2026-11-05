@@ -6,15 +6,19 @@ import type {
   UsersFilters,
 } from '@/features/users/types/users';
 
-export function getDefaultUserPassword(role: 'admin' | 'staff') {
-  return role === 'admin' ? 'Admin123' : 'Staff123';
+// Initial credentials are handed over by the provisioning administrator; never returned by the API.
+export function generateInitialPassword() {
+  const bytes = crypto.getRandomValues(new Uint8Array(18));
+  return 'Aa1!' + Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
 }
 
-// Demo password resets use the same role-based defaults as account creation.
 export function getTemporaryPassword(role: ManagedUser['role']) {
-  if (role === 'super_admin')
-    throw new Error('Super Admin must change their own password');
-  return getDefaultUserPassword(role);
+  if (role === 'super_admin') throw new Error('Super Admin must change their own password');
+  return generateInitialPassword();
+}
+
+export async function reissueInitialPassword(id: string, password: string) {
+  await api.post(`/users/${encodeURIComponent(id)}/reissue-initial-password`, { password });
 }
 
 export async function listUsers(
@@ -39,14 +43,8 @@ export async function createUser(input: CreateUserInput) {
   await api.post('/users', { ...input, active: true });
 }
 
-export async function resetUserPassword({
-  id,
-  password,
-}: {
-  id: string;
-  password: string;
-}) {
-  await api.put(`/users/${encodeURIComponent(id)}`, { password });
+export async function resetUserPassword(id: string) {
+  await api.post(`/users/${encodeURIComponent(id)}/reset-password`, {});
 }
 
 export async function deleteUser(id: string) {

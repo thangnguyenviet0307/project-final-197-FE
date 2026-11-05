@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { getApiError } from '@/services/api';
-import { getDefaultUserPassword } from '@/features/users/services/users.service';
+import { generateInitialPassword } from '@/features/users/services/users.service';
 import { createUserSchema } from '@/features/users/schemas/user-schema';
 import type { CreateUserInput } from '@/features/users/types/users';
 import { useCreateUser } from '@/features/users/hooks/use-create-user';
@@ -35,7 +35,7 @@ export function UserForm({
       firstName: '',
       lastName: '',
       email: '',
-      password: getDefaultUserPassword('staff'),
+      password: generateInitialPassword(),
       role: 'staff',
     },
   });
@@ -47,7 +47,7 @@ export function UserForm({
         firstName: '',
         lastName: '',
         email: '',
-        password: getDefaultUserPassword('staff'),
+        password: generateInitialPassword(),
         role: 'staff',
       });
       onSaved();
@@ -135,7 +135,7 @@ export function UserForm({
                     onValueChange={(value) => {
                       if (value !== 'staff' && value !== 'admin') return;
                       field.onChange(value);
-                      form.setValue('password', getDefaultUserPassword(value), {
+                      form.setValue('password', generateInitialPassword(), {
                         shouldValidate: true,
                       });
                     }}

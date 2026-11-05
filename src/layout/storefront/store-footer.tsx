@@ -52,15 +52,15 @@ export function StoreFooter() {
                 Việt Nam
               </p>
 
-              <p className="flex items-center gap-3">
+              <Link to="/contact" className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]">
                 <Phone className="size-4 text-[#65b719]" />
                 Hỗ trợ khách hàng
-              </p>
+              </Link>
 
-              <p className="flex items-center gap-3">
+              <Link to="/contact" className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]">
                 <Mail className="size-4 text-[#65b719]" />
                 Liên hệ qua trang hỗ trợ
-              </p>
+              </Link>
             </div>
           </section>
 

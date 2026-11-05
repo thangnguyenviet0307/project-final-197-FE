@@ -63,8 +63,8 @@ export function AccountLayout() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[290px_minmax(0,1fr)]">
-          <aside className="self-start overflow-hidden rounded-lg border border-gray-200 bg-white">
-            <div className="bg-[#253529] px-6 py-7 text-white">
+          <aside className="min-w-0 self-start overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <div className="hidden bg-[#253529] px-6 py-7 text-white lg:block">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#55b000]">
                 <UserRound size={28} />
               </div>
@@ -74,7 +74,7 @@ export function AccountLayout() {
               </p>
             </div>
 
-            <nav aria-label="Điều hướng tài khoản" className="p-3">
+            <nav aria-label="Điều hướng tài khoản" className="flex gap-1 overflow-x-auto p-2 lg:block lg:p-3">
               {accountMenus.map((item) => {
                 const Icon = item.icon;
 
@@ -83,7 +83,7 @@ export function AccountLayout() {
                     key={item.path}
                     to={item.path}
                     className={({ isActive }) =>
-                      `mb-1 flex items-center gap-3 rounded-md px-4 py-3.5 text-sm transition-colors ${
+                      `flex shrink-0 items-center gap-2 rounded-md px-3 py-3 text-sm whitespace-nowrap transition-colors lg:mb-1 lg:gap-3 lg:px-4 lg:py-3.5 ${
                         isActive
                           ? 'bg-[#55b000]/10 font-bold text-[#459000]'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-[#55b000]'
@@ -92,7 +92,7 @@ export function AccountLayout() {
                   >
                     <Icon size={19} />
                     <span className="flex-1">{item.label}</span>
-                    <ChevronRight size={16} />
+                    <ChevronRight size={16} className="hidden lg:block" />
                   </NavLink>
                 );
               })}

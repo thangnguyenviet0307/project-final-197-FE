@@ -8,6 +8,7 @@ import {
   supportDate,
   warrantyLabels,
   warrantyStatusStyles,
+  adminWarrantyStatusStyles,
 } from '@/features/support/utils/support';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -69,7 +70,7 @@ export function WarrantyList({
                 onClick={() =>
                   onSelect(selectedId === item._id ? '' : item._id)
                 }
-                className={`block w-full rounded-xl border p-4 text-left transition hover:border-green-500 ${selectedId === item._id ? 'border-green-600 bg-green-50/50' : 'bg-background'}`}
+                className={`block w-full rounded-xl border p-4 text-left transition ${admin ? 'hover:border-ring' : 'hover:border-green-500'} ${selectedId === item._id ? admin ? 'border-ring bg-accent text-accent-foreground' : 'border-green-600 bg-green-50/50' : 'bg-background'}`}
               >
                 <span className="block text-sm font-semibold">
                   {item.productName}
@@ -79,17 +80,12 @@ export function WarrantyList({
                   {item.orderCode} · {supportDate(item.createdAt)}
                   {admin && ` · ${item.customerName ?? ''}`}
                 </span>
-                {admin && (
                   <span className="text-muted-foreground mt-2 block text-xs">
-                    {item.handlerId
-                      ? item.handlerId === userId
-                        ? 'Bạn phụ trách'
-                        : 'Đã có người phụ trách'
-                      : 'Chưa phân công'}
+                    Người tiếp nhận: {item.handlerName || (item.handlerId ? 'Nhân viên cửa hàng' : 'Chưa có người tiếp nhận')}
+                    {admin && item.handlerId === userId && ' (Bạn)'}
                   </span>
-                )}
                 <span
-                  className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${warrantyStatusStyles[item.status]}`}
+                  className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${(admin ? adminWarrantyStatusStyles : warrantyStatusStyles)[item.status]}`}
                 >
                   {warrantyLabels[item.status]}
                 </span>
@@ -103,7 +99,6 @@ export function WarrantyList({
                 : 'Chưa có yêu cầu phù hợp.'}
             </p>
           )}
-          {query.data.pagination.totalPages > 1 || page > 1 ? (
             <ListPagination
               label="Phân trang yêu cầu bảo hành"
               page={page}
@@ -111,7 +106,6 @@ export function WarrantyList({
               disabled={query.isFetching}
               onPageChange={setPage}
             />
-          ) : null}
         </>
       )}
     </section>

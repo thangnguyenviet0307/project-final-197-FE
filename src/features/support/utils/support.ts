@@ -60,6 +60,14 @@ export const warrantyStatusStyles: Record<WarrantyStatus, string> = {
   resolved: 'bg-green-50 text-green-800',
   rejected: 'bg-red-50 text-red-800',
 };
+// Admin badges follow its light/dark theme; the customer palette stays light.
+export const adminWarrantyStatusStyles: Record<WarrantyStatus, string> = {
+  submitted: 'bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  reviewing: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  repairing: 'bg-violet-500/10 text-violet-700 dark:text-violet-400',
+  resolved: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  rejected: 'bg-red-500/10 text-red-700 dark:text-red-400',
+};
 export function supportDate(value: string) {
   return new Date(value).toLocaleString('vi-VN');
 }

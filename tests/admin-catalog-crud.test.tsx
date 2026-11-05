@@ -207,9 +207,12 @@ it.each([false, true])("brand deletion keeps the confirmation open only on failu
   else await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
 })
 
-it("uses the demo temporary password for each role", () => {
-  expect(getTemporaryPassword("admin")).toBe("Admin123")
-  expect(getTemporaryPassword("staff")).toBe("Staff123")
+it("generates unpredictable initial credentials instead of role-based defaults", () => {
+  const first = getTemporaryPassword("admin")
+  const second = getTemporaryPassword("staff")
+  expect(first).toMatch(/^Aa1![a-f0-9]{36}$/)
+  expect(second).toMatch(/^Aa1![a-f0-9]{36}$/)
+  expect(first).not.toBe(second)
 })
 
 it("staff can read categories without seeing write actions", async () => {

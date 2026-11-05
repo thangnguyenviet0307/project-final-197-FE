@@ -28,6 +28,45 @@ function renderPage(node: ReactNode) {
   return render(<QueryClientProvider client={queryClient}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>)
 }
 
+it('opens first-login Profile for editing and marks required fields', async () => {
+  const incomplete = { ...user, personalEmail: '', onboardingRequired: true }
+  useAuthStore.getState().setSession(incomplete, { accessToken: 'access' })
+  api.defaults.adapter = async config => ({ config, data: { data: incomplete }, headers: new AxiosHeaders(), status: 200, statusText: '' })
+  renderPage(<UserProfilePage />)
+  for (const label of ['Tên', 'Họ', 'Email cá nhân']) {
+    const input = await screen.findByLabelText(label)
+    expect(input).toHaveProperty('required', true)
+    expect(input.closest('[data-slot="field"]')?.querySelector('.text-red-600')).toBeTruthy()
+  }
+})
+
+it('keeps OTP below personalEmail and saves the typed email before requesting a code', async () => {
+  const incomplete = { ...user, personalEmail: '', onboardingRequired: true }
+  useAuthStore.getState().setSession(incomplete, { accessToken: 'access' })
+  const writes: string[] = []
+  api.defaults.adapter = async config => {
+    if (config.method === 'patch') {
+      writes.push('profile')
+      expect((config.data as FormData).get('personalEmail')).toBe('new@example.com')
+      return { config, data: { data: { ...incomplete, personalEmail: 'new@example.com' } }, headers: new AxiosHeaders(), status: 200, statusText: '' }
+    }
+    if (config.method === 'post') {
+      writes.push(config.url!)
+      return { config, data: { data: null }, headers: new AxiosHeaders(), status: 200, statusText: '' }
+    }
+    return { config, data: { data: incomplete }, headers: new AxiosHeaders(), status: 200, statusText: '' }
+  }
+  renderPage(<UserProfilePage />)
+  const email = await screen.findByLabelText('Email cá nhân')
+  const otp = screen.getByPlaceholderText('Mã xác nhận')
+  expect(otp.closest('form')).toBe(email.closest('form'))
+  fireEvent.change(email, { target: { value: 'new@example.com' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }))
+  expect(await screen.findByText('Đã gửi mã đến email cá nhân đã lưu.')).toBeTruthy()
+  expect(writes).toEqual(['profile', '/auth/email-verification/send-otp'])
+  expect(screen.getByRole('button', { name: /Gửi lại sau/ })).toHaveProperty('disabled', true)
+})
+
 function DeleteAccountControl({ onDeleted }: { onDeleted: () => void }) {
   const [open, setOpen] = useState(false)
   return <>

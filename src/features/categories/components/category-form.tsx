@@ -78,6 +78,7 @@ export function CategoryForm({
           </Field>
           <ImageUploadField
             id="category-icon"
+            guidance="Lưu ý: Icon trên web store hiển thị trong khung vuông 36 × 36 px. Nên dùng ảnh vuông tỷ lệ 1:1 (ví dụ 256 × 256 px), đặt nội dung ở giữa và hạn chế khoảng trắng thừa. Ảnh ngang hoặc dọc sẽ có khoảng trống để giữ trọn ảnh, không bị cắt hay kéo méo."
             label="Ảnh danh mục"
             selected={image.selected}
             existingUrl={category?.icon}
@@ -147,7 +148,7 @@ export function CategoryForm({
               categories.isError
             }
           >
-            {busy ? 'Saving...' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
+            {busy ? 'Đang lưu…' : category ? 'Lưu thay đổi' : 'Tạo danh mục'}
           </Button>
           <Button
             type="button"

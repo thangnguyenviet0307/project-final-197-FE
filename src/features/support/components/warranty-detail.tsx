@@ -19,6 +19,7 @@ import {
   warrantyTransitions,
   supportDate,
   warrantyStatusStyles,
+  adminWarrantyStatusStyles,
 } from '@/features/support/utils/support';
 import { getApiError } from '@/services/api';
 import { useAuthStore } from '@/stores/auth.store';
@@ -329,7 +330,7 @@ export function WarrantyDetailPanel({
       <div className="flex flex-wrap justify-between gap-3">
         <h3 className="text-xl font-bold">Chi tiết bảo hành</h3>
         <span
-          className={`rounded-full px-3 py-1 text-sm font-semibold ${warrantyStatusStyles[detail.status]}`}
+          className={`rounded-full px-3 py-1 text-sm font-semibold ${(admin ? adminWarrantyStatusStyles : warrantyStatusStyles)[detail.status]}`}
         >
           {warrantyLabels[detail.status]}
         </span>
@@ -343,6 +344,10 @@ export function WarrantyDetailPanel({
       </p>
       <p className="text-muted-foreground mt-1 text-xs break-all">
         Mã yêu cầu: {detail._id}
+      </p>
+      <p className="mt-3 text-sm">
+        <span className="text-muted-foreground">Người tiếp nhận: </span>
+        <span className="font-medium">{detail.handlerName || (detail.handlerId ? 'Nhân viên cửa hàng' : 'Chưa có người tiếp nhận')}</span>
       </p>
       {admin && (
         <div className="bg-muted/30 mt-4 rounded-lg p-3 text-sm">

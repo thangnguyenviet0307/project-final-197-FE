@@ -72,6 +72,11 @@ const api = {
   },
   async post(url, body) {
     body = catalogBody(body)
+    if (/^\/users\/[^/]+\/reset-password$/.test(url)) {
+      assert.deepEqual(Object.keys(body), [])
+      requests.push({ method: 'POST', url, body })
+      return { data: { success: true, data: null } }
+    }
     const schema = url === "/customers" ? customers.createCustomerSchema : url === "/brands" ? brands.createBrandSchema : url === "/categories" ? categories.createCategoriesSchema : users.createUserSchema
     const parsed = schema.parse(body)
     assert.ok(Object.keys(body).every(key => Object.hasOwn(parsed, key)), `Backend would discard unsupported fields for ${url}`)
@@ -120,10 +125,10 @@ await brandService.updateById(id, { image: catalogImage, name: "Uploaded logo" }
 await categoryService.createCategory({ name: "Uploaded category", parent: null, isActive: false, image: catalogImage })
 await categoryService.updateCategory({ id, input: { image: catalogImage, name: "Uploaded icon" } })
 const temporary = userService.getTemporaryPassword("staff")
-assert.equal(temporary, "Staff123")
-assert.equal(userService.getTemporaryPassword("admin"), "Admin123")
+assert.match(temporary, /^Aa1![a-f0-9]{36}$/)
+assert.notEqual(temporary, userService.getTemporaryPassword("admin"))
 await userService.createUser({ firstName: "New", lastName: "Staff", email: "staff@example.com", role: "staff", password: temporary })
-await userService.resetUserPassword({ id, password: userService.getTemporaryPassword("admin") })
+await userService.resetUserPassword(id)
 assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "" }).success, true)
 assert.equal(brands.updateBrandSchema.safeParse({ logoUrl: "" }).success, true)
 assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "javascript:alert(1)" }).success, false)

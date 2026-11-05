@@ -1,0 +1,61 @@
+/* Storefront tokens live on its layout, never on :root or the admin theme. */
+.storefront-ui {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #55b000;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #374151;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f0fdf4;
+  --accent-foreground: #166534;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: #55b000;
+  --destructive: #b91c1c;
+}
+
+.storefront-ui [data-slot='input'],
+.storefront-ui [data-slot='textarea'] {
+  background-color: #ffffff;
+  color: #111827;
+  caret-color: #111827;
+}
+
+.storefront-ui [data-slot='input']::placeholder,
+.storefront-ui [data-slot='textarea']::placeholder {
+  color: #6b7280;
+}
+
+.storefront-ui [data-slot='input']:disabled,
+.storefront-ui [data-slot='textarea']:disabled {
+  background-color: #f3f4f6;
+}
+
+/* Root .dark selectors may still match descendants: keep storefront variants local. */
+.storefront-ui [data-slot='button'][data-variant='outline'] {
+  background-color: #ffffff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.storefront-ui [data-slot='button'][data-variant='outline']:hover:not(:disabled),
+.storefront-ui [data-slot='button'][data-variant='ghost']:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.storefront-ui [data-slot='button'][data-variant='destructive'] {
+  background-color: #b91c1c;
+  color: #ffffff;
+}
+
+.storefront-ui [data-slot='button'][data-variant='destructive']:hover:not(:disabled) {
+  background-color: #991b1b;
+}

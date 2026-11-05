@@ -39,4 +39,8 @@ Thumbs.db
 Desktop.ini
 
 reports
+
+# Isolated local browser profile, screenshots and UI audit fixtures.
+.local-backups/ui-audit/
+
 docs

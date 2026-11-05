@@ -11,7 +11,12 @@
   border-color: #d1d5db;
   background-color: #fff;
   color: #111827;
+  caret-color: #111827;
   padding-inline: 0.875rem;
+}
+
+.customer-auth-form [data-slot='input']::placeholder {
+  color: #9ca3af;
 }
 
 .customer-auth-form [data-slot='input'].customer-auth-password {

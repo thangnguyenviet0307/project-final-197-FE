@@ -27,6 +27,7 @@ export function ChangePasswordForm({
   storefront?: boolean;
 }) {
   const required = useAuthStore((state) => state.user?.mustChangePassword);
+  const deadline = useAuthStore((state) => state.user?.temporaryPasswordExpiresAt);
   const form = useForm<Values>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -63,6 +64,7 @@ export function ChangePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {required && deadline && <p role="status" className="mb-4 text-sm">Bạn phải đổi mật khẩu trước {new Date(deadline).toLocaleString('vi-VN')}. Đăng nhập không gia hạn thời gian.</p>}
           <form
             className="space-y-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
@@ -104,9 +106,7 @@ export function ChangePasswordForm({
             </p>
             <ul
               className="text-muted-foreground space-y-2 text-sm"
-              aria-label={
-                storefront ? 'Yêu cầu mật khẩu' : 'Password requirements'
-              }
+              aria-label="Yêu cầu mật khẩu"
             >
               {(storefront
                 ? [
@@ -115,9 +115,9 @@ export function ChangePasswordForm({
                     'Có ký tự đặc biệt, mật khẩu xác nhận phải trùng khớp và mật khẩu mới phải khác mật khẩu hiện tại.',
                   ]
                 : [
-                    'Password must contain at least 6 characters.',
-                    'Include at least one uppercase letter and one number.',
-                    'Include at least one special character, for example: !@#$%^&*()_',
+                    'Mật khẩu dài từ 6 đến 1024 ký tự.',
+                    'Có ít nhất một chữ in hoa và một chữ số.',
+                    'Có ít nhất một ký tự đặc biệt, ví dụ: !@#$%^&*()_',
                   ]
               ).map((requirement) => (
                 <li key={requirement} className="flex items-start gap-2">

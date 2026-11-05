@@ -191,7 +191,7 @@ it("searches accounts by name or account email and shows an empty search result"
     page: 1, limit: 10, search: "Jane Smith",
   })))
   expect(screen.getByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByText("Searching")).toBeTruthy()
+  expect(screen.getByText("Đang tìm kiếm…")).toBeTruthy()
   releaseSearch()
   expect(await screen.findByText('Không tìm thấy tài khoản cho "Jane Smith".')).toBeTruthy()
 
@@ -204,7 +204,7 @@ it("searches accounts by name or account email and shows an empty search result"
   expect(await screen.findByText('Không tìm thấy tài khoản cho "jane@example.com".')).toBeTruthy()
 })
 
-it.each(["staff", "admin"] as const)("creates %s accounts using the requested default password", async role => {
+it.each(["staff", "admin"] as const)("creates %s accounts using random initial credentials", async role => {
   const writes = setup()
   await screen.findByText("target@example.com")
   fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
@@ -215,7 +215,7 @@ it.each(["staff", "admin"] as const)("creates %s accounts using the requested de
   fireEvent.mouseUp(option)
   fireEvent.click(option)
   const password = (screen.getByLabelText("Mật khẩu tạm thời") as HTMLInputElement).value
-  expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
+  expect(password).toMatch(/^Aa1![a-f0-9]{36}$/)
   fireEvent.change(screen.getByLabelText("Nhập tên"), { target: { value: "New" } })
   fireEvent.change(screen.getByLabelText("Nhập họ"), { target: { value: "User" } })
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } })
@@ -223,16 +223,14 @@ it.each(["staff", "admin"] as const)("creates %s accounts using the requested de
   await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users", expect.objectContaining({ role, password })))
 })
 
-it.each(["staff", "admin"] as const)("resets %s accounts using the role-based default password", async role => {
+it.each(["staff", "admin"] as const)("resets %s accounts by requesting email delivery without exposing a password", async role => {
   const writes = setup(role)
   await screen.findByText("target@example.com")
   fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
   fireEvent.click(await screen.findByRole("menuitem", { name: "Đặt lại mật khẩu" }))
-  const field = screen.getByLabelText("Mật khẩu tạm thời mới")
-  const password = (field as HTMLInputElement).value
-  expect(password).toBe(role === "admin" ? "Admin123" : "Staff123")
-  fireEvent.submit(field.closest("form")!)
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { password }))
+  expect(screen.queryByLabelText("Mật khẩu tạm thời mới")).toBeNull()
+  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
+  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/target/reset-password", {}))
 })
 
 it("confirms account deletion from the Edit actions menu", async () => {

@@ -21,11 +21,11 @@ export function ProductDetailGallery({ product }: { product: Product }) {
 
   return (
     <section aria-label="Hình ảnh sản phẩm" className="min-w-0 space-y-3">
-      <div className="bg-muted/20 overflow-hidden rounded-xl border">
+      <div className="bg-muted/20 relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-xl border">
         <ProductImage
           src={active}
           alt={product.product_name}
-          className="aspect-square max-h-[480px] w-full object-contain"
+          className="absolute inset-0 size-full object-contain object-center p-4"
         />
       </div>
       {images.length > 0 ? (
@@ -38,12 +38,12 @@ export function ProductDetailGallery({ product }: { product: Product }) {
                 aria-label={`Xem ảnh ${index + 1}`}
                 aria-pressed={active === url}
                 onClick={() => setSelected(url)}
-                className={`focus-visible:outline-ring size-20 shrink-0 overflow-hidden rounded-lg border-2 focus-visible:outline-2 focus-visible:outline-offset-2 ${active === url ? 'border-primary' : 'border-transparent'}`}
+                className={`focus-visible:outline-ring bg-muted/20 relative size-20 shrink-0 overflow-hidden rounded-lg border-2 focus-visible:outline-2 focus-visible:outline-offset-2 ${active === url ? 'border-primary' : 'border-transparent'}`}
               >
                 <ProductImage
                   src={url}
                   alt=""
-                  className="size-full object-contain"
+                  className="absolute inset-0 size-full object-contain object-center p-1"
                 />
               </button>
             ))}

@@ -9,6 +9,7 @@ export function ImageUploadField({
   existingUrl,
   error,
   disabled,
+  guidance,
   onSelect,
 }: {
   id: string;
@@ -17,6 +18,7 @@ export function ImageUploadField({
   existingUrl?: string;
   error: string;
   disabled: boolean;
+  guidance?: string;
   onSelect: (file: File | null) => void;
 }) {
   return (
@@ -29,6 +31,7 @@ export function ImageUploadField({
         id={id}
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        aria-describedby={guidance ? `${id}-guidance` : undefined}
         disabled={disabled}
         onChange={(event) => onSelect(event.target.files?.[0] ?? null)}
         className="file:bg-muted block w-full min-w-0 text-sm file:mr-3 file:rounded-lg file:border file:px-3 file:py-2"
@@ -36,6 +39,11 @@ export function ImageUploadField({
       <p className="text-muted-foreground text-xs">
         JPG, PNG, WebP · Tối đa 5 MB. Ảnh được tải lên khi lưu biểu mẫu.
       </p>
+      {guidance && (
+        <p id={`${id}-guidance`} className="text-muted-foreground text-sm leading-6">
+          {guidance}
+        </p>
+      )}
       {(selected || existingUrl) && (
         <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border p-3">
           <div className="size-20 shrink-0 [&>*]:size-full">

@@ -29,6 +29,7 @@ export interface WarrantySummary {
   createdAt: string;
   customerName?: string;
   handlerId?: string | null;
+  handlerName?: string | null;
 }
 export interface WarrantyDetail extends WarrantySummary {
   __v: number;

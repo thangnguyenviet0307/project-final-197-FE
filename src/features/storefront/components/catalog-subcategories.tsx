@@ -1,3 +1,4 @@
+import { CatalogFilterOption, catalogOptionGrid } from './catalog-filter-option';
 import type { PublicCategory } from '@/features/categories/types/categories';
 
 export function CatalogSubcategories({
@@ -36,22 +37,20 @@ export function CatalogSubcategories({
         <nav
           key={parent._id}
           aria-label={`Danh mục con của ${parent.name}`}
-          className="flex flex-wrap items-center gap-2.5"
+          className={catalogOptionGrid}
         >
           {categories
             .filter((child) => child.parent === parent._id)
             .map((category) => {
               const selected = selectedChildIds.includes(category._id);
               return (
-                <button
+                <CatalogFilterOption
                   key={category._id}
-                  type="button"
-                  aria-pressed={selected}
+                  name={category.name}
+                  image={category.icon}
+                  selected={selected}
                   onClick={() => select(parent._id, category._id)}
-                  className={`min-h-10 rounded-xl border px-4 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] ${selected ? 'border-[#4d9210] bg-[#e9f5e0] font-semibold text-[#397a16]' : 'border-gray-200 bg-white text-gray-700 hover:border-[#9acb74] hover:text-[#397a16]'}`}
-                >
-                  {category.name}
-                </button>
+                />
               );
             })}
         </nav>

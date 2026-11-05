@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { CustomerOrderCard } from '@/features/orders/components/customer-order-card';
 import { WarrantyCreateForm } from '@/features/support/components/warranty-create-form';
 import { WarrantyDetailPanel } from '@/features/support/components/warranty-detail';
+import { WarrantyList } from '@/features/support/components/warranty-list';
 import { isWarrantyRequestEligible } from '@/features/support/utils/warranty-eligibility';
 import type { WarrantyDetail } from '@/features/support/types/support';
 import type { CustomerOrder } from '@/features/orders/types/customer-orders';
@@ -15,6 +16,9 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   eligible: vi.fn(),
   refetch: vi.fn(),
+  list: vi.fn(),
+  totalPages: 1,
+  eligibilityError: false,
   detail: null as WarrantyDetail | null,
   existing: [] as Array<{ orderId: string }>,
 }));
@@ -22,12 +26,13 @@ vi.mock('@/features/orders/components/customer-order-cancel', () => ({
   CustomerOrderCancel: () => null,
 }));
 vi.mock('@/features/support/hooks/use-support', () => ({
-  useEligibleWarrantyOrders: (page: number, orderId?: string) => {
+  useEligibleWarrantyOrders: (page: number, orderId?: string, enabled = true) => {
     mocks.eligible(page, orderId);
     return {
       isPending: false,
+      isError: mocks.eligibilityError,
       data: {
-        data: [
+        data: !enabled || mocks.existing.some(item => item.orderId === (orderId ?? 'a'.repeat(24))) ? [] : [
           {
             _id: 'a'.repeat(24),
             orderDate: '2026-11-03T00:00:00Z',
@@ -51,12 +56,14 @@ vi.mock('@/features/support/hooks/use-support', () => ({
     isPending: false,
     refetch: mocks.refetch,
   }),
-  useWarranties: () => ({
-    data: { data: mocks.existing, pagination: { totalPages: 1 } },
+  useWarranties: (admin: boolean, page: number, status: string) => {
+    mocks.list(admin, page, status);
+    return ({
+    data: { data: mocks.existing, pagination: { totalPages: mocks.totalPages } },
     isPending: false,
     isError: false,
     refetch: vi.fn(),
-  }),
+  }); },
   useSupportMutations: () => ({
     create: { mutateAsync: mocks.create, isPending: false },
     upload: { mutateAsync: mocks.upload, isPending: false },
@@ -67,6 +74,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   useAuthStore.setState({ user: null });
   mocks.existing = [];
+  mocks.eligibilityError = false;
+  mocks.totalPages = 1;
   mocks.detail = {
     _id: 'b'.repeat(24),
     __v: 2,
@@ -87,6 +96,24 @@ beforeEach(() => {
 const wrap = (element: React.ReactNode) => (
   <MemoryRouter>{element}</MemoryRouter>
 );
+it.each([true, false])('paginates the warranty list and resets the page on filtering (admin=%s)', admin => {
+  mocks.totalPages = 3;
+  render(wrap(<WarrantyList admin={admin} selectedId="" onSelect={() => {}} />));
+  expect(screen.getByRole('navigation', { name: 'Phân trang yêu cầu bảo hành' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  expect(mocks.list).toHaveBeenLastCalledWith(admin, 2, '');
+  fireEvent.change(screen.getByLabelText('Lọc trạng thái bảo hành'), { target: { value: 'resolved' } });
+  expect(mocks.list).toHaveBeenLastCalledWith(admin, 1, 'resolved');
+});
+it.each(['super_admin', 'admin', 'staff', 'customer'] as const)('shows the acceptor name to an authorized %s viewer', role => {
+  useAuthStore.setState({ user: {
+    id: 'viewer', firstName: 'Test', lastName: 'Viewer', name: 'Viewer Test', email: 'viewer@example.com', mustChangePassword: false,
+    ...(role === 'customer' ? { accountType: 'customer' as const } : { accountType: 'user' as const, role }),
+  } });
+  mocks.detail = { ...mocks.detail!, status: 'resolved', handlerName: 'Nguyễn Văn An' };
+  render(wrap(<WarrantyDetailPanel id={'b'.repeat(24)} admin={role !== 'customer'} />));
+  expect(screen.getByText('Nguyễn Văn An')).toBeTruthy();
+});
 it('offers a warranty link for each item only after its order is completed', () => {
   const order: CustomerOrder = {
     _id: 'a'.repeat(24),
@@ -357,4 +384,22 @@ it('prevents staff from updating another employees accepted request', () => {
   render(wrap(<WarrantyDetailPanel id={'b'.repeat(24)} admin />));
   expect(screen.queryByLabelText('Phản hồi cho khách hàng')).toBeNull();
   expect(screen.getByText(/Yêu cầu do nhân viên khác phụ trách/)).toBeTruthy();
+});
+
+it('uses server eligibility instead of fetching an oversized request history', () => {
+  render(wrap(<WarrantyCreateForm onCreated={() => {}} onCancel={() => {}} />));
+  expect(mocks.eligible).toHaveBeenCalledWith(1, undefined);
+  expect(mocks.list).not.toHaveBeenCalled();
+});
+
+it('does not offer a warranty action when server eligibility fails', () => {
+  mocks.eligibilityError = true;
+  const order: CustomerOrder = {
+    _id: 'a'.repeat(24), orderDate: '2026-11-01', orderStatus: 4,
+    totalAmount: 100, street: '', city: '', state: '',
+    orderItems: [{ productName: 'Phone', quantity: 1, price: 100, discount: 0 }],
+  };
+  render(wrap(<CustomerOrderCard order={order} />));
+  expect(screen.queryByRole('link', { name: 'Yêu cầu bảo hành' })).toBeNull();
+  expect(mocks.list).not.toHaveBeenCalled();
 });
