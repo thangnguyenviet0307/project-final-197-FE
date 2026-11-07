@@ -16,8 +16,72 @@ beforeEach(() => {
   queryClient.clear()
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, name: config.url === "/categories" ? "Cases" : "Thương hiệu", isActive: true }] } })
 })
-afterEach(() => { api.defaults.adapter = original; queryClient.clear() })
+afterEach(() => { api.defaults.adapter = original; queryClient.clear(); vi.unstubAllGlobals() })
+it('uploads selected thumbnail files and retries failed uploads without saving the product twice', async () => {
+  vi.stubGlobal('URL', class extends URL {
+    static createObjectURL = vi.fn(() => 'blob:preview')
+    static revokeObjectURL = vi.fn()
+  })
+  const save = vi.fn().mockResolvedValue({ ...product, __v: 1 })
+  let attempts = 0
+  const writes: unknown[] = []
+  const catalog = api.defaults.adapter as (config: never) => Promise<unknown>
+  api.defaults.adapter = async config => {
+    if (config.method === 'get') return catalog(config as never) as never
+    if (config.url?.endsWith('/images')) {
+      attempts++
+      expect((config.data as FormData).get('image')).toBeInstanceOf(File)
+      if (attempts === 1) throw new Error('Upload unavailable')
+      return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data: {
+        ...product, __v: 2, images: [{ public_id: 'products/image', secure_url: 'https://res.cloudinary.com/test/image/upload/products/image.png' }],
+      } } }
+    }
+    writes.push(JSON.parse(config.data))
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data: product } }
+  }
+  wrap(<ProductForm product={product} save={save} pending={false} />)
+  await waitFor(() => expect(screen.queryByText('Đang tải danh mục và thương hiệu…')).toBeNull())
+  fireEvent.change(screen.getByLabelText('Tên sản phẩm'), { target: { value: 'Updated case' } })
+  expect(screen.queryByLabelText('Đường dẫn ảnh đại diện')).toBeNull()
+  fireEvent.change(screen.getByLabelText('Ảnh sản phẩm'), { target: { files: [new File(['image'], 'case.png', { type: 'image/png' })] } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await screen.findByText(/Sản phẩm đã được lưu/)
+  expect(save).toHaveBeenCalledOnce()
+  fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất tải ảnh' }))
+  await waitFor(() => expect(writes).toEqual([{ thumbnail: 'https://res.cloudinary.com/test/image/upload/products/image.png' }]))
+  expect(save).toHaveBeenCalledOnce()
+  expect(attempts).toBe(2)
+  vi.restoreAllMocks()
+})
 function wrap(children: ReactNode) { return render(<QueryClientProvider client={queryClient}><RouterProvider router={createMemoryRouter([{ path: "*", element: children }])} /></QueryClientProvider>) }
+it('uploads main and extra variant files and links URLs without losing variant IDs or inventory', async () => {
+  vi.stubGlobal('URL', class extends URL {
+    static createObjectURL = vi.fn(() => 'blob:preview')
+    static revokeObjectURL = vi.fn()
+  })
+  const save = vi.fn().mockResolvedValue({ ...product, __v: 0 })
+  const gallery: NonNullable<Product['images']> = []
+  const patches: Record<string, unknown>[] = []
+  const catalog = api.defaults.adapter as (config: never) => Promise<unknown>
+  api.defaults.adapter = async config => {
+    if (config.method === 'get') return catalog(config as never) as never
+    if (config.url?.endsWith('/images')) {
+      gallery.push({ public_id: `products/${gallery.length}`, secure_url: `https://res.cloudinary.com/test/image/upload/${gallery.length}.png` })
+    } else patches.push(JSON.parse(config.data))
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data: { ...product, __v: gallery.length, images: [...gallery] } } }
+  }
+  wrap(<ProductForm product={product} save={save} pending={false} />)
+  await waitFor(() => expect(screen.queryByText('Đang tải danh mục và thương hiệu…')).toBeNull())
+  fireEvent.click(screen.getByRole('button', { name: 'Thêm ảnh' }))
+  const file = new File(['image'], 'case.png', { type: 'image/png' })
+  fireEvent.change(screen.getByLabelText('Ảnh chính biến thể'), { target: { files: [file] } })
+  fireEvent.change(screen.getByLabelText('Ảnh 1'), { target: { files: [file] } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await waitFor(() => expect(patches).toHaveLength(1))
+  expect(patches[0]).toMatchObject({ expectedVersion: 2, variants: [{ _id: 'b'.repeat(24), stock: 2,
+    image: 'https://res.cloudinary.com/test/image/upload/0.png', images: ['https://res.cloudinary.com/test/image/upload/1.png'] }] })
+  expect(save).toHaveBeenCalledOnce()
+})
 it("edits shipping metadata, dimensions and tags without resending inventory or import provenance", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   wrap(<ProductForm product={{ ...product, sku: "CASE-NEW", tags: ["Case"], source: "dummyjson" }} save={save} pending={false} />)

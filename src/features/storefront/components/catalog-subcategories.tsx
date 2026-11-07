@@ -1,4 +1,4 @@
-import { CatalogFilterOption, catalogOptionGrid } from './catalog-filter-option';
+import { CatalogFilterOption } from './catalog-filter-option';
 import type { PublicCategory } from '@/features/categories/types/categories';
 
 export function CatalogSubcategories({
@@ -37,7 +37,7 @@ export function CatalogSubcategories({
         <nav
           key={parent._id}
           aria-label={`Danh mục con của ${parent.name}`}
-          className={catalogOptionGrid}
+          className="flex flex-wrap gap-2"
         >
           {categories
             .filter((child) => child.parent === parent._id)
@@ -45,6 +45,7 @@ export function CatalogSubcategories({
               const selected = selectedChildIds.includes(category._id);
               return (
                 <CatalogFilterOption
+                  compact
                   key={category._id}
                   name={category.name}
                   image={category.icon}

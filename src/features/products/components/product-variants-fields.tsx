@@ -1,6 +1,5 @@
 import {
   useFieldArray,
-  useWatch,
   type UseFormReturn,
   type FieldPath,
 } from 'react-hook-form';
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import type { ProductFormValues } from '@/features/products/schemas/product-schema';
-import { ProductImage } from '@/features/products/components/product-image';
+import { ProductUploadField } from './product-upload-field';
 
 export function ProductInputField({
   form,
@@ -71,10 +70,6 @@ function VariantFields({
     control: form.control,
     name: `variants.${index}.images`,
   });
-  const variant = useWatch({
-    control: form.control,
-    name: `variants.${index}`,
-  });
   return (
     <fieldset className="space-y-4 rounded-lg border p-4">
       <legend className="px-2 font-medium">Biến thể {index + 1}</legend>
@@ -119,17 +114,12 @@ function VariantFields({
           numeric
           optional
         />
-        <ProductInputField
+        <ProductUploadField
           form={form}
           name={`variants.${index}.image`}
-          label="Đường dẫn ảnh chính"
+          label="Ảnh chính biến thể"
         />
       </div>
-      <ProductImage
-        src={variant?.image}
-        alt={`Xem trước ảnh chính biến thể ${index + 1}`}
-        className="size-24 border"
-      />
       <div className="space-y-3">
         <h3 className="text-sm font-medium">Tùy chọn</h3>
         {options.fields.map((option, optionIndex) => (
@@ -171,15 +161,10 @@ function VariantFields({
         <h3 className="text-sm font-medium">Hình ảnh</h3>
         {images.fields.map((image, imageIndex) => (
           <div key={image.id} className="flex items-end gap-2">
-            <ProductInputField
+            <ProductUploadField
               form={form}
               name={`variants.${index}.images.${imageIndex}.url`}
-              label={`Đường dẫn ảnh ${imageIndex + 1}`}
-            />
-            <ProductImage
-              src={variant?.images?.[imageIndex]?.url}
-              alt={`Xem trước ảnh ${imageIndex + 1} của biến thể ${index + 1}`}
-              className="size-16 shrink-0 border"
+              label={`Ảnh ${imageIndex + 1}`}
             />
             <Button
               type="button"
@@ -197,7 +182,7 @@ function VariantFields({
           onClick={() => images.append({ url: '' })}
         >
           <Plus />
-          Thêm đường dẫn ảnh
+          Thêm ảnh
         </Button>
       </div>
       <Button type="button" variant="destructive" onClick={onRemove}>

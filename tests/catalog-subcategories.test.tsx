@@ -24,6 +24,18 @@ function mount(search: string) {
   render(<MemoryRouter initialEntries={[`/shop${search}`]}><StorefrontProductsPage /><Location /></MemoryRouter>)
 }
 
+it('shows only parent categories in the dialog and reveals compact children only after applying', async () => {
+  mount('')
+  fireEvent.click(screen.getByRole('button', { name: 'Lọc' }))
+  const dialog = await screen.findByRole('dialog')
+  expect(within(dialog).queryByRole('button', { name: 'Tiểu thuyết' })).toBeNull()
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Books' }))
+  expect(screen.queryByRole('region', { name: 'Chọn danh mục con' })).toBeNull()
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Xem 0 kết quả' }))
+  const children = await screen.findByRole('navigation', { name: 'Danh mục con của Books' })
+  expect(within(children).getByRole('button', { name: 'Tiểu thuyết' })).toBeTruthy()
+})
+
 it("narrows a parent to a child, keeps sibling navigation and preserves other filters", () => {
   mount(`?category=${parent},${other}&brand=${"e".repeat(24)}&minPrice=100&search=book&sort=price-desc&page=4`)
   const row = screen.getByRole("navigation", { name: "Danh mục con của Books" })

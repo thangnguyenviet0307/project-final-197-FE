@@ -1,5 +1,14 @@
 import { Controller, useForm, useWatch, type FieldPath } from 'react-hook-form';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  uploadProductImage,
+  updateProduct,
+} from '@/features/products/services/products.service';
+import {
+  ProductUploadField,
+  ProductUploadsContext,
+} from './product-upload-field';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { LoaderCircle } from 'lucide-react';
@@ -34,7 +43,6 @@ import {
   ProductInputField,
   ProductVariantsFields,
 } from '@/features/products/components/product-variants-fields';
-import { ProductImage } from '@/features/products/components/product-image';
 import { useUnsavedProductChanges } from '@/features/products/hooks/use-unsaved-product-changes';
 import { useProductListLocation } from '@/features/products/hooks/use-product-list-location';
 import {
@@ -49,13 +57,13 @@ import { ContentSkeleton } from '@/components/page-skeleton';
 import { ProductDetailsFields } from '@/features/products/components/product-details-fields';
 
 type ProductFormProps = { pending: boolean } & (
-  | { product?: undefined; save: (input: ProductInput) => Promise<unknown> }
+  | { product?: undefined; save: (input: ProductInput) => Promise<Product> }
   | {
       product: Product;
       save: (
         input: Partial<ProductInput>,
         original: Product
-      ) => Promise<unknown>;
+      ) => Promise<Product>;
     }
 );
 
@@ -64,6 +72,22 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   const categories = useCategories();
   const brands = useBrands();
   const [original] = useState(product);
+  const client = useQueryClient();
+  const files = useRef(
+    new Map<string, { path: FieldPath<ProductFormValues>; file: File }>()
+  );
+  const savedProduct = useRef<Product | undefined>(undefined);
+  const uploadedFields = useRef(new Set<string>());
+  const [hasFiles, setHasFiles] = useState(false);
+  const [finishingImages, setFinishingImages] = useState(false);
+  const selectFile = useCallback(
+    (key: string, path: FieldPath<ProductFormValues>, file: File | null) => {
+      if (file) files.current.set(key, { path, file });
+      else files.current.delete(key);
+      setHasFiles(files.current.size > 0);
+    },
+    []
+  );
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(
       original ? productEditSchema(original) : productSchema
@@ -71,9 +95,10 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
     defaultValues: productDefaults(original),
   });
   const { dirtyFields, isDirty } = form.formState;
-  const { blocker, allowSavedNavigation } = useUnsavedProductChanges(isDirty);
+  const { blocker, allowSavedNavigation } = useUnsavedProductChanges(
+    isDirty || hasFiles || finishingImages
+  );
   const returnTo = useProductListLocation();
-  const thumbnail = useWatch({ control: form.control, name: 'thumbnail' });
   const variants = useWatch({ control: form.control, name: 'variants' });
   const busy = pending || form.formState.isSubmitting;
   const catalogLoading = categories.isPending || brands.isPending;
@@ -143,292 +168,369 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   }
 
   return (
-    <form
-      noValidate
-      className="space-y-6"
-      onSubmit={form.handleSubmit(async (values) => {
-        try {
-          form.clearErrors('root');
-          if (product && original) {
-            const input = productUpdatePayload(values, dirtyFields, original);
-            if (Object.keys(input).length) await save(input, original);
-          } else if (!product) {
-            await save(productPayload(values));
-          }
-          allowSavedNavigation();
-          navigate(product ? `/auth/products/${product._id}` : returnTo, {
-            state: { returnTo },
-          });
-        } catch (error: unknown) {
-          const failure = getApiError(error);
-          form.setError('root', { message: failure.message });
-          failure.errors?.forEach(({ field, message }) => {
-            const path = productErrorPath(field, values);
-            if (path) {
-              form.setError(path as FieldPath<ProductFormValues>, { message });
+    <ProductUploadsContext.Provider value={{ select: selectFile }}>
+      <form
+        noValidate
+        className="space-y-6"
+        onSubmit={(event) => {
+          void form.handleSubmit(async (values) => {
+            try {
+              form.clearErrors('root');
+              if (
+                !savedProduct.current &&
+                files.current.size + (product?.images?.length ?? 0) > 8
+              )
+                throw new Error(
+                  'Thư viện tối đa 8 ảnh. Hãy chọn ít ảnh hơn hoặc xóa ảnh cũ ở trang chi tiết sản phẩm.'
+                );
+              if (!savedProduct.current && product && original) {
+                const input = productUpdatePayload(
+                  values,
+                  dirtyFields,
+                  original
+                );
+                savedProduct.current = Object.keys(input).length
+                  ? await save(input, original)
+                  : product;
+              } else if (!savedProduct.current && !product) {
+                savedProduct.current = await save(productPayload(values));
+              }
+              if (hasFiles || finishingImages) {
+                setFinishingImages(true);
+                for (const [key, { path, file }] of files.current) {
+                  const uploaded = await uploadProductImage({
+                    id: savedProduct.current!._id,
+                    file,
+                  });
+                  savedProduct.current = uploaded;
+                  const image = uploaded.images?.at(-1);
+                  if (!image)
+                    throw new Error('Không nhận được ảnh đã tải lên.');
+                  form.setValue(path, image.secure_url, { shouldDirty: true });
+                  uploadedFields.current.add(path);
+                  files.current.delete(key);
+                }
+                const imagesPayload = productPayload(form.getValues());
+                savedProduct.current = await updateProduct({
+                  id: savedProduct.current!._id,
+                  input: {
+                    ...(uploadedFields.current.has('thumbnail')
+                      ? { thumbnail: imagesPayload.thumbnail }
+                      : {}),
+                    ...([...uploadedFields.current].some((path) =>
+                      path.startsWith('variants.')
+                    )
+                      ? {
+                          variants: savedProduct.current!.variants?.map(
+                            (variant) => {
+                              const index = imagesPayload.variants?.findIndex(
+                                (item) => item.sku === variant.sku
+                              );
+                              const draft =
+                                index === undefined || index < 0
+                                  ? undefined
+                                  : imagesPayload.variants?.[index];
+                              return {
+                                ...variant,
+                                ...(uploadedFields.current.has(
+                                  `variants.${index}.image`
+                                )
+                                  ? { image: draft?.image }
+                                  : {}),
+                                ...([...uploadedFields.current].some((path) =>
+                                  path.startsWith(`variants.${index}.images.`)
+                                )
+                                  ? { images: draft?.images }
+                                  : {}),
+                              };
+                            }
+                          ),
+                          expectedVersion: savedProduct.current!.__v ?? 0,
+                        }
+                      : {}),
+                  },
+                });
+                await client.invalidateQueries({ queryKey: ['products'] });
+              }
+              allowSavedNavigation();
+              navigate(product ? `/auth/products/${product._id}` : returnTo, {
+                state: { returnTo },
+              });
+            } catch (error: unknown) {
+              const failure = getApiError(error);
+              form.setError('root', {
+                message: savedProduct.current
+                  ? `Sản phẩm đã được lưu. ${failure.message} Bấm lưu để thử lại phần ảnh còn lại; sản phẩm sẽ không được tạo lại.`
+                  : failure.message,
+              });
+              failure.errors?.forEach(({ field, message }) => {
+                const path = productErrorPath(field, values);
+                if (path) {
+                  form.setError(path as FieldPath<ProductFormValues>, {
+                    message,
+                  });
+                }
+              });
             }
-          });
-        }
-      })}
-    >
-      {catalogLoading && (
-        <ContentSkeleton
-          label="Đang tải danh mục và thương hiệu…"
-          variant="form"
-        />
-      )}
-      {catalogError && (
-        <div role="alert" className="text-destructive">
-          {getApiError(catalogError).message}{' '}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              void categories.refetch();
-              void brands.refetch();
-            }}
-          >
-            Thử lại
-          </Button>
-        </div>
-      )}
-      {!catalogLoading &&
-        !catalogError &&
-        (!categoryChoices.length || !brandChoices.length) && (
-          <p role="alert">
-            Cần có danh mục và thương hiệu đang hoạt động để tạo sản phẩm.
-          </p>
-        )}
-      <fieldset
-        hidden={catalogLoading}
-        disabled={busy || catalogLoading || !!catalogError}
-        className="space-y-6 disabled:opacity-70"
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ProductInputField
-            form={form}
-            name="product_name"
-            label="Tên sản phẩm"
-          />
-          <ProductInputField
-            form={form}
-            name="model_year"
-            label="Năm sản xuất"
-            numeric
-            optional
-          />
-          {catalogField('category', 'Danh mục', categoryChoices)}
-          {catalogField('brand', 'Thương hiệu', brandChoices)}
-          <ProductInputField
-            form={form}
-            name="price"
-            label="Giá (không bắt buộc; mặc định là giá biến thể thấp nhất)"
-            numeric
-            optional
-          />
-          <ProductInputField
-            form={form}
-            name="discount"
-            label="Giảm giá (%)"
-            numeric
-          />
-          <ProductInputField
-            form={form}
-            name="thumbnail"
-            label="Đường dẫn ảnh đại diện"
-          />
-          <ProductImage
-            src={thumbnail}
-            alt="Xem trước ảnh đại diện"
-            className="size-24 border"
-          />
-          {!product && (
-            <p className="text-muted-foreground text-xs">
-              Lưu sản phẩm trước, sau đó tải ảnh lên từ trang chi tiết sản phẩm.
-            </p>
-          )}
-          {variants.length ? (
-            <Field>
-              <FieldLabel>Tổng tồn kho</FieldLabel>
-              <output className="text-sm">
-                {variants.reduce(
-                  (total, variant) => total + (Number(variant.stock) || 0),
-                  0
-                )}
-              </output>
-              <p className="text-muted-foreground text-xs">
-                Được tính từ tồn kho của các biến thể.
-              </p>
-            </Field>
-          ) : (
-            <ProductInputField
-              form={form}
-              name="stock"
-              label="Tồn kho"
-              numeric
-              optional
-            />
-          )}
-        </div>
-        <Controller
-          control={form.control}
-          name="description"
-          render={({ field, fieldState }) => (
-            <Field>
-              <FieldLabel htmlFor="description">Mô tả</FieldLabel>
-              <ProductDescriptionEditor
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={busy || catalogLoading || !!catalogError}
-                invalid={!!fieldState.error}
-              />
-              <FieldError id="description-error" errors={[fieldState.error]} />
-            </Field>
-          )}
-        />
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register('is_active')} />
-          Sản phẩm đang hoạt động
-        </label>
-        <fieldset className="flex flex-wrap gap-4">
-          <legend>Hiển thị sản phẩm</legend>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" {...form.register('on_sale')} />
-            On sale - Đang bán
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              {...form.register('is_new')}
-              onChange={(event) => {
-                for (const name of [
-                  'is_best_seller',
-                  'is_new',
-                  'is_hot',
-                ] as const)
-                  form.setValue(
-                    name,
-                    name === 'is_new' && event.target.checked,
-                    { shouldDirty: true }
-                  );
-              }}
-            />
-            New - Mới
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              {...form.register('is_hot')}
-              onChange={(event) => {
-                for (const name of [
-                  'is_best_seller',
-                  'is_new',
-                  'is_hot',
-                ] as const)
-                  form.setValue(
-                    name,
-                    name === 'is_hot' && event.target.checked,
-                    { shouldDirty: true }
-                  );
-              }}
-            />
-            Hot - Nổi bật
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" {...form.register('is_home')} />
-            Home - Trang chủ
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              {...form.register('is_best_seller')}
-              onChange={(event) => {
-                for (const name of [
-                  'is_best_seller',
-                  'is_new',
-                  'is_hot',
-                ] as const)
-                  form.setValue(
-                    name,
-                    name === 'is_best_seller' && event.target.checked,
-                    { shouldDirty: true }
-                  );
-              }}
-            />
-            Best Seller - Bán chạy
-          </label>
-        </fieldset>
-        <ProductDetailsFields form={form} />
-        <ProductVariantsFields form={form} />
-      </fieldset>
-      {form.formState.errors.root && (
-        <p role="alert" className="text-destructive">
-          {form.formState.errors.root.message}
-        </p>
-      )}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="submit"
-          disabled={
-            busy ||
-            catalogLoading ||
-            !!catalogError ||
-            (!product && (!categoryChoices.length || !brandChoices.length))
-          }
-        >
-          {busy && <LoaderCircle className="animate-spin" />}
-          {product ? 'Lưu thay đổi' : 'Tạo sản phẩm'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={busy}
-          onClick={() =>
-            navigate(product ? `/auth/products/${product._id}` : returnTo, {
-              state: { returnTo },
-            })
-          }
-        >
-          Hủy
-        </Button>
-      </div>
-      <Dialog
-        open={blocker.state === 'blocked'}
-        onOpenChange={(open) => {
-          if (!open && blocker.state === 'blocked') blocker.reset();
+          })(event);
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Bỏ các thay đổi chưa lưu?</DialogTitle>
-            <DialogDescription>
-              Thay đổi sản phẩm chưa được lưu. Rời trang sẽ làm mất các thay đổi
-              này.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+        {catalogLoading && (
+          <ContentSkeleton
+            label="Đang tải danh mục và thương hiệu…"
+            variant="form"
+          />
+        )}
+        {catalogError && (
+          <div role="alert" className="text-destructive">
+            {getApiError(catalogError).message}{' '}
             <Button
               type="button"
               variant="outline"
               onClick={() => {
-                if (blocker.state === 'blocked') blocker.reset();
+                void categories.refetch();
+                void brands.refetch();
               }}
             >
-              Tiếp tục chỉnh sửa
+              Thử lại
             </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                if (blocker.state === 'blocked') blocker.proceed();
-              }}
-            >
-              Bỏ thay đổi
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </form>
+          </div>
+        )}
+        {!catalogLoading &&
+          !catalogError &&
+          (!categoryChoices.length || !brandChoices.length) && (
+            <p role="alert">
+              Cần có danh mục và thương hiệu đang hoạt động để tạo sản phẩm.
+            </p>
+          )}
+        <fieldset
+          hidden={catalogLoading}
+          disabled={busy || finishingImages || catalogLoading || !!catalogError}
+          className="space-y-6 disabled:opacity-70"
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <ProductInputField
+              form={form}
+              name="product_name"
+              label="Tên sản phẩm"
+            />
+            <ProductInputField
+              form={form}
+              name="model_year"
+              label="Năm sản xuất"
+              numeric
+              optional
+            />
+            {catalogField('category', 'Danh mục', categoryChoices)}
+            {catalogField('brand', 'Thương hiệu', brandChoices)}
+            <ProductInputField
+              form={form}
+              name="price"
+              label="Giá (không bắt buộc; mặc định là giá biến thể thấp nhất)"
+              numeric
+              optional
+            />
+            <ProductInputField
+              form={form}
+              name="discount"
+              label="Giảm giá (%)"
+              numeric
+            />
+            <ProductUploadField
+              form={form}
+              name="thumbnail"
+              label="Ảnh sản phẩm"
+            />
+            {variants.length ? (
+              <Field>
+                <FieldLabel>Tổng tồn kho</FieldLabel>
+                <output className="text-sm">
+                  {variants.reduce(
+                    (total, variant) => total + (Number(variant.stock) || 0),
+                    0
+                  )}
+                </output>
+                <p className="text-muted-foreground text-xs">
+                  Được tính từ tồn kho của các biến thể.
+                </p>
+              </Field>
+            ) : (
+              <ProductInputField
+                form={form}
+                name="stock"
+                label="Tồn kho"
+                numeric
+                optional
+              />
+            )}
+          </div>
+          <Controller
+            control={form.control}
+            name="description"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel htmlFor="description">Mô tả</FieldLabel>
+                <ProductDescriptionEditor
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  disabled={busy || catalogLoading || !!catalogError}
+                  invalid={!!fieldState.error}
+                />
+                <FieldError
+                  id="description-error"
+                  errors={[fieldState.error]}
+                />
+              </Field>
+            )}
+          />
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" {...form.register('is_active')} />
+            Sản phẩm đang hoạt động
+          </label>
+          <fieldset className="flex flex-wrap gap-4">
+            <legend>Hiển thị sản phẩm</legend>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" {...form.register('on_sale')} />
+              On sale - Đang bán
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                {...form.register('is_new')}
+                onChange={(event) => {
+                  for (const name of [
+                    'is_best_seller',
+                    'is_new',
+                    'is_hot',
+                  ] as const)
+                    form.setValue(
+                      name,
+                      name === 'is_new' && event.target.checked,
+                      { shouldDirty: true }
+                    );
+                }}
+              />
+              New - Mới
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                {...form.register('is_hot')}
+                onChange={(event) => {
+                  for (const name of [
+                    'is_best_seller',
+                    'is_new',
+                    'is_hot',
+                  ] as const)
+                    form.setValue(
+                      name,
+                      name === 'is_hot' && event.target.checked,
+                      { shouldDirty: true }
+                    );
+                }}
+              />
+              Hot - Nổi bật
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" {...form.register('is_home')} />
+              Home - Trang chủ
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                {...form.register('is_best_seller')}
+                onChange={(event) => {
+                  for (const name of [
+                    'is_best_seller',
+                    'is_new',
+                    'is_hot',
+                  ] as const)
+                    form.setValue(
+                      name,
+                      name === 'is_best_seller' && event.target.checked,
+                      { shouldDirty: true }
+                    );
+                }}
+              />
+              Best Seller - Bán chạy
+            </label>
+          </fieldset>
+          <ProductDetailsFields form={form} />
+          <ProductVariantsFields form={form} />
+        </fieldset>
+        {form.formState.errors.root && (
+          <p role="alert" className="text-destructive">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="submit"
+            disabled={
+              busy ||
+              catalogLoading ||
+              !!catalogError ||
+              (!product && (!categoryChoices.length || !brandChoices.length))
+            }
+          >
+            {busy && <LoaderCircle className="animate-spin" />}
+            {finishingImages
+              ? 'Hoàn tất tải ảnh'
+              : product
+                ? 'Lưu thay đổi'
+                : 'Tạo sản phẩm'}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() =>
+              navigate(product ? `/auth/products/${product._id}` : returnTo, {
+                state: { returnTo },
+              })
+            }
+          >
+            Hủy
+          </Button>
+        </div>
+        <Dialog
+          open={blocker.state === 'blocked'}
+          onOpenChange={(open) => {
+            if (!open && blocker.state === 'blocked') blocker.reset();
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Bỏ các thay đổi chưa lưu?</DialogTitle>
+              <DialogDescription>
+                Thay đổi sản phẩm chưa được lưu. Rời trang sẽ làm mất các thay
+                đổi này.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (blocker.state === 'blocked') blocker.reset();
+                }}
+              >
+                Tiếp tục chỉnh sửa
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  if (blocker.state === 'blocked') blocker.proceed();
+                }}
+              >
+                Bỏ thay đổi
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </form>
+    </ProductUploadsContext.Provider>
   );
 }

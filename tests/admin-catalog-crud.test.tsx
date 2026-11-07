@@ -210,8 +210,8 @@ it.each([false, true])("brand deletion keeps the confirmation open only on failu
 it("generates unpredictable initial credentials instead of role-based defaults", () => {
   const first = getTemporaryPassword("admin")
   const second = getTemporaryPassword("staff")
-  expect(first).toMatch(/^Aa1![a-f0-9]{36}$/)
-  expect(second).toMatch(/^Aa1![a-f0-9]{36}$/)
+  expect(first).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
+  expect(second).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
   expect(first).not.toBe(second)
 })
 

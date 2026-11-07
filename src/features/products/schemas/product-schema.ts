@@ -64,7 +64,6 @@ export const variantSchema = z.object({
       url: z
         .string()
         .trim()
-        .min(1, 'Vui lòng nhập đường dẫn ảnh.')
         .max(255, 'Đường dẫn ảnh không được vượt quá 255 ký tự.'),
     })
   ),
@@ -314,7 +313,7 @@ export function productPayload(values: ProductFormValues): ProductInput {
       ({ options, images, variant_name, ...variant }) => ({
         ...variant,
         variant_name: variant_name || null,
-        images: images.map(({ url }) => url),
+        images: images.map(({ url }) => url).filter(Boolean),
         attributes: Object.fromEntries(
           options.map(({ name, value }) => [name, value])
         ),

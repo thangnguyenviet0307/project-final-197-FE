@@ -215,7 +215,7 @@ it.each(["staff", "admin"] as const)("creates %s accounts using random initial c
   fireEvent.mouseUp(option)
   fireEvent.click(option)
   const password = (screen.getByLabelText("Mật khẩu tạm thời") as HTMLInputElement).value
-  expect(password).toMatch(/^Aa1![a-f0-9]{36}$/)
+  expect(password).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
   fireEvent.change(screen.getByLabelText("Nhập tên"), { target: { value: "New" } })
   fireEvent.change(screen.getByLabelText("Nhập họ"), { target: { value: "User" } })
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } })

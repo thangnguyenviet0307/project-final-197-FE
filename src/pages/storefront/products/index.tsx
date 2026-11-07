@@ -1,4 +1,7 @@
-import { CatalogFilterOption, catalogOptionGrid } from '@/features/storefront/components/catalog-filter-option';
+import {
+  CatalogFilterOption,
+  catalogOptionGrid,
+} from '@/features/storefront/components/catalog-filter-option';
 import { memo, useState, type SubmitEvent } from 'react';
 import './catalog-filters.css';
 import {
@@ -48,10 +51,7 @@ const CatalogProductGrid = memo(function CatalogProductGrid({
 
 function FilterOptionsLoading({ label }: { label: string }) {
   return (
-    <div
-      role="status"
-      className={catalogOptionGrid}
-    >
+    <div role="status" className={catalogOptionGrid}>
       <span className="sr-only">{label}</span>
       {Array.from({ length: 12 }, (_, index) => (
         <div
@@ -532,7 +532,7 @@ export default function StorefrontProductsPage() {
               <DialogContent
                 overlayClassName="store-filter-overlay"
                 showCloseButton={false}
-                className="store-filter-dialog flex h-[min(760px,90dvh)] max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl"
+                className="store-filter-dialog flex h-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl"
               >
                 <DialogHeader className="relative flex min-h-20 shrink-0 flex-row items-center justify-between border-b border-gray-100 bg-[#f4f5f2] px-5 py-5 sm:px-8">
                   <DialogTitle className="pr-24 text-xl font-bold tracking-tight text-gray-950">
@@ -546,10 +546,7 @@ export default function StorefrontProductsPage() {
                   </DialogClose>
                 </DialogHeader>
 
-                <form
-                  onSubmit={applyFilters}
-                  className="flex min-h-0 flex-1 flex-col"
-                >
+                <form onSubmit={applyFilters} className="flex min-h-0 flex-col">
                   <div className="min-h-0 space-y-6 overflow-y-auto overscroll-contain px-5 py-6 sm:px-8">
                     <SelectedFilters
                       items={draftSelections}
@@ -666,24 +663,26 @@ export default function StorefrontProductsPage() {
                             onClick={() => updateDraft({ category: '' })}
                           />
 
-                          {categories.data?.map((item) => (
-                            <CatalogFilterOption
-                              key={item._id}
-                              name={categoryLabel(item)}
-                              image={item.icon}
-                              selected={selectionIds(draft.category).includes(
-                                item._id
-                              )}
-                              onClick={() =>
-                                updateDraft({
-                                  category: toggleSelection(
-                                    draft.category,
-                                    item._id
-                                  ),
-                                })
-                              }
-                            />
-                          ))}
+                          {categories.data
+                            ?.filter((item) => !item.parent)
+                            .map((item) => (
+                              <CatalogFilterOption
+                                key={item._id}
+                                name={categoryLabel(item)}
+                                image={item.icon}
+                                selected={selectionIds(draft.category).includes(
+                                  item._id
+                                )}
+                                onClick={() =>
+                                  updateDraft({
+                                    category: toggleSelection(
+                                      draft.category,
+                                      item._id
+                                    ),
+                                  })
+                                }
+                              />
+                            ))}
                         </div>
                       )}
                     </section>

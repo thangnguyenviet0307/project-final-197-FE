@@ -149,9 +149,20 @@ export function HomeHeroSlider() {
     return (
       <div
         role="status"
-        className="grid min-h-[420px] place-items-center bg-[#1e271b] text-white sm:min-h-[500px]"
+        aria-label="Đang tải banner"
+        className="relative min-h-[420px] overflow-hidden bg-gray-100 sm:min-h-[500px]"
       >
-        Đang tải banner…
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 animate-pulse motion-reduce:animate-none"
+        >
+          <div className="mx-auto flex h-full max-w-7xl flex-col justify-center gap-5 px-8">
+            <div className="h-4 w-28 rounded bg-gray-200" />
+            <div className="h-10 w-2/3 max-w-lg rounded bg-gray-200" />
+            <div className="h-5 w-1/2 max-w-sm rounded bg-gray-200" />
+            <div className="mt-3 h-11 w-36 rounded-lg bg-gray-200" />
+          </div>
+        </div>
       </div>
     );
   if (query.isError)
