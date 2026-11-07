@@ -79,7 +79,7 @@ it("uses Backend products for the homepage featured section", () => {
 it("keeps catalog search and pagination when returning from a product detail", () => {
   render(<MemoryRouter initialEntries={["/shop?search=Chicken&page=2"]}><Routes><Route path="/shop" element={<StorefrontProductsPage />} /><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
   fireEvent.click(screen.getByRole("link", { name: "Xem Ceramic Chicken" }))
-  expect(screen.getByRole("link", { name: "Quay lại danh sách" }).getAttribute("href")).toBe("/shop?search=Chicken&page=2")
+  expect(screen.getByRole("link", { name: "Quay lại danh sách" }).getAttribute("href")).toBe("/shop?n=2&q=Chicken")
 })
 it("shows real rating/reviews, paginates reviews and links related products", () => {
   render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)

@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateProfile } from '@/features/auth/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
@@ -7,14 +8,15 @@ export function useUpdateProfile(
   options: MutationCallbacks<
     Awaited<ReturnType<typeof updateProfile>>,
     Parameters<typeof updateProfile>[0]
-  > = {}
+  > = {},
+  showSuccess: () => boolean = () => true
 ) {
   const queryClient = useQueryClient();
   return useMutation({
     ...options,
     mutationFn: updateProfile,
-    meta: { successMessage: 'Đã cập nhật hồ sơ.' },
     onSuccess: async (...args) => {
+      if (showSuccess()) toast.success('Đã cập nhật hồ sơ.');
       const version = useAuthStore.getState().sessionVersion;
       queryClient.setQueryData(['auth', 'me', version], args[0]);
       await Promise.all([

@@ -17,7 +17,7 @@ it("renders API title/description/image and generates a category-specific CTA, k
   render(<MemoryRouter><HomeHeroSlider /></MemoryRouter>)
   expect(screen.getByRole("heading", { name: "Tiêu đề riêng" })).toBeTruthy()
   expect(screen.getByText("Mô tả riêng")).toBeTruthy()
-  expect(screen.getByRole("link", { name: "Khám phá Tai nghe" }).getAttribute("href")).toBe(`/shop?category=${"a".repeat(24)}`)
+  expect(screen.getByRole("link", { name: "Khám phá Tai nghe" }).getAttribute("href")).toBe("/shop?category=Tai%20nghe")
   expect(document.querySelector("img")?.getAttribute("src")).toBe("https://images.test/hero.jpg")
   expect(screen.queryByRole("button", { name: "Banner trước" })).toBeNull()
   expect(screen.queryByRole("button", { name: "Banner tiếp theo" })).toBeNull()

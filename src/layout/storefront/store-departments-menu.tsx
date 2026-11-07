@@ -53,7 +53,7 @@ function CategoryBranch({
     >
       <div className="flex items-stretch bg-white text-[#666] hover:bg-gray-50 hover:text-[#55b000]">
         <Link
-          to={`/shop?category=${category._id}`}
+          to={`/shop?category=${encodeURIComponent(category.slug)}`}
           onClick={onNavigate}
           className="focus-visible:outline-inset flex min-h-[52px] min-w-0 flex-1 items-center gap-2.5 px-5 py-3 text-base leading-6 font-normal focus-visible:outline-2 focus-visible:outline-[#55b000]"
         >

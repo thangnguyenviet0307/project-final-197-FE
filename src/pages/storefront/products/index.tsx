@@ -1,8 +1,12 @@
 import {
+  readCatalogUrl,
+  writeCatalogUrl,
+} from '@/features/storefront/utils/catalog-url';
+import {
   CatalogFilterOption,
   catalogOptionGrid,
 } from '@/features/storefront/components/catalog-filter-option';
-import { memo, useState, type SubmitEvent } from 'react';
+import { memo, useEffect, useState, type SubmitEvent } from 'react';
 import './catalog-filters.css';
 import {
   Filter,
@@ -287,7 +291,25 @@ function parsePrice(value: string): number | undefined {
 }
 
 export default function StorefrontProductsPage() {
-  const [params, setParams] = useSearchParams();
+  const [urlParams, setUrlParams] = useSearchParams();
+  const categories = usePublicCategories(true);
+  const brands = usePublicBrands(true);
+  const params = readCatalogUrl(
+    urlParams,
+    categories.data ?? [],
+    brands.data ?? []
+  );
+  function slugParams(value: URLSearchParams) {
+    return writeCatalogUrl(value, categories.data ?? [], brands.data ?? []);
+  }
+  function setParams(update: (previous: URLSearchParams) => URLSearchParams) {
+    setUrlParams(slugParams(update(new URLSearchParams(params))));
+  }
+  const canonical = slugParams(params).toString();
+  useEffect(() => {
+    if (canonical !== urlParams.toString())
+      setUrlParams(canonical, { replace: true });
+  }, [canonical, urlParams, setUrlParams]);
   const requested = Number(params.get('page'));
   const page = Number.isSafeInteger(requested) && requested > 0 ? requested : 1;
   const search = params.get('search') ?? '';
@@ -307,8 +329,6 @@ export default function StorefrontProductsPage() {
     draftState?.key === filterKey
       ? draftState.value
       : filterDraftFromParams(params);
-  const categories = usePublicCategories(true);
-  const brands = usePublicBrands(true);
   const filterBrands = brands.data ?? [];
   const categoryId = resolveCategories(category, categories.data ?? []);
   const subcategory = params.get('subcategory') ?? '';
@@ -356,6 +376,7 @@ export default function StorefrontProductsPage() {
 
   function applyFilters(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!previewReady || !preview.data || preview.data <= 0) return;
     const minPrice = parsePrice(draft.minPrice);
     const maxPrice = parsePrice(draft.maxPrice);
     if (
@@ -721,7 +742,7 @@ export default function StorefrontProductsPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={!previewReady}
+                      disabled={!previewReady || !preview.data || preview.data <= 0}
                       aria-busy={!previewReady && !preview.isError}
                       className="inline-flex min-h-11 min-w-56 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] disabled:cursor-not-allowed disabled:opacity-60"
                     >

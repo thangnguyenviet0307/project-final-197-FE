@@ -68,7 +68,7 @@ function HeroSlides({ slides }: { slides: PublicHeroSlide[] }) {
                     aria-hidden={hidden}
                     tabIndex={hidden ? -1 : undefined}
                     style={{ visibility: hidden ? 'hidden' : 'visible' }}
-                    to={`/shop?category=${encodeURIComponent(item.category._id)}`}
+                    to={`/shop?category=${encodeURIComponent(item.category.name)}`}
                     className="col-start-1 row-start-4 mt-7 inline-flex min-h-12 max-w-full items-center gap-3 justify-self-start rounded-lg bg-[#69ad27] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#57951f]"
                   >
                     Khám phá {item.category.name}

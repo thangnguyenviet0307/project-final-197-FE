@@ -41,9 +41,9 @@ it("navigates from a root category with children and closes the departments pane
   render(<><StoreDepartmentsMenu /><Location /></>)
   fireEvent.click(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }))
   const root = screen.getByRole("link", { name: /Linh kiện/ })
-  expect(root.getAttribute("href")).toBe("/shop?category=1")
+  expect(root.getAttribute("href")).toBe("/shop?category=linh-kien")
   fireEvent.click(root)
-  expect(screen.getByTestId("location").textContent).toBe("?category=1")
+  expect(screen.getByTestId("location").textContent).toBe("?category=linh-kien")
   expect(screen.getByRole("button", { name: "DANH MỤC SẢN PHẨM" }).getAttribute("aria-expanded")).toBe("false")
 })
 
