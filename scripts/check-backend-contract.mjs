@@ -15,16 +15,16 @@ const require = createRequire(import.meta.url)
 const backendRequire = createRequire(path.join(backend, "package.json"))
 const loaded = new Map()
 const allowed = new Set([
-  "validations/common.validation.ts", "validations/customers.validation.ts",
-  "validations/users.validation.ts", "validations/brands.validation.ts",
-  "validations/categories.validation.ts", "validations/checkout.validation.ts", "validations/customer-order-cancel.validation.ts",
-  "validations/products.validation.ts", "validations/hero-slides.validation.ts",
-  "validations/orders.validation.ts", "types/orders.type.ts",
-  "validations/articles.validation.ts", "validations/post-categories.validation.ts",
-  "validations/product-news.validation.ts",
-  "validations/support.validation.ts",
-  "validations/information.validation.ts",
-  "validations/managed-document.validation.ts",
+  "validations/shared/common.validation.ts", "validations/customers/customers.validation.ts",
+  "validations/users/users.validation.ts", "validations/brands/brands.validation.ts",
+  "validations/categories/categories.validation.ts", "validations/orders/checkout.validation.ts", "validations/orders/customer-order-cancel.validation.ts",
+  "validations/products/products.validation.ts", "validations/storefront/hero-slides.validation.ts",
+  "validations/orders/orders.validation.ts", "types/orders/orders.type.ts",
+  "validations/articles/articles.validation.ts", "validations/articles/post-categories.validation.ts",
+  "validations/products/product-news.validation.ts",
+  "validations/support/support.validation.ts",
+  "validations/support/information.validation.ts",
+  "validations/support/managed-document.validation.ts",
 ])
 
 function evaluate(file, resolve) {
@@ -49,10 +49,10 @@ function loadValidation(relative) {
   return loaded.get(relative)
 }
 
-const customers = loadValidation("validations/customers.validation.ts")
-const brands = loadValidation("validations/brands.validation.ts")
-const categories = loadValidation("validations/categories.validation.ts")
-const users = loadValidation("validations/users.validation.ts")
+const customers = loadValidation("validations/customers/customers.validation.ts")
+const brands = loadValidation("validations/brands/brands.validation.ts")
+const categories = loadValidation("validations/categories/categories.validation.ts")
+const users = loadValidation("validations/users/users.validation.ts")
 const id = "a".repeat(24)
 const requests = []
 const customer = { _id: id, firstName: "An", lastName: "Nguyen", email: "an@example.com", phone: "0901234567", address: { street: "One", city: "City", state: "State" }, isActive: true }
@@ -133,8 +133,8 @@ assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "" }).success, 
 assert.equal(brands.updateBrandSchema.safeParse({ logoUrl: "" }).success, true)
 assert.equal(categories.updateCategoriesSchema.safeParse({ icon: "javascript:alert(1)" }).success, false)
 assert.equal(brands.updateBrandSchema.safeParse({ logoUrl: "data:image/svg+xml,test" }).success, false)
-const products = loadValidation("validations/products.validation.ts")
-const common = loadValidation("validations/common.validation.ts")
+const products = loadValidation("validations/products/products.validation.ts")
+const common = loadValidation("validations/shared/common.validation.ts")
 const productForm = evaluate(path.join(root, "src/features/products/schemas/product-schema.ts"), specifier => {
   if (specifier === "zod") return require("zod")
   if (specifier === "@/features/products/types/products") return evaluate(path.join(root, "src/features/products/types/products.ts"), require)
@@ -181,7 +181,7 @@ await reviewService.createProductReview({ id, input: reviewForm.productReviewSch
 assert.deepEqual(await reviewService.getProductMetrics(id), { rating: 0, reviewCount: 0, soldCount: 0 })
 assert.equal((await reviewService.listProductReviews(id, 2)).pagination.page, 2)
 await reviewService.deleteProductReview({ id, reviewId: id })
-const heroValidation = loadValidation("validations/hero-slides.validation.ts")
+const heroValidation = loadValidation("validations/storefront/hero-slides.validation.ts")
 const heroApi = {
   async get(url) { requests.push({ method: "GET", url }); return { data: { data: [] } } },
   async post(url, body) { heroValidation.createHeroSlideSchema.parse(body); requests.push({ method: "POST", url, body }); return { data: { data: { _id: id, ...body } } } },
@@ -202,7 +202,7 @@ await heroService.listPublicHeroSlides()
 await heroService.createHeroSlide(heroInput)
 await heroService.updateHeroSlide({ id, input: { expectedVersion: 0, description: "Updated description", imageUrl: null } })
 await heroService.deleteHeroSlide({ id, expectedVersion: 1 })
-const checkoutValidation = loadValidation("validations/checkout.validation.ts")
+const checkoutValidation = loadValidation("validations/orders/checkout.validation.ts")
 const guestCheckoutApi = {
   async post(url, body, config) {
     assert.equal(url, "/storefront/checkout")
@@ -232,19 +232,19 @@ const adminOrderAddress = evaluate(path.join(root, "src/features/orders/schemas/
   if (specifier === "zod") return require("zod")
   throw new Error(`Unsupported order schema import: ${specifier}`)
 }).adminOrderAddressSchema
-const backendAddress = loadValidation("validations/common.validation.ts").createAddressSchema()
+const backendAddress = loadValidation("validations/shared/common.validation.ts").createAddressSchema()
 for (const [field, limit] of [["street", 255], ["city", 50], ["state", 50]]) {
   for (const length of [0, limit, limit + 1]) {
     const value = { street: "Street", city: "City", state: "State", [field]: "x".repeat(length) }
     assert.equal(adminOrderAddress.safeParse(value).success, backendAddress.safeParse(value).success, `Order address boundary: ${field}/${length}`)
   }
 }
-const noteValidation = loadValidation("validations/orders.validation.ts").updateOrderNoteSchema
+const noteValidation = loadValidation("validations/orders/orders.validation.ts").updateOrderNoteSchema
 noteValidation.parse({ orderNote: "Updated note", expectedOrderNote: "Original note" })
 noteValidation.parse({ orderNote: "First note", expectedOrderNote: "" })
 assert.equal(noteValidation.safeParse({ orderNote: "Unsafe update without baseline" }).success, false)
 await checkoutService.createCheckout(requests.at(-1).body, true)
-const cancelOrderValidation = loadValidation("validations/customer-order-cancel.validation.ts")
+const cancelOrderValidation = loadValidation("validations/orders/customer-order-cancel.validation.ts")
 const customerOrdersService = evaluate(path.join(root, "src/features/orders/services/customer-orders.service.ts"), specifier => {
   if (specifier === "@/services/api") return { api: {
     async patch(url, body) {
@@ -257,8 +257,8 @@ const customerOrdersService = evaluate(path.join(root, "src/features/orders/serv
   throw new Error(`Unsupported customer order service import: ${specifier}`)
 })
 await customerOrdersService.cancelCustomerOrder({ id, cancellationReason: "Không còn nhu cầu" })
-const postValidation = loadValidation("validations/articles.validation.ts")
-const categoryValidation = loadValidation("validations/post-categories.validation.ts")
+const postValidation = loadValidation("validations/articles/articles.validation.ts")
+const categoryValidation = loadValidation("validations/articles/post-categories.validation.ts")
 const editorialService = evaluate(path.join(root, "src/features/articles/services/articles.service.ts"), specifier => {
   if (specifier === "@/services/api") return { api: {
     async post(url, body) {
@@ -285,7 +285,7 @@ await editorialService.updatePostCategory({ id, input: { expectedVersion: 0, isA
 await editorialService.deleteArticle({ id, expectedVersion: 1 })
 await editorialService.deletePostCategory({ id, expectedVersion: 1 })
 postValidation.publicArticleQuerySchema.parse({ type: "news", isFeatured: "true", sort: "display", page: "1", limit: "3" })
-const newsValidation = loadValidation("validations/product-news.validation.ts")
+const newsValidation = loadValidation("validations/products/product-news.validation.ts")
 const productNewsService = evaluate(path.join(root, "src/features/products/services/product-news.service.ts"), specifier => {
   if (specifier === "@/services/api") return { authApi: {}, api: { async patch(url, body) {
     assert.equal(url, `/products/${id}/news`)
@@ -297,7 +297,7 @@ const productNewsService = evaluate(path.join(root, "src/features/products/servi
 })
 await productNewsService.updateProductNews({ id, input: { articleIds: [id], expectedVersion: 2 } })
 await productNewsService.updateProductNews({ id, input: { articleIds: [], expectedVersion: 3 } })
-const supportValidation = loadValidation("validations/support.validation.ts")
+const supportValidation = loadValidation("validations/support/support.validation.ts")
 const supportService = evaluate(path.join(root, "src/features/support/services/support.service.ts"), specifier => {
   if (specifier === "@/services/api") return { api: {
     async put(url, body) {
@@ -332,7 +332,7 @@ await supportService.eligibleOrders(1)
 await supportService.eligibleOrders(1, undefined, id)
 await supportService.listWarranties(false, 1, "")
 await supportService.listWarranties(true, 2, "reviewing")
-const informationValidation = loadValidation("validations/information.validation.ts")
+const informationValidation = loadValidation("validations/support/information.validation.ts")
 const informationService = evaluate(path.join(root, "src/features/support/services/information.service.ts"), specifier => {
   if (specifier === "@/services/api") return { api: {
     async put(url, body) {
@@ -354,7 +354,7 @@ for (const slug of ["gioi-thieu", "dieu-khoan-su-dung", "cau-hoi-thuong-gap"]) {
   await informationService.getAdminInformation(slug)
   await informationService.saveInformation({ slug, content: "<h2>Title</h2><p>Content</p>", expectedVersion: 2, publish: true })
 }
-const managedValidation = loadValidation("validations/managed-document.validation.ts")
+const managedValidation = loadValidation("validations/support/managed-document.validation.ts")
 const managedService = evaluate(path.join(root, "src/features/support/services/managed-document.service.ts"), specifier => {
   if (specifier === "@/services/api") {
     const check = (url, method, body) => {
@@ -381,7 +381,7 @@ for (const key of managedValidation.documentKeys) {
 const assigneesService = evaluate(path.join(root, "src/features/orders/services/order-assignees.service.ts"), specifier => {
   if (specifier === "@/services/api") return { api: { async get(url, config) {
     assert.equal(url, "/orders/assignees")
-    loadValidation("validations/orders.validation.ts").orderAssigneesQuerySchema.parse(config.params)
+    loadValidation("validations/orders/orders.validation.ts").orderAssigneesQuerySchema.parse(config.params)
     requests.push({ method: "GET", url, query: config.params })
     return { data: { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } } }
   } } }

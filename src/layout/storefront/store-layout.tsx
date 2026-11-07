@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { ChatWidget } from '@/features/ai/components/chat-widget';
 
 import { StoreHeader } from './store-header';
 import { StoreNavbar } from './store-navbar';
@@ -23,6 +24,7 @@ export function StoreLayout() {
 
         {/* Footer */}
         <StoreFooter />
+        <ChatWidget />
       </div>
     </StorefrontUiContext.Provider>
   );

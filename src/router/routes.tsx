@@ -248,6 +248,10 @@ export const routes: RouteObject[] = [
             lazy: page(() => import('@/pages/admin/post-categories')),
           },
           {
+            path: '/auth/ai',
+            lazy: page(() => import('@/pages/admin/ai')),
+          },
+          {
             path: '/auth/hero-slides',
             lazy: page(() => import('@/pages/admin/hero-slides')),
           },

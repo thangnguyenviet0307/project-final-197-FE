@@ -96,3 +96,4 @@ it("uses actual parent IDs to distinguish Books with Toys from the childless Boo
   expect(screen.getByRole("button", { name: "Toys" })).toBeTruthy()
   expect(screen.queryByRole("button", { name: "Books" })).toBeNull()
 })
+vi.mock('@/features/ai/components/smart-search', () => ({ SmartSearch: () => null }));

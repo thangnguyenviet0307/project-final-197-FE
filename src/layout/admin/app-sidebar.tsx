@@ -67,6 +67,7 @@ const data = {
         },
 
         { title: 'Sản phẩm', url: '/auth/products', icon: Package },
+        { title: 'Quản trị AI', url: '/auth/ai', icon: Shield },
         {
           title: 'Người dùng',
           url: '/auth/users',
@@ -145,6 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             '/auth/articles',
             '/auth/post-categories',
             '/auth/policies',
+            '/auth/ai',
           ].includes(item.url) || isAdministrator(user?.role)
       )
       .map((item) =>

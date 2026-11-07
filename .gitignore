@@ -43,4 +43,5 @@ reports
 # Isolated local browser profile, screenshots and UI audit fixtures.
 .local-backups/ui-audit/
 
-docs
+/docs/*
+!/docs/AI_MODULE.md

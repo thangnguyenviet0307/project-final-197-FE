@@ -328,3 +328,5 @@ it("keeps an existing selection after refetch and uses the base product only whe
     expect(useCartStore.getState().items[0].unitPrice).toBe(90000)
   } finally { state.product = original }
 })
+vi.mock('@/features/ai/components/smart-search', () => ({ SmartSearch: () => null }));
+vi.mock('@/features/ai/components/ai-recommendations', () => ({ AiRecommendations: () => null }));

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AiRecommendations } from '@/features/ai/components/ai-recommendations';
 import { toast } from 'sonner';
 import { useCartStore } from '@/stores/cart.store';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -440,6 +441,7 @@ function ProductDetails({ product }: { product: Product }) {
         <ProductNewsSidebar slug={product.slug ?? ''} />
       </div>
       <RelatedProducts slug={product.slug ?? ''} />
+      <AiRecommendations slug={product.slug ?? ''} />
     </div>
   );
 }
