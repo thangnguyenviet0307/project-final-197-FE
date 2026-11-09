@@ -110,7 +110,7 @@ function VariantFields({
         <ProductInputField
           form={form}
           name={`variants.${index}.compare_at_price`}
-          label="Giá so sánh"
+          label="Giá niêm yết (trước giảm)"
           numeric
           optional
         />

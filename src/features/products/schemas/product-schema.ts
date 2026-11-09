@@ -53,8 +53,8 @@ export const variantSchema = z.object({
   color: optionalText('Màu sắc', 50),
   size: optionalText('Kích thước', 50),
   price: numeric('Giá biến thể').nonnegative('Giá biến thể không được âm.'),
-  compare_at_price: numeric('Giá so sánh')
-    .nonnegative('Giá so sánh không được âm.')
+  compare_at_price: numeric('Giá niêm yết (trước giảm)')
+    .nonnegative('Giá niêm yết (trước giảm) không được âm.')
     .nullable()
     .optional(),
   stock: stock('Tồn kho biến thể').optional(),

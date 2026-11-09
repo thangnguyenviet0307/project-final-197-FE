@@ -210,7 +210,7 @@ export default function ProductDetailPage() {
                       ['Màu sắc', variant.color],
                       ['Kích thước', variant.size],
                       [
-                        'Giá so sánh',
+                        'Giá niêm yết (trước giảm)',
                         variant.compare_at_price == null
                           ? null
                           : formatPrice(variant.compare_at_price),

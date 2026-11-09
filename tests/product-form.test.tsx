@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
@@ -110,7 +110,7 @@ it.each([
   ["Tồn kho biến thể", "-5", "Tồn kho biến thể không được âm."],
   ["Tồn kho biến thể", "1.5", "Tồn kho biến thể phải là số nguyên."],
   ["Giá biến thể", "-1", "Giá biến thể không được âm."],
-  ["Giá so sánh", "-1", "Giá so sánh không được âm."],
+  ["Giá niêm yết (trước giảm)", "-1", "Giá niêm yết (trước giảm) không được âm."],
   ["Giảm giá (%)", "71", "Mức giảm giá không được vượt quá 70%."],
   ["Năm sản xuất", "1899", "Năm sản xuất phải từ 1900 trở đi."],
 ])("shows a useful error next to %s when its value is %s", async (label, value, message) => {
@@ -198,10 +198,63 @@ it("sends null when an existing compare-at price is cleared", async () => {
   const save = vi.fn().mockResolvedValue(undefined)
   wrap(<ProductForm product={{ ...product, variants: [{ ...product.variants![0], compare_at_price: 150 }] }} save={save} pending={false} />)
   await waitFor(() => expect(screen.queryByText("Đang tải danh mục và thương hiệu…")).toBeNull())
-  fireEvent.change(screen.getByLabelText("Giá so sánh"), { target: { value: "" } })
+  fireEvent.change(screen.getByLabelText("Giá niêm yết (trước giảm)"), { target: { value: "" } })
   fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
   await waitFor(() => expect(save).toHaveBeenCalledOnce())
   const payload = JSON.parse(JSON.stringify(save.mock.calls[0][0]))
   expect(payload.variants[0].compare_at_price).toBeNull()
 })
 
+
+it.each(['Ảnh sản phẩm', 'Ảnh chính biến thể'])('uploads five files selected together in %s and resumes after partial failure', async (label) => {
+  vi.stubGlobal('URL', class extends URL {
+    static createObjectURL = vi.fn(() => 'blob:preview')
+    static revokeObjectURL = vi.fn()
+  })
+  const save = vi.fn().mockResolvedValue({ ...product, __v: 0 })
+  const gallery: NonNullable<Product['images']> = []
+  const patches: Record<string, unknown>[] = []
+  const sent: string[] = []
+  let fail = true
+  const catalog = api.defaults.adapter as (config: never) => Promise<unknown>
+  api.defaults.adapter = async config => {
+    if (config.method === 'get') return catalog(config as never) as never
+    if (config.url?.endsWith('/images')) {
+      const file = (config.data as FormData).get('image') as File
+      sent.push(file.name)
+      if (gallery.length === 1 && fail) { fail = false; throw new Error('Temporary upload failure') }
+      gallery.push({ public_id: `products/${gallery.length}`, secure_url: `https://res.cloudinary.com/test/image/upload/${gallery.length}.png` })
+    } else patches.push(JSON.parse(config.data))
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data: { ...product, __v: gallery.length, images: [...gallery] } } }
+  }
+  wrap(<ProductForm product={product} save={save} pending={false} />)
+  await waitFor(() => expect(screen.queryByText('Đang tải danh mục và thương hiệu…')).toBeNull())
+  fireEvent.change(screen.getByLabelText('Tên sản phẩm'), { target: { value: 'Batch images' } })
+  const files = Array.from({ length: 5 }, (_, i) => new File(['image'], `${i}.png`, { type: 'image/png' }))
+  const input = screen.getByLabelText(label) as HTMLInputElement
+  expect(input.multiple).toBe(true)
+  fireEvent.change(input, { target: { files } })
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await screen.findByText(/Sản phẩm đã được lưu/)
+  fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất tải ảnh' }))
+  await waitFor(() => expect(patches).toHaveLength(1))
+  expect(gallery).toHaveLength(5)
+  expect(sent).toEqual(['0.png', '1.png', '1.png', '2.png', '3.png', '4.png'])
+  expect(save).toHaveBeenCalledOnce()
+  if (label === 'Ảnh sản phẩm') expect(patches[0]).toEqual({ thumbnail: gallery[0].secure_url })
+  else expect(patches[0]).toMatchObject({ expectedVersion: 5, variants: [{ _id: 'b'.repeat(24), stock: 2, image: gallery[0].secure_url, images: gallery.slice(1).map(image => image.secure_url) }] })
+})
+
+it('rejects more than five files and preserves the previously selected files', async () => {
+  vi.stubGlobal('URL', class extends URL {
+    static createObjectURL = vi.fn(() => 'blob:preview')
+    static revokeObjectURL = vi.fn()
+  })
+  wrap(<ProductForm product={product} save={vi.fn()} pending={false} />)
+  await waitFor(() => expect(screen.queryByText('Đang tải danh mục và thương hiệu…')).toBeNull())
+  const input = screen.getByLabelText('Ảnh sản phẩm')
+  fireEvent.change(input, { target: { files: [new File(['image'], 'keep.png', { type: 'image/png' })] } })
+  fireEvent.change(input, { target: { files: Array.from({ length: 6 }, (_, i) => new File(['image'], `${i}.png`, { type: 'image/png' })) } })
+  expect(screen.getByText('Chọn tối đa 5 ảnh mỗi lần.')).toBeTruthy()
+  expect(screen.getByText('keep.png')).toBeTruthy()
+})

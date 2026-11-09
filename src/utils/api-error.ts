@@ -186,7 +186,7 @@ function validationLabel(field: string, url = ''): string {
     variant_name: 'Tên biến thể',
     stock: 'Tồn kho',
     price: 'Giá',
-    compare_at_price: 'Giá so sánh',
+    compare_at_price: 'Giá niêm yết (trước giảm)',
     discount: 'Giảm giá',
     category: 'Danh mục',
     brand: 'Thương hiệu',

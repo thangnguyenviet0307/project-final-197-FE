@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { ProductImage } from '@/features/products/components/product-image';
 import type { Product } from '@/features/products/types/products';
@@ -27,6 +28,16 @@ export function ProductDetailGallery({ product }: { product: Product }) {
           alt={product.product_name}
           className="absolute inset-0 size-full object-contain object-center p-4"
         />
+        {images.length > 1 && (
+          <>
+            <button type="button" aria-label="Ảnh trước" onClick={() => setSelected(images[(images.indexOf(active!) - 1 + images.length) % images.length])} className="absolute top-1/2 left-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border bg-background/90 text-foreground shadow hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
+              <ChevronLeft aria-hidden="true" />
+            </button>
+            <button type="button" aria-label="Ảnh tiếp theo" onClick={() => setSelected(images[(images.indexOf(active!) + 1) % images.length])} className="absolute top-1/2 right-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border bg-background/90 text-foreground shadow hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
+              <ChevronRight aria-hidden="true" />
+            </button>
+          </>
+        )}
       </div>
       {images.length > 0 ? (
         <>

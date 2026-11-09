@@ -17,7 +17,7 @@ import { ProductImage } from './product-image';
 export const ProductUploadsContext = createContext<{
   select: (
     key: string,
-    path: FieldPath<ProductFormValues>,
+    path: FieldPath<ProductFormValues> | null,
     file: File | null
   ) => void;
 } | null>(null);
@@ -34,21 +34,27 @@ export function ProductUploadField({
   const uploads = useContext(ProductUploadsContext);
   const key = useId();
   const input = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState('');
   useEffect(
     () => () => {
-      if (preview) URL.revokeObjectURL(preview);
+      previews.forEach((preview) => URL.revokeObjectURL(preview));
     },
-    [preview]
+    [previews]
   );
   const select = uploads?.select;
   useEffect(() => {
-    if (!file || !select) return;
-    select(key, name, file);
-    return () => select(key, name, null);
-  }, [file, key, name, select]);
+    if (!files.length || !select) return;
+    const variant = /^variants\.(\d+)\./.exec(name);
+    files.forEach((file, index) => {
+      const path = index === 0 ? name : variant
+        ? `variants.${variant[1]}.images` as FieldPath<ProductFormValues>
+        : null;
+      select(`${key}-${index}`, path, file);
+    });
+    return () => files.forEach((_, index) => select(`${key}-${index}`, null, null));
+  }, [files, key, name, select]);
   const stored = form.watch(name);
   return (
     <Field>
@@ -57,24 +63,28 @@ export function ProductUploadField({
         ref={input}
         id={name}
         type="file"
+        multiple
         hidden
         aria-describedby={`${key}-selection`}
         accept="image/jpeg,image/png,image/webp"
         onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (!file) return;
-          if (
+          const selected = Array.from(event.target.files ?? []);
+          event.target.value = '';
+          if (!selected.length) return;
+          if (selected.length > 5) {
+            setError('Chọn tối đa 5 ảnh mỗi lần.');
+            return;
+          }
+          if (selected.some((file) =>
             !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
-            !file.size ||
-            file.size > 5 * 1024 * 1024
-          ) {
-            setError('Chọn ảnh JPG, PNG hoặc WebP, tối đa 5 MB.');
-            event.target.value = '';
+            !file.size || file.size > 5 * 1024 * 1024
+          )) {
+            setError('Chọn ảnh JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh.');
             return;
           }
           setError('');
-          setPreview(URL.createObjectURL(file));
-          setFile(file);
+          setPreviews(selected.map((file) => URL.createObjectURL(file)));
+          setFiles(selected);
         }}
       />
       <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border p-2">
@@ -93,19 +103,17 @@ export function ProductUploadField({
           className="text-muted-foreground min-w-0 flex-1 text-sm break-all"
           aria-live="polite"
         >
-          {file?.name ?? 'Chưa chọn ảnh'}
+          {files.length ? files.map((file) => file.name).join(', ') : 'Chưa chọn ảnh'}
         </span>
       </div>
       <p className="text-muted-foreground text-xs">
-        JPG, PNG hoặc WebP, tối đa 5 MB. Ảnh được tải lên khi lưu sản phẩm.
+        Chọn tối đa 5 ảnh mỗi lần, JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh. Ảnh đầu tiên làm ảnh chính; các ảnh còn lại vào thư viện. Ảnh được tải lên khi lưu sản phẩm.
       </p>
-      {(preview || (typeof stored === 'string' && stored)) && (
-        <ProductImage
-          src={preview || String(stored)}
-          alt={label}
-          className="size-20 border"
-        />
-      )}
+      <div className="flex flex-wrap gap-2">
+        {(previews.length ? previews : typeof stored === 'string' && stored ? [stored] : []).map((src, index) => (
+          <ProductImage key={`${src}-${index}`} src={src} alt={`${label} ${index + 1}`} className="size-20 border" />
+        ))}
+      </div>
       {error && (
         <p role="alert" className="text-destructive text-sm">
           {error}

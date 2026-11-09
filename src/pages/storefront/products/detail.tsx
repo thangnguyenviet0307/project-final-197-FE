@@ -160,11 +160,9 @@ function ProductDetails({ product }: { product: Product }) {
                 </div>
                 {!!product.variants?.length && (
                   <fieldset>
-                    <legend className="mb-3 font-semibold">
-                      Chọn biến thể
-                    </legend>
+                    <legend className="sr-only">Tùy chọn sản phẩm</legend>
                     <div className="flex flex-wrap gap-2">
-                      {product.variants.map((item) => (
+                      {product.variants.map((item, index) => (
                         <button
                           key={item._id ?? item.sku}
                           type="button"
@@ -172,12 +170,7 @@ function ProductDetails({ product }: { product: Product }) {
                           onClick={() => setSelected(item._id ?? item.sku)}
                           className={`rounded-lg border px-4 py-2 ${selected === (item._id ?? item.sku) ? 'border-green-700 bg-green-50' : 'border-gray-200'}`}
                         >
-                          {item.variant_name || item.sku}
-                          {[item.color, item.size].filter(Boolean).length > 0 &&
-                            ' · ' +
-                              [item.color, item.size]
-                                .filter(Boolean)
-                                .join(' / ')}
+                          {[item.variant_name, [item.color, item.size].filter(Boolean).join(' / ')].filter(Boolean).join(' · ') || `Lựa chọn ${index + 1}`}
                         </button>
                       ))}
                     </div>
@@ -396,7 +389,6 @@ function ProductDetails({ product }: { product: Product }) {
                   {[
                     ['Danh mục', productCategoryNames(product)],
                     ['Thương hiệu', catalogName(product.brand)],
-                    ['SKU', variant?.sku ?? product.sku],
                     ['Năm sản xuất', product.model_year],
                     ['Mã vạch', product.barcode],
                     ['Số lượng đặt tối thiểu', minimum],

@@ -74,14 +74,14 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   const [original] = useState(product);
   const client = useQueryClient();
   const files = useRef(
-    new Map<string, { path: FieldPath<ProductFormValues>; file: File }>()
+    new Map<string, { path: FieldPath<ProductFormValues> | null; file: File }>()
   );
   const savedProduct = useRef<Product | undefined>(undefined);
   const uploadedFields = useRef(new Set<string>());
   const [hasFiles, setHasFiles] = useState(false);
   const [finishingImages, setFinishingImages] = useState(false);
   const selectFile = useCallback(
-    (key: string, path: FieldPath<ProductFormValues>, file: File | null) => {
+    (key: string, path: FieldPath<ProductFormValues> | null, file: File | null) => {
       if (file) files.current.set(key, { path, file });
       else files.current.delete(key);
       setHasFiles(files.current.size > 0);
@@ -206,8 +206,15 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                   const image = uploaded.images?.at(-1);
                   if (!image)
                     throw new Error('Không nhận được ảnh đã tải lên.');
-                  form.setValue(path, image.secure_url, { shouldDirty: true });
-                  uploadedFields.current.add(path);
+                  if (path?.endsWith('.images')) {
+                    const arrayPath = path as `variants.${number}.images`;
+                    const existing = form.getValues(arrayPath) ?? [];
+                    form.setValue(arrayPath, [...existing, { url: image.secure_url }], { shouldDirty: true });
+                    uploadedFields.current.add(`${arrayPath}.${existing.length}.url`);
+                  } else if (path) {
+                    form.setValue(path, image.secure_url, { shouldDirty: true });
+                    uploadedFields.current.add(path);
+                  }
                   files.current.delete(key);
                 }
                 const imagesPayload = productPayload(form.getValues());
