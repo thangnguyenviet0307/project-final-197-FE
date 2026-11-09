@@ -25,8 +25,18 @@ function displayDate(value?: string) {
     : date.toLocaleString('vi-VN');
 }
 
-export function CustomerProfileDialog({ customer }: { customer: ICustomer }) {
-  const [open, setOpen] = useState(false);
+export function CustomerProfileDialog({
+  customer,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  customer: ICustomer;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
+  const setOpen = onOpenChange ?? setLocalOpen;
   const name =
     customer.displayName ||
     `${customer.last_name} ${customer.first_name}`.trim();
