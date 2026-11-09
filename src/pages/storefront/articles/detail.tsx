@@ -129,9 +129,9 @@ export default function StorefrontArticleDetailPage() {
         </div>
         {post.tags.length > 0 && (
           <ul aria-label="Thẻ bài viết" className="mt-8 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
+            {post.tags.map((tag, index) => (
               <li
-                key={tag}
+                key={`${tag}-${index}`}
                 className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600"
               >
                 {tag}

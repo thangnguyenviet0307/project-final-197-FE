@@ -171,11 +171,11 @@ export default function ProductDetailPage() {
                 </dl>
               </div>
             </div>
-            <InventoryEditor key={product._id} product={product} />
+            <InventoryEditor key={`inventory-${product._id}`} product={product} />
             <ProductDetailsInfo product={product} />
             <ProductReviews key={`reviews-${product._id}`} id={product._id} />
             {admin && <ProductGallery product={product} />}
-            {admin && <ProductNewsEditor key={product._id} id={product._id} />}
+            {admin && <ProductNewsEditor key={`news-${product._id}`} id={product._id} />}
             {product.description && (
               <section>
                 <h2 className="mb-2 text-lg font-semibold">Mô tả</h2>
