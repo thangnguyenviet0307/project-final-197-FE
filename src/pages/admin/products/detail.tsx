@@ -1,3 +1,4 @@
+import { productCategoryNames } from '@/features/products/types/products';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { ProductDetailGallery } from '@/features/products/components/product-detail-gallery';
 import { AdminStoreProductLink } from '@/features/storefront/components/admin-store-product-link';
@@ -82,7 +83,7 @@ export default function ProductDetailPage() {
                 <div className="space-y-3">
                   <p className="text-muted-foreground text-sm">
                     {catalogName(product.brand)} ·{' '}
-                    {catalogName(product.category)}
+                    {productCategoryNames(product)}
                   </p>
                   <h1 className="text-2xl font-semibold tracking-tight break-words lg:text-3xl">
                     {product.product_name}
@@ -130,7 +131,7 @@ export default function ProductDetailPage() {
                 </div>
                 <dl className="grid grid-cols-2 content-start gap-3 text-sm">
                   {[
-                    ['Danh mục', catalogName(product.category)],
+                    ['Danh mục', productCategoryNames(product)],
                     ['Thương hiệu', catalogName(product.brand)],
                     [
                       'Giá',

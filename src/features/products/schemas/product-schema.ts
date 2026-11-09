@@ -156,6 +156,10 @@ export const productSchema = z
       .trim()
       .min(3, 'Tên sản phẩm phải có ít nhất 3 ký tự.')
       .max(255, 'Tên sản phẩm không được vượt quá 255 ký tự.'),
+    categories: z
+      .array(objectId)
+      .max(50, 'Chọn tối đa 50 danh mục bổ sung.')
+      .optional(),
     category: z
       .string()
       .regex(/^[a-f\d]{24}$/i, 'Vui lòng chọn danh mục hợp lệ.'),
@@ -260,6 +264,7 @@ export function productDefaults(product?: Product): ProductFormValues {
     minimumOrderQuantity: product?.minimumOrderQuantity ?? 1,
     product_name: product?.product_name ?? '',
     category: product ? catalogId(product.category) : '',
+    categories: product?.categories?.map(catalogId) ?? [],
     brand: product ? catalogId(product.brand) : '',
     model_year: product
       ? (product.model_year ?? undefined)

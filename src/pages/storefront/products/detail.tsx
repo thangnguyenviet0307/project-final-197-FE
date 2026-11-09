@@ -1,3 +1,7 @@
+import {
+  productCategoryNames,
+  productCategories,
+} from '@/features/products/types/products';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useCartStore } from '@/stores/cart.store';
@@ -108,12 +112,15 @@ function ProductDetails({ product }: { product: Product }) {
                     <span className="mr-1 text-sm font-medium text-gray-500">
                       Danh mục:
                     </span>
-                    <Link
-                      to={`/shop?category=${catalogId(product.category)}`}
-                      className="rounded-full bg-[#4d9210] px-4 py-2 text-xs font-semibold text-white"
-                    >
-                      {catalogName(product.category)}
-                    </Link>
+                    {productCategories(product).map((category) => (
+                      <Link
+                        key={catalogId(category)}
+                        to={`/shop?category=${catalogId(category)}`}
+                        className="rounded-full bg-[#4d9210] px-4 py-2 text-xs font-semibold text-white"
+                      >
+                        {catalogName(category)}
+                      </Link>
+                    ))}
                   </nav>
                   <p className="text-sm text-gray-500">
                     Thương hiệu:{' '}
@@ -387,7 +394,7 @@ function ProductDetails({ product }: { product: Product }) {
                 </caption>
                 <tbody>
                   {[
-                    ['Danh mục', catalogName(product.category)],
+                    ['Danh mục', productCategoryNames(product)],
                     ['Thương hiệu', catalogName(product.brand)],
                     ['SKU', variant?.sku ?? product.sku],
                     ['Năm sản xuất', product.model_year],

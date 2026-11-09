@@ -1,3 +1,4 @@
+import { productCategoryNames } from '@/features/products/types/products';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,7 +43,7 @@ function ProductPreview({ id }: { id: string }) {
         {[
           ['SKU sản phẩm', product.sku || 'Chưa có thông tin'],
           ['Mã vạch', product.barcode || 'Chưa có thông tin'],
-          ['Danh mục', catalogName(product.category)],
+          ['Danh mục', productCategoryNames(product)],
           ['Thương hiệu', catalogName(product.brand)],
           [
             'Giá',

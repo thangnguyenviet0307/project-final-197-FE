@@ -323,6 +323,60 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
             />
             {catalogField('category', 'Danh mục', categoryChoices)}
             {catalogField('brand', 'Thương hiệu', brandChoices)}
+            <Controller
+              control={form.control}
+              name="categories"
+              render={({ field, fieldState }) => (
+                <Field className="sm:col-span-2">
+                  <FieldLabel>Danh mục bổ sung</FieldLabel>
+                  <p className="text-muted-foreground text-xs">
+                    Có thể chọn nhiều danh mục. Ô Danh mục phía trên là danh mục
+                    chính.
+                  </p>
+                  <div
+                    role="group"
+                    aria-label="Danh mục bổ sung"
+                    className="grid max-h-56 gap-2 overflow-y-auto rounded-md border p-3 sm:grid-cols-2"
+                  >
+                    {(categories.data ?? [])
+                      .filter(
+                        (item) =>
+                          item._id !== form.watch('category') &&
+                          (categoryChoices.some(
+                            (choice) => choice._id === item._id
+                          ) ||
+                            field.value?.includes(item._id))
+                      )
+                      .map((item) => (
+                        <label
+                          key={item._id}
+                          className="flex items-start gap-2 text-sm"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={field.value?.includes(item._id) ?? false}
+                            onBlur={field.onBlur}
+                            onChange={(event) =>
+                              field.onChange(
+                                event.target.checked
+                                  ? [...(field.value ?? []), item._id]
+                                  : field.value?.filter((id) => id !== item._id)
+                              )
+                            }
+                          />
+                          <span>
+                            {item.name}
+                            {!item.isActive || item.isDeleted
+                              ? ' (không hoạt động)'
+                              : ''}
+                          </span>
+                        </label>
+                      ))}
+                  </div>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
             <ProductInputField
               form={form}
               name="price"

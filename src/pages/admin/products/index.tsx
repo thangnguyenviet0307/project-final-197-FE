@@ -1,3 +1,4 @@
+import { productCategoryNames } from '@/features/products/types/products';
 import { useValidListPage } from '@/hooks/use-valid-list-page';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { useCallback, useState, type ReactElement } from 'react';
@@ -379,7 +380,7 @@ export default function AdminProductsPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {catalogName(product.category)}
+                              {productCategoryNames(product)}
                             </TableCell>
                             <TableCell>{catalogName(product.brand)}</TableCell>
                             <TableCell className="whitespace-nowrap">

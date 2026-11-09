@@ -39,6 +39,7 @@ export interface ProductInput {
   minimumOrderQuantity?: number;
   product_name: string;
   category: string;
+  categories?: string[];
   brand: string;
   model_year?: number | null;
   price?: number;
@@ -50,7 +51,10 @@ export interface ProductInput {
   is_active?: boolean;
   variants?: ProductVariant[];
 }
-export interface Product extends Omit<ProductInput, 'category' | 'brand'> {
+export interface Product extends Omit<
+  ProductInput,
+  'category' | 'categories' | 'brand'
+> {
   count_view?: number;
   source?: 'dummyjson';
   external_id?: string;
@@ -62,6 +66,7 @@ export interface Product extends Omit<ProductInput, 'category' | 'brand'> {
   _id: string;
   __v?: number;
   category: CatalogReference | string | null;
+  categories?: (CatalogReference | string)[];
   brand: CatalogReference | string | null;
   images?: {
     public_id: string;
@@ -148,6 +153,24 @@ export function catalogName(value: Product['category']): string {
   return typeof value === 'string'
     ? value
     : (value?.name ?? 'Không có thông tin');
+}
+export function productCategories(
+  product: Pick<Product, 'category' | 'categories'>
+): (CatalogReference | string)[] {
+  const values = [product.category, ...(product.categories ?? [])].filter(
+    (value): value is CatalogReference | string => !!value
+  );
+  return values.filter(
+    (value, index) =>
+      values.findIndex((item) => catalogId(item) === catalogId(value)) === index
+  );
+}
+export function productCategoryNames(
+  product: Pick<Product, 'category' | 'categories'>
+): string {
+  return (
+    productCategories(product).map(catalogName).join(', ') || catalogName(null)
+  );
 }
 export const formatPrice = (value: number) =>
   new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(value);

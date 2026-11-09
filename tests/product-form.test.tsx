@@ -12,6 +12,19 @@ const original = api.defaults.adapter
 vi.mock("@/features/products/components/product-description-editor", () => ({ ProductDescriptionEditor: ({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) => <textarea id="description" aria-label="Mô tả" value={value} disabled={disabled} onChange={event => onChange(event.target.value)} /> }))
 const id = "a".repeat(24)
 const product: Product = { _id: id, product_name: "Phone case", category: { _id: id, name: "Cases" }, brand: { _id: id, name: "Thương hiệu" }, model_year: 2026, variants: [{ _id: "b".repeat(24), sku: "CASE-1", price: 100, stock: 2, attributes: { warranty: 12, wireless: false } }] }
+it('saves multiple additional categories through the product editor', async () => {
+  const extra = 'c'.repeat(24), another = 'd'.repeat(24)
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data:
+    config.url === '/categories' ? [{ _id: id, name: 'Cases', isActive: true }, { _id: extra, name: 'Accessories', isActive: true }, { _id: another, name: 'Gifts', isActive: true }]
+      : [{ _id: id, name: 'Brand', isActive: true }] } })
+  const save = vi.fn().mockResolvedValue(product)
+  wrap(<ProductForm product={product} save={save} pending={false} />)
+  fireEvent.click(await screen.findByRole('checkbox', { name: 'Accessories' }))
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Gifts' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await waitFor(() => expect(save).toHaveBeenCalled())
+  expect(save.mock.calls[0][0].categories).toEqual([extra, another])
+})
 beforeEach(() => {
   queryClient.clear()
   api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: { data: [{ _id: id, name: config.url === "/categories" ? "Cases" : "Thương hiệu", isActive: true }] } })

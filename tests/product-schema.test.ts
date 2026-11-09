@@ -4,6 +4,15 @@ import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
 const values = () => ({ ...productDefaults(), product_name: "Phone case", category: id, brand: id })
+it('retains extra categories on unrelated edits and permits explicit clearing', () => {
+  const extra = 'b'.repeat(24)
+  const product: Product = { ...productPayload(values()), _id: id, categories: [{ _id: extra, name: 'Extra' }] }
+  const defaults = productDefaults(product)
+  expect(defaults.categories).toEqual([extra])
+  expect(productPayload(defaults).categories).toEqual([extra])
+  expect(productUpdatePayload(defaults, { description: true }, product)).not.toHaveProperty('categories')
+  expect(productUpdatePayload({ ...defaults, categories: [] }, { categories: true }, product).categories).toEqual([])
+})
 it("validates new metadata and maps form fields into backend product details", () => {
   const input = productSchema.parse({ ...values(), sku: " case-new ", tags: [{ value: " Case " }], weight: 0,
     dimensions: { width: 0, height: 2, depth: 3 }, barcode: "1234", minimumOrderQuantity: 2 })

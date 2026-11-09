@@ -331,6 +331,14 @@ export default function StorefrontProductsPage() {
       : filterDraftFromParams(params);
   const filterBrands = brands.data ?? [];
   const categoryId = resolveCategories(category, categories.data ?? []);
+  const emptyCategory = '000000000000000000000000';
+  const hasCategoryFilter = !!category || !!urlParams.get('c');
+  const safeBrand = (value: string) =>
+    value && selectionIds(value).every((id) => /^[a-f\d]{24}$/i.test(id))
+      ? value
+      : value
+        ? emptyCategory
+        : undefined;
   const subcategory = params.get('subcategory') ?? '';
   const selectedChildren = childSelections(
     subcategory,
@@ -342,8 +350,10 @@ export default function StorefrontProductsPage() {
     page,
     limit: 12,
     search: search || undefined,
-    brand: brand || undefined,
-    category: effectiveCategories(categoryId, selectedChildren),
+    brand: safeBrand(brand),
+    category:
+      effectiveCategories(categoryId, selectedChildren) ??
+      (hasCategoryFilter ? emptyCategory : undefined),
     minPrice: parsePrice(minPriceParam),
     maxPrice: parsePrice(maxPriceParam),
     sortBy: sort.startsWith('price')
@@ -435,7 +445,7 @@ export default function StorefrontProductsPage() {
   const previewParams: Partial<ProductsQuery> = {
     ...catalogBadgeFilter(sort),
     search: search || undefined,
-    brand: draft.brand || undefined,
+    brand: safeBrand(draft.brand),
     category: effectiveCategories(
       draftCategoryId,
       childSelections(subcategory, draftCategoryId, categories.data ?? [])
@@ -445,6 +455,10 @@ export default function StorefrontProductsPage() {
   };
   const preview = useStoreFilterCount(previewParams, filtersOpen && validDraft);
   const previewReady =
+    !categories.isPending &&
+    !categories.isError &&
+    !brands.isPending &&
+    !brands.isError &&
     validDraft &&
     preview.data !== undefined &&
     !preview.isFetching &&
@@ -742,7 +756,9 @@ export default function StorefrontProductsPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={!previewReady || !preview.data || preview.data <= 0}
+                      disabled={
+                        !previewReady || !preview.data || preview.data <= 0
+                      }
                       aria-busy={!previewReady && !preview.isError}
                       className="inline-flex min-h-11 min-w-56 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] disabled:cursor-not-allowed disabled:opacity-60"
                     >

@@ -24,6 +24,11 @@ function mount(search: string) {
   render(<MemoryRouter initialEntries={[`/shop${search}`]}><StorefrontProductsPage /><Location /></MemoryRouter>)
 }
 
+it('keeps an invalid category slug constrained instead of requesting all products', () => {
+  mount('?c=missing-category')
+  expect(state.list).toHaveBeenLastCalledWith(expect.objectContaining({ category: '000000000000000000000000' }))
+})
+
 it('shows only parent categories in the dialog and reveals compact children only after applying', async () => {
   mount('')
   fireEvent.click(screen.getByRole('button', { name: 'Lọc' }))
