@@ -1,3 +1,4 @@
+import { RequiredMark } from '@/components/required-mark';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { useState } from 'react';
 import { LoaderCircle, Pencil, Trash2 } from 'lucide-react';
@@ -110,8 +111,9 @@ export function OrderActions({
           {mode === 'status' && (
             <>
               <label className="grid gap-2 text-sm">
-                Trạng thái mới
+                <span>Trạng thái mới <RequiredMark /></span>
                 <select
+                  aria-required="true"
                   className="bg-background rounded-md border p-2"
                   value={next}
                   disabled={pending}
@@ -131,8 +133,8 @@ export function OrderActions({
               </label>
               {next === 3 && (
                 <label className="grid gap-2 text-sm">
-                  Lý do hủy
-                  <textarea
+          <span>Lý do hủy <RequiredMark /></span>
+          <textarea
                     placeholder="Nhập lý do thay đổi trạng thái đơn hàng"
                     maxLength={1000}
                     className="bg-background rounded-md border p-2"

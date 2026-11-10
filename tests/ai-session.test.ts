@@ -47,6 +47,17 @@ it('serializes initialization before concurrent private calls and keeps public r
     expect.objectContaining({ timeout: 75000, signal: controller.signal })
   );
 });
+
+it('accepts only terminal cancellation confirmations for the matching request', async () => {
+  const result = { requestId: 'matching-request', status: 'cancelled', answer: '', sources: [] };
+  requests.post.mockResolvedValue({ data: { data: result } });
+  await expect(aiService.cancel('conversation', result.requestId, 'question')).resolves.toEqual(result);
+  expect(requests.post).toHaveBeenLastCalledWith('/ai/conversations/conversation/cancel', { requestId: result.requestId, content: 'question' });
+  requests.post.mockResolvedValue({ data: { data: { ...result, status: 'processing' } } });
+  await expect(aiService.cancel('conversation', result.requestId, 'question')).rejects.toThrow();
+  requests.post.mockResolvedValue({ data: { data: { ...result, requestId: 'other-request' } } });
+  await expect(aiService.cancel('conversation', result.requestId, 'question')).rejects.toThrow('mismatch');
+});
 it('cancelling one preparation does not abort shared initialization or the other caller', async () => {
   let release!: () => void;
   const initialized = new Promise<void>((resolve) => {

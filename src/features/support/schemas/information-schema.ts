@@ -1,8 +1,9 @@
+import { LONG_TEXT_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
 
 export const saveInformationSchema = z
   .object({
-    content: z.string().trim().max(30000),
+    content: z.string().trim().max(LONG_TEXT_MAX_LENGTH),
     expectedVersion: z.number().int().nonnegative(),
     publish: z.boolean(),
   })

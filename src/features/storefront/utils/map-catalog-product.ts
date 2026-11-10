@@ -1,3 +1,4 @@
+import { productCategoryNames } from '@/features/products/types/products';
 import { catalogName, type Product } from '@/features/products/types/products';
 import { discountedPrice } from '@/features/products/utils/product-price';
 import type { StorefrontProduct } from '@/features/storefront/types/storefront';
@@ -28,7 +29,7 @@ export function mapCatalogProduct(
     id: product._id,
     slug: product.slug ?? '',
     name: product.product_name,
-    category: catalogName(product.category),
+    category: productCategoryNames(product),
     brand: catalogName(product.brand),
     price: discountedPrice(price, product.discount) ?? 0,
     originalPrice: price,

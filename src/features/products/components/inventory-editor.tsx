@@ -1,4 +1,5 @@
 import { isAdministrator } from '@/features/auth/utils/roles';
+import { RequiredMark } from '@/components/required-mark';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -55,10 +56,11 @@ export function InventoryEditor({ product }: { product: Product }) {
         : ['Sản phẩm']
       ).map((label, index) => (
         <label key={label} className="grid gap-2 text-sm">
-          Tồn kho {label}
+          <span>Tồn kho {label}<RequiredMark /></span>
           <input
             className="bg-background rounded-md border p-2"
             type="number"
+            aria-required="true"
             min="0"
             step="1"
             max={Number.MAX_SAFE_INTEGER}

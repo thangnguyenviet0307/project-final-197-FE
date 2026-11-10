@@ -1,8 +1,9 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
 export const heroSlideSchema = z.object({
   category: z.string().regex(/^[a-f\d]{24}$/i, 'Chọn danh mục hợp lệ.'),
   title: z.string().trim().min(1, 'Nhập tiêu đề.').max(200),
-  description: z.string().trim().max(1000),
+  description: z.string().trim().max(DESCRIPTION_MAX_LENGTH),
   imageUrl: z
     .union([
       z

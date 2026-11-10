@@ -115,7 +115,7 @@ export default function UserProfilePage() {
           form.setError(field, { message });
       });
     },
-  });
+  }, () => !sendingEmail.current);
 
   const beginEditing = () => {
     reset(valuesFromUser(current));

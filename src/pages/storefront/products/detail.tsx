@@ -1,3 +1,7 @@
+import {
+  productCategoryNames,
+  productCategories,
+} from '@/features/products/types/products';
 import { useState } from 'react';
 import { AiRecommendations } from '@/features/ai/components/ai-recommendations';
 import { toast } from 'sonner';
@@ -29,6 +33,7 @@ import {
 } from '@/features/storefront/components/store-product-feedback';
 import { RelatedProducts } from '@/features/storefront/components/related-products';
 import { ProductNewsSidebar } from '@/features/storefront/components/product-news-sidebar';
+import { ProductPolicyText } from '@/features/products/components/product-policy-text';
 import '@/features/products/components/product-description.css';
 
 const attributeLabel = (name: string) =>
@@ -53,6 +58,19 @@ function ProductDetails({ product }: { product: Product }) {
   const variant = product.variants?.find(
     (item) => (item._id ?? item.sku) === selected
   );
+  const [galleryImage, setGalleryImage] = useState<string | undefined>(
+    () =>
+      variant?.image ?? variant?.images?.[0] ?? product.thumbnail ?? undefined
+  );
+  const selectImage = (url: string) => {
+    setGalleryImage(url);
+    const matches = (item: NonNullable<Product['variants']>[number]) =>
+      item.image === url || item.images?.includes(url);
+    // Shared images keep the current variant; generic gallery images change only the image.
+    const matching =
+      variant && matches(variant) ? variant : product.variants?.find(matches);
+    if (matching) setSelected(matching._id ?? matching.sku);
+  };
   const needsVariant = !!product.variants?.length && !variant;
   const basePrice = product.variants?.length ? variant?.price : product.price;
   const price =
@@ -89,12 +107,9 @@ function ProductDetails({ product }: { product: Product }) {
             <div className="grid gap-8 md:grid-cols-2">
               <div className="min-w-0 [&_section>div:first-child]:rounded-3xl [&_section>div:first-child]:border-gray-100 [&_section>div:first-child]:bg-white [&_section>div:first-child]:shadow-sm">
                 <ProductDetailGallery
-                  key={variant?._id ?? variant?.sku ?? product._id}
-                  product={
-                    variant?.image
-                      ? { ...product, thumbnail: variant.image }
-                      : product
-                  }
+                  product={product}
+                  selectedImage={galleryImage}
+                  onImageChange={selectImage}
                 />
               </div>
               <div className="min-w-0 space-y-6 lg:py-3">
@@ -109,12 +124,15 @@ function ProductDetails({ product }: { product: Product }) {
                     <span className="mr-1 text-sm font-medium text-gray-500">
                       Danh mục:
                     </span>
-                    <Link
-                      to={`/shop?category=${catalogId(product.category)}`}
-                      className="rounded-full bg-[#4d9210] px-4 py-2 text-xs font-semibold text-white"
-                    >
-                      {catalogName(product.category)}
-                    </Link>
+                    {productCategories(product).map((category) => (
+                      <Link
+                        key={catalogId(category)}
+                        to={`/shop?category=${catalogId(category)}`}
+                        className="rounded-full bg-[#4d9210] px-4 py-2 text-xs font-semibold text-white"
+                      >
+                        {catalogName(category)}
+                      </Link>
+                    ))}
                   </nav>
                   <p className="text-sm text-gray-500">
                     Thương hiệu:{' '}
@@ -154,24 +172,30 @@ function ProductDetails({ product }: { product: Product }) {
                 </div>
                 {!!product.variants?.length && (
                   <fieldset>
-                    <legend className="mb-3 font-semibold">
-                      Chọn biến thể
-                    </legend>
+                    <legend className="sr-only">Tùy chọn sản phẩm</legend>
                     <div className="flex flex-wrap gap-2">
-                      {product.variants.map((item) => (
+                      {product.variants.map((item, index) => (
                         <button
                           key={item._id ?? item.sku}
                           type="button"
                           aria-pressed={selected === (item._id ?? item.sku)}
-                          onClick={() => setSelected(item._id ?? item.sku)}
+                          onClick={() => {
+                            setSelected(item._id ?? item.sku);
+                            setGalleryImage(
+                              item.image ??
+                                item.images?.[0] ??
+                                product.thumbnail ??
+                                undefined
+                            );
+                          }}
                           className={`rounded-lg border px-4 py-2 ${selected === (item._id ?? item.sku) ? 'border-green-700 bg-green-50' : 'border-gray-200'}`}
                         >
-                          {item.variant_name || item.sku}
-                          {[item.color, item.size].filter(Boolean).length > 0 &&
-                            ' · ' +
-                              [item.color, item.size]
-                                .filter(Boolean)
-                                .join(' / ')}
+                          {[
+                            item.variant_name,
+                            [item.color, item.size].filter(Boolean).join(' / '),
+                          ]
+                            .filter(Boolean)
+                            .join(' · ') || `Lựa chọn ${index + 1}`}
                         </button>
                       ))}
                     </div>
@@ -283,7 +307,9 @@ function ProductDetails({ product }: { product: Product }) {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{title}</p>
                     <p className="mt-1 text-xs leading-5 break-words whitespace-pre-wrap text-gray-500">
-                      {text || 'Liên hệ cửa hàng để được tư vấn.'}
+                      <ProductPolicyText
+                        text={text || 'Liên hệ cửa hàng để được tư vấn.'}
+                      />
                     </p>
                   </div>
                 </div>
@@ -388,9 +414,8 @@ function ProductDetails({ product }: { product: Product }) {
                 </caption>
                 <tbody>
                   {[
-                    ['Danh mục', catalogName(product.category)],
+                    ['Danh mục', productCategoryNames(product)],
                     ['Thương hiệu', catalogName(product.brand)],
-                    ['SKU', variant?.sku ?? product.sku],
                     ['Năm sản xuất', product.model_year],
                     ['Mã vạch', product.barcode],
                     ['Số lượng đặt tối thiểu', minimum],

@@ -811,7 +811,7 @@ export default function UsersPage() {
             </DialogHeader>
             <form className="space-y-5" onSubmit={handleEditSubmit}>
               <Field>
-                <FieldLabel htmlFor="edit-user-role">Vai trò</FieldLabel>
+                <FieldLabel required htmlFor="edit-user-role">Vai trò</FieldLabel>
                 <select
                   id="edit-user-role"
                   value={editRole}
@@ -834,7 +834,7 @@ export default function UsersPage() {
                 </select>
               </Field>
               <Field>
-                <FieldLabel htmlFor="edit-user-status">Trạng thái</FieldLabel>
+                <FieldLabel required htmlFor="edit-user-status">Trạng thái</FieldLabel>
                 <select
                   id="edit-user-status"
                   value={editActive ? 'active' : 'suspended'}

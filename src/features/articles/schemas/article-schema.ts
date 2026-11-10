@@ -1,3 +1,4 @@
+import { LONG_TEXT_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
 const url = z
   .string()
@@ -19,8 +20,8 @@ export const articleInputSchema = z
       .string()
       .regex(/^[a-fA-F0-9]{24}$/)
       .optional(),
-    excerpt: z.string().trim().min(1).max(1000),
-    content: z.string().trim().min(1).max(100000),
+    excerpt: z.string().trim().min(1).max(DESCRIPTION_MAX_LENGTH),
+    content: z.string().trim().min(1).max(LONG_TEXT_MAX_LENGTH),
     authorName: z.string().trim().min(1).max(120),
     imageUrl: url,
     tags: z.array(z.string().trim().min(1).max(40)).max(20),
@@ -66,6 +67,6 @@ export const categoryInputSchema = z.object({
     .min(1)
     .max(255)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  description: z.string().trim().max(500),
+  description: z.string().trim().max(DESCRIPTION_MAX_LENGTH),
   isActive: z.boolean(),
 });

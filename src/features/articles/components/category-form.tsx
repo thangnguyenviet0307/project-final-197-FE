@@ -1,3 +1,5 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
+import { RequiredMark } from '@/components/required-mark';
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -56,7 +58,7 @@ export function PostCategoryForm({
     <form onSubmit={submit} className="space-y-4">
       <fieldset disabled={pending} className="space-y-4">
         <label className="grid gap-1">
-          Tên danh mục
+          <span>Tên danh mục <RequiredMark /></span>
           <Input
             placeholder="Nhập tên danh mục bài viết"
             required
@@ -66,7 +68,7 @@ export function PostCategoryForm({
           />
         </label>
         <label className="grid gap-1">
-          Slug danh mục
+          <span>Slug danh mục <RequiredMark /></span>
           <Input
             required
             maxLength={255}
@@ -79,7 +81,7 @@ export function PostCategoryForm({
           Mô tả danh mục
           <Input
             placeholder="Nhập mô tả danh mục bài viết"
-            maxLength={500}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             value={draft.description}
             onChange={(e) =>
               setDraft({ ...draft, description: e.target.value })

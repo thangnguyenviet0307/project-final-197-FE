@@ -138,7 +138,26 @@ api.interceptors.request.use((config: AuthRequest) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (
+      response.config.method?.toLowerCase() === 'delete' &&
+      response.status !== 204
+    ) {
+      const body: unknown = response.data;
+      if (
+        !body ||
+        typeof body !== 'object' ||
+        Array.isArray(body) ||
+        ('success' in body && body.success === false) ||
+        String(response.headers['content-type'] ?? '').includes('text/html')
+      ) {
+        throw new Error(
+          'Máy chủ chưa xác nhận xóa dữ liệu. Vui lòng kiểm tra cấu hình API hoặc tải lại trang trước khi thử lại.'
+        );
+      }
+    }
+    return response;
+  },
   async (error: unknown) => {
     if (
       !axios.isAxiosError(error) ||

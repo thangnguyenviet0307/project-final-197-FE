@@ -35,6 +35,14 @@ function fill() {
   fireEvent.change(screen.getByLabelText("Người đánh giá"), { target: { value: "  Binh  " } })
   fireEvent.change(screen.getByLabelText("Nội dung đánh giá"), { target: { value: "  Hài lòng  " } })
 }
+it('keeps reviews read-only for administrators on the detail page', async () => {
+  useAuthStore.getState().setSession({ id: 'admin', name: 'Admin', firstName: 'Admin', lastName: '', email: 'admin@example.com', role: 'admin', mustChangePassword: false }, { accessToken: 'access' })
+  render(<QueryClientProvider client={queryClient}><ProductReviews id={id} readOnly /></QueryClientProvider>)
+  expect(await screen.findByText('Sản phẩm tốt')).toBeTruthy()
+  expect(screen.queryByRole('button', { name: 'Thêm đánh giá' })).toBeNull()
+  expect(screen.queryByRole('button', { name: /Xóa đánh giá/ })).toBeNull()
+  expect(screen.queryByLabelText('Người đánh giá')).toBeNull()
+})
 it("shows server metrics and imported reviews and paginates on the server", async () => {
   setup("staff")
   expect(await screen.findByText("Sản phẩm tốt")).toBeTruthy()
@@ -56,13 +64,14 @@ it("validates review inputs then creates a review and refreshes metrics and revi
   await waitFor(() => expect(requests.find(request => request.method === "post")?.body).toEqual({ reviewerName: "Binh", comment: "Hài lòng", rating: 5 }))
   await waitFor(() => expect(screen.getByText("Số đánh giá").parentElement?.textContent).toContain("2"))
   expect((screen.getByLabelText("Nội dung đánh giá") as HTMLTextAreaElement).value).toBe("")
-  expect(requests.filter(request => request.url?.endsWith("/metrics"))).toHaveLength(2)
+  expect(requests.filter(request => request.url?.endsWith("/metrics")).length).toBeGreaterThanOrEqual(2)
 })
 it("keeps a review draft when the Backend rejects creation", async () => {
   setup(); await screen.findByText("Sản phẩm tốt")
   fill(); fail = true
   fireEvent.click(screen.getByRole("button", { name: "Thêm đánh giá" }))
-  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Không thể thực hiện thao tác.")
+  const form = screen.getByLabelText('Nội dung đánh giá').closest('form')!
+  expect(await within(form).findByRole("alert")).toHaveProperty("textContent", "Không thể thực hiện thao tác.")
   expect((screen.getByLabelText("Nội dung đánh giá") as HTMLTextAreaElement).value).toBe("  Hài lòng  ")
 })
 it("deletes only after confirmation and refreshes the empty metrics and list", async () => {

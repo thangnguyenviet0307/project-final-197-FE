@@ -45,6 +45,19 @@ it("refetches fresh mounted data after another tab changes data without reloadin
   expect(client.getQueryState(["auth", "me"])?.isInvalidated).toBe(false)
 })
 
+it("updates the publishing tab without navigation even when storage is unavailable", async () => {
+  const { client, read } = await activeProduct()
+  const stop = subscribeToBusinessChanges(client)
+  cleanups.push(stop)
+  vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("Storage denied") })
+  publishBusinessChange()
+  await waitFor(() => expect(client.getQueryData(["products", "detail", "id"])).toEqual({ name: "Product 2" }))
+  stop()
+  publishBusinessChange()
+  await new Promise(resolve => setTimeout(resolve, 80))
+  expect(read).toHaveBeenCalledTimes(2)
+})
+
 it("refreshes API data retained by Fast Refresh and cleans up HMR listeners", async () => {
   const { client } = await activeProduct()
   let updated = () => {}

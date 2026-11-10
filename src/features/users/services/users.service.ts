@@ -8,17 +8,44 @@ import type {
 
 // Initial credentials are handed over by the provisioning administrator; never returned by the API.
 export function generateInitialPassword() {
-  const bytes = crypto.getRandomValues(new Uint8Array(18));
-  return 'Aa1!' + Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
+  const groups = [
+    'ABCDEFGHJKLMNPQRSTUVWXYZ',
+    'abcdefghijkmnopqrstuvwxyz',
+    '23456789',
+    '!@#$%',
+  ];
+  const pick = (length: number) => {
+    const limit = Math.floor(256 / length) * length;
+    let value: number;
+    do {
+      value = crypto.getRandomValues(new Uint8Array(1))[0];
+    } while (value >= limit);
+    return value % length;
+  };
+  const alphabet = groups.join('');
+  const characters = groups.map((group) => group[pick(group.length)]);
+  while (characters.length < 8)
+    characters.push(alphabet[pick(alphabet.length)]);
+  for (let index = characters.length - 1; index > 0; index--) {
+    const other = pick(index + 1);
+    [characters[index], characters[other]] = [
+      characters[other],
+      characters[index],
+    ];
+  }
+  return characters.join('');
 }
 
 export function getTemporaryPassword(role: ManagedUser['role']) {
-  if (role === 'super_admin') throw new Error('Super Admin must change their own password');
+  if (role === 'super_admin')
+    throw new Error('Super Admin must change their own password');
   return generateInitialPassword();
 }
 
 export async function reissueInitialPassword(id: string, password: string) {
-  await api.post(`/users/${encodeURIComponent(id)}/reissue-initial-password`, { password });
+  await api.post(`/users/${encodeURIComponent(id)}/reissue-initial-password`, {
+    password,
+  });
 }
 
 export async function listUsers(

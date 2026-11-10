@@ -1,4 +1,6 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '@/features/products/constants';
 import {
   catalogId,
   type Product,
@@ -53,8 +55,8 @@ export const variantSchema = z.object({
   color: optionalText('Màu sắc', 50),
   size: optionalText('Kích thước', 50),
   price: numeric('Giá biến thể').nonnegative('Giá biến thể không được âm.'),
-  compare_at_price: numeric('Giá so sánh')
-    .nonnegative('Giá so sánh không được âm.')
+  compare_at_price: numeric('Giá niêm yết (trước giảm)')
+    .nonnegative('Giá niêm yết (trước giảm) không được âm.')
     .nullable()
     .optional(),
   stock: stock('Tồn kho biến thể').optional(),
@@ -64,7 +66,6 @@ export const variantSchema = z.object({
       url: z
         .string()
         .trim()
-        .min(1, 'Vui lòng nhập đường dẫn ảnh.')
         .max(255, 'Đường dẫn ảnh không được vượt quá 255 ký tự.'),
     })
   ),
@@ -146,9 +147,9 @@ export const productSchema = z
         }
       })
       .optional(),
-    warrantyInformation: optionalText('Thông tin bảo hành', 2000),
-    shippingInformation: optionalText('Thông tin giao hàng', 2000),
-    returnPolicy: optionalText('Chính sách đổi trả', 2000),
+    warrantyInformation: optionalText('Thông tin bảo hành', DESCRIPTION_MAX_LENGTH),
+    shippingInformation: optionalText('Thông tin giao hàng', DESCRIPTION_MAX_LENGTH),
+    returnPolicy: optionalText('Chính sách đổi trả', DESCRIPTION_MAX_LENGTH),
     minimumOrderQuantity: stock('Số lượng đặt tối thiểu')
       .min(1, 'Số lượng đặt tối thiểu phải từ 1.')
       .optional(),
@@ -157,6 +158,10 @@ export const productSchema = z
       .trim()
       .min(3, 'Tên sản phẩm phải có ít nhất 3 ký tự.')
       .max(255, 'Tên sản phẩm không được vượt quá 255 ký tự.'),
+    categories: z
+      .array(objectId)
+      .max(50, 'Chọn tối đa 50 danh mục bổ sung.')
+      .optional(),
     category: z
       .string()
       .regex(/^[a-f\d]{24}$/i, 'Vui lòng chọn danh mục hợp lệ.'),
@@ -176,7 +181,7 @@ export const productSchema = z
     discount: numeric('Giảm giá')
       .min(0, 'Mức giảm giá không được âm.')
       .max(70, 'Mức giảm giá không được vượt quá 70%.'),
-    description: optionalText('Mô tả', 2000),
+    description: optionalText('Mô tả', PRODUCT_DESCRIPTION_MAX_LENGTH),
     thumbnail: optionalText('Đường dẫn ảnh đại diện', 255),
     stock: stock('Tồn kho').optional(),
     on_sale: z.boolean().optional(),
@@ -261,6 +266,7 @@ export function productDefaults(product?: Product): ProductFormValues {
     minimumOrderQuantity: product?.minimumOrderQuantity ?? 1,
     product_name: product?.product_name ?? '',
     category: product ? catalogId(product.category) : '',
+    categories: product?.categories?.map(catalogId) ?? [],
     brand: product ? catalogId(product.brand) : '',
     model_year: product
       ? (product.model_year ?? undefined)
@@ -314,7 +320,7 @@ export function productPayload(values: ProductFormValues): ProductInput {
       ({ options, images, variant_name, ...variant }) => ({
         ...variant,
         variant_name: variant_name || null,
-        images: images.map(({ url }) => url),
+        images: images.map(({ url }) => url).filter(Boolean),
         attributes: Object.fromEntries(
           options.map(({ name, value }) => [name, value])
         ),

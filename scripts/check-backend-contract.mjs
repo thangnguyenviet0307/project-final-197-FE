@@ -15,6 +15,7 @@ const require = createRequire(import.meta.url)
 const backendRequire = createRequire(path.join(backend, "package.json"))
 const loaded = new Map()
 const allowed = new Set([
+  "config/text-limits.ts", "config/product-limits.ts",
   "validations/shared/common.validation.ts", "validations/customers/customers.validation.ts",
   "validations/users/users.validation.ts", "validations/brands/brands.validation.ts",
   "validations/categories/categories.validation.ts", "validations/orders/checkout.validation.ts", "validations/orders/customer-order-cancel.validation.ts",
@@ -32,7 +33,14 @@ function evaluate(file, resolve) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText
   const exports = {}
-  vm.runInNewContext(code, { exports, require: resolve, crypto: webcrypto, FormData, File }, { filename: file })
+  const pureConstants = {
+    "@/constants/text-limits": "constants/text-limits.ts",
+    "@/features/products/constants": "features/products/constants.ts",
+  }
+  const resolveWithConstants = specifier => Object.hasOwn(pureConstants, specifier)
+    ? evaluate(path.join(root, "src", pureConstants[specifier]), resolve)
+    : resolve(specifier)
+  vm.runInNewContext(code, { exports, require: resolveWithConstants, crypto: webcrypto, FormData, File }, { filename: file })
   return exports
 }
 function loadValidation(relative) {
@@ -125,7 +133,8 @@ await brandService.updateById(id, { image: catalogImage, name: "Uploaded logo" }
 await categoryService.createCategory({ name: "Uploaded category", parent: null, isActive: false, image: catalogImage })
 await categoryService.updateCategory({ id, input: { image: catalogImage, name: "Uploaded icon" } })
 const temporary = userService.getTemporaryPassword("staff")
-assert.match(temporary, /^Aa1![a-f0-9]{36}$/)
+assert.equal(temporary.length, 8)
+for (const pattern of [/[A-Z]/, /[a-z]/, /[0-9]/, /[!@#$%]/]) assert.match(temporary, pattern)
 assert.notEqual(temporary, userService.getTemporaryPassword("admin"))
 await userService.createUser({ firstName: "New", lastName: "Staff", email: "staff@example.com", role: "staff", password: temporary })
 await userService.resetUserPassword(id)

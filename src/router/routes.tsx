@@ -194,6 +194,10 @@ export const routes: RouteObject[] = [
         path: '/auth/products/:id',
         lazy: page(() => import('@/pages/admin/products/detail')),
       },
+      {
+        path: '/auth/products/:id/inventory',
+        lazy: page(() => import('@/pages/admin/products/inventory')),
+      },
 
       {
         path: '/auth/brands',

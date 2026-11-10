@@ -3,6 +3,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { getApiError } from '@/services/api';
 import { Link } from 'react-router-dom';
 import { CatalogImage } from '@/components/catalog-image';
+import { CatalogDetailDialog } from '@/components/catalog-detail-dialog';
+import { detailRow } from '@/utils/detail-row';
 
 import { useEffect, useState } from 'react';
 import { Tags, Trash2, Plus } from 'lucide-react';
@@ -138,6 +140,8 @@ export function BrandTable({
   const admin = useAuthStore((state) => isAdministrator(state.user?.role));
   const [searchValue, setSearchValue] = useState(searchQuery);
   const [page, setPage] = useState(1);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = brands.find((brand) => brand._id === detailId) ?? null;
   const limit = 10;
   const [status, setStatus] = useState('all');
   const [previousSearch, setPreviousSearch] = useState(searchQuery);
@@ -248,7 +252,11 @@ export function BrandTable({
             </TableHeader>
             <TableBody>
               {visible.map((brand) => (
-                <TableRow key={brand._id}>
+                <TableRow
+                  key={brand._id}
+                  {...detailRow(() => setDetailId(brand._id))}
+                  aria-label={`Xem thương hiệu ${brand.name}`}
+                >
                   <TableCell>
                     <div className="flex max-w-80 min-w-48 items-center gap-3">
                       <CatalogImage src={brand.logoUrl} alt={brand.name} />
@@ -294,6 +302,12 @@ export function BrandTable({
         page={currentPage}
         totalPages={totalPages}
         onPageChange={setPage}
+      />
+      <CatalogDetailDialog
+        record={detail}
+        title="Chi tiết thương hiệu"
+        image={detail?.logoUrl}
+        onClose={() => setDetailId(null)}
       />
     </div>
   );

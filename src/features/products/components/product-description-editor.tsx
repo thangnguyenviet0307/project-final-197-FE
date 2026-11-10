@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '@/features/products/constants';
 import ReactQuill from 'react-quill-new';
 import {
   descriptionToHtml,
@@ -71,7 +72,7 @@ export function ProductDescriptionEditor({
         }}
       />
       <p id="description-hint" className="text-muted-foreground mt-2 text-xs">
-        {value.length}/2000 ký tự, bao gồm định dạng. Hình ảnh được quản lý
+        {value.length.toLocaleString('vi-VN')}/{PRODUCT_DESCRIPTION_MAX_LENGTH.toLocaleString('vi-VN')} ký tự, bao gồm định dạng. Hình ảnh được quản lý
         riêng.
       </p>
     </div>

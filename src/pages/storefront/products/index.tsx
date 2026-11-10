@@ -1,6 +1,13 @@
-import { CatalogFilterOption, catalogOptionGrid } from '@/features/storefront/components/catalog-filter-option';
+import {
+  readCatalogUrl,
+  writeCatalogUrl,
+} from '@/features/storefront/utils/catalog-url';
+import {
+  CatalogFilterOption,
+  catalogOptionGrid,
+} from '@/features/storefront/components/catalog-filter-option';
+import { memo, useEffect, useState, type SubmitEvent } from 'react';
 import { SmartSearch } from '@/features/ai/components/smart-search';
-import { memo, useState, type SubmitEvent } from 'react';
 import './catalog-filters.css';
 import {
   Filter,
@@ -49,10 +56,7 @@ const CatalogProductGrid = memo(function CatalogProductGrid({
 
 function FilterOptionsLoading({ label }: { label: string }) {
   return (
-    <div
-      role="status"
-      className={catalogOptionGrid}
-    >
+    <div role="status" className={catalogOptionGrid}>
       <span className="sr-only">{label}</span>
       {Array.from({ length: 12 }, (_, index) => (
         <div
@@ -288,7 +292,25 @@ function parsePrice(value: string): number | undefined {
 }
 
 export default function StorefrontProductsPage() {
-  const [params, setParams] = useSearchParams();
+  const [urlParams, setUrlParams] = useSearchParams();
+  const categories = usePublicCategories(true);
+  const brands = usePublicBrands(true);
+  const params = readCatalogUrl(
+    urlParams,
+    categories.data ?? [],
+    brands.data ?? []
+  );
+  function slugParams(value: URLSearchParams) {
+    return writeCatalogUrl(value, categories.data ?? [], brands.data ?? []);
+  }
+  function setParams(update: (previous: URLSearchParams) => URLSearchParams) {
+    setUrlParams(slugParams(update(new URLSearchParams(params))));
+  }
+  const canonical = slugParams(params).toString();
+  useEffect(() => {
+    if (canonical !== urlParams.toString())
+      setUrlParams(canonical, { replace: true });
+  }, [canonical, urlParams, setUrlParams]);
   const requested = Number(params.get('page'));
   const page = Number.isSafeInteger(requested) && requested > 0 ? requested : 1;
   const search = params.get('search') ?? '';
@@ -308,10 +330,16 @@ export default function StorefrontProductsPage() {
     draftState?.key === filterKey
       ? draftState.value
       : filterDraftFromParams(params);
-  const categories = usePublicCategories(true);
-  const brands = usePublicBrands(true);
   const filterBrands = brands.data ?? [];
   const categoryId = resolveCategories(category, categories.data ?? []);
+  const emptyCategory = '000000000000000000000000';
+  const hasCategoryFilter = !!category || !!urlParams.get('c');
+  const safeBrand = (value: string) =>
+    value && selectionIds(value).every((id) => /^[a-f\d]{24}$/i.test(id))
+      ? value
+      : value
+        ? emptyCategory
+        : undefined;
   const subcategory = params.get('subcategory') ?? '';
   const selectedChildren = childSelections(
     subcategory,
@@ -323,8 +351,10 @@ export default function StorefrontProductsPage() {
     page,
     limit: 12,
     search: search || undefined,
-    brand: brand || undefined,
-    category: effectiveCategories(categoryId, selectedChildren),
+    brand: safeBrand(brand),
+    category:
+      effectiveCategories(categoryId, selectedChildren) ??
+      (hasCategoryFilter ? emptyCategory : undefined),
     minPrice: parsePrice(minPriceParam),
     maxPrice: parsePrice(maxPriceParam),
     sortBy: sort.startsWith('price')
@@ -357,6 +387,7 @@ export default function StorefrontProductsPage() {
 
   function applyFilters(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!previewReady || !preview.data || preview.data <= 0) return;
     const minPrice = parsePrice(draft.minPrice);
     const maxPrice = parsePrice(draft.maxPrice);
     if (
@@ -415,7 +446,7 @@ export default function StorefrontProductsPage() {
   const previewParams: Partial<ProductsQuery> = {
     ...catalogBadgeFilter(sort),
     search: search || undefined,
-    brand: draft.brand || undefined,
+    brand: safeBrand(draft.brand),
     category: effectiveCategories(
       draftCategoryId,
       childSelections(subcategory, draftCategoryId, categories.data ?? [])
@@ -425,6 +456,10 @@ export default function StorefrontProductsPage() {
   };
   const preview = useStoreFilterCount(previewParams, filtersOpen && validDraft);
   const previewReady =
+    !categories.isPending &&
+    !categories.isError &&
+    !brands.isPending &&
+    !brands.isError &&
     validDraft &&
     preview.data !== undefined &&
     !preview.isFetching &&
@@ -534,7 +569,7 @@ export default function StorefrontProductsPage() {
               <DialogContent
                 overlayClassName="store-filter-overlay"
                 showCloseButton={false}
-                className="store-filter-dialog flex h-[min(760px,90dvh)] max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl"
+                className="store-filter-dialog flex h-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-3xl border border-gray-100 bg-white p-0 text-gray-900 shadow-2xl sm:max-w-4xl"
               >
                 <DialogHeader className="relative flex min-h-20 shrink-0 flex-row items-center justify-between border-b border-gray-100 bg-[#f4f5f2] px-5 py-5 sm:px-8">
                   <DialogTitle className="pr-24 text-xl font-bold tracking-tight text-gray-950">
@@ -548,10 +583,7 @@ export default function StorefrontProductsPage() {
                   </DialogClose>
                 </DialogHeader>
 
-                <form
-                  onSubmit={applyFilters}
-                  className="flex min-h-0 flex-1 flex-col"
-                >
+                <form onSubmit={applyFilters} className="flex min-h-0 flex-col">
                   <div className="min-h-0 space-y-6 overflow-y-auto overscroll-contain px-5 py-6 sm:px-8">
                     <SelectedFilters
                       items={draftSelections}
@@ -668,24 +700,26 @@ export default function StorefrontProductsPage() {
                             onClick={() => updateDraft({ category: '' })}
                           />
 
-                          {categories.data?.map((item) => (
-                            <CatalogFilterOption
-                              key={item._id}
-                              name={categoryLabel(item)}
-                              image={item.icon}
-                              selected={selectionIds(draft.category).includes(
-                                item._id
-                              )}
-                              onClick={() =>
-                                updateDraft({
-                                  category: toggleSelection(
-                                    draft.category,
-                                    item._id
-                                  ),
-                                })
-                              }
-                            />
-                          ))}
+                          {categories.data
+                            ?.filter((item) => !item.parent)
+                            .map((item) => (
+                              <CatalogFilterOption
+                                key={item._id}
+                                name={categoryLabel(item)}
+                                image={item.icon}
+                                selected={selectionIds(draft.category).includes(
+                                  item._id
+                                )}
+                                onClick={() =>
+                                  updateDraft({
+                                    category: toggleSelection(
+                                      draft.category,
+                                      item._id
+                                    ),
+                                  })
+                                }
+                              />
+                            ))}
                         </div>
                       )}
                     </section>
@@ -724,7 +758,9 @@ export default function StorefrontProductsPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={!previewReady}
+                      disabled={
+                        !previewReady || !preview.data || preview.data <= 0
+                      }
                       aria-busy={!previewReady && !preview.isError}
                       className="inline-flex min-h-11 min-w-56 items-center justify-center rounded-xl bg-[#4d9210] px-8 text-sm font-semibold text-white transition hover:bg-[#3f7c0c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210] disabled:cursor-not-allowed disabled:opacity-60"
                     >

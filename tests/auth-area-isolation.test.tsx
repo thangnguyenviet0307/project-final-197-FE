@@ -102,6 +102,22 @@ it("does not reload or replace an admin session when a customer tab changes its 
   reloadError.mockRestore()
 })
 
+it("keeps the page and cached data when another tab persists the same session marker", async () => {
+  useAuthStore.getState().setSession(admin, { accessToken: "admin-access" })
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: { data: admin } })
+  function Session() { useAuthSession(); return <p>Admin session</p> }
+  const reloadError = vi.spyOn(console, "error").mockImplementation(() => {})
+  const view = render(<Session />)
+  await initializeSession()
+  queryClient.setQueryData(["products", "preserved"], ["existing product"])
+  window.dispatchEvent(new StorageEvent("storage", { key: "admin-auth", newValue: localStorage.getItem("admin-auth") }))
+  expect(reloadError).not.toHaveBeenCalled()
+  expect(useAuthStore.getState().accessToken).toBe("admin-access")
+  expect(queryClient.getQueryData(["products", "preserved"])).toEqual(["existing product"])
+  view.unmount()
+  reloadError.mockRestore()
+})
+
 it.each([false, true])("starts with empty login fields and disables autofill (storefront=%s)", storefront => {
   render(<QueryClientProvider client={queryClient}><MemoryRouter>{storefront ? <CustomerAuthForm /> : <LoginForm1 />}</MemoryRouter></QueryClientProvider>)
   for (const label of ["Email", "Mật khẩu"]) {

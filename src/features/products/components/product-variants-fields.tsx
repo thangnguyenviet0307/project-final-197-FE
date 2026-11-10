@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import type { ProductFormValues } from '@/features/products/schemas/product-schema';
-import { ProductImage } from '@/features/products/components/product-image';
+import { ProductUploadField } from './product-upload-field';
 
 export function ProductInputField({
   form,
@@ -25,12 +25,23 @@ export function ProductInputField({
   optional?: boolean;
 }) {
   const error = form.getFieldState(name, form.formState).error;
+  const dimensions = useWatch({ control: form.control, name: 'dimensions' });
+  const required =
+    ['product_name', 'discount'].includes(name) ||
+    /^variants\.\d+\.(sku|price)$/.test(name) ||
+    /^variants\.\d+\.options\.\d+\.name$/.test(name) ||
+    /^tags\.\d+\.value$/.test(name) ||
+    (name.startsWith('dimensions.') &&
+      Object.values(dimensions ?? {}).some((value) => value !== undefined));
   return (
     <Field>
-      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+      <FieldLabel htmlFor={name} required={required}>
+        {label}
+      </FieldLabel>
       <Input
         placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
         id={name}
+        aria-required={required}
         type={numeric ? 'number' : 'text'}
         step={numeric ? 'any' : undefined}
         aria-invalid={!!error}
@@ -70,10 +81,6 @@ function VariantFields({
   const images = useFieldArray({
     control: form.control,
     name: `variants.${index}.images`,
-  });
-  const variant = useWatch({
-    control: form.control,
-    name: `variants.${index}`,
   });
   return (
     <fieldset className="space-y-4 rounded-lg border p-4">
@@ -115,21 +122,16 @@ function VariantFields({
         <ProductInputField
           form={form}
           name={`variants.${index}.compare_at_price`}
-          label="Giá so sánh"
+          label="Giá niêm yết (trước giảm)"
           numeric
           optional
         />
-        <ProductInputField
+        <ProductUploadField
           form={form}
           name={`variants.${index}.image`}
-          label="Đường dẫn ảnh chính"
+          label="Ảnh chính biến thể"
         />
       </div>
-      <ProductImage
-        src={variant?.image}
-        alt={`Xem trước ảnh chính biến thể ${index + 1}`}
-        className="size-24 border"
-      />
       <div className="space-y-3">
         <h3 className="text-sm font-medium">Tùy chọn</h3>
         {options.fields.map((option, optionIndex) => (
@@ -171,15 +173,10 @@ function VariantFields({
         <h3 className="text-sm font-medium">Hình ảnh</h3>
         {images.fields.map((image, imageIndex) => (
           <div key={image.id} className="flex items-end gap-2">
-            <ProductInputField
+            <ProductUploadField
               form={form}
               name={`variants.${index}.images.${imageIndex}.url`}
-              label={`Đường dẫn ảnh ${imageIndex + 1}`}
-            />
-            <ProductImage
-              src={variant?.images?.[imageIndex]?.url}
-              alt={`Xem trước ảnh ${imageIndex + 1} của biến thể ${index + 1}`}
-              className="size-16 shrink-0 border"
+              label={`Ảnh ${imageIndex + 1}`}
             />
             <Button
               type="button"
@@ -197,7 +194,7 @@ function VariantFields({
           onClick={() => images.append({ url: '' })}
         >
           <Plus />
-          Thêm đường dẫn ảnh
+          Thêm ảnh
         </Button>
       </div>
       <Button type="button" variant="destructive" onClick={onRemove}>

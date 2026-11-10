@@ -18,13 +18,13 @@ export function ProductCard({ product }: { product: StorefrontProduct }) {
       <Link
         to={`/shop/${encodeURIComponent(product.slug)}`}
         state={linkState}
-        className="product-card-media relative block aspect-[4/3] shrink-0 overflow-hidden bg-[#f4f5f2]"
+        className="product-card-media relative block aspect-[4/3] shrink-0 overflow-hidden bg-white"
         aria-label={`Xem ${product.name}`}
       >
         <ProductImage
           src={product.image}
           alt={product.name}
-          className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
+          className="absolute inset-0 size-full object-contain object-center p-3 sm:p-4"
         />
         {!!product.badges?.length && (
           <div

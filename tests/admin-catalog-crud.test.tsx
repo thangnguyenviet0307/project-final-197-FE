@@ -45,6 +45,85 @@ function mockApi(resource: "customers" | "brands" | "categories", rejectDelete =
   return { writes, gets }
 }
 
+it.each(['super_admin', 'admin', 'staff'] as const)('%s opens category, brand and customer details from rows', async (role) => {
+  useAuthStore.setState(state => ({ user: { ...state.user!, role } }))
+  const writes = vi.fn()
+  api.defaults.adapter = async config => {
+    if (config.method !== 'get') writes(config.method)
+    const data = config.url === '/brands' ? [brand] : config.url === '/categories' ? [category] : [customer]
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: {
+      data, pagination: { page: 1, limit: 10, total: 1, totalPages: 1 },
+    } }
+  }
+  setup(<><CategoriesPage /><BrandsPage /><CustomersPage /></>)
+  const categoryRow = await screen.findByRole('row', { name: 'Xem danh mục Phones' })
+  fireEvent.click(categoryRow)
+  const categoryDialog = await screen.findByRole('dialog', { name: 'Chi tiết danh mục' })
+  expect(within(categoryDialog).getByText('Danh mục gốc')).toBeTruthy()
+  fireEvent.keyDown(categoryDialog, { key: 'Escape' })
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  fireEvent.keyDown(await screen.findByRole('row', { name: 'Xem thương hiệu Acme' }), { key: 'Enter' })
+  const brandDialog = await screen.findByRole('dialog', { name: 'Chi tiết thương hiệu' })
+  expect(within(brandDialog).getByText('Devices')).toBeTruthy()
+  fireEvent.keyDown(brandDialog, { key: 'Escape' })
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  fireEvent.click((await screen.findByText('an@example.com')).closest('tr')!)
+  const customerDialog = await screen.findByRole('dialog', { name: 'Hồ sơ khách hàng' })
+  expect(within(customerDialog).getAllByText('an@example.com').length).toBeGreaterThan(0)
+  expect(writes).not.toHaveBeenCalled()
+  if (role === 'staff') {
+    expect(screen.queryByRole('button', { name: 'Edit Phones' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Delete Phones' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Xóa Acme' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /Xóa.*An/ })).toBeNull()
+  }
+})
+
+it('filters root and child categories and resolves both parent shapes', async () => {
+  const child = { ...category, _id: 'd'.repeat(24), name: 'Child', slug: 'child', parent: category._id }
+  const populated = { ...child, _id: 'e'.repeat(24), name: 'Populated', parent: { _id: category._id, name: category.name } }
+  const third = { ...child, _id: 'f'.repeat(24), name: 'Third child' }
+  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: { data: [category, child, populated, third] } })
+  setup(<CategoriesPage />)
+  const childRow = await screen.findByRole('row', { name: 'Xem danh mục Child' })
+  expect(screen.getByRole('columnheader', { name: 'Danh mục cha' })).toBeTruthy()
+  expect(screen.getByRole('columnheader', { name: 'Danh mục con' })).toBeTruthy()
+  const rootRow = screen.getByRole('row', { name: 'Xem danh mục Phones' })
+  const children = within(rootRow).getByRole('list', { name: 'Danh mục con của Phones' })
+  expect(within(children).getByText('Child')).toBeTruthy()
+  expect(within(children).getByText('Populated')).toBeTruthy()
+  expect(within(children).queryByText('Third child')).toBeNull()
+  expect(within(rootRow).getByText('3 danh mục con')).toBeTruthy()
+  expect(within(rootRow).getByText('+1 danh mục khác')).toBeTruthy()
+  expect(screen.getAllByRole('columnheader')).toHaveLength(5)
+  fireEvent.click(rootRow)
+  const detail = await screen.findByRole('dialog', { name: 'Chi tiết danh mục' })
+  expect(within(detail).getByText(/Third child/)).toBeTruthy()
+  expect(within(detail).getByText('phones')).toBeTruthy()
+  fireEvent.keyDown(detail, { key: 'Escape' })
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  expect(within(childRow).getByText('Không có')).toBeTruthy()
+  expect(within(childRow).getByText('Phones')).toBeTruthy()
+  expect(within(screen.getByRole('row', { name: 'Xem danh mục Populated' })).getByText('Phones')).toBeTruthy()
+  fireEvent.change(screen.getByLabelText('Loại danh mục'), { target: { value: 'root' } })
+  expect(screen.queryByRole('row', { name: 'Xem danh mục Child' })).toBeNull()
+  expect(screen.getByRole('row', { name: 'Xem danh mục Phones' })).toBeTruthy()
+  expect(within(screen.getByRole('row', { name: 'Xem danh mục Phones' })).getByText('Child')).toBeTruthy()
+  fireEvent.change(screen.getByLabelText('Loại danh mục'), { target: { value: 'child' } })
+  expect(screen.queryByRole('row', { name: 'Xem danh mục Phones' })).toBeNull()
+  expect(screen.getByRole('row', { name: 'Xem danh mục Child' })).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Đặt lại bộ lọc' }))
+  expect(screen.getByRole('row', { name: 'Xem danh mục Phones' })).toBeTruthy()
+})
+
+it('opens category edit without also opening the row detail', async () => {
+  mockApi('categories')
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole('button', { name: 'Edit Phones' }))
+  expect(await screen.findByRole('dialog', { name: 'Chỉnh sửa danh mục' })).toBeTruthy()
+  expect(screen.queryByRole('dialog', { name: 'Chi tiết danh mục' })).toBeNull()
+})
+
 it("exposes no administrative customer creation method", () => {
   expect(Object.hasOwn(customersService, "createCustomer")).toBe(false)
 })
@@ -210,8 +289,8 @@ it.each([false, true])("brand deletion keeps the confirmation open only on failu
 it("generates unpredictable initial credentials instead of role-based defaults", () => {
   const first = getTemporaryPassword("admin")
   const second = getTemporaryPassword("staff")
-  expect(first).toMatch(/^Aa1![a-f0-9]{36}$/)
-  expect(second).toMatch(/^Aa1![a-f0-9]{36}$/)
+  expect(first).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
+  expect(second).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
   expect(first).not.toBe(second)
 })
 
@@ -425,6 +504,30 @@ it("explains which direct child categories become roots before deleting a parent
   setup(<CategoriesPage />)
   fireEvent.click(await screen.findByRole("button", { name: "Delete Phones" }))
   const dialog = await screen.findByRole("dialog", { name: "Xóa danh mục?" })
-  expect(await within(dialog).findByText(/Xóa danh mục này sẽ chuyển 1 danh mục con trực tiếp thành danh mục gốc/)).toBeTruthy()
+  expect(await within(dialog).findByText(/Tích chọn danh mục con cần xóa kèm/)).toBeTruthy()
   expect(within(dialog).getByText("Child category")).toBeTruthy()
+  expect(within(dialog).getByRole('checkbox', { name: 'Child category' })).toHaveProperty('checked', false)
+})
+
+it('sends only explicitly selected children and checks product references for the selected set', async () => {
+  const child = { ...category, _id: 'd'.repeat(24), name: 'Remove child', parent: category._id }
+  const survivor = { ...category, _id: 'e'.repeat(24), name: 'Keep child', parent: category._id }
+  const writes = vi.fn(), filters = vi.fn()
+  api.defaults.adapter = async config => {
+    if (config.method === 'delete') writes(config.url, JSON.parse(config.data))
+    if (config.url === '/products') filters(config.params.category)
+    return { config, headers: new AxiosHeaders(), status: 200, statusText: 'OK', data: config.url === '/products'
+      ? { data: [], pagination: { total: 0, totalPages: 0 } }
+      : { success: true, data: [category, child, survivor] } }
+  }
+  setup(<CategoriesPage />)
+  fireEvent.click(await screen.findByRole('button', { name: 'Delete Phones' }))
+  const dialog = await screen.findByRole('dialog', { name: 'Xóa danh mục?' })
+  fireEvent.click(await within(dialog).findByRole('checkbox', { name: 'Remove child' }))
+  expect(within(dialog).getByRole('checkbox', { name: 'Keep child' })).toHaveProperty('checked', false)
+  await waitFor(() => expect(filters).toHaveBeenCalledWith([category._id, child._id].sort().join(',')))
+  const confirm = within(dialog).getByRole('button', { name: 'Xác nhận xóa' })
+  await waitFor(() => expect(confirm).toHaveProperty('disabled', false))
+  fireEvent.click(confirm)
+  await waitFor(() => expect(writes).toHaveBeenCalledWith(`/categories/${category._id}`, { childIds: [child._id] }))
 })

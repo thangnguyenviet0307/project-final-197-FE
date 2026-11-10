@@ -1,3 +1,5 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
+import { RequiredMark } from '@/components/required-mark';
 import { useState, type SubmitEvent } from 'react';
 import { useCategories } from '@/features/categories/hooks/use-categories';
 import { heroSlideSchema } from '@/features/hero-slides/schemas/hero-slide-schema';
@@ -76,7 +78,7 @@ export function HeroSlideForm({
         className="space-y-4 disabled:opacity-70"
       >
         <label className="grid gap-2 text-sm">
-          Danh mục
+          <span>Danh mục {(!slide || !!slide.category) && <RequiredMark />}</span>
           <select
             required={!slide || !!slide.category}
             aria-invalid={!!categoryError}
@@ -114,7 +116,7 @@ export function HeroSlideForm({
           </p>
         )}
         <label className="grid gap-2 text-sm">
-          Tiêu đề
+          <span>Tiêu đề <RequiredMark /></span>
           <Textarea
             placeholder="Nhập tiêu đề banner"
             required
@@ -132,7 +134,7 @@ export function HeroSlideForm({
           Mô tả
           <Textarea
             placeholder="Nhập mô tả banner"
-            maxLength={1000}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             value={draft.description}
             onChange={(event) =>
               setDraft((previous) => ({
@@ -161,7 +163,7 @@ export function HeroSlideForm({
           </span>
         </label>
         <label className="grid gap-2 text-sm">
-          Thứ tự
+          <span>Thứ tự <RequiredMark /></span>
           <Input
             type="number"
             min={0}

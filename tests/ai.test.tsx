@@ -309,7 +309,9 @@ it('stops while Socket.IO is connecting and ignores late ready events', async ()
     (screen.getByLabelText('Câu hỏi cho trợ lý') as HTMLTextAreaElement).value
   ).toBe('Chưa kết nối');
 });
-it('stops accepted streaming immediately and ignores late completed events', async () => {
+it('waits for durable cancellation confirmation and ignores late completed events', async () => {
+  const cancelled = deferred<Awaited<ReturnType<typeof aiService.cancel>>>();
+  const cancel = vi.spyOn(aiService, 'cancel').mockReturnValue(cancelled.promise);
   const { socket, handlers } = socketFixture();
   vi.spyOn(aiService, 'create').mockResolvedValue({ id });
   vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
@@ -327,7 +329,9 @@ it('stops accepted streaming immediately and ignores late completed events', asy
   });
   const lateCompleted = handlers.get('chat:completed');
   fireEvent.click(screen.getByRole('button', { name: 'Dừng' }));
-  expect(socket.emit).toHaveBeenCalledWith('chat:cancel', { requestId });
+  expect(cancel).toHaveBeenCalledWith(id, requestId, 'Câu hỏi đã nhận');
+  expect(screen.getByText('Đang dừng…')).toBeTruthy();
+  expect(screen.queryByText('Đã dừng lượt trả lời.')).toBeNull();
   await act(async () => {
     lateCompleted?.({
       type: 'chat:completed',
@@ -343,6 +347,40 @@ it('stops accepted streaming immediately and ignores late completed events', asy
   expect(screen.queryByText('Không được ghi đè')).toBeNull();
   expect(screen.getByText('Nội dung từng phần')).toBeTruthy();
   expect(socket.disconnect).toHaveBeenCalled();
+  await act(async () => cancelled.resolve({ requestId, status: 'cancelled', answer: '', sources: [] }));
+  expect(await screen.findByText('Đã dừng lượt trả lời.')).toBeTruthy();
+});
+
+it.each(['completed', 'unavailable'] as const)('cancel reports %s without claiming cancellation', async (outcome) => {
+  const { socket, handlers } = socketFixture();
+  vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+  vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+  const cancel = vi.spyOn(aiService, 'cancel');
+  if (outcome === 'completed') cancel.mockResolvedValue({ requestId: 'saved', status: 'completed', answer: 'Kết quả đã lưu', sources: [] });
+  else cancel.mockRejectedValue(new Error('Network unavailable'));
+  mount();
+  openAndSend('Câu hỏi');
+  await waitFor(() => expect(socket.emit).toHaveBeenCalled());
+  const { requestId } = socket.emit.mock.calls[0]![1] as { requestId: string };
+  await act(async () => handlers.get('chat:accepted')?.({ type: 'chat:accepted', requestId }));
+  fireEvent.click(screen.getByRole('button', { name: 'Dừng' }));
+  expect(await screen.findByText(outcome === 'completed'
+    ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.'
+    : 'Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.')).toBeTruthy();
+  expect(screen.queryByText('Đã dừng lượt trả lời.')).toBeNull();
+});
+
+it('processing replay stays processing and does not masquerade as completion', async () => {
+  const { socket, handlers } = socketFixture();
+  vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+  vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+  mount();
+  openAndSend('Câu hỏi đang chạy');
+  await waitFor(() => expect(socket.emit).toHaveBeenCalled());
+  const { requestId } = socket.emit.mock.calls[0]![1] as { requestId: string };
+  await act(async () => handlers.get('chat:processing')?.({ type: 'chat:processing', requestId, data: { status: 'processing' } }));
+  expect(await screen.findByText('Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.')).toBeTruthy();
+  expect(completedSchema.safeParse({ answer: '', status: 'processing', sources: [], products: [] }).success).toBe(false);
 });
 it('keeps a draft when ticket creation fails', async () => {
   vi.spyOn(aiService, 'create').mockResolvedValue({ id });

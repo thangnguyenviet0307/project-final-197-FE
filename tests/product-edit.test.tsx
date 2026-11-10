@@ -8,6 +8,10 @@ import ProductEditPage from "@/pages/admin/products/edit"
 import { api } from "@/services/api"
 import { queryClient } from "@/services/query-client"
 import type { Product } from "@/features/products/types/products"
+vi.mock('@/features/products/components/product-gallery', () => ({ ProductGallery: () => null }));
+vi.mock('@/features/products/components/inventory-editor', () => ({ InventoryEditor: () => null }));
+vi.mock('@/features/products/components/product-reviews', () => ({ ProductReviews: () => null }));
+vi.mock('@/features/products/components/product-news-editor', () => ({ ProductNewsEditor: () => null }));
 
 vi.mock("@/layout/admin/base-layout", () => ({ BaseLayout: ({ children }: { children: ReactNode }) => <main>{children}</main> }))
 const adapter = api.defaults.adapter

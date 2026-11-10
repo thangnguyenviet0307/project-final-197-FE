@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,7 +19,7 @@ const schema = z.object({
     .trim()
     .min(1, 'Vui lòng nhập tên thương hiệu.')
     .max(100, 'Tên thương hiệu không được vượt quá 100 ký tự.'),
-  description: z.string().trim(),
+  description: z.string().trim().max(DESCRIPTION_MAX_LENGTH),
   logoUrl: imageUrlSchema,
   isActive: z.boolean(),
 });
@@ -72,7 +73,7 @@ export function BrandForm({
       >
         <fieldset disabled={busy} className="space-y-4">
           <Field>
-            <FieldLabel htmlFor="brand-name">Tên thương hiệu</FieldLabel>
+            <FieldLabel required htmlFor="brand-name">Tên thương hiệu</FieldLabel>
             <Input
               placeholder="Nhập tên thương hiệu"
               id="brand-name"
@@ -96,6 +97,7 @@ export function BrandForm({
             <Textarea
               placeholder="Nhập mô tả thương hiệu"
               id="brand-description"
+              maxLength={DESCRIPTION_MAX_LENGTH}
               rows={5}
               {...form.register('description')}
             />

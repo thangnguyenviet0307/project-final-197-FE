@@ -3,6 +3,7 @@ import { isAdministrator } from '@/features/auth/utils/roles';
 
 import { useAuthStore } from '@/stores/auth.store';
 import { CustomerProfileDialog } from '@/features/customers/components/customer-profile-dialog';
+import { detailRow } from '@/utils/detail-row';
 import {
   customerAddress,
   customerBirthDate,
@@ -162,6 +163,7 @@ export function CustomerTable({
 }: CustomerTableProps) {
   const admin = useAuthStore((state) => isAdministrator(state.user?.role));
   const [searchValue, setSearchValue] = useState(searchQuery);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const [previousSearchQuery, setPreviousSearchQuery] = useState(searchQuery);
   if (previousSearchQuery !== searchQuery) {
@@ -263,7 +265,11 @@ export function CustomerTable({
           <TableBody>
             {visibleCustomers.length > 0 ? (
               visibleCustomers.map((customer) => (
-                <TableRow key={customer._id}>
+                <TableRow
+                  key={customer._id}
+                  {...detailRow(() => setDetailId(customer._id))}
+                  aria-label={`Xem khách hàng ${customer.displayName || `${customer.last_name} ${customer.first_name}`.trim()}`}
+                >
                   {/* Họ tên và Email */}
                   <TableCell>
                     <div className="flex flex-col">
@@ -328,7 +334,13 @@ export function CustomerTable({
                       >
                         Lịch sử đơn hàng
                       </Link>
-                      <CustomerProfileDialog customer={customer} />
+                      <CustomerProfileDialog
+                        customer={customer}
+                        open={detailId === customer._id}
+                        onOpenChange={(open) =>
+                          setDetailId(open ? customer._id : null)
+                        }
+                      />
 
                       {admin && (
                         <DeleteCustomerDialog

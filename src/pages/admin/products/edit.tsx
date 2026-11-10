@@ -9,6 +9,10 @@ import { getApiError } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { useProductListLocation } from '@/features/products/hooks/use-product-list-location';
 import { ArrowLeft } from 'lucide-react';
+import { ProductGallery } from '@/features/products/components/product-gallery';
+import { InventoryEditor } from '@/features/products/components/inventory-editor';
+import { ProductReviews } from '@/features/products/components/product-reviews';
+import { ProductNewsEditor } from '@/features/products/components/product-news-editor';
 export default function ProductEditPage() {
   const { id = '' } = useParams();
   const query = useProduct(id);
@@ -83,6 +87,10 @@ export default function ProductEditPage() {
                 });
               }}
             />
+            <ProductGallery product={query.data} />
+            <InventoryEditor key={`inventory-${id}`} product={query.data} />
+            <ProductReviews key={`reviews-${id}`} id={id} />
+            <ProductNewsEditor key={`news-${id}`} id={id} />
           </>
         )}
       </div>

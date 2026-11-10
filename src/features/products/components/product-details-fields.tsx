@@ -1,9 +1,11 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { Controller, useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { ProductInputField } from '@/features/products/components/product-variants-fields';
 import type { ProductFormValues } from '@/features/products/schemas/product-schema';
+import { ProductPolicyPicker } from './product-policy-picker';
 
 export function ProductDetailsFields({
   form,
@@ -28,6 +30,7 @@ export function ProductDetailsFields({
           name="minimumOrderQuantity"
           label="Số lượng đặt tối thiểu"
           numeric
+          optional
         />
         <ProductInputField
           form={form}
@@ -105,12 +108,17 @@ export function ProductDetailsFields({
             render={({ field, fieldState }) => (
               <Field>
                 <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                <ProductPolicyPicker
+                  name={name}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                />
                 <Textarea
                   placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
                   {...field}
                   id={name}
                   value={field.value ?? ''}
-                  maxLength={2000}
+                  maxLength={DESCRIPTION_MAX_LENGTH}
                   aria-invalid={!!fieldState.error}
                   aria-describedby={`${name}-error`}
                 />

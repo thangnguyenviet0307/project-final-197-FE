@@ -2,6 +2,9 @@ import { isAdministrator } from '@/features/auth/utils/roles';
 import { DeleteCategoryDialog } from '@/features/categories/components/delete-category-dialog';
 import { Link } from 'react-router-dom';
 import { CatalogImage } from '@/components/catalog-image';
+import { CatalogDetailDialog } from '@/components/catalog-detail-dialog';
+import { detailRow } from '@/utils/detail-row';
+import { categoryParentName } from '@/features/categories/utils/category-parent';
 import { CategoryForm } from '@/features/categories/components/category-form';
 import {
   Dialog,
@@ -55,6 +58,10 @@ export default function AdminCategoriesPage() {
 
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
+  const [hierarchyFilter, setHierarchyFilter] = useState('all');
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail =
+    categories.find((category) => category._id === detailId) ?? null;
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
@@ -86,9 +93,12 @@ export default function AdminCategoriesPage() {
             ? cat.isActive
             : !cat.isActive;
 
-      return matchesSearch && matchesStatus;
+      const matchesHierarchy =
+        hierarchyFilter === 'all' ||
+        (hierarchyFilter === 'root' ? !cat.parent : !!cat.parent);
+      return matchesSearch && matchesStatus && matchesHierarchy;
     });
-  }, [categories, searchTerm, statusFilter]);
+  }, [categories, searchTerm, statusFilter, hierarchyFilter]);
 
   // Statistics
   const stats = useMemo(() => {
@@ -100,6 +110,20 @@ export default function AdminCategoriesPage() {
   }, [categories]);
 
   const isSaving = updateMutation.isPending;
+  const childrenByParent = useMemo(() => {
+    const children = new Map<string, Category[]>();
+    for (const category of categories) {
+      const parentId =
+        typeof category.parent === 'object'
+          ? category.parent?._id
+          : category.parent;
+      if (!parentId) continue;
+      const siblings = children.get(parentId) ?? [];
+      siblings.push(category);
+      children.set(parentId, siblings);
+    }
+    return children;
+  }, [categories]);
 
   const cards = [
     {
@@ -202,7 +226,7 @@ export default function AdminCategoriesPage() {
                 }}
               />
             </Field>
-            <Field className="lg:col-span-2">
+            <Field>
               <FieldLabel htmlFor="category-status">Trạng thái</FieldLabel>
               <select
                 id="category-status"
@@ -225,6 +249,24 @@ export default function AdminCategoriesPage() {
                 <option value="inactive">Ngừng hoạt động</option>
               </select>
             </Field>
+            <Field>
+              <FieldLabel htmlFor="category-hierarchy">
+                Loại danh mục
+              </FieldLabel>
+              <select
+                id="category-hierarchy"
+                className="bg-background h-8 rounded-md border px-2 text-sm"
+                value={hierarchyFilter}
+                onChange={(event) => {
+                  setHierarchyFilter(event.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="all">Tất cả danh mục</option>
+                <option value="root">Danh mục gốc</option>
+                <option value="child">Danh mục con</option>
+              </select>
+            </Field>
             <Button
               type="button"
               variant="outline"
@@ -232,6 +274,7 @@ export default function AdminCategoriesPage() {
               onClick={() => {
                 setSearchTerm('');
                 setStatusFilter('all');
+                setHierarchyFilter('all');
                 setPage(1);
               }}
             >
@@ -270,11 +313,9 @@ export default function AdminCategoriesPage() {
                     <TableRow>
                       {[
                         'Danh mục',
-                        'Đường dẫn',
-                        'Mô tả',
                         'Danh mục cha',
+                        'Danh mục con',
                         'Trạng thái',
-                        'Ngày tạo',
                         'Thao tác',
                       ].map((label) => (
                         <TableHead key={label}>{label}</TableHead>
@@ -283,15 +324,17 @@ export default function AdminCategoriesPage() {
                   </TableHeader>
                   <TableBody>
                     {visibleCategories.map((category) => {
-                      const parentName =
-                        typeof category.parent === 'object' &&
-                        category.parent !== null
-                          ? category.parent.name
-                          : categories.find(
-                              (item) => item._id === category.parent
-                            )?.name;
+                      const parentName = categoryParentName(
+                        category,
+                        categories
+                      );
+                      const children = childrenByParent.get(category._id) ?? [];
                       return (
-                        <TableRow key={category._id}>
+                        <TableRow
+                          key={category._id}
+                          {...detailRow(() => setDetailId(category._id))}
+                          aria-label={`Xem danh mục ${category.name}`}
+                        >
                           <TableCell>
                             <div className="flex max-w-80 min-w-48 items-center gap-3">
                               <CatalogImage
@@ -306,16 +349,41 @@ export default function AdminCategoriesPage() {
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {category.slug}
+                          <TableCell className="max-w-56 text-sm wrap-break-word whitespace-normal">
+                            {parentName}
                           </TableCell>
-                          <TableCell
-                            className="text-muted-foreground max-w-80 truncate"
-                            title={category.description}
-                          >
-                            {category.description || '-'}
+                          <TableCell className="max-w-80 min-w-48 whitespace-normal">
+                            {children.length ? (
+                              <div className="space-y-1">
+                                <span className="text-muted-foreground text-xs">
+                                  {children.length} danh mục con
+                                </span>
+                                <ul
+                                  className="space-y-0.5 text-sm"
+                                  aria-label={`Danh mục con của ${category.name}`}
+                                >
+                                  {children.slice(0, 2).map((child) => (
+                                    <li
+                                      key={child._id}
+                                      className="max-w-64 truncate"
+                                      title={child.name}
+                                    >
+                                      {child.name}
+                                    </li>
+                                  ))}
+                                </ul>
+                                {children.length > 2 && (
+                                  <span className="text-muted-foreground text-xs">
+                                    +{children.length - 2} danh mục khác
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Không có
+                              </span>
+                            )}
                           </TableCell>
-                          <TableCell>{parentName || 'Danh mục gốc'}</TableCell>
                           <TableCell>
                             <Badge
                               variant={
@@ -326,13 +394,6 @@ export default function AdminCategoriesPage() {
                                 ? 'Đang hoạt động'
                                 : 'Ngừng hoạt động'}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground whitespace-nowrap">
-                            {category.createdAt
-                              ? new Date(category.createdAt).toLocaleDateString(
-                                  'vi-VN'
-                                )
-                              : '-'}
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-1">
@@ -409,6 +470,23 @@ export default function AdminCategoriesPage() {
             )}
           </DialogContent>
         </Dialog>
+
+        <CatalogDetailDialog
+          record={detail}
+          childNames={
+            detail
+              ? (childrenByParent.get(detail._id) ?? []).map(
+                  (child) => child.name
+                )
+              : undefined
+          }
+          title="Chi tiết danh mục"
+          image={detail?.icon}
+          parentName={
+            detail ? categoryParentName(detail, categories) : undefined
+          }
+          onClose={() => setDetailId(null)}
+        />
 
         {deleteTarget && canManage && (
           <DeleteCategoryDialog

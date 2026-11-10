@@ -1,3 +1,4 @@
+import { RequiredMark } from '@/components/required-mark';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -109,9 +110,10 @@ export function OrderDatesDialog({
             </fieldset>
           ) : (
             <label className="grid gap-2 text-sm">
-              Thời điểm hoàn tất
+              <span>Thời điểm hoàn tất <RequiredMark /></span>
               <input
                 type="datetime-local"
+                aria-required="true"
                 className="bg-background rounded-md border p-2"
                 value={completed}
                 min={localTimestamp(order.orderDate)}

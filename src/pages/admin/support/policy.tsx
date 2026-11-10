@@ -1,3 +1,5 @@
+import { POLICY_SECTION_MAX_LENGTH } from '@/constants/text-limits';
+import { RequiredMark } from '@/components/required-mark';
 import { ContentEditor } from '@/features/support/components/content';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -123,8 +125,9 @@ function PolicyEditor({
         .map((section) => (
           <div key={section.key}>
             <label htmlFor={section.key} className="font-semibold">
-              {section.title}
+              {section.title}<RequiredMark />
             </label>
+            <p className="text-muted-foreground text-xs">Bắt buộc khi công bố; có thể để trống khi lưu bản nháp.</p>
             <p
               id={`${section.key}-hint`}
               className="text-muted-foreground my-2 text-sm"
@@ -141,7 +144,7 @@ function PolicyEditor({
               }}
             />
             <p className="text-muted-foreground text-right text-xs">
-              {content[section.key].length}/30000
+              {content[section.key].length.toLocaleString('vi-VN')}/{POLICY_SECTION_MAX_LENGTH.toLocaleString('vi-VN')}
             </p>
           </div>
         ))}

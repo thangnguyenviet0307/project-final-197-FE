@@ -80,6 +80,15 @@ export async function updateCategory({
   return data.data;
 }
 
-export async function deleteCategory(id: string): Promise<void> {
-  await api.delete(`/categories/${encodeURIComponent(id)}`);
+export type DeleteCategoryInput = string | { id: string; childIds: string[] };
+export async function deleteCategory(
+  input: DeleteCategoryInput
+): Promise<void> {
+  const id = typeof input === 'string' ? input : input.id;
+  await api.delete(
+    `/categories/${encodeURIComponent(id)}`,
+    typeof input === 'string'
+      ? undefined
+      : { data: { childIds: input.childIds } }
+  );
 }

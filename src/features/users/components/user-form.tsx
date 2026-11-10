@@ -87,7 +87,7 @@ export function UserForm({
         <fieldset disabled={mutation.isPending} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field data-invalid={!!form.formState.errors.firstName}>
-              <FieldLabel htmlFor="create-first-name">Nhập tên</FieldLabel>
+              <FieldLabel required htmlFor="create-first-name">Nhập tên</FieldLabel>
               <Input
                 placeholder="Nhập tên"
                 id="create-first-name"
@@ -98,7 +98,7 @@ export function UserForm({
               <FieldError errors={[form.formState.errors.firstName]} />
             </Field>
             <Field data-invalid={!!form.formState.errors.lastName}>
-              <FieldLabel htmlFor="create-last-name">Nhập họ</FieldLabel>
+              <FieldLabel required htmlFor="create-last-name">Nhập họ</FieldLabel>
               <Input
                 placeholder="Nhập họ"
                 id="create-last-name"
@@ -111,7 +111,7 @@ export function UserForm({
           </div>
 
           <Field data-invalid={!!form.formState.errors.email}>
-            <FieldLabel htmlFor="create-email">Email</FieldLabel>
+            <FieldLabel required htmlFor="create-email">Email</FieldLabel>
             <Input
               placeholder="Nhập email tài khoản"
               id="create-email"
@@ -125,7 +125,7 @@ export function UserForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field data-invalid={!!form.formState.errors.role}>
-              <FieldLabel htmlFor="create-role">Vai trò</FieldLabel>
+              <FieldLabel required htmlFor="create-role">Vai trò</FieldLabel>
               <Controller
                 name="role"
                 control={form.control}
@@ -179,7 +179,7 @@ export function UserForm({
               <FieldError errors={[form.formState.errors.role]} />
             </Field>
             <Field data-invalid={!!form.formState.errors.password}>
-              <FieldLabel htmlFor="create-password">
+              <FieldLabel required htmlFor="create-password">
                 Mật khẩu tạm thời
               </FieldLabel>
               <Input

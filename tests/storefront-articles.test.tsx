@@ -58,3 +58,23 @@ it("renders safe article detail content", () => {
   expect(detail.container.querySelector("script")).toBeNull()
   expect(screen.getByText(/<script>alert\(1\)<\/script>/)).toBeTruthy()
 })
+
+it("keeps repeated article tags consistent through data refreshes without duplicate keys", () => {
+  const previousTags = state.article.tags;
+  const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+  try {
+    const page = () => <MemoryRouter initialEntries={["/bai-viet/bai-viet-mau"]}><Routes><Route path="/bai-viet/:slug" element={<StorefrontArticleDetailPage />} /></Routes></MemoryRouter>;
+    state.article.tags = ["blog", "blog"];
+    const view = render(page());
+    for (const tags of [["blog", "blog"], ["blog"], ["news", "blog", "blog"], []]) {
+      state.article.tags = tags;
+      view.rerender(page());
+      const list = screen.queryByRole("list", { name: "Thẻ bài viết" });
+      expect(list ? [...list.querySelectorAll("li")].map(item => item.textContent) : []).toEqual(tags);
+    }
+    expect(errors.mock.calls.filter(call => call.some(value => String(value).includes("same key")))).toHaveLength(0);
+  } finally {
+    state.article.tags = previousTags;
+    errors.mockRestore();
+  }
+});

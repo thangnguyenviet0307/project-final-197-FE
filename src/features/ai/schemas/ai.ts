@@ -11,7 +11,7 @@ export const socketEventSchema = z.object({
 });
 export const completedSchema = z.object({
   answer: z.string(),
-  status: z.string(),
+  status: z.literal('completed'),
   sources: z
     .array(
       z.object({
@@ -36,4 +36,10 @@ export const completedSchema = z.object({
       })
     )
     .default([]),
+});
+export const cancelResultSchema = completedSchema.pick({
+  answer: true, sources: true,
+}).extend({
+  requestId: z.string(),
+  status: z.enum(['completed', 'cancelled', 'failed']),
 });

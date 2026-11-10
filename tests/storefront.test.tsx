@@ -79,7 +79,7 @@ it("uses Backend products for the homepage featured section", () => {
 it("keeps catalog search and pagination when returning from a product detail", () => {
   render(<MemoryRouter initialEntries={["/shop?search=Chicken&page=2"]}><Routes><Route path="/shop" element={<StorefrontProductsPage />} /><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
   fireEvent.click(screen.getByRole("link", { name: "Xem Ceramic Chicken" }))
-  expect(screen.getByRole("link", { name: "Quay lại danh sách" }).getAttribute("href")).toBe("/shop?search=Chicken&page=2")
+  expect(screen.getByRole("link", { name: "Quay lại danh sách" }).getAttribute("href")).toBe("/shop?n=2&q=Chicken")
 })
 it("shows real rating/reviews, paginates reviews and links related products", () => {
   render(<MemoryRouter initialEntries={["/shop/ceramic-chicken"]}><Routes><Route path="/shop/:slug" element={<StorefrontProductDetailPage />} /></Routes></MemoryRouter>)
@@ -113,8 +113,8 @@ it("groups category labels and policies inside the overview, without duplicated 
     expect(within(overview).getByText("Đổi trả")).toBeTruthy()
     fireEvent.click(screen.getByRole("tab", { name: "Thông tin chi tiết" }))
     const table = screen.getByRole("table", { name: "Thông tin chi tiết sản phẩm" })
-    expect(within(table).getByRole("rowheader", { name: "SKU" })).toBeTruthy()
-    expect(within(table).getByRole("cell", { name: "BLUE" })).toBeTruthy()
+    expect(within(table).queryByRole("rowheader", { name: "SKU" })).toBeNull()
+    expect(within(table).queryByRole("cell", { name: "BLUE" })).toBeNull()
     expect(within(table).getByRole("rowheader", { name: "Material" })).toBeTruthy()
     for (const name of ["Giao hàng", "Bảo hành", "Đổi trả"]) expect(within(table).queryByRole("rowheader", { name })).toBeNull()
     const sidebar = screen.getByRole("complementary", { name: "Tin tức liên quan" })

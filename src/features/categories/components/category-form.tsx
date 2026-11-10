@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -67,7 +68,7 @@ export function CategoryForm({
       >
         <fieldset disabled={busy} className="space-y-4">
           <Field>
-            <FieldLabel htmlFor="category-name">Tên danh mục</FieldLabel>
+            <FieldLabel required htmlFor="category-name">Tên danh mục</FieldLabel>
             <Input
               placeholder="Nhập tên danh mục"
               id="category-name"
@@ -91,6 +92,7 @@ export function CategoryForm({
             <Textarea
               placeholder="Nhập mô tả danh mục"
               id="category-description"
+              maxLength={DESCRIPTION_MAX_LENGTH}
               rows={5}
               {...form.register('description')}
             />

@@ -43,12 +43,14 @@ export function CatalogFilterOption({
   all,
   selected,
   onClick,
+  compact = false,
 }: {
   name: string;
   image?: string;
   all?: boolean;
   selected: boolean;
   onClick: () => void;
+  compact?: boolean;
 }) {
   return (
     <button
@@ -57,6 +59,8 @@ export function CatalogFilterOption({
       onClick={onClick}
       className={cn(
         'flex h-16 w-full min-w-0 items-center rounded-xl border px-3 text-gray-700 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4d9210]',
+        compact &&
+          'h-12 w-auto max-w-full gap-2 rounded-lg px-2.5 [&_img]:size-7 [&_span[aria-hidden]]:size-7',
         selected
           ? 'border-[#4d9210] bg-[#e9f5e0] text-[#397a16] ring-1 ring-[#4d9210]'
           : 'border-gray-200 bg-white hover:border-[#9acb74] hover:text-[#397a16]'

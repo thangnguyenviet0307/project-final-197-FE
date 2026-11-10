@@ -29,6 +29,9 @@ export function useChat(open: boolean) {
     requestId: string;
     conversationId: string | null;
     accepted: boolean;
+    content: string;
+    sent: boolean;
+    cancelling?: boolean;
   } | null>(null);
   const endingRef = useRef(new Set<string>());
   const [endingIds, setEndingIds] = useState<string[]>([]);
@@ -134,7 +137,7 @@ export function useChat(open: boolean) {
     const requestId = crypto.randomUUID();
     const controller = new AbortController();
     sendController.current = controller;
-    const turn = { requestId, conversationId: id, accepted: false };
+    const turn = { requestId, conversationId: id, accepted: false, content: parsed.data, sent: false, cancelling: false };
     activeTurn.current = turn;
     const current = () =>
       currentGeneration === generation.current && !controller.signal.aborted;
@@ -191,12 +194,6 @@ export function useChat(open: boolean) {
           );
         if (!turn.accepted)
           setLive((value) => (value?.requestId === requestId ? null : value));
-        else
-          setLive((value) =>
-            value?.requestId === requestId && value.status === 'processing'
-              ? { ...value, status: 'failed' }
-              : value
-          );
         if (activeTurn.current === turn) activeTurn.current = null;
         void refresh(conversationId);
       };
@@ -214,12 +211,23 @@ export function useChat(open: boolean) {
             turn.accepted = true;
             onAccepted?.();
           }
-          if (result.type === 'chat:ready')
+          if (result.type === 'chat:ready') {
+            turn.sent = true;
             connection.emit('chat:send', {
               conversationId,
               requestId,
               content: parsed.data,
             });
+          }
+          if (result.type === 'chat:processing') {
+            if (!turn.accepted) {
+              turn.accepted = true;
+              onAccepted?.();
+            }
+            setError('Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.');
+            finished = true;
+            connection.disconnect();
+          }
           if (result.type === 'chat:status' && typeof result.data === 'string')
             setStatus(result.data);
           if (result.type === 'chat:delta' && typeof result.data === 'string') {
@@ -257,6 +265,7 @@ export function useChat(open: boolean) {
         'chat:status',
         'chat:delta',
         'chat:completed',
+        'chat:processing',
         'chat:error',
       ])
         connection.on(name, onEvent);
@@ -282,34 +291,50 @@ export function useChat(open: boolean) {
       }
     }
   };
-  const cancel = () => {
+  const cancel = async () => {
     if (!active.current) return;
     const turn = activeTurn.current;
-    if (socket.current?.connected && turn)
-      socket.current.emit('chat:cancel', { requestId: turn.requestId });
-    generation.current++;
+    if (turn?.cancelling) return;
+    if (turn) turn.cancelling = true;
+    const version = ++generation.current;
     sendController.current?.abort();
     disposeSocket.current?.();
-    active.current = false;
-    activeTurn.current = null;
-    setBusy(false);
-    setStatus('');
-    setError('Đã dừng lượt gửi.');
-    setLive((value) =>
-      turn && value?.requestId === turn.requestId && turn.accepted
-        ? { ...value, status: 'cancelled' }
-        : null
-    );
-    if (turn?.conversationId) void refresh(turn.conversationId);
+    setStatus('Đang dừng…');
+    setError('');
+    try {
+      if (turn?.sent && turn.conversationId) {
+        const result = await aiService.cancel(turn.conversationId, turn.requestId, turn.content);
+        if (version !== generation.current) return;
+        setLive(value => value?.requestId === turn.requestId
+          ? { ...value, ...result, answer: result.answer || value.answer } : value);
+        setError(result.status === 'cancelled' ? 'Đã dừng lượt trả lời.' :
+          result.status === 'completed' ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.' : 'Lượt trả lời đã thất bại.');
+      } else if (version === generation.current) {
+        setLive(null);
+        setError('Đã dừng trước khi gửi câu hỏi.');
+      }
+    } catch {
+      if (version === generation.current)
+        setError('Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.');
+    } finally {
+      if (version === generation.current) {
+        active.current = false;
+        activeTurn.current = null;
+        setBusy(false);
+        setStatus('');
+        if (turn?.conversationId) void refresh(turn.conversationId);
+      }
+    }
   };
   const end = async () => {
     if (!id || endingRef.current.has(id)) return;
     const target = id;
-    cancel();
-    const version = generation.current;
     endingRef.current.add(target);
     setEndingIds([...endingRef.current]);
+    const cancellation = cancel();
+    const version = generation.current;
     try {
+      await cancellation;
       await aiService.end(target);
       if (version === generation.current) setLive(null);
       await refresh(target);
