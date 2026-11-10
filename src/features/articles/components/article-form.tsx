@@ -1,3 +1,4 @@
+import { RequiredMark } from '@/components/required-mark';
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -138,7 +139,7 @@ export function ArticleForm({
     <form onSubmit={submit} className="space-y-4">
       <fieldset disabled={pending} className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-1 sm:col-span-2">
-          Tiêu đề
+          <span>Tiêu đề <RequiredMark /></span>
           <Input
             placeholder="Nhập tiêu đề bài viết"
             required
@@ -149,7 +150,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1">
-          Loại bài
+          <span>Loại bài <RequiredMark /></span>
           <select
             className="bg-background h-10 rounded-md border px-3"
             value={draft.type}
@@ -162,7 +163,7 @@ export function ArticleForm({
           </select>
         </label>
         <label className="grid gap-1">
-          Danh mục
+          <span>Danh mục {(!article || !!article.categoryId) && <RequiredMark />}</span>
           <select
             required={!article || !!article.categoryId}
             className="bg-background h-10 rounded-md border px-3"
@@ -194,7 +195,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1">
-          Tác giả
+          <span>Tác giả <RequiredMark /></span>
           <Input
             placeholder="Nhập tên tác giả"
             required
@@ -204,7 +205,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1 sm:col-span-2">
-          Tóm tắt
+          <span>Tóm tắt <RequiredMark /></span>
           <Textarea
             placeholder="Nhập mô tả ngắn cho bài viết"
             required
@@ -214,7 +215,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1 sm:col-span-2">
-          Nội dung
+          <span>Nội dung <RequiredMark /></span>
           <Textarea
             placeholder="Nhập nội dung bài viết"
             aria-label="Nội dung"
@@ -239,7 +240,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1">
-          Trạng thái
+          <span>Trạng thái <RequiredMark /></span>
           <select
             className="bg-background h-10 rounded-md border px-3"
             value={draft.status}
@@ -254,7 +255,7 @@ export function ArticleForm({
           </select>
         </label>
         <label className="grid gap-1">
-          Thời gian xuất bản
+          <span>Thời gian xuất bản {(draft.status === 'scheduled') && <RequiredMark />}</span>
           <Input
             type="datetime-local"
             required={draft.status === 'scheduled'}
@@ -271,7 +272,7 @@ export function ArticleForm({
           />
         </label>
         <label className="grid gap-1">
-          Thứ tự trên trang chủ
+          <span>Thứ tự trên trang chủ <RequiredMark /></span>
           <Input
             type="number"
             required

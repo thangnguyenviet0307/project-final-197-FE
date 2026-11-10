@@ -32,13 +32,9 @@ import { getApiError } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { ProductDescriptionEditor } from '@/features/products/components/product-description-editor';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { SearchableSelect } from '@/components/searchable-select';
+import { searchText } from '@/utils/search-text';
+import { Input } from '@/components/ui/input';
 import {
   ProductInputField,
   ProductVariantsFields,
@@ -72,6 +68,7 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   const categories = useCategories();
   const brands = useBrands();
   const [original] = useState(product);
+  const [categorySearch, setCategorySearch] = useState('');
   const client = useQueryClient();
   const files = useRef(
     new Map<string, { path: FieldPath<ProductFormValues> | null; file: File }>()
@@ -81,7 +78,11 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   const [hasFiles, setHasFiles] = useState(false);
   const [finishingImages, setFinishingImages] = useState(false);
   const selectFile = useCallback(
-    (key: string, path: FieldPath<ProductFormValues> | null, file: File | null) => {
+    (
+      key: string,
+      path: FieldPath<ProductFormValues> | null,
+      file: File | null
+    ) => {
       if (file) files.current.set(key, { path, file });
       else files.current.delete(key);
       setHasFiles(files.current.size > 0);
@@ -100,11 +101,12 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
   );
   const returnTo = useProductListLocation();
   const variants = useWatch({ control: form.control, name: 'variants' });
+  const primaryCategory = useWatch({ control: form.control, name: 'category' });
   const busy = pending || form.formState.isSubmitting;
   const catalogLoading = categories.isPending || brands.isPending;
   const catalogError = categories.error || brands.error;
   const categoryChoices = (categories.data ?? []).filter(
-    (item) => item.isActive !== false && !item.isDeleted
+    (item) => item.isActive !== false && !item.isDeleted && !item.parent
   );
   const brandChoices = (brands.data ?? []).filter(
     (item) => item.isActive !== false && !item.isDeleted
@@ -115,7 +117,14 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
     label: string,
     choices: CatalogReference[]
   ) {
-    const current = product?.[name];
+    const reference = product?.[name];
+    const required = !product || Boolean(reference);
+    const current =
+      typeof reference === 'string'
+        ? (name === 'category' ? categories.data : brands.data)?.find(
+            (item) => item._id === reference
+          )
+        : reference;
     const unavailable =
       typeof current === 'object' &&
       current &&
@@ -128,38 +137,35 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
         name={name}
         render={({ field, fieldState }) => (
           <Field>
-            <FieldLabel htmlFor={name}>{label}</FieldLabel>
-            <Select
+            <FieldLabel htmlFor={name} required={required}>
+              {label}
+            </FieldLabel>
+            <SearchableSelect
+              id={name}
+              searchLabel={`Tìm ${label.toLocaleLowerCase('vi-VN')}`}
               value={field.value}
-              onValueChange={(value) => field.onChange(value ?? '')}
-            >
-              <SelectTrigger
-                id={name}
-                className="w-full"
-                aria-invalid={!!fieldState.error}
-                aria-describedby={`${name}-error`}
-                onBlur={field.onBlur}
-                ref={field.ref}
-              >
-                <SelectValue>
-                  {choices.find((item) => item._id === field.value)?.name ??
-                    unavailable?.name ??
-                    'Chọn…'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {unavailable && (
-                  <SelectItem value={unavailable._id} disabled>
-                    {unavailable.name} (không khả dụng)
-                  </SelectItem>
-                )}
-                {choices.map((item) => (
-                  <SelectItem key={item._id} value={item._id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={field.onChange}
+              required={required}
+              invalid={!!fieldState.error}
+              describedBy={`${name}-error`}
+              onBlur={field.onBlur}
+              ref={field.ref}
+              options={[
+                ...(unavailable
+                  ? [
+                      {
+                        value: unavailable._id,
+                        label: `${unavailable.name} (giá trị hiện tại)`,
+                        disabled: true,
+                      },
+                    ]
+                  : []),
+                ...choices.map((item) => ({
+                  value: item._id,
+                  label: item.name,
+                })),
+              ]}
+            />
             <FieldError id={`${name}-error`} errors={[fieldState.error]} />
           </Field>
         )}
@@ -209,10 +215,18 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                   if (path?.endsWith('.images')) {
                     const arrayPath = path as `variants.${number}.images`;
                     const existing = form.getValues(arrayPath) ?? [];
-                    form.setValue(arrayPath, [...existing, { url: image.secure_url }], { shouldDirty: true });
-                    uploadedFields.current.add(`${arrayPath}.${existing.length}.url`);
+                    form.setValue(
+                      arrayPath,
+                      [...existing, { url: image.secure_url }],
+                      { shouldDirty: true }
+                    );
+                    uploadedFields.current.add(
+                      `${arrayPath}.${existing.length}.url`
+                    );
                   } else if (path) {
-                    form.setValue(path, image.secure_url, { shouldDirty: true });
+                    form.setValue(path, image.secure_url, {
+                      shouldDirty: true,
+                    });
                     uploadedFields.current.add(path);
                   }
                   files.current.delete(key);
@@ -260,9 +274,14 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                 await client.invalidateQueries({ queryKey: ['products'] });
               }
               allowSavedNavigation();
-              navigate(product ? `/auth/products/${product._id}` : returnTo, {
-                state: { returnTo },
-              });
+              navigate(
+                product
+                  ? `/auth/products/${product.slug || product._id}`
+                  : returnTo,
+                {
+                  state: { returnTo },
+                }
+              );
             } catch (error: unknown) {
               const failure = getApiError(error);
               form.setError('root', {
@@ -336,6 +355,12 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
               render={({ field, fieldState }) => (
                 <Field className="sm:col-span-2">
                   <FieldLabel>Danh mục bổ sung</FieldLabel>
+                  <Input
+                    aria-label="Tìm danh mục bổ sung"
+                    placeholder="Tìm danh mục bổ sung…"
+                    value={categorySearch}
+                    onChange={(event) => setCategorySearch(event.target.value)}
+                  />
                   <p className="text-muted-foreground text-xs">
                     Có thể chọn nhiều danh mục. Ô Danh mục phía trên là danh mục
                     chính.
@@ -348,11 +373,12 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                     {(categories.data ?? [])
                       .filter(
                         (item) =>
-                          item._id !== form.watch('category') &&
-                          (categoryChoices.some(
-                            (choice) => choice._id === item._id
-                          ) ||
-                            field.value?.includes(item._id))
+                          item._id !== primaryCategory &&
+                          ((item.isActive !== false && !item.isDeleted) ||
+                            field.value?.includes(item._id)) &&
+                          searchText(item.name).includes(
+                            searchText(categorySearch)
+                          )
                       )
                       .map((item) => (
                         <label
@@ -547,9 +573,14 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
             variant="outline"
             disabled={busy}
             onClick={() =>
-              navigate(product ? `/auth/products/${product._id}` : returnTo, {
-                state: { returnTo },
-              })
+              navigate(
+                product
+                  ? `/auth/products/${product.slug || product._id}`
+                  : returnTo,
+                {
+                  state: { returnTo },
+                }
+              )
             }
           >
             Hủy

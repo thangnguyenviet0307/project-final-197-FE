@@ -66,6 +66,7 @@ function Editor({
           : 'Chưa có nội dung được công bố.'}
       </p>
       <ContentEditor
+        requiredOnPublish
         label={title}
         value={content}
         onChange={(value) => {

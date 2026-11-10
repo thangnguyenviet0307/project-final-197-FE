@@ -72,7 +72,7 @@ export function BrandForm({
       >
         <fieldset disabled={busy} className="space-y-4">
           <Field>
-            <FieldLabel htmlFor="brand-name">Tên thương hiệu</FieldLabel>
+            <FieldLabel required htmlFor="brand-name">Tên thương hiệu</FieldLabel>
             <Input
               placeholder="Nhập tên thương hiệu"
               id="brand-name"

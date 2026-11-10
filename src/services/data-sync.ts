@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 
 const storageKey = 'admin-data-updated';
+const localChangeEvent = 'business-data-changed';
 const businessKeys = [
   'products',
   'orders',
@@ -19,8 +20,14 @@ interface HotUpdates {
 }
 
 // Send only a change signal, never API responses, credentials or personal data.
+export function notifyBusinessChange() {
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new Event(localChangeEvent));
+}
+
 export function publishBusinessChange() {
   if (typeof window === 'undefined') return;
+  notifyBusinessChange();
   try {
     window.localStorage.setItem(
       storageKey,
@@ -67,10 +74,12 @@ export function subscribeToBusinessChanges(
     }
   };
   window.addEventListener('storage', receive);
+  window.addEventListener(localChangeEvent, refresh);
   // Fast Refresh preserves React Query's cache. Re-read API data after code updates.
   hot?.on('vite:afterUpdate', refresh);
   return () => {
     window.removeEventListener('storage', receive);
+    window.removeEventListener(localChangeEvent, refresh);
     hot?.off('vite:afterUpdate', refresh);
     if (timer !== undefined) clearTimeout(timer);
   };

@@ -3,7 +3,15 @@ import { useState } from 'react';
 import { ProductImage } from '@/features/products/components/product-image';
 import type { Product } from '@/features/products/types/products';
 
-export function ProductDetailGallery({ product }: { product: Product }) {
+export function ProductDetailGallery({
+  product,
+  selectedImage,
+  onImageChange,
+}: {
+  product: Product;
+  selectedImage?: string;
+  onImageChange?: (url: string) => void;
+}) {
   const images = [
     ...new Set(
       [
@@ -17,7 +25,12 @@ export function ProductDetailGallery({ product }: { product: Product }) {
       ].filter((url): url is string => !!url)
     ),
   ];
-  const [selected, setSelected] = useState<string>();
+  const [localSelected, setLocalSelected] = useState<string>();
+  const selected = selectedImage ?? localSelected;
+  const setSelected = (url: string | undefined) => {
+    setLocalSelected(url);
+    if (url) onImageChange?.(url);
+  };
   const active = selected && images.includes(selected) ? selected : images[0];
 
   return (
@@ -30,10 +43,31 @@ export function ProductDetailGallery({ product }: { product: Product }) {
         />
         {images.length > 1 && (
           <>
-            <button type="button" aria-label="Ảnh trước" onClick={() => setSelected(images[(images.indexOf(active!) - 1 + images.length) % images.length])} className="absolute top-1/2 left-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border bg-background/90 text-foreground shadow hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
+            <button
+              type="button"
+              aria-label="Ảnh trước"
+              onClick={() =>
+                setSelected(
+                  images[
+                    (images.indexOf(active!) - 1 + images.length) %
+                      images.length
+                  ]
+                )
+              }
+              className="bg-background/90 text-foreground hover:bg-accent focus-visible:outline-ring absolute top-1/2 left-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border shadow focus-visible:outline-2"
+            >
               <ChevronLeft aria-hidden="true" />
             </button>
-            <button type="button" aria-label="Ảnh tiếp theo" onClick={() => setSelected(images[(images.indexOf(active!) + 1) % images.length])} className="absolute top-1/2 right-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border bg-background/90 text-foreground shadow hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
+            <button
+              type="button"
+              aria-label="Ảnh tiếp theo"
+              onClick={() =>
+                setSelected(
+                  images[(images.indexOf(active!) + 1) % images.length]
+                )
+              }
+              className="bg-background/90 text-foreground hover:bg-accent focus-visible:outline-ring absolute top-1/2 right-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border shadow focus-visible:outline-2"
+            >
               <ChevronRight aria-hidden="true" />
             </button>
           </>

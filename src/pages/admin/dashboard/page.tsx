@@ -251,7 +251,7 @@ function LowStockProducts() {
                   className="size-10 shrink-0 border"
                 />
                 <Link
-                  to={`/auth/products/${product._id}`}
+                  to={`/auth/products/${product.slug || product._id}`}
                   state={{ returnTo: '/auth/products?stockStatus=low_stock' }}
                   className="min-w-0 flex-1 text-sm font-medium break-words underline-offset-4 hover:underline"
                 >

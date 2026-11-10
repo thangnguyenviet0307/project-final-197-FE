@@ -35,6 +35,14 @@ function fill() {
   fireEvent.change(screen.getByLabelText("Người đánh giá"), { target: { value: "  Binh  " } })
   fireEvent.change(screen.getByLabelText("Nội dung đánh giá"), { target: { value: "  Hài lòng  " } })
 }
+it('keeps reviews read-only for administrators on the detail page', async () => {
+  useAuthStore.getState().setSession({ id: 'admin', name: 'Admin', firstName: 'Admin', lastName: '', email: 'admin@example.com', role: 'admin', mustChangePassword: false }, { accessToken: 'access' })
+  render(<QueryClientProvider client={queryClient}><ProductReviews id={id} readOnly /></QueryClientProvider>)
+  expect(await screen.findByText('Sản phẩm tốt')).toBeTruthy()
+  expect(screen.queryByRole('button', { name: 'Thêm đánh giá' })).toBeNull()
+  expect(screen.queryByRole('button', { name: /Xóa đánh giá/ })).toBeNull()
+  expect(screen.queryByLabelText('Người đánh giá')).toBeNull()
+})
 it("shows server metrics and imported reviews and paginates on the server", async () => {
   setup("staff")
   expect(await screen.findByText("Sản phẩm tốt")).toBeTruthy()

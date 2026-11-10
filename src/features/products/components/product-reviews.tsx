@@ -21,10 +21,10 @@ import type { ProductReviewInput } from '@/features/products/types/products';
 import { useAuthStore } from '@/stores/auth.store';
 import { getApiError } from '@/services/api';
 
-export function ProductReviews({ id }: { id: string }) {
+export function ProductReviews({ id, readOnly = false }: { id: string; readOnly?: boolean }) {
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const admin = useAuthStore((state) => isAdministrator(state.user?.role));
+  const admin = useAuthStore((state) => !readOnly && isAdministrator(state.user?.role));
   const { metrics, reviews, create, remove } = useProductReviews(id, page);
   const form = useForm<ProductReviewInput>({
     resolver: zodResolver(productReviewSchema),
@@ -156,10 +156,11 @@ export function ProductReviews({ id }: { id: string }) {
             className="grid gap-4 sm:grid-cols-2"
           >
             <Field>
-              <FieldLabel htmlFor="reviewerName">Người đánh giá</FieldLabel>
+              <FieldLabel required htmlFor="reviewerName">Người đánh giá</FieldLabel>
               <Input
                 placeholder="Nhập tên người đánh giá"
                 id="reviewerName"
+                aria-required="true"
                 maxLength={100}
                 aria-invalid={!!form.formState.errors.reviewerName}
                 {...form.register('reviewerName')}
@@ -167,10 +168,11 @@ export function ProductReviews({ id }: { id: string }) {
               <FieldError errors={[form.formState.errors.reviewerName]} />
             </Field>
             <Field>
-              <FieldLabel htmlFor="rating">Số sao (1–5)</FieldLabel>
+              <FieldLabel required htmlFor="rating">Số sao (1–5)</FieldLabel>
               <Input
                 placeholder="Nhập tên người đánh giá"
                 id="rating"
+                aria-required="true"
                 type="number"
                 min={1}
                 max={5}
@@ -181,12 +183,13 @@ export function ProductReviews({ id }: { id: string }) {
               <FieldError errors={[form.formState.errors.rating]} />
             </Field>
             <Field className="sm:col-span-2">
-              <FieldLabel htmlFor="review-comment">
+              <FieldLabel required htmlFor="review-comment">
                 Nội dung đánh giá
               </FieldLabel>
               <Textarea
                 placeholder="Nhập nội dung đánh giá sản phẩm"
                 id="review-comment"
+                aria-required="true"
                 maxLength={2000}
                 aria-invalid={!!form.formState.errors.comment}
                 {...form.register('comment')}

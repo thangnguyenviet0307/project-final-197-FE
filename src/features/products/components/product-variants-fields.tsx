@@ -1,5 +1,6 @@
 import {
   useFieldArray,
+  useWatch,
   type UseFormReturn,
   type FieldPath,
 } from 'react-hook-form';
@@ -24,12 +25,23 @@ export function ProductInputField({
   optional?: boolean;
 }) {
   const error = form.getFieldState(name, form.formState).error;
+  const dimensions = useWatch({ control: form.control, name: 'dimensions' });
+  const required =
+    ['product_name', 'discount'].includes(name) ||
+    /^variants\.\d+\.(sku|price)$/.test(name) ||
+    /^variants\.\d+\.options\.\d+\.name$/.test(name) ||
+    /^tags\.\d+\.value$/.test(name) ||
+    (name.startsWith('dimensions.') &&
+      Object.values(dimensions ?? {}).some((value) => value !== undefined));
   return (
     <Field>
-      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+      <FieldLabel htmlFor={name} required={required}>
+        {label}
+      </FieldLabel>
       <Input
         placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
         id={name}
+        aria-required={required}
         type={numeric ? 'number' : 'text'}
         step={numeric ? 'any' : undefined}
         aria-invalid={!!error}

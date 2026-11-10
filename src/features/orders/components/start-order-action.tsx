@@ -1,4 +1,5 @@
 import { isAdministrator } from '@/features/auth/utils/roles';
+import { RequiredMark } from '@/components/required-mark';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,7 @@ export function HandlerPicker({
     ) ?? [];
   return (
     <div className="min-w-0 space-y-3">
+      <p className="text-sm font-medium">Nhân viên tiếp nhận<RequiredMark /></p>
       <label className="bg-muted/30 flex min-w-0 items-start gap-3 rounded-lg border p-3 text-sm">
         <input
           type="radio"

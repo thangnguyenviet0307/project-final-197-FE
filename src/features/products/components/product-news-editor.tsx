@@ -243,7 +243,13 @@ function NewsSelectionForm({
   );
 }
 
-export function ProductNewsEditor({ id }: { id: string }) {
+export function ProductNewsEditor({
+  id,
+  readOnly = false,
+}: {
+  id: string;
+  readOnly?: boolean;
+}) {
   const query = useProductNews(id);
   const [revision, setRevision] = useState(0);
   const [reloaded, setReloaded] = useState<ProductNewsSelection | null>(null);
@@ -259,6 +265,18 @@ export function ProductNewsEditor({ id }: { id: string }) {
             Thử lại tin đã chọn
           </Button>
         </p>
+      ) : readOnly ? (
+        query.data.articles.length ? (
+          <ul className="space-y-2 text-sm">
+            {query.data.articles.map((article) => (
+              <li key={article._id}>{article.title}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Chưa chọn tin tức nào cho sản phẩm.
+          </p>
+        )
       ) : (
         <NewsSelectionForm
           key={revision}

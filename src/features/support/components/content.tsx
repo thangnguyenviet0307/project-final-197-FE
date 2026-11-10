@@ -1,4 +1,5 @@
 import ReactQuill from 'react-quill-new';
+import { RequiredMark } from '@/components/required-mark';
 import { useEffect, useId, useRef } from 'react';
 import {
   descriptionToHtml,
@@ -30,11 +31,13 @@ export function ContentEditor({
   onChange,
   disabled,
   label,
+  requiredOnPublish = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
   label: string;
+  requiredOnPublish?: boolean;
 }) {
   const editor = useRef<ReactQuill>(null);
   const id = useId();
@@ -49,6 +52,7 @@ export function ContentEditor({
   }, [id, label]);
   return (
     <div className="product-description-editor" aria-disabled={disabled}>
+      {requiredOnPublish && <p className="mb-2 text-sm">{label}<RequiredMark /> <span className="text-muted-foreground">Bắt buộc khi công bố; bản nháp có thể để trống.</span></p>}
       <ReactQuill
         ref={editor}
         theme="snow"

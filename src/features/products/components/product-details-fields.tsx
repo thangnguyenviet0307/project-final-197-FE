@@ -4,6 +4,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { ProductInputField } from '@/features/products/components/product-variants-fields';
 import type { ProductFormValues } from '@/features/products/schemas/product-schema';
+import { ProductPolicyPicker } from './product-policy-picker';
 
 export function ProductDetailsFields({
   form,
@@ -28,6 +29,7 @@ export function ProductDetailsFields({
           name="minimumOrderQuantity"
           label="Số lượng đặt tối thiểu"
           numeric
+          optional
         />
         <ProductInputField
           form={form}
@@ -105,6 +107,11 @@ export function ProductDetailsFields({
             render={({ field, fieldState }) => (
               <Field>
                 <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                <ProductPolicyPicker
+                  name={name}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                />
                 <Textarea
                   placeholder={`Nhập ${label.toLocaleLowerCase('vi-VN')}`}
                   {...field}

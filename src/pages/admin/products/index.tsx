@@ -359,7 +359,7 @@ export default function AdminProductsPage() {
                                 <div className="min-w-0">
                                   <Link
                                     className="block truncate font-medium hover:underline"
-                                    to={`/auth/products/${product._id}`}
+                                    to={`/auth/products/${product.slug || product._id}`}
                                     state={linkState}
                                     title={product.product_name}
                                   >
@@ -459,7 +459,7 @@ export default function AdminProductsPage() {
                                     aria-label={`View ${product.product_name}`}
                                     render={
                                       <Link
-                                        to={`/auth/products/${product._id}`}
+                                        to={`/auth/products/${product.slug || product._id}`}
                                         state={linkState}
                                       />
                                     }

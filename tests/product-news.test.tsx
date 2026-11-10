@@ -21,6 +21,13 @@ beforeEach(() => {
   state.selected = { articleIds: [state.articles[0]._id], articles: [state.articles[0]], expectedVersion: 2 }
   state.error = false; state.pending = false; state.save.mockReset(); state.refetch.mockReset()
 })
+it('shows saved product news without search, selection or save controls in read-only details', () => {
+  render(<MemoryRouter><ProductNewsEditor id={'a'.repeat(24)} readOnly /></MemoryRouter>)
+  expect(screen.getByText('Tin 1')).toBeTruthy()
+  expect(screen.queryByRole('textbox')).toBeNull()
+  expect(screen.queryByRole('button')).toBeNull()
+  expect(state.save).not.toHaveBeenCalled()
+})
 it("maps checked product flags to corner badges without inventing a sale discount", () => {
   const mapped = mapCatalogProduct({ _id: "product", product_name: "Cable", slug: "cable", category: null, brand: null, price: 100, on_sale: true, is_best_seller: true, is_new: true, is_hot: true, is_home: true })
   const view = render(<MemoryRouter><ProductCard product={mapped} /></MemoryRouter>)

@@ -3,8 +3,7 @@ import { isAdministrator } from '@/features/auth/utils/roles';
 import { ProductDetailGallery } from '@/features/products/components/product-detail-gallery';
 import { AdminStoreProductLink } from '@/features/storefront/components/admin-store-product-link';
 import { discountedPrice } from '@/features/products/utils/product-price';
-import { InventoryEditor } from '@/features/products/components/inventory-editor';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { Pencil, ArrowLeft } from 'lucide-react';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { ProductQueryState } from '@/features/products/components/product-query-state';
@@ -17,17 +16,25 @@ import { ProductImage } from '@/features/products/components/product-image';
 import { useProductListLocation } from '@/features/products/hooks/use-product-list-location';
 import { descriptionToHtml } from '@/features/products/utils/product-description';
 import '@/features/products/components/product-description.css';
-import { ProductGallery } from '@/features/products/components/product-gallery';
 import { ProductDetailsInfo } from '@/features/products/components/product-details-info';
 import { ProductReviews } from '@/features/products/components/product-reviews';
 import { ProductNewsEditor } from '@/features/products/components/product-news-editor';
 
 export default function ProductDetailPage() {
   const { id = '' } = useParams();
-  const query = useProduct(id);
+  const query = useProduct(id, true);
   const admin = useAuthStore((state) => isAdministrator(state.user?.role));
   const product = query.data;
   const returnTo = useProductListLocation();
+  if (product?.slug && id !== product.slug) {
+    return (
+      <Navigate
+        to={`/auth/products/${product.slug}`}
+        replace
+        state={{ returnTo }}
+      />
+    );
+  }
   const salePrice =
     product?.price === undefined
       ? null
@@ -51,12 +58,30 @@ export default function ProductDetailPage() {
             Quay lại
           </Button>
           {product && <AdminStoreProductLink product={product} />}
+          {product && (
+            <Button
+              nativeButton={false}
+              role="link"
+              variant="outline"
+              render={
+                <Link
+                  to={`/auth/products/${product._id}/inventory`}
+                  state={{ returnTo }}
+                />
+              }
+            >
+              Cập nhật tồn kho
+            </Button>
+          )}
           {admin && product && (
             <Button
               nativeButton={false}
               role="link"
               render={
-                <Link to={`/auth/products/${id}/edit`} state={{ returnTo }} />
+                <Link
+                  to={`/auth/products/${product._id}/edit`}
+                  state={{ returnTo }}
+                />
               }
             >
               <Pencil />
@@ -66,7 +91,7 @@ export default function ProductDetailPage() {
         </div>
         {query.isError || !product ? (
           <ProductQueryState
-            invalid={!/^[a-f\d]{24}$/i.test(id)}
+            invalid={!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(id)}
             error={query.error}
             retry={query.refetch}
           />
@@ -171,11 +196,13 @@ export default function ProductDetailPage() {
                 </dl>
               </div>
             </div>
-            <InventoryEditor key={`inventory-${product._id}`} product={product} />
             <ProductDetailsInfo product={product} />
-            <ProductReviews key={`reviews-${product._id}`} id={product._id} />
-            {admin && <ProductGallery product={product} />}
-            {admin && <ProductNewsEditor key={`news-${product._id}`} id={product._id} />}
+            <ProductReviews
+              key={`reviews-${product._id}`}
+              id={product._id}
+              readOnly
+            />
+            {admin && <ProductNewsEditor id={product._id} readOnly />}
             {product.description && (
               <section>
                 <h2 className="mb-2 text-lg font-semibold">Mô tả</h2>
