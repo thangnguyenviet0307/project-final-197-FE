@@ -4,6 +4,14 @@ import type { Product } from "@/features/products/types/products"
 
 const id = "a".repeat(24)
 const values = () => ({ ...productDefaults(), product_name: "Phone case", category: id, brand: id })
+it('accepts and preserves one million description characters for creation and editing, rejecting overflow', () => {
+  const description = 'ệ'.repeat(1_000_000)
+  const draft = productSchema.parse({ ...values(), description })
+  expect(productPayload(draft).description).toBe(description)
+  const original: Product = { ...productPayload(values()), _id: id }
+  expect(productUpdatePayload(draft, { description: true }, original).description).toBe(description)
+  expect(productSchema.safeParse({ ...values(), description: description + 'x' }).success).toBe(false)
+})
 it('retains extra categories on unrelated edits and permits explicit clearing', () => {
   const extra = 'b'.repeat(24)
   const product: Product = { ...productPayload(values()), _id: id, categories: [{ _id: extra, name: 'Extra' }] }
@@ -18,7 +26,7 @@ it("validates new metadata and maps form fields into backend product details", (
     dimensions: { width: 0, height: 2, depth: 3 }, barcode: "1234", minimumOrderQuantity: 2 })
   expect(productPayload(input)).toMatchObject({ sku: "CASE-NEW", tags: ["Case"], weight: 0, dimensions: { width: 0, height: 2, depth: 3 }, barcode: "1234", minimumOrderQuantity: 2 })
   for (const invalid of [{ weight: -1 }, { minimumOrderQuantity: 0 }, { minimumOrderQuantity: 1.5 }, { tags: [{ value: " " }] },
-    { dimensions: { width: 2 } }, { warrantyInformation: "x".repeat(2001) }, { sku: "bad sku" }]) {
+    { dimensions: { width: 2 } }, { warrantyInformation: "x".repeat(100001) }, { sku: "bad sku" }]) {
     expect(productSchema.safeParse({ ...values(), ...invalid }).success).toBe(false)
   }
 })

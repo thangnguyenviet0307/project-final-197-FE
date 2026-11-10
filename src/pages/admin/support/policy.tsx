@@ -1,3 +1,4 @@
+import { POLICY_SECTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
 import { ContentEditor } from '@/features/support/components/content';
 import { useState } from 'react';
@@ -143,7 +144,7 @@ function PolicyEditor({
               }}
             />
             <p className="text-muted-foreground text-right text-xs">
-              {content[section.key].length}/30000
+              {content[section.key].length.toLocaleString('vi-VN')}/{POLICY_SECTION_MAX_LENGTH.toLocaleString('vi-VN')}
             </p>
           </div>
         ))}

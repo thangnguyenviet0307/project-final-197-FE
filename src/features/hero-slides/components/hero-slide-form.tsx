@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
 import { useState, type SubmitEvent } from 'react';
 import { useCategories } from '@/features/categories/hooks/use-categories';
@@ -133,7 +134,7 @@ export function HeroSlideForm({
           Mô tả
           <Textarea
             placeholder="Nhập mô tả banner"
-            maxLength={1000}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             value={draft.description}
             onChange={(event) =>
               setDraft((previous) => ({

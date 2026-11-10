@@ -1,3 +1,4 @@
+import { LONG_TEXT_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
@@ -209,7 +210,7 @@ export function ArticleForm({
           <Textarea
             placeholder="Nhập mô tả ngắn cho bài viết"
             required
-            maxLength={1000}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             value={draft.excerpt}
             onChange={(e) => patch({ excerpt: e.target.value })}
           />
@@ -221,7 +222,7 @@ export function ArticleForm({
             aria-label="Nội dung"
             required
             rows={12}
-            maxLength={100000}
+            maxLength={LONG_TEXT_MAX_LENGTH}
             value={draft.content}
             onChange={(e) => patch({ content: e.target.value })}
           />

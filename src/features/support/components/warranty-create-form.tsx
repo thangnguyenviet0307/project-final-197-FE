@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { useEffect, useRef, useState } from 'react';
 import { validateImageFile } from '@/utils/image-file';
 import { ImageFilePicker } from '@/components/image-file-picker';
@@ -255,7 +256,7 @@ export function WarrantyCreateForm({
           id="warranty-description"
           rows={5}
           minLength={10}
-          maxLength={3000}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           required
           disabled={pendingInput !== null || busy}
           value={description}

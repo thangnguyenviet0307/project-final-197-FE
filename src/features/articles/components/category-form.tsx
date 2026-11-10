@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { Input } from '@/components/ui/input';
@@ -80,7 +81,7 @@ export function PostCategoryForm({
           Mô tả danh mục
           <Input
             placeholder="Nhập mô tả danh mục bài viết"
-            maxLength={500}
+            maxLength={DESCRIPTION_MAX_LENGTH}
             value={draft.description}
             onChange={(e) =>
               setDraft({ ...draft, description: e.target.value })

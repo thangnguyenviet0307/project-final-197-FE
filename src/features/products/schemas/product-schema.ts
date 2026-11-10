@@ -1,4 +1,6 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
+import { PRODUCT_DESCRIPTION_MAX_LENGTH } from '@/features/products/constants';
 import {
   catalogId,
   type Product,
@@ -145,9 +147,9 @@ export const productSchema = z
         }
       })
       .optional(),
-    warrantyInformation: optionalText('Thông tin bảo hành', 2000),
-    shippingInformation: optionalText('Thông tin giao hàng', 2000),
-    returnPolicy: optionalText('Chính sách đổi trả', 2000),
+    warrantyInformation: optionalText('Thông tin bảo hành', DESCRIPTION_MAX_LENGTH),
+    shippingInformation: optionalText('Thông tin giao hàng', DESCRIPTION_MAX_LENGTH),
+    returnPolicy: optionalText('Chính sách đổi trả', DESCRIPTION_MAX_LENGTH),
     minimumOrderQuantity: stock('Số lượng đặt tối thiểu')
       .min(1, 'Số lượng đặt tối thiểu phải từ 1.')
       .optional(),
@@ -179,7 +181,7 @@ export const productSchema = z
     discount: numeric('Giảm giá')
       .min(0, 'Mức giảm giá không được âm.')
       .max(70, 'Mức giảm giá không được vượt quá 70%.'),
-    description: optionalText('Mô tả', 2000),
+    description: optionalText('Mô tả', PRODUCT_DESCRIPTION_MAX_LENGTH),
     thumbnail: optionalText('Đường dẫn ảnh đại diện', 255),
     stock: stock('Tồn kho').optional(),
     on_sale: z.boolean().optional(),

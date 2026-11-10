@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { useUnsavedForm } from '@/hooks/use-unsaved-form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,6 +92,7 @@ export function CategoryForm({
             <Textarea
               placeholder="Nhập mô tả danh mục"
               id="category-description"
+              maxLength={DESCRIPTION_MAX_LENGTH}
               rows={5}
               {...form.register('description')}
             />

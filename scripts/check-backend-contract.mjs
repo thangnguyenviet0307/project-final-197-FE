@@ -15,6 +15,7 @@ const require = createRequire(import.meta.url)
 const backendRequire = createRequire(path.join(backend, "package.json"))
 const loaded = new Map()
 const allowed = new Set([
+  "config/text-limits.ts", "config/product-limits.ts",
   "validations/common.validation.ts", "validations/customers.validation.ts",
   "validations/users.validation.ts", "validations/brands.validation.ts",
   "validations/categories.validation.ts", "validations/checkout.validation.ts", "validations/customer-order-cancel.validation.ts",
@@ -32,7 +33,14 @@ function evaluate(file, resolve) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText
   const exports = {}
-  vm.runInNewContext(code, { exports, require: resolve, crypto: webcrypto, FormData, File }, { filename: file })
+  const pureConstants = {
+    "@/constants/text-limits": "constants/text-limits.ts",
+    "@/features/products/constants": "features/products/constants.ts",
+  }
+  const resolveWithConstants = specifier => Object.hasOwn(pureConstants, specifier)
+    ? evaluate(path.join(root, "src", pureConstants[specifier]), resolve)
+    : resolve(specifier)
+  vm.runInNewContext(code, { exports, require: resolveWithConstants, crypto: webcrypto, FormData, File }, { filename: file })
   return exports
 }
 function loadValidation(relative) {

@@ -1,14 +1,15 @@
+import { POLICY_SECTION_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { z } from 'zod';
 import { validateImageFile } from '@/utils/image-file';
 
 export const policyContentSchema = z
   .object({
-    warranty: z.string().trim().max(30000),
-    returns: z.string().trim().max(30000),
-    shipping: z.string().trim().max(30000),
-    payment: z.string().trim().max(30000),
-    support: z.string().trim().max(30000),
-    privacy: z.string().trim().max(30000),
+    warranty: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
+    returns: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
+    shipping: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
+    payment: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
+    support: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
+    privacy: z.string().trim().max(POLICY_SECTION_MAX_LENGTH),
   })
   .strict();
 export const savePolicySchema = z
@@ -47,7 +48,7 @@ export const createWarrantySchema = z
       .string()
       .trim()
       .min(10, 'Vui lòng mô tả lỗi ít nhất 10 ký tự.')
-      .max(3000),
+      .max(DESCRIPTION_MAX_LENGTH),
   })
   .strict();
 export const updateWarrantySchema = z

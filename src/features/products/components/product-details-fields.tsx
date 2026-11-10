@@ -1,3 +1,4 @@
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { Controller, useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
@@ -117,7 +118,7 @@ export function ProductDetailsFields({
                   {...field}
                   id={name}
                   value={field.value ?? ''}
-                  maxLength={2000}
+                  maxLength={DESCRIPTION_MAX_LENGTH}
                   aria-invalid={!!fieldState.error}
                   aria-describedby={`${name}-error`}
                 />

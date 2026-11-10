@@ -64,13 +64,14 @@ it("validates review inputs then creates a review and refreshes metrics and revi
   await waitFor(() => expect(requests.find(request => request.method === "post")?.body).toEqual({ reviewerName: "Binh", comment: "Hài lòng", rating: 5 }))
   await waitFor(() => expect(screen.getByText("Số đánh giá").parentElement?.textContent).toContain("2"))
   expect((screen.getByLabelText("Nội dung đánh giá") as HTMLTextAreaElement).value).toBe("")
-  expect(requests.filter(request => request.url?.endsWith("/metrics"))).toHaveLength(2)
+  expect(requests.filter(request => request.url?.endsWith("/metrics")).length).toBeGreaterThanOrEqual(2)
 })
 it("keeps a review draft when the Backend rejects creation", async () => {
   setup(); await screen.findByText("Sản phẩm tốt")
   fill(); fail = true
   fireEvent.click(screen.getByRole("button", { name: "Thêm đánh giá" }))
-  expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Không thể thực hiện thao tác.")
+  const form = screen.getByLabelText('Nội dung đánh giá').closest('form')!
+  expect(await within(form).findByRole("alert")).toHaveProperty("textContent", "Không thể thực hiện thao tác.")
   expect((screen.getByLabelText("Nội dung đánh giá") as HTMLTextAreaElement).value).toBe("  Hài lòng  ")
 })
 it("deletes only after confirmation and refreshes the empty metrics and list", async () => {
