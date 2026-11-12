@@ -1,10 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, X } from 'lucide-react';
+import {
+  MessageCircle,
+  X,
+  ShoppingBag,
+  Plus,
+  RefreshCw,
+  Send,
+  Square,
+  History,
+  ArrowUpRight,
+  Sparkles,
+} from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useChat } from '../hooks/use-chat';
 import { AiProducts } from './ai-products';
 import './chat-widget.css';
+
+function turnFeedback(status: string, streaming: boolean) {
+  if (status === 'cancelled') return 'Đã dừng trả lời câu hỏi này.';
+  if (status === 'failed')
+    return 'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử gửi lại.';
+  if (status === 'processing')
+    return streaming
+      ? 'Đang xử lý câu hỏi…'
+      : 'Chưa có kết quả được xác nhận. Chọn “Tải lại” để kiểm tra trạng thái.';
+  return 'Chưa có nội dung trả lời cho câu hỏi này.';
+}
 export function ChatWidget() {
   const identity = useAuthStore((s) => s.sessionId);
   const loading = useAuthStore((s) => s.isLoading);
@@ -13,11 +35,34 @@ export function ChatWidget() {
 function ChatSession() {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
+  const [endTarget, setEndTarget] = useState<string | null>(null);
   const chat = useChat(open);
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const followLatest = useRef(true);
+  const lastTurn = chat.rows.at(-1);
+  useEffect(() => {
+    followLatest.current = true;
+  }, [open, chat.id, chat.historyPage]);
+  useEffect(() => {
+    const element = messagesRef.current;
+    if (open && element && followLatest.current && chat.historyPage === 1)
+      element.scrollTop = element.scrollHeight;
+  }, [
+    open,
+    chat.id,
+    chat.historyPage,
+    lastTurn?.requestId,
+    lastTurn?.answer,
+    lastTurn?.status,
+    chat.status,
+    chat.error,
+  ]);
   const customer = useAuthStore((s) => s.isAuthenticated);
   const completed = chat.history.data?.conversation.status === 'completed';
   const send = (value: string) => {
     if (value.trim()) {
+      setEndTarget(null);
+      followLatest.current = true;
       void chat.send(value, () =>
         setDraft((current) => (current === value ? '' : current))
       );
@@ -28,10 +73,11 @@ function ChatSession() {
       {!open && (
         <button
           className="ai-launcher"
+          aria-haspopup="dialog"
           aria-label="Mở trợ lý mua sắm AI"
           onClick={() => setOpen(true)}
         >
-          <MessageCircle size={23} /> Trợ lý AI
+          <MessageCircle size={21} aria-hidden="true" /> Trợ lý AI
         </button>
       )}
       {open && (
@@ -41,29 +87,37 @@ function ChatSession() {
           aria-labelledby="ai-title"
           className="ai-window"
         >
-          <header>
-            <div>
+          <header className="ai-header">
+            <div className="ai-assistant-avatar">
+              <ShoppingBag size={21} aria-hidden="true" />
+            </div>
+            <div className="ai-heading">
               <strong id="ai-title">Trợ lý mua sắm AI</strong>
               <small>Tìm sản phẩm phù hợp cùng bạn</small>
             </div>
-            <button aria-label="Thu nhỏ trợ lý" onClick={() => setOpen(false)}>
-              <X />
+            <button
+              aria-label="Thu nhỏ trợ lý"
+              onClick={() => {
+                setEndTarget(null);
+                setOpen(false);
+              }}
+            >
+              <X size={19} aria-hidden="true" />
             </button>
           </header>
           <nav aria-label="Điều khiển hội thoại">
-            <button disabled={chat.busy} onClick={() => chat.select(null)}>
-              Chat mới
+            <button
+              disabled={chat.busy}
+              onClick={() => {
+                setEndTarget(null);
+                chat.select(null);
+              }}
+            >
+              <Plus size={14} aria-hidden="true" /> Chat mới
             </button>
             <button
               disabled={!chat.id || completed || chat.ending}
-              onClick={() => {
-                if (
-                  window.confirm(
-                    'Kết thúc hội thoại này? Bạn vẫn có thể xem lịch sử trong thời hạn lưu trữ.'
-                  )
-                )
-                  void chat.end();
-              }}
+              onClick={() => setEndTarget(chat.id)}
             >
               {chat.ending ? 'Đang kết thúc…' : 'Kết thúc'}
             </button>
@@ -73,19 +127,53 @@ function ChatSession() {
                 void chat.list.refetch();
               }}
             >
-              Tải lại
+              <RefreshCw size={14} aria-hidden="true" /> Tải lại
             </button>
           </nav>
-          <details>
-            <summary>Lịch sử hội thoại</summary>
+          {endTarget && endTarget === chat.id && !completed && (
+            <div
+              className="ai-confirmation"
+              role="group"
+              aria-label="Xác nhận kết thúc hội thoại"
+            >
+              <p role="status">
+                Bạn muốn kết thúc hội thoại này? Bạn vẫn có thể xem lịch sử
+                trong thời hạn lưu trữ.
+              </p>
+              <div className="ai-confirmation-actions">
+                <button type="button" onClick={() => setEndTarget(null)}>
+                  Tiếp tục trò chuyện
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEndTarget(null);
+                    void chat.end();
+                  }}
+                >
+                  Xác nhận kết thúc
+                </button>
+              </div>
+            </div>
+          )}
+          <details className="ai-history">
+            <summary>
+              <History size={14} aria-hidden="true" />
+              Lịch sử hội thoại
+            </summary>
             {chat.list.isError && (
               <p role="alert">Không tải được lịch sử. Hãy thử tải lại.</p>
             )}
             {chat.list.data?.rows.map((c) => (
               <button
                 disabled={chat.busy}
+                className="ai-history-item"
+                aria-current={c._id === chat.id ? 'true' : undefined}
                 key={c._id}
-                onClick={() => chat.select(c._id)}
+                onClick={() => {
+                  setEndTarget(null);
+                  chat.select(c._id);
+                }}
               >
                 {new Date(c.lastActivityAt).toLocaleString('vi-VN')} ·{' '}
                 {c.status === 'completed' ? 'Đã kết thúc' : 'Đang mở'}
@@ -106,17 +194,27 @@ function ChatSession() {
               Sau
             </button>
           </details>
-          <div className="ai-messages" aria-label="Tin nhắn">
-            <p className="ai-welcome">
-              Xin chào! Tôi có thể giúp bạn tìm, so sánh sản phẩm và xem chính
-              sách cửa hàng.
-            </p>
-            <p className="ai-retention">
-              {customer
-                ? 'Tin nhắn được xóa sau 30 ngày kể từ lúc gửi.'
-                : 'Lịch sử khách được xóa sau 24 giờ kể từ khi kết thúc.'}{' '}
-              Hội thoại tự kết thúc sau 1 giờ không hoạt động.
-            </p>
+          <div
+            className="ai-messages"
+            aria-label="Tin nhắn"
+            ref={messagesRef}
+            onScroll={(event) => {
+              const node = event.currentTarget;
+              followLatest.current =
+                node.scrollHeight - node.scrollTop - node.clientHeight < 90;
+            }}
+          >
+            {chat.rows.length === 0 && (
+              <div className="ai-intro">
+                <span className="ai-intro-icon">
+                  <Sparkles size={25} aria-hidden="true" />
+                </span>{' '}
+                <p className="ai-welcome">
+                  Xin chào! Tôi có thể giúp bạn tìm, so sánh sản phẩm và xem
+                  chính sách cửa hàng.
+                </p>
+              </div>
+            )}
             {chat.history.isPending && chat.id && (
               <p role="status">Đang tải lịch sử…</p>
             )}
@@ -142,29 +240,43 @@ function ChatSession() {
               </div>
             )}
             {chat.rows.map((turn) => (
-              <article key={turn.requestId}>
+              <article className="ai-turn" key={turn.requestId}>
                 <p className="ai-user">{turn.content}</p>
+                <div className="ai-answer-label">
+                  <ShoppingBag size={13} aria-hidden="true" /> Trợ lý AI
+                </div>
                 <p className="ai-answer">
                   {turn.answer ||
-                    (turn.status === 'processing'
-                      ? 'Đang xử lý…'
-                      : 'Lượt trả lời chưa hoàn tất.')}
+                    turn.error?.message ||
+                    turnFeedback(turn.status, chat.busy)}
                 </p>
+                {turn.answer && turn.status !== 'completed' && (
+                  <p className="ai-turn-note">
+                    {turn.error?.message ||
+                      turnFeedback(turn.status, chat.busy)}
+                  </p>
+                )}
                 {turn.sources.map((source) => (
-                  <Link key={source.key} to={source.href}>
-                    {source.title} ↗{' '}
+                  <Link className="ai-source" key={source.key} to={source.href}>
+                    {source.title} <ArrowUpRight size={12} aria-hidden="true" />
                   </Link>
                 ))}
                 <AiProducts products={turn.products || []} />
               </article>
             ))}
-            {chat.status && <p role="status">{chat.status}</p>}
+            {chat.status && (
+              <p className="ai-working" role="status">
+                {chat.status}
+              </p>
+            )}
             {chat.error && <p role="alert">{chat.error}</p>}
             {completed && (
-              <p>Hội thoại đã kết thúc. Chọn “Chat mới” để tiếp tục.</p>
+              <p role="status">
+                Hội thoại đã kết thúc. Chọn “Chat mới” để tiếp tục.
+              </p>
             )}
           </div>
-          <div className="ai-prompts">
+          <div className="ai-prompts" aria-label="Gợi ý câu hỏi">
             {[
               'Tìm theo ngân sách',
               'Gợi ý sản phẩm',
@@ -181,6 +293,7 @@ function ChatSession() {
             ))}
           </div>
           <form
+            className="ai-composer"
             onSubmit={(event) => {
               event.preventDefault();
               send(draft);
@@ -195,21 +308,46 @@ function ChatSession() {
               maxLength={2000}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(event) => {
+                if (
+                  event.key === 'Enter' &&
+                  !event.shiftKey &&
+                  !event.nativeEvent.isComposing
+                ) {
+                  event.preventDefault();
+                  if (!chat.busy && !completed && !chat.ending) send(draft);
+                }
+              }}
               placeholder="Bạn đang tìm sản phẩm nào?"
               disabled={chat.busy || completed || chat.ending}
             />
             <button
+              className="ai-send"
+              title="Gửi tin nhắn"
               disabled={chat.busy || completed || chat.ending || !draft.trim()}
               type="submit"
             >
-              Gửi
+              <Send size={17} aria-hidden="true" />
+              <span className="sr-only">Gửi</span>
             </button>
             {chat.busy && (
-              <button type="button" onClick={chat.cancel}>
-                Dừng
+              <button
+                className="ai-stop"
+                type="button"
+                title="Dừng trả lời"
+                onClick={chat.cancel}
+              >
+                <Square size={14} aria-hidden="true" />
+                <span className="sr-only">Dừng</span>
               </button>
             )}
           </form>
+          <p className="ai-retention">
+            {customer
+              ? 'Tin nhắn được xóa sau 30 ngày kể từ lúc gửi.'
+              : 'Lịch sử khách được xóa sau 24 giờ kể từ khi kết thúc.'}{' '}
+            Hội thoại tự kết thúc sau 1 giờ không hoạt động.
+          </p>
         </section>
       )}
     </div>

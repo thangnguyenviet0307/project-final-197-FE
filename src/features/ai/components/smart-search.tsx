@@ -111,7 +111,9 @@ export function SmartSearch() {
       {result.data && (
         <div className="mt-4 space-y-3">
           <p className="text-sm">
-            {result.data.semantic
+            {result.data.scope === 'catalog'
+              ? 'Kết quả sắp xếp trên toàn bộ danh mục phù hợp'
+              : result.data.semantic
               ? 'Kết quả kết hợp từ khóa và ngữ nghĩa'
               : 'Kết quả theo từ khóa'}
           </p>

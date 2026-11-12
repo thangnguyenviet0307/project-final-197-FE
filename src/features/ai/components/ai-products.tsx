@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import type { AiProduct } from '../types/ai';
 export function AiProducts({ products }: { products: AiProduct[] }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="ai-product-grid grid gap-3 sm:grid-cols-2">
       {products.map((p) => (
         <Link
           key={p.id}
           to={`/shop/${encodeURIComponent(p.slug)}`}
-          className="rounded-xl border border-gray-200 bg-white p-3 text-gray-900 hover:border-green-600"
+          className="ai-product-card rounded-xl border border-gray-200 bg-white p-3 text-gray-900 hover:border-green-600"
         >
           {p.thumbnail && /^https?:\/\//.test(p.thumbnail) && (
             <img

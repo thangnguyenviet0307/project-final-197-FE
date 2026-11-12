@@ -6,6 +6,7 @@ import { getApiError } from '@/services/api';
 import { aiService, socketEndpoint } from '../services/ai.service';
 import {
   chatInputSchema,
+  chatErrorSchema,
   completedSchema,
   socketEventSchema,
 } from '../schemas/ai';
@@ -248,9 +249,24 @@ export function useChat(open: boolean) {
             connection.disconnect();
           }
           if (result.type === 'chat:error') {
-            setError(
-              'Lượt trả lời chưa hoàn tất hoặc đã dừng. Hãy tải lại lịch sử để xem trạng thái, hoặc gửi câu hỏi mới.'
-            );
+            const feedback = chatErrorSchema.safeParse(result.data);
+            const turnStatus = feedback.success ? feedback.data.status : undefined;
+            if (turnStatus) {
+              // These are persisted terminal states, unlike a disconnect.
+              if (!turn.accepted) {
+                turn.accepted = true;
+                onAccepted?.();
+              }
+              setLive(value => value?.requestId === requestId
+                ? { ...value, status: turnStatus, error: feedback.success ? { code: feedback.data.code, message: feedback.data.message, retryable: feedback.data.retryable } : undefined } : value);
+            }
+            setError(feedback.success && feedback.data.message
+              ? feedback.data.message
+              : turnStatus === 'cancelled'
+                ? 'Đã dừng trả lời. Bạn có thể gửi câu hỏi khác.'
+                : turnStatus === 'failed'
+                  ? 'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử lại hoặc tìm sản phẩm trong cửa hàng.'
+                  : 'Không thể xử lý yêu cầu lúc này. Hãy tải lại lịch sử để kiểm tra hoặc thử lại sau.');
             finished = true;
             connection.disconnect();
           }

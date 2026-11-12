@@ -15,6 +15,7 @@ export interface AiSource {
   href: string;
 }
 export interface AiTurn {
+  error?: { code?: string; message?: string; retryable?: boolean };
   requestId: string;
   content: string;
   answer: string;
@@ -40,6 +41,7 @@ export interface AiHistory {
   page: number;
 }
 export interface AiSearchResult {
+  scope?: 'catalog' | 'ranked-candidates' | 'selected-products';
   rows: AiProduct[];
   total: number;
   page: number;
@@ -47,6 +49,7 @@ export interface AiSearchResult {
   semantic: boolean;
 }
 export interface AiAdminStatus {
+  failures?: { requestId: string; updatedAt: string; error: { code: string; stage: string; message: string } }[];
   config: {
     enabled: boolean;
     indexingEnabled: boolean;

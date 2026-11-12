@@ -84,6 +84,9 @@ it('minimizing preserves a conversation, while explicit completion closes it', a
   expect(aiService.end).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: 'Mở trợ lý mua sắm AI' }));
   fireEvent.click(screen.getByRole('button', { name: 'Kết thúc' }));
+  expect(aiService.end).not.toHaveBeenCalled();
+  expect(window.confirm).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận kết thúc' }));
   await waitFor(() => expect(aiService.end).toHaveBeenCalledWith(id));
   await screen.findByText(
     'Hội thoại đã kết thúc. Chọn “Chat mới” để tiếp tục.'
@@ -114,6 +117,51 @@ it('changing account clears the current transcript and uses a separate query cac
   await waitFor(() =>
     expect(screen.queryByText('Nội dung riêng của khách cũ')).toBeNull()
   );
+});
+
+it('confirms ending inside the chat and can keep the conversation open', async () => {
+  mount();
+  fireEvent.click(screen.getByRole('button', { name: 'Mở trợ lý mua sắm AI' }));
+  fireEvent.click(screen.getByText('Lịch sử hội thoại'));
+  fireEvent.click(await screen.findByRole('button', { name: /Đang mở/ }));
+  fireEvent.click(screen.getByRole('button', { name: 'Kết thúc' }));
+  expect(
+    screen.getByRole('group', { name: 'Xác nhận kết thúc hội thoại' })
+  ).toBeTruthy();
+  expect(aiService.end).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục trò chuyện' }));
+  expect(
+    screen.queryByRole('group', { name: 'Xác nhận kết thúc hội thoại' })
+  ).toBeNull();
+  expect(window.confirm).not.toHaveBeenCalled();
+  expect(aiService.end).not.toHaveBeenCalled();
+});
+
+it('explains failed, cancelled and uncertain history turns inside the chat', async () => {
+  history.rows = ['failed', 'cancelled', 'processing'].map((status) => ({
+    requestId: status,
+    content: `Question ${status}`,
+    status,
+    sources: [],
+    answer: status === 'cancelled' ? 'Nội dung trả lời một phần' : '',
+  }));
+  mount();
+  fireEvent.click(screen.getByRole('button', { name: 'Mở trợ lý mua sắm AI' }));
+  fireEvent.click(screen.getByText('Lịch sử hội thoại'));
+  fireEvent.click(await screen.findByRole('button', { name: /Đang mở/ }));
+  expect(
+    await screen.findByText(
+      'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử gửi lại.'
+    )
+  ).toBeTruthy();
+  expect(screen.getByText('Đã dừng trả lời câu hỏi này.')).toBeTruthy();
+  expect(screen.getByText('Nội dung trả lời một phần')).toBeTruthy();
+  expect(
+    screen.getByText(
+      'Chưa có kết quả được xác nhận. Chọn “Tải lại” để kiểm tra trạng thái.'
+    )
+  ).toBeTruthy();
+  expect(screen.queryByText('Lượt trả lời chưa hoàn tất.')).toBeNull();
 });
 it('shows the agreed retention policy and rejects unsafe sources or oversized input', async () => {
   mount();
@@ -311,7 +359,9 @@ it('stops while Socket.IO is connecting and ignores late ready events', async ()
 });
 it('waits for durable cancellation confirmation and ignores late completed events', async () => {
   const cancelled = deferred<Awaited<ReturnType<typeof aiService.cancel>>>();
-  const cancel = vi.spyOn(aiService, 'cancel').mockReturnValue(cancelled.promise);
+  const cancel = vi
+    .spyOn(aiService, 'cancel')
+    .mockReturnValue(cancelled.promise);
   const { socket, handlers } = socketFixture();
   vi.spyOn(aiService, 'create').mockResolvedValue({ id });
   vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
@@ -347,28 +397,52 @@ it('waits for durable cancellation confirmation and ignores late completed event
   expect(screen.queryByText('Không được ghi đè')).toBeNull();
   expect(screen.getByText('Nội dung từng phần')).toBeTruthy();
   expect(socket.disconnect).toHaveBeenCalled();
-  await act(async () => cancelled.resolve({ requestId, status: 'cancelled', answer: '', sources: [] }));
+  await act(async () =>
+    cancelled.resolve({
+      requestId,
+      status: 'cancelled',
+      answer: '',
+      sources: [],
+    })
+  );
   expect(await screen.findByText('Đã dừng lượt trả lời.')).toBeTruthy();
 });
 
-it.each(['completed', 'unavailable'] as const)('cancel reports %s without claiming cancellation', async (outcome) => {
-  const { socket, handlers } = socketFixture();
-  vi.spyOn(aiService, 'create').mockResolvedValue({ id });
-  vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
-  const cancel = vi.spyOn(aiService, 'cancel');
-  if (outcome === 'completed') cancel.mockResolvedValue({ requestId: 'saved', status: 'completed', answer: 'Kết quả đã lưu', sources: [] });
-  else cancel.mockRejectedValue(new Error('Network unavailable'));
-  mount();
-  openAndSend('Câu hỏi');
-  await waitFor(() => expect(socket.emit).toHaveBeenCalled());
-  const { requestId } = socket.emit.mock.calls[0]![1] as { requestId: string };
-  await act(async () => handlers.get('chat:accepted')?.({ type: 'chat:accepted', requestId }));
-  fireEvent.click(screen.getByRole('button', { name: 'Dừng' }));
-  expect(await screen.findByText(outcome === 'completed'
-    ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.'
-    : 'Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.')).toBeTruthy();
-  expect(screen.queryByText('Đã dừng lượt trả lời.')).toBeNull();
-});
+it.each(['completed', 'unavailable'] as const)(
+  'cancel reports %s without claiming cancellation',
+  async (outcome) => {
+    const { socket, handlers } = socketFixture();
+    vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+    vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+    const cancel = vi.spyOn(aiService, 'cancel');
+    if (outcome === 'completed')
+      cancel.mockResolvedValue({
+        requestId: 'saved',
+        status: 'completed',
+        answer: 'Kết quả đã lưu',
+        sources: [],
+      });
+    else cancel.mockRejectedValue(new Error('Network unavailable'));
+    mount();
+    openAndSend('Câu hỏi');
+    await waitFor(() => expect(socket.emit).toHaveBeenCalled());
+    const { requestId } = socket.emit.mock.calls[0]![1] as {
+      requestId: string;
+    };
+    await act(async () =>
+      handlers.get('chat:accepted')?.({ type: 'chat:accepted', requestId })
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Dừng' }));
+    expect(
+      await screen.findByText(
+        outcome === 'completed'
+          ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.'
+          : 'Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.'
+      )
+    ).toBeTruthy();
+    expect(screen.queryByText('Đã dừng lượt trả lời.')).toBeNull();
+  }
+);
 
 it('processing replay stays processing and does not masquerade as completion', async () => {
   const { socket, handlers } = socketFixture();
@@ -378,9 +452,97 @@ it('processing replay stays processing and does not masquerade as completion', a
   openAndSend('Câu hỏi đang chạy');
   await waitFor(() => expect(socket.emit).toHaveBeenCalled());
   const { requestId } = socket.emit.mock.calls[0]![1] as { requestId: string };
-  await act(async () => handlers.get('chat:processing')?.({ type: 'chat:processing', requestId, data: { status: 'processing' } }));
-  expect(await screen.findByText('Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.')).toBeTruthy();
-  expect(completedSchema.safeParse({ answer: '', status: 'processing', sources: [], products: [] }).success).toBe(false);
+  await act(async () =>
+    handlers.get('chat:processing')?.({
+      type: 'chat:processing',
+      requestId,
+      data: { status: 'processing' },
+    })
+  );
+  expect(
+    await screen.findByText(
+      'Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.'
+    )
+  ).toBeTruthy();
+  expect(
+    completedSchema.safeParse({
+      answer: '',
+      status: 'processing',
+      sources: [],
+      products: [],
+    }).success
+  ).toBe(false);
+});
+
+it.each(['cancelled', 'failed'] as const)(
+  'uses the confirmed %s state and safe server feedback inside chat',
+  async (status) => {
+    const { socket, handlers } = socketFixture();
+    vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+    vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+    mount();
+    openAndSend('Câu hỏi kiểm tra phản hồi');
+    await waitFor(() => expect(socket.emit).toHaveBeenCalled());
+    const { requestId } = socket.emit.mock.calls[0]![1] as {
+      requestId: string;
+    };
+    await act(async () => {
+      handlers.get('chat:error')?.({
+        type: 'chat:error',
+        requestId,
+        data: { status, message: 'Thông báo an toàn từ dịch vụ AI.' },
+      });
+    });
+    expect(await screen.findByRole('alert')).toHaveProperty(
+      'textContent',
+      'Thông báo an toàn từ dịch vụ AI.'
+    );
+    expect(screen.getAllByText('Thông báo an toàn từ dịch vụ AI.').length).toBe(
+      2
+    );
+  }
+);
+it('restores the persisted credit-limit explanation inside historical chat', async () => {
+  history.rows = [
+    {
+      requestId: 'failed-quota',
+      content: 'Tìm tai nghe',
+      answer: '',
+      status: 'failed',
+      sources: [],
+      error: {
+        code: 'AI_CREDIT_EXHAUSTED',
+        message: 'Trợ lý tạm chưa khả dụng do hạn mức dịch vụ.',
+      },
+    },
+  ];
+  mount();
+  fireEvent.click(screen.getByRole('button', { name: 'Mở trợ lý mua sắm AI' }));
+  fireEvent.click(screen.getByText('Lịch sử hội thoại'));
+  fireEvent.click(await screen.findByRole('button', { name: /Đang mở/ }));
+  expect(
+    await screen.findByText('Trợ lý tạm chưa khả dụng do hạn mức dịch vụ.')
+  ).toBeTruthy();
+  expect(window.confirm).not.toHaveBeenCalled();
+});
+it('sends with Enter while keeping Shift+Enter and IME composition available', async () => {
+  const { socket } = socketFixture();
+  vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+  vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+  mount();
+  fireEvent.click(screen.getByRole('button', { name: 'Mở trợ lý mua sắm AI' }));
+  const input = screen.getByLabelText('Câu hỏi cho trợ lý');
+  fireEvent.change(input, { target: { value: 'Tìm tai nghe dưới 500k' } });
+  fireEvent.keyDown(input, { key: 'Enter', shiftKey: true });
+  fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+  expect(socket.emit).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'Enter' });
+  await waitFor(() =>
+    expect(socket.emit).toHaveBeenCalledWith(
+      'chat:send',
+      expect.objectContaining({ content: 'Tìm tai nghe dưới 500k' })
+    )
+  );
 });
 it('keeps a draft when ticket creation fails', async () => {
   vi.spyOn(aiService, 'create').mockResolvedValue({ id });
@@ -416,6 +578,7 @@ it('late completion of chat A cannot clear streaming content in chat B', async (
   fireEvent.click(await screen.findByRole('button', { name: /Đang mở/ }));
   await waitFor(() => expect(aiService.history).toHaveBeenCalledWith(id, 1));
   fireEvent.click(screen.getByRole('button', { name: 'Kết thúc' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận kết thúc' }));
   fireEvent.click(screen.getByRole('button', { name: 'Chat mới' }));
   fireEvent.change(screen.getByLabelText('Câu hỏi cho trợ lý'), {
     target: { value: 'Câu hỏi của B' },
@@ -482,6 +645,7 @@ it('restores product cards from history and only refreshes conversation queries 
     await screen.findByRole('link', { name: /Sản phẩm đã gợi ý/ })
   ).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Kết thúc' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận kết thúc' }));
   await screen.findByText(
     'Hội thoại đã kết thúc. Chọn “Chat mới” để tiếp tục.'
   );
