@@ -198,3 +198,28 @@ it('keeps repeated article tags consistent through data refreshes without duplic
     errors.mockRestore();
   }
 });
+
+it('wraps pasted article text at normal spaces while retaining line breaks and literal HTML', () => {
+  const previous = state.article.content;
+  state.article.content =
+    'Chính\u00a0sách\u00a0cửa\u00a0hàng\n<script>literal</script>';
+  try {
+    const view = render(
+      <MemoryRouter initialEntries={['/bai-viet/bai-viet-mau']}>
+        <Routes>
+          <Route
+            path="/bai-viet/:slug"
+            element={<StorefrontArticleDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>
+    );
+    const body = view.container.querySelector('.whitespace-pre-wrap');
+    expect(body?.textContent).toBe(
+      'Chính sách cửa hàng\n<script>literal</script>'
+    );
+    expect(body?.querySelector('script')).toBeNull();
+  } finally {
+    state.article.content = previous;
+  }
+});

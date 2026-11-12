@@ -1,3 +1,4 @@
+import { normalizeTextSpacing } from '@/utils/text-spacing';
 import DOMPurify from 'dompurify';
 
 export function sanitizeDescription(html: string): string {
@@ -34,6 +35,13 @@ export function sanitizeDescription(html: string): string {
     ALLOW_DATA_ATTR: false,
     RETURN_DOM_FRAGMENT: true,
   });
+  // Pasted/Quill HTML can contain non-breaking spaces between every word.
+  // Normalize text nodes only; image URLs and other attributes must stay intact.
+  const walker = document.createTreeWalker(fragment, NodeFilter.SHOW_TEXT);
+  let textNode: Node | null;
+  while ((textNode = walker.nextNode())) {
+    textNode.nodeValue = normalizeTextSpacing(textNode.nodeValue ?? '');
+  }
   for (const node of fragment.querySelectorAll('[class]')) {
     const classes = [...node.classList].filter((name) =>
       /^(ql-align-(center|right|justify)|ql-indent-[1-8]|ql-size-(small|large|huge)|ql-direction-rtl|ql-ui)$/.test(
@@ -65,7 +73,7 @@ export function sanitizeDescription(html: string): string {
 export function descriptionToHtml(value: string): string {
   if (!value) return '';
   if (/<\/?[a-z][^>]*>/i.test(value)) return sanitizeDescription(value);
-  const escaped = value
+  const escaped = normalizeTextSpacing(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

@@ -1,3 +1,4 @@
+import { normalizeTextSpacing } from '@/utils/text-spacing';
 import {
   LONG_TEXT_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
@@ -347,7 +348,9 @@ export function ArticleForm({
         >
           <h2 className="text-xl font-bold">{draft.title}</h2>
           <p>{draft.excerpt}</p>
-          <div className="break-words whitespace-pre-wrap">{draft.content}</div>
+          <div className="break-words whitespace-pre-wrap">
+            {normalizeTextSpacing(draft.content)}
+          </div>
         </article>
       )}
       {error && (

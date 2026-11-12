@@ -170,7 +170,9 @@
   padding: 18px 16px;
   overflow: auto;
   overscroll-behavior: contain;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
   background: #fafbf9;
   scrollbar-width: thin;
   scrollbar-color: #d2d9ce transparent;

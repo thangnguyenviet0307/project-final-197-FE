@@ -40,7 +40,7 @@ export function ContentEditor({
 export function ContentBody({ value }: { value: string }) {
   return (
     <div
-      className="product-description-content leading-8 break-words"
+      className="product-description-content leading-8"
       dangerouslySetInnerHTML={{ __html: descriptionToHtml(value) }}
     />
   );

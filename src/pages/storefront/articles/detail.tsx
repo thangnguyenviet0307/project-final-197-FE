@@ -1,3 +1,4 @@
+import { normalizeTextSpacing } from '@/utils/text-spacing';
 import { ArrowLeft, CalendarDays, Newspaper } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useRecordArticleView } from '@/features/storefront/hooks/use-record-article-view';
@@ -125,7 +126,7 @@ export default function StorefrontArticleDetailPage() {
           />
         )}
         <div className="mt-8 text-base leading-8 break-words whitespace-pre-wrap text-gray-800">
-          {post.content}
+          {normalizeTextSpacing(post.content)}
         </div>
         {post.tags.length > 0 && (
           <ul aria-label="Thẻ bài viết" className="mt-8 flex flex-wrap gap-2">

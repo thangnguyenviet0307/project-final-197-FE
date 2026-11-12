@@ -1,3 +1,4 @@
+import { normalizeTextSpacing } from '@/utils/text-spacing';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -255,14 +256,14 @@ function ChatSession() {
             )}
             {chat.rows.map((turn) => (
               <article className="ai-turn" key={turn.requestId}>
-                <p className="ai-user">{turn.content}</p>
+                <p className="ai-user">{normalizeTextSpacing(turn.content)}</p>
                 <div className="ai-answer-label">
                   <ShoppingBag size={13} aria-hidden="true" /> Trợ lý AI
                 </div>
                 <p className="ai-answer">
-                  {turn.answer ||
-                    turn.error?.message ||
-                    turnFeedback(turn.status, chat.busy)}
+                  {normalizeTextSpacing(
+                    turn.answer || turn.error?.message || ''
+                  ) || turnFeedback(turn.status, chat.busy)}
                 </p>
                 {turn.answer && turn.status !== 'completed' && (
                   <p className="ai-turn-note">

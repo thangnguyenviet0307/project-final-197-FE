@@ -14,7 +14,6 @@
 .product-description-editor .ql-editor {
   min-height: 12rem;
   color: var(--foreground);
-  overflow-wrap: anywhere;
 }
 .product-description-editor[aria-disabled='true'] .ql-toolbar {
   pointer-events: none;
@@ -36,8 +35,15 @@
   border-color: var(--border);
   z-index: 20;
 }
+.product-description-editor .ql-editor,
+.product-description-editor .ql-editor *,
+.product-description-content,
+.product-description-content * {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+}
 .product-description-content {
-  overflow-wrap: anywhere;
   font-size: 0.875rem;
 }
 .product-description-content p {
