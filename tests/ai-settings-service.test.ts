@@ -24,3 +24,16 @@ it('omits read-only embedding pointers when saving settings returned by the serv
   });
   expect(put).toHaveBeenCalledWith('/ai/admin/settings', writable);
 });
+
+it('clears history with the confirmed revision in the authenticated DELETE body', async () => {
+  const remove = vi
+    .spyOn(api, 'delete')
+    .mockResolvedValue({ data: { data: { revision: 8, audit: [] } } });
+  expect(await aiSettingsService.clearAudit(7)).toEqual({
+    revision: 8,
+    audit: [],
+  });
+  expect(remove).toHaveBeenCalledWith('/ai/admin/settings/audit', {
+    data: { revision: 7 },
+  });
+});

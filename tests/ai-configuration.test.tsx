@@ -6,6 +6,8 @@ import {
   fireEvent,
   waitFor,
   cleanup,
+  within,
+  act,
 } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
@@ -247,4 +249,118 @@ it('selects OpenAI with a fresh credential and provider-specific model suggestio
       undefined
     )
   );
+});
+
+it.each([true, false])(
+  'paginates configuration history without disabling navigation for viewers (manage=%s)',
+  async (canManage) => {
+    data.audit = Array.from({ length: 25 }, (_, index) => ({
+      action: 'settings.updated',
+      actor: `actor-${index}`,
+      at: new Date(2026, 0, 1, 0, 0, index).toISOString(),
+    }));
+    mount(canManage);
+    const history = within(
+      await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
+    );
+    expect(history.getAllByRole('row')).toHaveLength(11);
+    expect(history.getByText('actor-0')).toBeTruthy();
+    const last = history.getByRole('button', {
+      name: 'Trang cuối',
+    }) as HTMLButtonElement;
+    expect(last.disabled).toBe(false);
+    expect(last.closest('fieldset')).toBeNull();
+    fireEvent.click(last);
+    expect(history.getByText('Trang 3 / 3')).toBeTruthy();
+    expect(history.getAllByRole('row')).toHaveLength(6);
+    expect(history.getByText('actor-24')).toBeTruthy();
+    expect(history.queryByText('actor-0')).toBeNull();
+    fireEvent.click(history.getByRole('button', { name: 'Trang đầu' }));
+    expect(history.getByText('actor-0')).toBeTruthy();
+    if (!canManage)
+      expect(history.queryByRole('button', { name: 'Xóa lịch sử' })).toBeNull();
+  }
+);
+
+it('confirms clearing history and resets pagination after success without changing settings', async () => {
+  data.audit = Array.from({ length: 11 }, (_, index) => ({
+    action: 'settings.updated',
+    actor: `actor-${index}`,
+    at: new Date().toISOString(),
+  }));
+  const cleared = { ...data, revision: 2, audit: [] };
+  const clear = vi
+    .spyOn(aiSettingsService, 'clearAudit')
+    .mockResolvedValue(cleared);
+  mount();
+  const history = within(
+    await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
+  );
+  fireEvent.click(history.getByRole('button', { name: 'Trang cuối' }));
+  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
+  expect(clear).not.toHaveBeenCalled();
+  fireEvent.click(history.getByRole('button', { name: 'Hủy' }));
+  expect(clear).not.toHaveBeenCalled();
+  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
+  fireEvent.click(
+    history.getByRole('button', { name: 'Xác nhận xóa lịch sử' })
+  );
+  await waitFor(() => expect(clear).toHaveBeenCalledWith(1));
+  expect(
+    await history.findByText('Chưa có thay đổi cấu hình trên web.')
+  ).toBeTruthy();
+  expect(history.queryByRole('navigation')).toBeNull();
+  expect(
+    (history.getByRole('button', { name: 'Xóa lịch sử' }) as HTMLButtonElement)
+      .disabled
+  ).toBe(true);
+  expect(client.getQueryData(['ai', 'admin', 'settings'])).toMatchObject({
+    settings: data.settings,
+    connections: data.connections,
+    audit: [],
+  });
+});
+
+it('keeps the confirmed revision and retains new history after a stale deletion is rejected', async () => {
+  data.audit = [
+    {
+      action: 'settings.updated',
+      actor: 'original',
+      at: new Date().toISOString(),
+    },
+  ];
+  const clear = vi
+    .spyOn(aiSettingsService, 'clearAudit')
+    .mockRejectedValue(new Error('Configuration changed. Reload.'));
+  mount();
+  const history = within(
+    await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
+  );
+  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
+  data = {
+    ...data,
+    revision: 2,
+    audit: [
+      {
+        action: 'connection.tested',
+        actor: 'new-entry',
+        at: new Date().toISOString(),
+      },
+      ...data.audit,
+    ],
+  };
+  await act(async () => {
+    client.setQueryData(['ai', 'admin', 'settings'], data);
+  });
+  fireEvent.click(
+    history.getByRole('button', { name: 'Xác nhận xóa lịch sử' })
+  );
+  await waitFor(() => expect(clear).toHaveBeenCalledWith(1));
+  expect(await history.findByText('new-entry')).toBeTruthy();
+  await waitFor(() =>
+    expect(
+      history.queryByRole('group', { name: 'Xác nhận xóa lịch sử' })
+    ).toBeNull()
+  );
+  expect(history.getByRole('alert')).toBeTruthy();
 });

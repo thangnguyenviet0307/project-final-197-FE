@@ -6,6 +6,16 @@ import type {
   AiConnectionInput,
 } from '../types/ai-settings';
 export const aiSettingsService = {
+  async clearAudit(revision: number) {
+    return (
+      await api.delete<ApiResponse<AiSettingsData>>(
+        '/ai/admin/settings/audit',
+        {
+          data: { revision },
+        }
+      )
+    ).data.data;
+  },
   async initialize(revision: number) {
     return (
       await api.post<ApiResponse<AiSettingsData>>(
