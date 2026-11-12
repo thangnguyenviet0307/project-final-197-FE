@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useCategories } from '@/features/categories/hooks/use-categories';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -70,7 +71,10 @@ export function DeleteCategoryDialog({
           </DialogDescription>
         </DialogHeader>
         {categories.isPending ? (
-          <p role="status">Đang kiểm tra danh mục con...</p>
+          <LoadingSkeleton
+            label="Đang kiểm tra danh mục con..."
+            variant="options"
+          />
         ) : categories.isError ? (
           <div role="alert">
             <p>Không thể kiểm tra danh mục con.</p>
@@ -122,7 +126,10 @@ export function DeleteCategoryDialog({
           </div>
         ) : null}
         {products.isPending ? (
-          <p role="status">Đang kiểm tra sản phẩm liên quan...</p>
+          <LoadingSkeleton
+            label="Đang kiểm tra sản phẩm liên quan..."
+            variant="list"
+          />
         ) : products.isError ? (
           <div role="alert" className="space-y-2">
             <p>

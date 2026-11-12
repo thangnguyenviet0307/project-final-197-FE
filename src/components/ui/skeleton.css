@@ -1,0 +1,8 @@
+/* Context-based scoping also follows React portals outside .storefront-ui. */
+[data-loading-area='storefront'] {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #111827;
+  --muted: #f3f4f6;
+  --border: #e5e7eb;
+}

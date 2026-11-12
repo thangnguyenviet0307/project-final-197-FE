@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ListPagination } from '@/components/list-pagination';
@@ -49,9 +50,11 @@ export function WarrantyList({
         </select>
       </div>
       {query.isPending ? (
-        <p role="status" className="mt-5">
-          Đang tải yêu cầu…
-        </p>
+        <LoadingSkeleton
+          label="Đang tải yêu cầu…"
+          variant="list"
+          className="mt-5"
+        />
       ) : query.isError ? (
         <div role="alert" className="mt-5">
           <p>Không thể tải danh sách yêu cầu.</p>

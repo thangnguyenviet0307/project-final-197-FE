@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useRelatedProducts } from '@/features/storefront/hooks/use-store-products';
 import { ProductCard } from '@/features/storefront/components/product-card';
 import { SectionHeading } from '@/features/storefront/components/section-heading';
@@ -18,7 +19,10 @@ export function RelatedProducts({ slug }: { slug: string }) {
         linkLabel="Xem tất cả sản phẩm"
       />
       {query.isPending ? (
-        <p role="status">Đang tải sản phẩm liên quan…</p>
+        <LoadingSkeleton
+          label="Đang tải sản phẩm liên quan…"
+          variant="products"
+        />
       ) : query.isError ? (
         <div role="alert">
           <p>Không thể tải sản phẩm liên quan.</p>

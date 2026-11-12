@@ -1,3 +1,4 @@
+import { LoadingImage } from '@/components/loading-image';
 import { Fragment, useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -29,7 +30,7 @@ function HeroSlides({ slides }: { slides: PublicHeroSlide[] }) {
         {slides.map(
           (item, index) =>
             (item.imageUrl || item.category.icon) && (
-              <img
+              <LoadingImage
                 key={item._id}
                 src={item.imageUrl || item.category.icon}
                 alt=""

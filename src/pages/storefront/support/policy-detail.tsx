@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { ContentBody } from '@/features/support/components/content';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -28,7 +29,7 @@ export default function PolicyDetailPage() {
       path={document.path}
     >
       {query.isPending ? (
-        <p role="status">Đang tải chính sách…</p>
+        <LoadingSkeleton label="Đang tải chính sách…" variant="text" />
       ) : query.isError ? (
         <div role="alert" className="space-y-4">
           <p>{getApiError(query.error).message}</p>

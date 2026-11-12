@@ -37,6 +37,7 @@ export function ProductPolicyPicker({
         id={`${name}-policy`}
         className="bg-background h-10 w-full rounded-md border px-3 text-sm"
         disabled={query.isPending || query.isError}
+        aria-busy={query.isPending}
         value={selected ? policy.path : ''}
         onChange={(event) => {
           const notes = value

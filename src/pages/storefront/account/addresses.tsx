@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useEffect } from 'react';
 import { LocalityFields } from '@/features/checkout/components/locality-fields';
 import { useCheckoutLocations } from '@/features/checkout/hooks/use-checkout';
@@ -238,7 +239,8 @@ function AddressEditor({ user }: { user: User }) {
 }
 export default function AddressesPage() {
   const query = useProfile();
-  if (query.isPending) return <p role="status">Đang tải địa chỉ…</p>;
+  if (query.isPending)
+    return <LoadingSkeleton label="Đang tải địa chỉ…" variant="list" />;
   if (query.isError)
     return (
       <div role="alert">

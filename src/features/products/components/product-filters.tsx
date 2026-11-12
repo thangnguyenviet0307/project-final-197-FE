@@ -69,6 +69,7 @@ export function ProductFilters({
               id={`filter-${name}`}
               className="bg-background h-8 rounded-md border px-2 text-sm"
               disabled={query.isPending}
+              aria-busy={query.isPending}
               value={draft[name]}
               onChange={(event) =>
                 setDraft((previous) => ({

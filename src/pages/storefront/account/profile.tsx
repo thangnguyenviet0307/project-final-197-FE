@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useEffect } from 'react';
 import { RequiredMark } from '@/components/required-mark';
 import { useForm, useWatch } from 'react-hook-form';
@@ -232,7 +233,8 @@ function ProfileEditor({ user }: { user: User }) {
 }
 export default function ProfilePage() {
   const query = useProfile();
-  if (query.isPending) return <p role="status">Đang tải hồ sơ…</p>;
+  if (query.isPending)
+    return <LoadingSkeleton label="Đang tải hồ sơ…" variant="form" />;
   if (query.isError)
     return (
       <div role="alert">

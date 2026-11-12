@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { RequiredMark } from '@/components/required-mark';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -123,7 +124,7 @@ export default function CreateOrderPage() {
           />
           {customerId && <p>Selected customer: {customerLabel}</p>}
           {customers.isPending ? (
-            <p>Đang tải khách hàng…</p>
+            <LoadingSkeleton label="Đang tải khách hàng…" variant="options" />
           ) : customers.isError ? (
             <p role="alert">{getApiError(customers.error).message}</p>
           ) : (
@@ -188,7 +189,7 @@ export default function CreateOrderPage() {
             }}
           />
           {products.isPending ? (
-            <p>Đang tải sản phẩm…</p>
+            <LoadingSkeleton label="Đang tải sản phẩm…" variant="list" />
           ) : products.isError ? (
             <p role="alert">{getApiError(products.error).message}</p>
           ) : (

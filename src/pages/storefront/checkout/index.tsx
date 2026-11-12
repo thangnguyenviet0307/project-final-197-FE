@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import {
@@ -27,9 +28,10 @@ export default function CheckoutPage() {
   const loading = useAuthStore((state) => state.isLoading);
   if (loading)
     return (
-      <p role="status" className="store-container py-12">
-        Đang tải thông tin khách hàng…
-      </p>
+      <LoadingSkeleton
+        label="Đang tải thông tin khách hàng…"
+        variant="options"
+      />
     );
   return user?.accountType === 'customer' ? (
     <CustomerCheckout key={user.id} customer={user} />

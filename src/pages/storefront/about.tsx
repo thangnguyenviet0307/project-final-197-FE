@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import {
   ArrowRight,
   Compass,
@@ -18,9 +19,10 @@ export default function StorefrontAboutPage() {
   if (query.isPending) {
     return (
       <main className="store-container py-20 text-center">
-        <p role="status" className="text-sm text-gray-500">
-          Đang tải thông tin DemoStore...
-        </p>
+        <LoadingSkeleton
+          label="Đang tải thông tin DemoStore..."
+          variant="article"
+        />
       </main>
     );
   }

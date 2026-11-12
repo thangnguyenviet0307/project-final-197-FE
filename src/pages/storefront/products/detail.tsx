@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import {
   productCategoryNames,
   productCategories,
@@ -527,7 +528,7 @@ export default function StorefrontProductDetailPage() {
         {slug.length < 3 || slug.length > 255 ? (
           <p role="alert">Đường dẫn sản phẩm không hợp lệ.</p>
         ) : query.isPending ? (
-          <p role="status">Đang tải sản phẩm…</p>
+          <LoadingSkeleton label="Đang tải sản phẩm…" variant="product" />
         ) : query.isError ? (
           <div role="alert">
             <p>

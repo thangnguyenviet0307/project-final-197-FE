@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 import {
@@ -28,11 +29,7 @@ export function RatingStars({ rating }: { rating: number }) {
 export function StoreRatingSummary({ slug }: { slug: string }) {
   const query = useStoreMetrics(slug);
   if (query.isPending)
-    return (
-      <p role="status" className="text-sm text-gray-500">
-        Đang tải điểm đánh giá…
-      </p>
-    );
+    return <LoadingSkeleton label="Đang tải điểm đánh giá…" variant="inline" />;
   if (query.isError)
     return (
       <button
@@ -65,9 +62,11 @@ export function StoreRatingBreakdown({ slug }: { slug: string }) {
   const query = useStoreMetrics(slug);
   if (query.isPending)
     return (
-      <p role="status" className="mb-6 text-sm text-gray-500">
-        Đang tải thống kê đánh giá…
-      </p>
+      <LoadingSkeleton
+        label="Đang tải thống kê đánh giá…"
+        variant="stats"
+        className="mb-6"
+      />
     );
   if (query.isError)
     return (
@@ -163,7 +162,7 @@ export function StoreProductReviews({ product }: { product: Product }) {
       <h2 className="mb-6 text-2xl font-bold">Đánh giá sản phẩm</h2>
       <StoreRatingBreakdown slug={slug} />
       {query.isPending ? (
-        <p role="status">Đang tải đánh giá…</p>
+        <LoadingSkeleton label="Đang tải đánh giá…" variant="list" />
       ) : query.isError ? (
         <div role="alert">
           <p>Không thể tải đánh giá.</p>

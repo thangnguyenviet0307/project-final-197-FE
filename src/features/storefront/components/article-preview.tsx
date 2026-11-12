@@ -1,3 +1,4 @@
+import { LoadingImage } from '@/components/loading-image';
 import { useState } from 'react';
 import { CalendarDays, Eye, Newspaper, UserRound } from 'lucide-react';
 import type { PublicArticleSummary } from '@/features/storefront/types/article';
@@ -15,7 +16,7 @@ export function ArticleCover({
       className={`relative overflow-hidden rounded-2xl bg-[#eef3e9] ${className}`}
     >
       {src && failed !== src ? (
-        <img
+        <LoadingImage
           src={src}
           alt=""
           loading="lazy"

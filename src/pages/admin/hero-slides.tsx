@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export default function AdminHeroSlidesPage() {
           </Button>
         </div>
         {query.isPending ? (
-          <p role="status">Đang tải slide…</p>
+          <LoadingSkeleton label="Đang tải slide…" variant="list" />
         ) : query.isError ? (
           <div role="alert">
             {getApiError(query.error).message}

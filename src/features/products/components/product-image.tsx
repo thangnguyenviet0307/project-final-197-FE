@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { LoadingImage } from '@/components/loading-image';
 import { ImageOff } from 'lucide-react';
 import { cn } from '@/utils/utils';
 
@@ -26,7 +27,7 @@ export function ProductImage({
       </span>
     );
   return (
-    <img
+    <LoadingImage
       src={src}
       alt={alt}
       loading="lazy"

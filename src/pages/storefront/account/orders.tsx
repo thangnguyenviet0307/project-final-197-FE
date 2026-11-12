@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Package } from 'lucide-react';
 import { useCustomerOrders } from '@/features/orders/hooks/use-customer-orders';
@@ -30,7 +31,7 @@ export default function OrdersPage() {
         </div>
       </div>
       {query.isPending ? (
-        <p role="status">Đang tải đơn hàng…</p>
+        <LoadingSkeleton label="Đang tải đơn hàng…" variant="list" />
       ) : query.isError ? (
         <div role="alert" className="space-y-3">
           <p>{getApiError(query.error).message}</p>

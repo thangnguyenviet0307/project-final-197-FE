@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
@@ -47,7 +48,7 @@ export default function PostCategoriesPage() {
           </Button>
         </div>
         {query.isPending ? (
-          <p role="status">Đang tải danh mục…</p>
+          <LoadingSkeleton label="Đang tải danh mục…" variant="table" />
         ) : query.isError ? (
           <p role="alert">
             {getApiError(query.error).message}

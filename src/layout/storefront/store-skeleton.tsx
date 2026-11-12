@@ -1,10 +1,19 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { StorefrontUiContext } from '@/context/storefront-ui-context';
 
 /** Static storefront shell: safe before the router and auth session are ready. */
 export function StoreSkeleton() {
   return (
+    <StorefrontUiContext.Provider value={true}>
+      <StoreSkeletonContent />
+    </StorefrontUiContext.Provider>
+  );
+}
+function StoreSkeletonContent() {
+  return (
     <div
       role="status"
+      data-loading-area="storefront"
       aria-label="Đang tải trang bán hàng"
       aria-busy="true"
       className="min-h-svh bg-white text-gray-900"

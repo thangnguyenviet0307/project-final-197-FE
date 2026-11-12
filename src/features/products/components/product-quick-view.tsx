@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { productCategoryNames } from '@/features/products/types/products';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,8 @@ import { getApiError } from '@/services/api';
 
 function ProductPreview({ id }: { id: string }) {
   const query = useProduct(id);
-  if (query.isPending) return <p role="status">Đang tải sản phẩm...</p>;
+  if (query.isPending)
+    return <LoadingSkeleton label="Đang tải sản phẩm..." variant="preview" />;
   if (query.isError)
     return (
       <div role="alert" className="space-y-2">

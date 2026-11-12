@@ -109,6 +109,7 @@ export function CategoryForm({
                 setValueAs: (value) => value || null,
               })}
               disabled={categories.isPending || categories.isError}
+              aria-busy={categories.isPending}
             >
               <option value="">Không có (danh mục gốc)</option>
               {categories.data

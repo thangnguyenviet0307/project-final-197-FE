@@ -1,3 +1,5 @@
+import { LoadingImage } from '@/components/loading-image';
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { normalizeTextSpacing } from '@/utils/text-spacing';
 import { ArrowLeft, CalendarDays, Newspaper } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -43,9 +45,7 @@ export default function StorefrontArticleDetailPage() {
   if (article.isPending) {
     return (
       <main className="store-container py-16">
-        <p role="status" className="text-center text-sm text-gray-500">
-          Đang tải bài viết...
-        </p>
+        <LoadingSkeleton label="Đang tải bài viết..." variant="article" />
       </main>
     );
   }
@@ -119,7 +119,7 @@ export default function StorefrontArticleDetailPage() {
           </div>
         </header>
         {post.imageUrl && (
-          <img
+          <LoadingImage
             src={post.imageUrl}
             alt={post.title}
             className="mt-8 aspect-[16/9] w-full rounded-lg object-cover"

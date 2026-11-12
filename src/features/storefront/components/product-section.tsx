@@ -6,6 +6,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/features/storefront/components/product-card';
 import { useStoreProductCarousel } from '@/features/storefront/hooks/use-store-product-carousel';
@@ -141,15 +142,28 @@ export function ProductSection({
                     />
                   ) : (
                     <div
-                      className={`product-carousel-placeholder ${query.isPending ? 'motion-safe:animate-pulse' : ''}`}
-                    />
+                      className="product-carousel-placeholder p-4"
+                      aria-hidden="true"
+                    >
+                      {(query.isPending || query.isFetchingNextPage) && (
+                        <>
+                          <Skeleton className="aspect-[4/3] w-full" />
+                          <div className="mt-5 space-y-3">
+                            <Skeleton className="h-3 w-2/3" />
+                            <Skeleton className="h-5 w-full" />
+                            <Skeleton className="h-5 w-4/5" />
+                            <Skeleton className="mt-6 h-6 w-24" />
+                          </div>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               );
             })}
           </div>
           {query.isPending && (
-            <div className="product-carousel-message" role="status">
+            <div className="sr-only" role="status">
               Đang tải sản phẩm…
             </div>
           )}

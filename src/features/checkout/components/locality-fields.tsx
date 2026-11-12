@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useCheckoutLocations } from '@/features/checkout/hooks/use-checkout';
 import { getApiError } from '@/services/api';
 
@@ -25,9 +26,11 @@ export function LocalityFields({
   return (
     <>
       {locations.isPending && (
-        <p role="status" className="text-sm text-gray-500 sm:col-span-2">
-          Đang tải danh sách địa phương…
-        </p>
+        <LoadingSkeleton
+          label="Đang tải danh sách địa phương…"
+          variant="inline"
+          className="sm:col-span-2"
+        />
       )}
       {locations.isError && (
         <div role="alert" className="text-sm text-red-600 sm:col-span-2">
@@ -77,6 +80,7 @@ export function LocalityFields({
             value={value}
             disabled={disabled || unavailable}
             aria-required="true"
+            aria-busy={locations.isPending}
             aria-invalid={!!error}
             aria-describedby={error ? `${idPrefix}-${field}-error` : undefined}
             onChange={(event) =>

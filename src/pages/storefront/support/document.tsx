@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Link, useLocation } from 'react-router-dom';
 import { ContentBody } from '@/features/support/components/content';
 import { PublicationFooter } from '@/features/support/components/publication-footer';
@@ -29,7 +30,7 @@ export default function StoreDocumentPage() {
       path={document.path}
     >
       {query.isPending ? (
-        <p role="status">Đang tải nội dung…</p>
+        <LoadingSkeleton label="Đang tải nội dung…" variant="text" />
       ) : query.isError ? (
         <div role="alert">
           <p>{getApiError(query.error).message}</p>

@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { AiSettingsHistory } from './ai-settings-history';
 import { AiEmbeddingVersions } from './ai-embedding-versions';
 import { useState } from 'react';
@@ -96,7 +97,8 @@ export function AiConfiguration({
       setBusy(false);
     }
   }
-  if (query.isPending) return <p role="status">Đang tải cấu hình AI…</p>;
+  if (query.isPending)
+    return <LoadingSkeleton label="Đang tải cấu hình AI…" variant="form" />;
   if (!data)
     return (
       <div role="alert">

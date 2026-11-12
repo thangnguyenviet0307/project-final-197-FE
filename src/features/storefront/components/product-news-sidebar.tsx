@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Link } from 'react-router-dom';
 import { usePublicProductNews } from '@/features/products/hooks/use-product-news';
 import { ProductImage } from '@/features/products/components/product-image';
@@ -14,9 +15,7 @@ export function ProductNewsSidebar({ slug }: { slug: string }) {
         Tin tức liên quan
       </h2>
       {query.isPending ? (
-        <p role="status" className="text-sm text-gray-500">
-          Đang tải tin tức…
-        </p>
+        <LoadingSkeleton label="Đang tải tin tức…" variant="list" />
       ) : query.isError ? (
         <div role="alert" className="space-y-2 text-sm text-gray-600">
           <p>{getApiError(query.error).message}</p>

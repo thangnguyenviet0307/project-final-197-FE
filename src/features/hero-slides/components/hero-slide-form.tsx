@@ -85,6 +85,7 @@ export function HeroSlideForm({
             required={!slide || !!slide.category}
             aria-invalid={!!categoryError}
             aria-describedby={categoryError ? 'hero-category-error' : undefined}
+            aria-busy={categories.isPending}
             className="bg-background h-10 rounded-md border px-3"
             value={draft.category}
             onChange={(event) => {

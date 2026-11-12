@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -135,7 +136,7 @@ function NewsSelectionForm({
           </Button>
         </form>
         {choices.isPending ? (
-          <p role="status">Đang tải danh sách tin…</p>
+          <LoadingSkeleton label="Đang tải danh sách tin…" variant="list" />
         ) : choices.isError ? (
           <p role="alert">
             {getApiError(choices.error).message}{' '}
@@ -257,7 +258,7 @@ export function ProductNewsEditor({
     <section className="space-y-4 rounded-xl border p-4">
       <h2 className="text-lg font-semibold">Tin tức liên quan của sản phẩm</h2>
       {!query.data && query.isPending ? (
-        <p role="status">Đang tải tin đã chọn…</p>
+        <LoadingSkeleton label="Đang tải tin đã chọn…" variant="list" />
       ) : !query.data ? (
         <p role="alert">
           {getApiError(query.error).message}{' '}

@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown, CircleHelp, Search } from 'lucide-react';
@@ -34,9 +35,10 @@ export default function StorefrontFAQPage() {
   if (query.isPending) {
     return (
       <main className="store-container py-20 text-center">
-        <p role="status" className="text-sm text-gray-500">
-          Đang tải câu hỏi thường gặp...
-        </p>
+        <LoadingSkeleton
+          label="Đang tải câu hỏi thường gặp..."
+          variant="text"
+        />
       </main>
     );
   }

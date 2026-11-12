@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { RequiredMark } from '@/components/required-mark';
 import { useState } from 'react';
@@ -73,7 +74,7 @@ export function HandlerPicker({
         />
       </label>
       {query.isPending ? (
-        <p role="status">Đang tải nhân viên…</p>
+        <LoadingSkeleton label="Đang tải nhân viên…" variant="options" />
       ) : query.isError ? (
         <div role="alert">
           <p>{getApiError(query.error).message}</p>

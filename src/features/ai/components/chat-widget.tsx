@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { normalizeTextSpacing } from '@/utils/text-spacing';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -231,7 +232,7 @@ function ChatSession() {
               </div>
             )}
             {chat.history.isPending && chat.id && (
-              <p role="status">Đang tải lịch sử…</p>
+              <LoadingSkeleton label="Đang tải lịch sử…" variant="chat" />
             )}
             {chat.history.isError && (
               <p role="alert">Không tải được hội thoại. Vui lòng tải lại.</p>

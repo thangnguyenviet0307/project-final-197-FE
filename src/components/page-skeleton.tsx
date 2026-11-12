@@ -64,7 +64,10 @@ export function ContentSkeleton({
 
 export function PageSkeleton() {
   return (
-    <div className="bg-background text-foreground flex min-h-svh">
+    <div
+      data-loading-area="admin"
+      className="bg-background text-foreground flex min-h-svh"
+    >
       <aside
         aria-hidden="true"
         className="hidden w-64 shrink-0 space-y-6 border-r p-6 lg:block"

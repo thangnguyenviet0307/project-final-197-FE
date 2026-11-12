@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useEffect, useState } from 'react';
 import { RequiredMark } from '@/components/required-mark';
 import { ImageFilePicker } from '@/components/image-file-picker';
@@ -313,7 +314,8 @@ export function WarrantyDetailPanel({
       setMessage('');
     } else setMessage(getApiError(result.error).message);
   }
-  if (query.isPending) return <p role="status">Đang tải yêu cầu…</p>;
+  if (query.isPending)
+    return <LoadingSkeleton label="Đang tải yêu cầu…" variant="list" />;
   if (!query.data)
     return (
       <div role="alert">

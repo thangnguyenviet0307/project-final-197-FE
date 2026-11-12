@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Database, Plus } from 'lucide-react';
@@ -170,7 +171,12 @@ export function AiEmbeddingVersions({
             )}
           </div>
         )}
-        {query.isPending && <p role="status">Đang tải phiên bản embeddings…</p>}
+        {query.isPending && (
+          <LoadingSkeleton
+            label="Đang tải phiên bản embeddings…"
+            variant="table"
+          />
+        )}
         {query.isError && (
           <p role="alert" className="text-destructive">
             {getApiError(query.error).message}

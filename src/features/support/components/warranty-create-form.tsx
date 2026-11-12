@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { useEffect, useRef, useState } from 'react';
 import { validateImageFile } from '@/utils/image-file';
@@ -148,9 +149,11 @@ export function WarrantyCreateForm({
         nhận phương án.
       </p>
       {query.isPending ? (
-        <p role="status" className="mt-4">
-          Đang tải đơn đã hoàn tất…
-        </p>
+        <LoadingSkeleton
+          label="Đang tải đơn đã hoàn tất…"
+          variant="list"
+          className="mt-4"
+        />
       ) : query.isError ? (
         <div role="alert" className="mt-4">
           <p>{getApiError(query.error).message}</p>

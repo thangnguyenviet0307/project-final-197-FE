@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronRight, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -168,9 +169,11 @@ export function StoreDepartmentsMenu() {
           className="absolute top-full left-0 z-50 max-h-[70vh] w-full overflow-y-auto bg-white shadow-[0_3px_18px_rgba(0,0,0,0.08)] lg:max-h-none lg:overflow-visible"
         >
           {isPending ? (
-            <p role="status" className="px-5 py-4 text-sm text-gray-600">
-              Đang tải danh mục…
-            </p>
+            <LoadingSkeleton
+              label="Đang tải danh mục…"
+              variant="options"
+              className="px-5"
+            />
           ) : isError ? (
             <div role="alert" className="px-5 py-4 text-sm text-gray-700">
               <p>Không tải được danh mục. Vui lòng thử lại.</p>

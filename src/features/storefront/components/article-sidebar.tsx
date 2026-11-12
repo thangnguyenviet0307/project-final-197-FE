@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Clock3, TrendingUp } from 'lucide-react';
 import { useArticleSidebar } from '@/features/storefront/hooks/use-public-articles';
@@ -28,9 +29,10 @@ export function ArticleSidebar({
           Bạn đọc xem nhiều
         </h2>
         {popular.isPending ? (
-          <p role="status" className="p-5 text-sm text-gray-500">
-            Đang tải bài được đọc nhiều…
-          </p>
+          <LoadingSkeleton
+            label="Đang tải bài được đọc nhiều…"
+            variant="list"
+          />
         ) : popular.isError ? (
           <div role="alert" className="space-y-2 p-5 text-sm text-gray-600">
             <p>{getApiError(popular.error).message}</p>
@@ -81,9 +83,7 @@ export function ArticleSidebar({
           {type === 'news' ? 'Tin mới nhất' : 'Blog mới nhất'}
         </h2>
         {latest.isPending ? (
-          <p role="status" className="text-sm text-gray-500">
-            Đang tải bài mới…
-          </p>
+          <LoadingSkeleton label="Đang tải bài mới…" variant="list" />
         ) : latest.isError ? (
           <div role="alert" className="space-y-2 text-sm text-gray-600">
             <p>{getApiError(latest.error).message}</p>

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { api, getApiError } from '@/services/api';
 import { formatPrice } from '@/features/products/types/products';
 import {
@@ -31,7 +32,7 @@ export function PersonalSales() {
       </CardHeader>
       <CardContent>
         {query.isPending ? (
-          <p role="status">Loading your sales...</p>
+          <LoadingSkeleton label="Loading your sales..." variant="stats" />
         ) : query.isError ? (
           <div role="alert">
             <p>{getApiError(query.error).message}</p>

@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import {
   POLICY_SECTION_MAX_LENGTH,
   LONG_TEXT_MAX_LENGTH,
@@ -200,7 +201,7 @@ export default function DocumentEditorPage() {
             <Button onClick={() => void query.refetch()}>Thử lại</Button>
           </div>
         ) : (
-          <p role="status">Đang tải nội dung…</p>
+          <LoadingSkeleton label="Đang tải nội dung…" variant="form" />
         )}
       </div>
     </BaseLayout>

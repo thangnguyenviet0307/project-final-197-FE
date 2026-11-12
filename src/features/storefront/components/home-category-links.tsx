@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Link } from 'react-router-dom';
 import { CatalogOptionContent } from '@/features/storefront/components/catalog-filter-option';
 import { usePublicCategories } from '@/features/categories/hooks/use-public-categories';
@@ -7,7 +8,7 @@ export function HomeCategoryLinks() {
   return (
     <nav aria-label="Danh mục nhanh" className="store-container pt-5">
       {query.isPending ? (
-        <p role="status">Đang tải danh mục…</p>
+        <LoadingSkeleton label="Đang tải danh mục…" variant="categories" />
       ) : query.isError ? (
         <p>
           Không thể tải danh mục. <Link to="/shop">Xem sản phẩm</Link>

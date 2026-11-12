@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { isAdministrator } from '@/features/auth/utils/roles';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -44,9 +45,14 @@ export function ProductReviews({
       aria-label="Đánh giá sản phẩm"
     >
       <h2 className="text-lg font-semibold">Đánh giá và doanh số</h2>
+      {metrics.isError && metrics.data && (
+        <p role="alert">
+          Không thể cập nhật thống kê. Đang hiển thị dữ liệu gần nhất.
+        </p>
+      )}
       {metrics.isPending ? (
-        <p role="status">Đang tải thống kê đánh giá…</p>
-      ) : metrics.isError ? (
+        <LoadingSkeleton label="Đang tải thống kê đánh giá…" variant="stats" />
+      ) : metrics.isError && !metrics.data ? (
         <div role="alert">
           {getApiError(metrics.error).message}{' '}
           <Button variant="outline" onClick={() => void metrics.refetch()}>
@@ -74,9 +80,14 @@ export function ProductReviews({
           </dl>
         )
       )}
+      {reviews.isError && reviews.data && (
+        <p role="alert">
+          Không thể cập nhật đánh giá. Đang hiển thị dữ liệu gần nhất.
+        </p>
+      )}
       {reviews.isPending ? (
-        <p role="status">Đang tải đánh giá…</p>
-      ) : reviews.isError ? (
+        <LoadingSkeleton label="Đang tải đánh giá…" variant="list" />
+      ) : reviews.isError && !reviews.data ? (
         <div role="alert">
           {getApiError(reviews.error).message}{' '}
           <Button variant="outline" onClick={() => void reviews.refetch()}>

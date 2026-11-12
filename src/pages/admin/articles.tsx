@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
@@ -177,7 +178,7 @@ export default function AdminArticlesPage() {
           </p>
         )}
         {query.isPending ? (
-          <p role="status">Đang tải bài viết…</p>
+          <LoadingSkeleton label="Đang tải bài viết…" variant="table" />
         ) : query.isError ? (
           <p role="alert">
             {getApiError(query.error).message}
@@ -303,7 +304,10 @@ export default function AdminArticlesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 {categories.isPending ? (
-                  <p role="status">Đang tải danh mục…</p>
+                  <LoadingSkeleton
+                    label="Đang tải danh mục…"
+                    variant="options"
+                  />
                 ) : categories.isError ? (
                   <p role="alert">
                     Không tải được danh mục.{' '}

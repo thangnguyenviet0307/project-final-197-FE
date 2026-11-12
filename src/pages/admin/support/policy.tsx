@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { POLICY_SECTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
 import { ContentEditor } from '@/features/support/components/content';
@@ -231,7 +232,7 @@ export default function AdminPolicyPage() {
             <Button onClick={() => void query.refetch()}>Thử lại</Button>
           </div>
         ) : (
-          <p role="status">Đang tải chính sách…</p>
+          <LoadingSkeleton label="Đang tải chính sách…" variant="form" />
         )}
       </div>
     </BaseLayout>

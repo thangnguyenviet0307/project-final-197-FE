@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -110,7 +111,7 @@ export default function DocumentsPage() {
           </Button>
         </div>
         {query.isPending ? (
-          <p role="status">Đang tải danh sách…</p>
+          <LoadingSkeleton label="Đang tải danh sách…" variant="table" />
         ) : query.isError ? (
           <div role="alert">
             <p>{getApiError(query.error).message}</p>

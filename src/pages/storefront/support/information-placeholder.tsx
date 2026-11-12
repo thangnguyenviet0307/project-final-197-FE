@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { ContentBody } from '@/features/support/components/content';
 import { useInformation } from '@/features/support/hooks/use-information';
 import { getApiError } from '@/services/api';
@@ -24,7 +25,7 @@ export default function InformationPlaceholderPage() {
       path={`/${document.slug}`}
     >
       {query.isPending ? (
-        <p role="status">Đang tải nội dung…</p>
+        <LoadingSkeleton label="Đang tải nội dung…" variant="text" />
       ) : query.isError ? (
         <div role="alert">
           <p>{getApiError(query.error).message}</p>

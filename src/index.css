@@ -289,3 +289,24 @@ html {
 .store-home-sections > div > section {
   background-color: transparent;
 }
+
+/* Reserve native select dimensions while asynchronous options are loading. */
+select[aria-busy='true'] {
+  background-color: var(--muted);
+  color: transparent;
+  animation: skeleton-field-pulse 2s ease-in-out infinite;
+}
+@keyframes skeleton-field-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  select[aria-busy='true'] {
+    animation: none;
+  }
+}

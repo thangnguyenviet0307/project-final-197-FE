@@ -1,4 +1,5 @@
-﻿import { ArrowUpRight, ChevronRight, Search } from 'lucide-react';
+import { LoadingSkeleton } from '@/components/loading-skeleton';
+import { ArrowUpRight, ChevronRight, Search } from 'lucide-react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useValidListPage } from '@/hooks/use-valid-list-page';
 import {
@@ -133,9 +134,11 @@ export default function StorefrontArticlesPage() {
             </Link>
           ))}
           {categories.isPending && (
-            <span role="status" className="p-2 text-sm text-gray-500">
-              Đang tải danh mục…
-            </span>
+            <LoadingSkeleton
+              label="Đang tải danh mục…"
+              variant="chips"
+              className="w-auto py-0"
+            />
           )}
           {categories.isError && (
             <button
@@ -161,9 +164,7 @@ export default function StorefrontArticlesPage() {
               )}
             </header>
             {query.isPending ? (
-              <p role="status" className="p-6 text-gray-500">
-                Đang tải bài viết…
-              </p>
+              <LoadingSkeleton label="Đang tải bài viết…" variant="articles" />
             ) : query.isError ? (
               <div role="alert" className="space-y-3 p-6">
                 <p>{getApiError(query.error).message}</p>

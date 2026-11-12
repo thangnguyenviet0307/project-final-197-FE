@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import {
   readCatalogUrl,
   writeCatalogUrl,
@@ -857,9 +858,7 @@ export default function StorefrontProductsPage() {
         </nav>
 
         {query.isPending ? (
-          <p role="status" className="py-12 text-center text-gray-500">
-            Đang tải sản phẩm…
-          </p>
+          <LoadingSkeleton label="Đang tải sản phẩm…" variant="products" />
         ) : query.isError ? (
           <div role="alert" className="py-12 text-center">
             <p>{getApiError(query.error).message}</p>

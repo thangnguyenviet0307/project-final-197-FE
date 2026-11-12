@@ -1,3 +1,5 @@
+import { LoadingImage } from '@/components/loading-image';
+import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { ArrowRight, Newspaper } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SectionHeading } from '@/features/storefront/components/section-heading';
@@ -23,9 +25,11 @@ export function StorefrontNewsSection() {
           Tất cả tin tức & Blog <ArrowRight size={16} />
         </Link>
         {articles.isPending ? (
-          <p role="status" className="py-8 text-center text-sm text-gray-500">
-            Đang tải tin tức...
-          </p>
+          <LoadingSkeleton
+            label="Đang tải tin tức..."
+            variant="articles"
+            count={3}
+          />
         ) : articles.isError ? (
           <div
             role="alert"
@@ -57,7 +61,7 @@ export function StorefrontNewsSection() {
                   className="block overflow-hidden bg-[#f3f4f1]"
                 >
                   {article.imageUrl ? (
-                    <img
+                    <LoadingImage
                       src={article.imageUrl}
                       alt={article.title}
                       loading="lazy"
