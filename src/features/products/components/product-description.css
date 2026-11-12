@@ -75,3 +75,80 @@
   color: var(--primary);
   text-decoration: underline;
 }
+.rich-text-history {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.rich-text-history button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  background: var(--background);
+}
+.rich-text-history button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rich-text-history button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.product-description-editor .ql-editor {
+  max-height: 32rem;
+}
+.product-description-editor .ql-editor img,
+.product-description-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.4rem;
+}
+.product-description-content .ql-align-center {
+  text-align: center;
+}
+.product-description-content .ql-align-right {
+  text-align: right;
+}
+.product-description-content .ql-align-justify {
+  text-align: justify;
+}
+.product-description-content .ql-direction-rtl {
+  direction: rtl;
+}
+.product-description-content .ql-size-small {
+  font-size: 0.75em;
+}
+.product-description-content .ql-size-large {
+  font-size: 1.5em;
+}
+.product-description-content .ql-size-huge {
+  font-size: 2.5em;
+}
+.product-description-content .ql-indent-1 {
+  padding-left: 3em;
+}
+.product-description-content .ql-indent-2 {
+  padding-left: 6em;
+}
+.product-description-content .ql-indent-3 {
+  padding-left: 9em;
+}
+.product-description-content .ql-indent-4 {
+  padding-left: 12em;
+}
+.product-description-content .ql-indent-5 {
+  padding-left: 15em;
+}
+.product-description-content .ql-indent-6 {
+  padding-left: 18em;
+}
+.product-description-content .ql-indent-7 {
+  padding-left: 21em;
+}
+.product-description-content .ql-indent-8 {
+  padding-left: 24em;
+}
