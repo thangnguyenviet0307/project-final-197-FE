@@ -10,11 +10,3 @@ export function useAiSearch(
     meta: { suppressGlobalErrorToast: true },
   });
 }
-export function useAiRecommendations(slug: string) {
-  return useQuery({
-    queryKey: ['ai', 'recommendations', slug],
-    queryFn: ({ signal }) => aiService.recommendations(slug, signal),
-    enabled: !!slug,
-    meta: { suppressGlobalErrorToast: true },
-  });
-}

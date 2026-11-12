@@ -15,8 +15,7 @@ export function StorefrontNewsSection() {
     >
       <div className="store-container">
         <SectionHeading
-          title="Thông tin hữu ích cho phụ kiện bạn chọn"
-          description="Mẹo chọn mua và sử dụng phụ kiện, giúp bạn tìm hiểu kỹ hơn trước khi khám phá sản phẩm."
+          title="Tin tức & Cẩm nang"
         />
 
         <Link

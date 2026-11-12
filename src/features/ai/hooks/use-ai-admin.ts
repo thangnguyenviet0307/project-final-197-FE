@@ -5,6 +5,7 @@ export function useAiAdmin() {
   const status = useQuery({
     queryKey: ['ai', 'admin'],
     queryFn: aiService.status,
+    refetchInterval: 15000,
   });
   const reindex = useMutation({
     mutationFn: aiService.reindex,

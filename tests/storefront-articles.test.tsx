@@ -32,7 +32,7 @@ vi.mock("@/features/storefront/hooks/use-public-articles", () => ({
 it("renders Backend news cards and links to the article detail page", () => {
   render(<MemoryRouter><StorefrontNewsSection /></MemoryRouter>)
   expect(screen.getByRole("region", { name: "Tin tức và cẩm nang phụ kiện" })).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Thông tin hữu ích cho phụ kiện bạn chọn" })).toBeTruthy()
+  expect(screen.getByRole("heading", { name: "Tin tức & Cẩm nang" })).toBeTruthy()
   expect(screen.getByRole("heading", { name: "Chọn cáp sạc phù hợp: bắt đầu từ cổng kết nối" })).toBeTruthy()
   expect(screen.getByRole("link", { name: "Đọc bài viết" }).getAttribute("href")).toBe("/bai-viet/chon-cap-sac")
 })

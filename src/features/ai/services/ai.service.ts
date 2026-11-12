@@ -7,7 +7,6 @@ import type {
   AiAdminStatus,
   AiConversation,
   AiHistory,
-  AiProduct,
   AiSearchResult,
 } from '../types/ai';
 const AI_HTTP_TIMEOUT_MS = 75000;
@@ -147,14 +146,6 @@ export const aiService = {
         signal,
         timeout: AI_HTTP_TIMEOUT_MS,
       })
-    ).data.data;
-  },
-  async recommendations(slug: string, signal?: AbortSignal) {
-    return (
-      await api.get<ApiResponse<AiProduct[]>>(
-        `/ai/recommendations/${encodeURIComponent(slug)}`,
-        { signal, timeout: AI_HTTP_TIMEOUT_MS }
-      )
     ).data.data;
   },
   async status() {

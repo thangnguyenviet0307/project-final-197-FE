@@ -329,4 +329,3 @@ it("keeps an existing selection after refetch and uses the base product only whe
   } finally { state.product = original }
 })
 vi.mock('@/features/ai/components/smart-search', () => ({ SmartSearch: () => null }));
-vi.mock('@/features/ai/components/ai-recommendations', () => ({ AiRecommendations: () => null }));

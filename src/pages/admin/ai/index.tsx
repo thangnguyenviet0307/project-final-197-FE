@@ -1,3 +1,4 @@
+import { AiConfiguration } from '@/features/ai/components/ai-configuration';
 import {
   Activity,
   Database,
@@ -122,6 +123,7 @@ export default function AiAdminPage() {
             ))}
           </div>
         )}
+        <AiConfiguration />
         {data && (
           <>
             <section
@@ -205,8 +207,8 @@ export default function AiAdminPage() {
                     </div>
                   </dl>
                   <p className="text-muted-foreground mt-5 border-t pt-4 text-sm">
-                    Model, giới hạn lượt gọi và bật/tắt AI được cấu hình tại môi
-                    trường máy chủ. Khóa API không hiển thị trên website.
+                    Cấu hình được quản lý trong phần Kết nối và Điều khiển vận
+                    hành phía trên. Khóa API đầy đủ không hiển thị trên website.
                   </p>
                 </CardContent>
               </Card>

@@ -41,7 +41,6 @@ vi.mock('@/features/storefront/components/store-product-feedback', () => ({
   StoreRatingSummary: () => null,
   StoreProductReviews: () => null,
 }));
-vi.mock('@/features/ai/components/ai-recommendations', () => ({ AiRecommendations: () => null }));
 vi.mock('@/features/storefront/components/related-products', () => ({
   RelatedProducts: () => null,
 }));

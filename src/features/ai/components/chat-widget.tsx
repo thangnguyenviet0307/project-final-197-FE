@@ -17,14 +17,29 @@ import { useChat } from '../hooks/use-chat';
 import { AiProducts } from './ai-products';
 import './chat-widget.css';
 
+function TypingDots() {
+  return (
+    <span
+      className="ai-typing"
+      role="status"
+      aria-label="Trợ lý đang soạn trả lời"
+    >
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+    </span>
+  );
+}
 function turnFeedback(status: string, streaming: boolean) {
   if (status === 'cancelled') return 'Đã dừng trả lời câu hỏi này.';
   if (status === 'failed')
     return 'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử gửi lại.';
   if (status === 'processing')
-    return streaming
-      ? 'Đang xử lý câu hỏi…'
-      : 'Chưa có kết quả được xác nhận. Chọn “Tải lại” để kiểm tra trạng thái.';
+    return streaming ? (
+      <TypingDots />
+    ) : (
+      'Chưa có kết quả được xác nhận. Chọn “Tải lại” để kiểm tra trạng thái.'
+    );
   return 'Chưa có nội dung trả lời cho câu hỏi này.';
 }
 export function ChatWidget() {
@@ -210,8 +225,7 @@ function ChatSession() {
                   <Sparkles size={25} aria-hidden="true" />
                 </span>{' '}
                 <p className="ai-welcome">
-                  Xin chào! Tôi có thể giúp bạn tìm, so sánh sản phẩm và xem
-                  chính sách cửa hàng.
+                  Xin chào! Tôi có thể giúp gì cho bạn?
                 </p>
               </div>
             )}
@@ -264,11 +278,17 @@ function ChatSession() {
                 <AiProducts products={turn.products || []} />
               </article>
             ))}
-            {chat.status && (
+            {chat.status && (!chat.busy || chat.status === 'Đang dừng…') && (
               <p className="ai-working" role="status">
                 {chat.status}
               </p>
             )}
+            {chat.busy &&
+              !chat.rows.some((turn) => turn.status === 'processing') && (
+                <p className="ai-working">
+                  <TypingDots />
+                </p>
+              )}
             {chat.error && <p role="alert">{chat.error}</p>}
             {completed && (
               <p role="status">
