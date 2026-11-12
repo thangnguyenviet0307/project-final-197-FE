@@ -56,13 +56,24 @@ afterEach(() => {
   client.clear();
   vi.restoreAllMocks();
 });
-function mount() {
+function mount(canManage = true) {
   render(
     <QueryClientProvider client={client}>
-      <AiConfiguration />
+      <AiConfiguration canManage={canManage} />
     </QueryClientProvider>
   );
 }
+
+it('viewers can read configuration but cannot submit operating changes', async () => {
+  const save = vi.spyOn(aiSettingsService, 'save');
+  mount(false);
+  const add = await screen.findByRole('button', { name: 'Thêm kết nối' });
+  expect((add.closest('fieldset') as HTMLFieldSetElement).disabled).toBe(true);
+  const submit = screen.getByRole('button', { name: 'Lưu vận hành' });
+  fireEvent.submit(submit.closest('form')!);
+  expect(save).not.toHaveBeenCalled();
+  expect(screen.getByText('Gemini chính')).toBeTruthy();
+});
 
 it('adds a model/key through the real service contract and clears the credential input after saving', async () => {
   const save = vi

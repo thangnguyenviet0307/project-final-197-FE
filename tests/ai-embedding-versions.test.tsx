@@ -46,6 +46,7 @@ function mount() {
   render(
     <QueryClientProvider client={client}>
       <AiEmbeddingVersions
+        canManage
         encryptionReady
         connections={[
           {

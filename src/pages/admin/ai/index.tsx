@@ -1,4 +1,5 @@
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
+import { useAuthStore } from '@/stores/auth.store';
 import {
   Activity,
   Database,
@@ -41,6 +42,7 @@ function EnabledBadge({ enabled }: { enabled: boolean }) {
 }
 
 export default function AiAdminPage() {
+  const canManage = useAuthStore((state) => state.user?.role === 'super_admin');
   const { status, reindex } = useAiAdmin();
   const data = status.data;
   const today = Math.floor(status.dataUpdatedAt / 86400000);
@@ -78,10 +80,13 @@ export default function AiAdminPage() {
             <Button
               disabled={
                 reindex.isPending ||
+                !canManage ||
                 !data?.config.enabled ||
                 !data.config.indexingEnabled
               }
-              onClick={() => reindex.mutate()}
+              onClick={() => {
+                if (canManage) reindex.mutate();
+              }}
             >
               <Database aria-hidden="true" />
               {reindex.isPending ? 'Đang xếp lịch…' : 'Đồng bộ kiến thức'}
@@ -123,7 +128,13 @@ export default function AiAdminPage() {
             ))}
           </div>
         )}
-        <AiConfiguration />
+        {!canManage && (
+          <p role="status" className="text-muted-foreground text-sm">
+            Bạn có quyền xem. Chỉ Super Admin được thay đổi cấu hình, API key,
+            tính năng và đồng bộ AI.
+          </p>
+        )}
+        <AiConfiguration canManage={canManage} />
         {data && (
           <>
             <section

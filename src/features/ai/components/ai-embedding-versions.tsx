@@ -58,9 +58,11 @@ const field =
 export function AiEmbeddingVersions({
   connections,
   encryptionReady,
+  canManage = false,
 }: {
   connections: AiConnection[];
   encryptionReady: boolean;
+  canManage?: boolean;
 }) {
   const client = useQueryClient();
   const query = useQuery({
@@ -89,7 +91,7 @@ export function AiEmbeddingVersions({
     work: () => Promise<EmbeddingVersionsData>,
     text: string
   ) {
-    if (busy) return false;
+    if (busy || !canManage) return false;
     setBusy(true);
     setError('');
     setMessage('');
@@ -120,6 +122,7 @@ export function AiEmbeddingVersions({
           variant="outline"
           disabled={
             busy ||
+            !canManage ||
             !encryptionReady ||
             !data ||
             !eligible.length ||

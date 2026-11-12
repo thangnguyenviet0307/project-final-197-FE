@@ -146,7 +146,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             '/auth/articles',
             '/auth/post-categories',
             '/auth/policies',
-            '/auth/ai',
           ].includes(item.url) || isAdministrator(user?.role)
       )
       .map((item) =>

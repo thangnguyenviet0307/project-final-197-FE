@@ -60,7 +60,11 @@ const actions: Record<string, string> = {
   'embedding.delete': 'Xóa phiên bản embeddings',
 };
 
-export function AiConfiguration() {
+export function AiConfiguration({
+  canManage = false,
+}: {
+  canManage?: boolean;
+}) {
   const client = useQueryClient();
   const query = useQuery({
     queryKey: ['ai', 'admin', 'settings'],
@@ -85,7 +89,7 @@ export function AiConfiguration() {
     action: () => Promise<AiSettingsData>,
     success: string
   ) {
-    if (busy) return false;
+    if (busy || !canManage) return false;
     setBusy(true);
     setError('');
     setMessage('');
@@ -120,7 +124,7 @@ export function AiConfiguration() {
   const change = (values: Partial<AiFeatureSettings>) =>
     setDraft({ ...current, ...values });
   return (
-    <div className="space-y-6">
+    <fieldset disabled={!canManage} className="min-w-0 space-y-6">
       {message && (
         <p role="status" className="rounded-lg border p-3 text-sm">
           {message}
@@ -699,6 +703,7 @@ export function AiConfiguration() {
         </CardContent>
       </Card>
       <AiEmbeddingVersions
+        canManage={canManage}
         connections={data.connections}
         encryptionReady={data.encryptionReady}
       />
@@ -744,6 +749,6 @@ export function AiConfiguration() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </fieldset>
   );
 }
