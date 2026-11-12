@@ -68,7 +68,9 @@ export function CategoryForm({
       >
         <fieldset disabled={busy} className="space-y-4">
           <Field>
-            <FieldLabel required htmlFor="category-name">Tên danh mục</FieldLabel>
+            <FieldLabel required htmlFor="category-name">
+              Tên danh mục
+            </FieldLabel>
             <Input
               placeholder="Nhập tên danh mục"
               id="category-name"

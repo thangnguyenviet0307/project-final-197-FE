@@ -52,12 +52,18 @@ export function StoreFooter() {
                 Việt Nam
               </p>
 
-              <Link to="/contact" className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]">
+              <Link
+                to="/contact"
+                className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]"
+              >
                 <Phone className="size-4 text-[#65b719]" />
                 Hỗ trợ khách hàng
               </Link>
 
-              <Link to="/contact" className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]">
+              <Link
+                to="/contact"
+                className="flex items-center gap-3 rounded transition-colors hover:text-[#65b719] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#65b719]"
+              >
                 <Mail className="size-4 text-[#65b719]" />
                 Liên hệ qua trang hỗ trợ
               </Link>

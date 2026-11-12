@@ -78,10 +78,12 @@ export const aiService = {
   async cancel(id: string, requestId: string, content: string) {
     return withSession(async () => {
       const response = await api.post<ApiResponse<unknown>>(
-        `/ai/conversations/${id}/cancel`, { requestId, content }
+        `/ai/conversations/${id}/cancel`,
+        { requestId, content }
       );
       const result = cancelResultSchema.parse(response.data.data);
-      if (result.requestId !== requestId) throw new Error('Cancellation response mismatch');
+      if (result.requestId !== requestId)
+        throw new Error('Cancellation response mismatch');
       return result;
     });
   },

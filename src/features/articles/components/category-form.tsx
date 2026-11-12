@@ -58,7 +58,9 @@ export function PostCategoryForm({
     <form onSubmit={submit} className="space-y-4">
       <fieldset disabled={pending} className="space-y-4">
         <label className="grid gap-1">
-          <span>Tên danh mục <RequiredMark /></span>
+          <span>
+            Tên danh mục <RequiredMark />
+          </span>
           <Input
             placeholder="Nhập tên danh mục bài viết"
             required
@@ -68,7 +70,9 @@ export function PostCategoryForm({
           />
         </label>
         <label className="grid gap-1">
-          <span>Slug danh mục <RequiredMark /></span>
+          <span>
+            Slug danh mục <RequiredMark />
+          </span>
           <Input
             required
             maxLength={255}

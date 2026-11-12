@@ -138,7 +138,14 @@ export function useChat(open: boolean) {
     const requestId = crypto.randomUUID();
     const controller = new AbortController();
     sendController.current = controller;
-    const turn = { requestId, conversationId: id, accepted: false, content: parsed.data, sent: false, cancelling: false };
+    const turn = {
+      requestId,
+      conversationId: id,
+      accepted: false,
+      content: parsed.data,
+      sent: false,
+      cancelling: false,
+    };
     activeTurn.current = turn;
     const current = () =>
       currentGeneration === generation.current && !controller.signal.aborted;
@@ -225,7 +232,9 @@ export function useChat(open: boolean) {
               turn.accepted = true;
               onAccepted?.();
             }
-            setError('Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.');
+            setError(
+              'Lượt này vẫn đang xử lý. Hãy tải lại lịch sử để xem kết quả.'
+            );
             finished = true;
             connection.disconnect();
           }
@@ -250,23 +259,40 @@ export function useChat(open: boolean) {
           }
           if (result.type === 'chat:error') {
             const feedback = chatErrorSchema.safeParse(result.data);
-            const turnStatus = feedback.success ? feedback.data.status : undefined;
+            const turnStatus = feedback.success
+              ? feedback.data.status
+              : undefined;
             if (turnStatus) {
               // These are persisted terminal states, unlike a disconnect.
               if (!turn.accepted) {
                 turn.accepted = true;
                 onAccepted?.();
               }
-              setLive(value => value?.requestId === requestId
-                ? { ...value, status: turnStatus, error: feedback.success ? { code: feedback.data.code, message: feedback.data.message, retryable: feedback.data.retryable } : undefined } : value);
+              setLive((value) =>
+                value?.requestId === requestId
+                  ? {
+                      ...value,
+                      status: turnStatus,
+                      error: feedback.success
+                        ? {
+                            code: feedback.data.code,
+                            message: feedback.data.message,
+                            retryable: feedback.data.retryable,
+                          }
+                        : undefined,
+                    }
+                  : value
+              );
             }
-            setError(feedback.success && feedback.data.message
-              ? feedback.data.message
-              : turnStatus === 'cancelled'
-                ? 'Đã dừng trả lời. Bạn có thể gửi câu hỏi khác.'
-                : turnStatus === 'failed'
-                  ? 'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử lại hoặc tìm sản phẩm trong cửa hàng.'
-                  : 'Không thể xử lý yêu cầu lúc này. Hãy tải lại lịch sử để kiểm tra hoặc thử lại sau.');
+            setError(
+              feedback.success && feedback.data.message
+                ? feedback.data.message
+                : turnStatus === 'cancelled'
+                  ? 'Đã dừng trả lời. Bạn có thể gửi câu hỏi khác.'
+                  : turnStatus === 'failed'
+                    ? 'Trợ lý chưa thể trả lời câu hỏi này. Bạn có thể thử lại hoặc tìm sản phẩm trong cửa hàng.'
+                    : 'Không thể xử lý yêu cầu lúc này. Hãy tải lại lịch sử để kiểm tra hoặc thử lại sau.'
+            );
             finished = true;
             connection.disconnect();
           }
@@ -319,19 +345,33 @@ export function useChat(open: boolean) {
     setError('');
     try {
       if (turn?.sent && turn.conversationId) {
-        const result = await aiService.cancel(turn.conversationId, turn.requestId, turn.content);
+        const result = await aiService.cancel(
+          turn.conversationId,
+          turn.requestId,
+          turn.content
+        );
         if (version !== generation.current) return;
-        setLive(value => value?.requestId === turn.requestId
-          ? { ...value, ...result, answer: result.answer || value.answer } : value);
-        setError(result.status === 'cancelled' ? 'Đã dừng lượt trả lời.' :
-          result.status === 'completed' ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.' : 'Lượt trả lời đã thất bại.');
+        setLive((value) =>
+          value?.requestId === turn.requestId
+            ? { ...value, ...result, answer: result.answer || value.answer }
+            : value
+        );
+        setError(
+          result.status === 'cancelled'
+            ? 'Đã dừng lượt trả lời.'
+            : result.status === 'completed'
+              ? 'Lượt trả lời đã hoàn tất trước khi yêu cầu dừng được xác nhận.'
+              : 'Lượt trả lời đã thất bại.'
+        );
       } else if (version === generation.current) {
         setLive(null);
         setError('Đã dừng trước khi gửi câu hỏi.');
       }
     } catch {
       if (version === generation.current)
-        setError('Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.');
+        setError(
+          'Chưa xác nhận được yêu cầu dừng. Hãy tải lại lịch sử để kiểm tra trạng thái.'
+        );
     } finally {
       if (version === generation.current) {
         active.current = false;

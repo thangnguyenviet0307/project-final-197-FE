@@ -1,392 +1,870 @@
-import UserCreatePage from "@/pages/admin/users/create"
-import type { ReactNode } from "react"
-import { afterEach, beforeEach, expect, it, vi } from "vitest"
-import { fireEvent, render, screen, within, waitFor } from "@testing-library/react"
-import { MemoryRouter, Routes, Route } from "react-router-dom"
-import { QueryClientProvider } from "@tanstack/react-query"
-import { AxiosHeaders, type AxiosResponse } from "axios"
-import UsersPage from "@/pages/admin/users/index"
-import { api, clearAuth } from "@/services/api"
-import { queryClient } from "@/services/query-client"
-import { useAuthStore } from "@/stores/auth.store"
+import UserCreatePage from '@/pages/admin/users/create';
+import type { ReactNode } from 'react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import {
+  fireEvent,
+  render,
+  screen,
+  within,
+  waitFor,
+} from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { AxiosHeaders, type AxiosResponse } from 'axios';
+import UsersPage from '@/pages/admin/users/index';
+import { api, clearAuth } from '@/services/api';
+import { queryClient } from '@/services/query-client';
+import { useAuthStore } from '@/stores/auth.store';
 
-vi.mock("@/layout/admin/base-layout", () => ({
-  BaseLayout: ({ children, title }: { children: ReactNode; title?: string }) => <main>{title && <h1>{title}</h1>}{children}</main>,
-}))
-const originalAdapter = api.defaults.adapter
+vi.mock('@/layout/admin/base-layout', () => ({
+  BaseLayout: ({
+    children,
+    title,
+  }: {
+    children: ReactNode;
+    title?: string;
+  }) => (
+    <main>
+      {title && <h1>{title}</h1>}
+      {children}
+    </main>
+  ),
+}));
+const originalAdapter = api.defaults.adapter;
 beforeEach(() => {
-  queryClient.clear()
-  clearAuth()
-  useAuthStore.getState().setSession({ id: "self", name: "Quản trị viên", firstName: "Quản trị viên", lastName: "", email: "self@example.com", role: "super_admin", mustChangePassword: false }, { accessToken: "a", refreshToken: "r" })
-})
-afterEach(() => { api.defaults.adapter = originalAdapter; clearAuth() })
-function UserTestRoutes() { return <Routes><Route path="/auth/users/new" element={<UserCreatePage />} /><Route path="*" element={<UsersPage />} /></Routes> }
-function setup(role: "admin" | "staff" = "staff") {
-  const writes = vi.fn()
+  queryClient.clear();
+  clearAuth();
+  useAuthStore.getState().setSession(
+    {
+      id: 'self',
+      name: 'Quản trị viên',
+      firstName: 'Quản trị viên',
+      lastName: '',
+      email: 'self@example.com',
+      role: 'super_admin',
+      mustChangePassword: false,
+    },
+    { accessToken: 'a', refreshToken: 'r' }
+  );
+});
+afterEach(() => {
+  api.defaults.adapter = originalAdapter;
+  clearAuth();
+});
+function UserTestRoutes() {
+  return (
+    <Routes>
+      <Route path="/auth/users/new" element={<UserCreatePage />} />
+      <Route path="*" element={<UsersPage />} />
+    </Routes>
+  );
+}
+function setup(role: 'admin' | 'staff' = 'staff') {
+  const writes = vi.fn();
   api.defaults.adapter = async (config) => {
-    if (config.method !== "get") writes(config.method, config.url, config.data ? JSON.parse(config.data) : undefined)
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-      data: [{ _id: "target", firstName: "", lastName: "", email: "target@example.com", role, active: true }],
-      pagination: { total: 1, totalPages: 1 },
-    } }
-  }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  return writes
+    if (config.method !== 'get')
+      writes(
+        config.method,
+        config.url,
+        config.data ? JSON.parse(config.data) : undefined
+      );
+    return {
+      config,
+      headers: new AxiosHeaders(),
+      status: 200,
+      statusText: '',
+      data: {
+        data: [
+          {
+            _id: 'target',
+            firstName: '',
+            lastName: '',
+            email: 'target@example.com',
+            role,
+            active: true,
+          },
+        ],
+        pagination: { total: 1, totalPages: 1 },
+      },
+    };
+  };
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  return writes;
 }
 
-it("Admin cannot edit Admin/Super Admin accounts or offer Admin creation", async () => {
-  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role: "admin" } : null }))
-  setup("admin")
-  await screen.findByText("target@example.com")
-  expect((screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }) as HTMLButtonElement).disabled).toBe(true)
-  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
-  fireEvent.click(await screen.findByRole("combobox", { name: "Vai trò" }))
-  expect(screen.queryByRole("option", { name: "Quản trị viên" })).toBeNull()
-  expect(screen.queryByRole("option", { name: "Super Admin" })).toBeNull()
-  expect(screen.getByRole("option", { name: "Nhân viên" })).toBeTruthy()
-})
+it('Admin cannot edit Admin/Super Admin accounts or offer Admin creation', async () => {
+  useAuthStore.setState((state) => ({
+    user: state.user ? { ...state.user, role: 'admin' } : null,
+  }));
+  setup('admin');
+  await screen.findByText('target@example.com');
+  expect(
+    (
+      screen.getByRole('button', {
+        name: 'Chỉnh sửa tài khoản target@example.com',
+      }) as HTMLButtonElement
+    ).disabled
+  ).toBe(true);
+  fireEvent.click(screen.getByRole('link', { name: 'Thêm người dùng' }));
+  fireEvent.click(await screen.findByRole('combobox', { name: 'Vai trò' }));
+  expect(screen.queryByRole('option', { name: 'Quản trị viên' })).toBeNull();
+  expect(screen.queryByRole('option', { name: 'Super Admin' })).toBeNull();
+  expect(screen.getByRole('option', { name: 'Nhân viên' })).toBeTruthy();
+});
 
-it("Admin changes Staff status without sending a role change", async () => {
-  useAuthStore.setState(state => ({ user: state.user ? { ...state.user, role: "admin" } : null }))
-  const writes = setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Chỉnh sửa" }))
-  expect((screen.getByLabelText("Vai trò") as HTMLSelectElement).disabled).toBe(true)
-  fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "suspended" } })
-  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { active: false }))
-})
+it('Admin changes Staff status without sending a role change', async () => {
+  useAuthStore.setState((state) => ({
+    user: state.user ? { ...state.user, role: 'admin' } : null,
+  }));
+  const writes = setup();
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  fireEvent.click(await screen.findByRole('menuitem', { name: 'Chỉnh sửa' }));
+  expect((screen.getByLabelText('Vai trò') as HTMLSelectElement).disabled).toBe(
+    true
+  );
+  fireEvent.change(screen.getByLabelText('Trạng thái'), {
+    target: { value: 'suspended' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }));
+  await waitFor(() =>
+    expect(writes).toHaveBeenCalledWith('put', '/users/target', {
+      active: false,
+    })
+  );
+});
 
-it("Super Admin transfers ownership only after entering their current password", async () => {
-  const writes = setup("admin")
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Chuyển quyền Super Admin" }))
-  const button = screen.getByRole("button", { name: "Xác nhận chuyển quyền" })
-  expect((button as HTMLButtonElement).disabled).toBe(true)
-  fireEvent.change(screen.getByLabelText("Mật khẩu hiện tại của bạn"), { target: { value: "CurrentPassword123" } })
-  fireEvent.click(button)
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/transfer-ownership", { targetUserId: "target", currentPassword: "CurrentPassword123" }))
-  await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(false))
-})
+it('Super Admin transfers ownership only after entering their current password', async () => {
+  const writes = setup('admin');
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  fireEvent.click(
+    await screen.findByRole('menuitem', { name: 'Chuyển quyền Super Admin' })
+  );
+  const button = screen.getByRole('button', { name: 'Xác nhận chuyển quyền' });
+  expect((button as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.change(screen.getByLabelText('Mật khẩu hiện tại của bạn'), {
+    target: { value: 'CurrentPassword123' },
+  });
+  fireEvent.click(button);
+  await waitFor(() =>
+    expect(writes).toHaveBeenCalledWith('post', '/users/transfer-ownership', {
+      targetUserId: 'target',
+      currentPassword: 'CurrentPassword123',
+    })
+  );
+  await waitFor(() =>
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+  );
+});
 
 it("Super Admin can revoke another account's sessions without changing its password", async () => {
-  const writes = setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Thu hồi phiên đăng nhập" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/target/revoke-sessions", undefined))
-})
+  const writes = setup();
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  fireEvent.click(
+    await screen.findByRole('menuitem', { name: 'Thu hồi phiên đăng nhập' })
+  );
+  await waitFor(() =>
+    expect(writes).toHaveBeenCalledWith(
+      'post',
+      '/users/target/revoke-sessions',
+      undefined
+    )
+  );
+});
 
-it("keeps Full name empty when the account has no name instead of copying the account email", async () => {
-  setup()
-  const emailCell = await screen.findByText("target@example.com")
-  const row = emailCell.closest("tr")!
-  const nameCell = within(row).getAllByRole("cell")[1]
-  expect(nameCell.firstElementChild?.textContent).toBe("")
-  expect(within(row).getAllByText("target@example.com")).toHaveLength(1)
-})
+it('keeps Full name empty when the account has no name instead of copying the account email', async () => {
+  setup();
+  const emailCell = await screen.findByText('target@example.com');
+  const row = emailCell.closest('tr')!;
+  const nameCell = within(row).getAllByRole('cell')[1];
+  expect(nameCell.firstElementChild?.textContent).toBe('');
+  expect(within(row).getAllByText('target@example.com')).toHaveLength(1);
+});
 
-it("constrains long full names to the name column and keeps the complete name available", async () => {
+it('constrains long full names to the name column and keeps the complete name available', async () => {
   api.defaults.adapter = async (config) => ({
-    config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-      data: [{ _id: "long-name", firstName: "A".repeat(80), lastName: "B".repeat(80), email: "long@example.com", role: "staff", active: true }],
+    config,
+    headers: new AxiosHeaders(),
+    status: 200,
+    statusText: '',
+    data: {
+      data: [
+        {
+          _id: 'long-name',
+          firstName: 'A'.repeat(80),
+          lastName: 'B'.repeat(80),
+          email: 'long@example.com',
+          role: 'staff',
+          active: true,
+        },
+      ],
       pagination: { total: 1, totalPages: 1 },
     },
-  })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  const row = (await screen.findByText("long@example.com")).closest("tr")!
-  const nameCell = within(row).getAllByRole("cell")[1]
-  const name = nameCell.querySelector("span.truncate")
-  expect(screen.getByRole("table").querySelector("col")?.getAttribute("style")).toBe("width: 20%;")
-  expect(screen.getByRole("table").classList.contains("w-full")).toBe(true)
-  expect(screen.getByRole("table").classList.contains("min-w-[1250px]")).toBe(false)
-  expect(name?.classList.contains("truncate")).toBe(true)
-  expect(name?.getAttribute("title")).toBe(`${"A".repeat(80)} ${"B".repeat(80)}`)
-})
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  const row = (await screen.findByText('long@example.com')).closest('tr')!;
+  const nameCell = within(row).getAllByRole('cell')[1];
+  const name = nameCell.querySelector('span.truncate');
+  expect(
+    screen.getByRole('table').querySelector('col')?.getAttribute('style')
+  ).toBe('width: 20%;');
+  expect(screen.getByRole('table').classList.contains('w-full')).toBe(true);
+  expect(screen.getByRole('table').classList.contains('min-w-[1250px]')).toBe(
+    false
+  );
+  expect(name?.classList.contains('truncate')).toBe(true);
+  expect(name?.getAttribute('title')).toBe(
+    `${'A'.repeat(80)} ${'B'.repeat(80)}`
+  );
+});
 
-it("keeps the Accounts table columns aligned across pages with different content", async () => {
-  const requests: { page: number; limit: number }[] = []
+it('keeps the Accounts table columns aligned across pages with different content', async () => {
+  const requests: { page: number; limit: number }[] = [];
   api.defaults.adapter = async (config) => {
-    requests.push(config.params as { page: number; limit: number })
-    const page = Number((config.params as { page: number }).page)
-    const accounts = page === 1
-      ? Array.from({ length: 10 }, (_, index) => ({
-          _id: `page-1-${index}`,
-          firstName: `Page One User ${index}`,
-          lastName: "",
-          email: `page1-${index}@example.com`,
-          personalEmail: index === 0 ? "a-very-long-personal-email-address@example.com" : undefined,
-          role: "staff" as const,
-          active: true,
-        }))
-      : [{
-          _id: "page-2",
-          firstName: "A very long full name on page two",
-          lastName: "",
-          email: "page2@example.com",
-          personalEmail: "personal@example.com",
-          role: "admin" as const,
-          active: true,
-        }]
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-      data: accounts,
-      pagination: { total: 11, totalPages: 2 },
-    } }
-  }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
+    requests.push(config.params as { page: number; limit: number });
+    const page = Number((config.params as { page: number }).page);
+    const accounts =
+      page === 1
+        ? Array.from({ length: 10 }, (_, index) => ({
+            _id: `page-1-${index}`,
+            firstName: `Page One User ${index}`,
+            lastName: '',
+            email: `page1-${index}@example.com`,
+            personalEmail:
+              index === 0
+                ? 'a-very-long-personal-email-address@example.com'
+                : undefined,
+            role: 'staff' as const,
+            active: true,
+          }))
+        : [
+            {
+              _id: 'page-2',
+              firstName: 'A very long full name on page two',
+              lastName: '',
+              email: 'page2@example.com',
+              personalEmail: 'personal@example.com',
+              role: 'admin' as const,
+              active: true,
+            },
+          ];
+    return {
+      config,
+      headers: new AxiosHeaders(),
+      status: 200,
+      statusText: '',
+      data: {
+        data: accounts,
+        pagination: { total: 11, totalPages: 2 },
+      },
+    };
+  };
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
 
-  await screen.findByText("page1-0@example.com")
-  const table = screen.getByRole("table")
-  const widthsOnPageOne = Array.from(table.querySelectorAll("col"), (column) => column.getAttribute("style"))
-  expect(table.classList.contains("table-fixed")).toBe(true)
-  expect(widthsOnPageOne[0]).toBe("width: 20%;")
-  expect(table.classList.contains("min-w-[1250px]")).toBe(false)
-  expect(table.parentElement?.classList.contains("overflow-x-auto")).toBe(true)
-  expect(table.parentElement?.parentElement?.classList.contains("overflow-x-auto")).toBe(false)
+  await screen.findByText('page1-0@example.com');
+  const table = screen.getByRole('table');
+  const widthsOnPageOne = Array.from(table.querySelectorAll('col'), (column) =>
+    column.getAttribute('style')
+  );
+  expect(table.classList.contains('table-fixed')).toBe(true);
+  expect(widthsOnPageOne[0]).toBe('width: 20%;');
+  expect(table.classList.contains('min-w-[1250px]')).toBe(false);
+  expect(table.parentElement?.classList.contains('overflow-x-auto')).toBe(true);
+  expect(
+    table.parentElement?.parentElement?.classList.contains('overflow-x-auto')
+  ).toBe(false);
 
-  fireEvent.click(screen.getByRole("button", { name: "Tiếp" }))
-  await screen.findByText("page2@example.com")
-  expect(requests).toContainEqual(expect.objectContaining({ page: 1, limit: 10 }))
-  expect(requests).toContainEqual(expect.objectContaining({ page: 2, limit: 10 }))
-  const pageTwoTable = screen.getByRole("table")
-  expect(Array.from(pageTwoTable.querySelectorAll("col"), (column) => column.getAttribute("style"))).toEqual(widthsOnPageOne)
-  expect(pageTwoTable.classList.contains("table-fixed")).toBe(true)
-  expect(pageTwoTable.classList.contains("min-w-[1250px]")).toBe(false)
-})
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  await screen.findByText('page2@example.com');
+  expect(requests).toContainEqual(
+    expect.objectContaining({ page: 1, limit: 10 })
+  );
+  expect(requests).toContainEqual(
+    expect.objectContaining({ page: 2, limit: 10 })
+  );
+  const pageTwoTable = screen.getByRole('table');
+  expect(
+    Array.from(pageTwoTable.querySelectorAll('col'), (column) =>
+      column.getAttribute('style')
+    )
+  ).toEqual(widthsOnPageOne);
+  expect(pageTwoTable.classList.contains('table-fixed')).toBe(true);
+  expect(pageTwoTable.classList.contains('min-w-[1250px]')).toBe(false);
+});
 
-it("searches accounts by name or account email and shows an empty search result", async () => {
-  const requests: unknown[] = []
+it('searches accounts by name or account email and shows an empty search result', async () => {
+  const requests: unknown[] = [];
   api.defaults.adapter = vi.fn(async (config) => {
-    if (config.method === "get") requests.push(config.params)
-    const params = config.params as { search?: string }
-    if (params.search === "Jane Smith") {
+    if (config.method === 'get') requests.push(config.params);
+    const params = config.params as { search?: string };
+    if (params.search === 'Jane Smith') {
       return await new Promise<AxiosResponse>((resolve) => {
-        releaseSearch = () => resolve({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-          data: [],
-          pagination: { total: 0, totalPages: 1 },
-        } })
-      })
+        releaseSearch = () =>
+          resolve({
+            config,
+            headers: new AxiosHeaders(),
+            status: 200,
+            statusText: '',
+            data: {
+              data: [],
+              pagination: { total: 0, totalPages: 1 },
+            },
+          });
+      });
     }
     const result = params.search
       ? []
-      : [{ _id: "target", firstName: "Jane", lastName: "Smith", email: "jane@example.com", role: "staff", active: true }]
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-      data: result,
-      pagination: { total: result.length, totalPages: 1 },
-    } }
-  })
-  let releaseSearch!: () => void
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
+      : [
+          {
+            _id: 'target',
+            firstName: 'Jane',
+            lastName: 'Smith',
+            email: 'jane@example.com',
+            role: 'staff',
+            active: true,
+          },
+        ];
+    return {
+      config,
+      headers: new AxiosHeaders(),
+      status: 200,
+      statusText: '',
+      data: {
+        data: result,
+        pagination: { total: result.length, totalPages: 1 },
+      },
+    };
+  });
+  let releaseSearch!: () => void;
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
 
-  const search = await screen.findByRole("textbox", { name: "Tìm tài khoản theo tên hoặc email" })
-  expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByRole("heading", { name: "Người dùng" }).compareDocumentPosition(screen.getByRole("search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  expect(screen.getByRole("navigation", { name: "Phân trang người dùng" })).toBeTruthy()
-  const requestCount = requests.length
-  fireEvent.change(search, { target: { value: "Jane Smith" } })
-  expect(requests).toHaveLength(requestCount)
-  await waitFor(() => expect(requests).toContainEqual(expect.objectContaining({
-    page: 1, limit: 10, search: "Jane Smith",
-  })))
-  expect(screen.getByText("jane@example.com")).toBeTruthy()
-  expect(screen.getByText("Đang tìm kiếm…")).toBeTruthy()
-  releaseSearch()
-  expect(await screen.findByText('Không tìm thấy tài khoản cho "Jane Smith".')).toBeTruthy()
+  const search = await screen.findByRole('textbox', {
+    name: 'Tìm tài khoản theo tên hoặc email',
+  });
+  expect(await screen.findByText('jane@example.com')).toBeTruthy();
+  expect(
+    screen
+      .getByRole('heading', { name: 'Người dùng' })
+      .compareDocumentPosition(screen.getByRole('search')) &
+      Node.DOCUMENT_POSITION_FOLLOWING
+  ).toBeTruthy();
+  expect(
+    screen.getByRole('navigation', { name: 'Phân trang người dùng' })
+  ).toBeTruthy();
+  const requestCount = requests.length;
+  fireEvent.change(search, { target: { value: 'Jane Smith' } });
+  expect(requests).toHaveLength(requestCount);
+  await waitFor(() =>
+    expect(requests).toContainEqual(
+      expect.objectContaining({
+        page: 1,
+        limit: 10,
+        search: 'Jane Smith',
+      })
+    )
+  );
+  expect(screen.getByText('jane@example.com')).toBeTruthy();
+  expect(screen.getByText('Đang tìm kiếm…')).toBeTruthy();
+  releaseSearch();
+  expect(
+    await screen.findByText('Không tìm thấy tài khoản cho "Jane Smith".')
+  ).toBeTruthy();
 
-  const secondRequestCount = requests.length
-  fireEvent.change(search, { target: { value: "jane@example.com" } })
-  expect(requests).toHaveLength(secondRequestCount)
-  await waitFor(() => expect(requests).toContainEqual(expect.objectContaining({
-    page: 1, limit: 10, search: "jane@example.com",
-  })))
-  expect(await screen.findByText('Không tìm thấy tài khoản cho "jane@example.com".')).toBeTruthy()
-})
+  const secondRequestCount = requests.length;
+  fireEvent.change(search, { target: { value: 'jane@example.com' } });
+  expect(requests).toHaveLength(secondRequestCount);
+  await waitFor(() =>
+    expect(requests).toContainEqual(
+      expect.objectContaining({
+        page: 1,
+        limit: 10,
+        search: 'jane@example.com',
+      })
+    )
+  );
+  expect(
+    await screen.findByText('Không tìm thấy tài khoản cho "jane@example.com".')
+  ).toBeTruthy();
+});
 
-it.each(["staff", "admin"] as const)("creates %s accounts using random initial credentials", async role => {
-  const writes = setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
-  fireEvent.click(await screen.findByRole("combobox", { name: "Vai trò" }))
-  const option = await screen.findByRole("option", { name: role === "admin" ? "Quản trị viên" : "Nhân viên" })
-  fireEvent.mouseMove(option)
-  fireEvent.mouseDown(option)
-  fireEvent.mouseUp(option)
-  fireEvent.click(option)
-  const password = (screen.getByLabelText("Mật khẩu tạm thời") as HTMLInputElement).value
-  expect(password).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/)
-  fireEvent.change(screen.getByLabelText("Nhập tên"), { target: { value: "New" } })
-  fireEvent.change(screen.getByLabelText("Nhập họ"), { target: { value: "User" } })
-  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } })
-  fireEvent.click(screen.getByRole("button", { name: "Tạo tài khoản" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users", expect.objectContaining({ role, password })))
-})
+it.each(['staff', 'admin'] as const)(
+  'creates %s accounts using random initial credentials',
+  async (role) => {
+    const writes = setup();
+    await screen.findByText('target@example.com');
+    fireEvent.click(screen.getByRole('link', { name: 'Thêm người dùng' }));
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Vai trò' }));
+    const option = await screen.findByRole('option', {
+      name: role === 'admin' ? 'Quản trị viên' : 'Nhân viên',
+    });
+    fireEvent.mouseMove(option);
+    fireEvent.mouseDown(option);
+    fireEvent.mouseUp(option);
+    fireEvent.click(option);
+    const password = (
+      screen.getByLabelText('Mật khẩu tạm thời') as HTMLInputElement
+    ).value;
+    expect(password).toMatch(
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%]).{8}$/
+    );
+    fireEvent.change(screen.getByLabelText('Nhập tên'), {
+      target: { value: 'New' },
+    });
+    fireEvent.change(screen.getByLabelText('Nhập họ'), {
+      target: { value: 'User' },
+    });
+    fireEvent.change(screen.getByLabelText('Email'), {
+      target: { value: 'new@example.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo tài khoản' }));
+    await waitFor(() =>
+      expect(writes).toHaveBeenCalledWith(
+        'post',
+        '/users',
+        expect.objectContaining({ role, password })
+      )
+    );
+  }
+);
 
-it.each(["staff", "admin"] as const)("resets %s accounts by requesting email delivery without exposing a password", async role => {
-  const writes = setup(role)
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Đặt lại mật khẩu" }))
-  expect(screen.queryByLabelText("Mật khẩu tạm thời mới")).toBeNull()
-  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("post", "/users/target/reset-password", {}))
-})
+it.each(['staff', 'admin'] as const)(
+  'resets %s accounts by requesting email delivery without exposing a password',
+  async (role) => {
+    const writes = setup(role);
+    await screen.findByText('target@example.com');
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Chỉnh sửa tài khoản target@example.com',
+      })
+    );
+    fireEvent.click(
+      await screen.findByRole('menuitem', { name: 'Đặt lại mật khẩu' })
+    );
+    expect(screen.queryByLabelText('Mật khẩu tạm thời mới')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }));
+    await waitFor(() =>
+      expect(writes).toHaveBeenCalledWith(
+        'post',
+        '/users/target/reset-password',
+        {}
+      )
+    );
+  }
+);
 
-it("confirms account deletion from the Edit actions menu", async () => {
-  const writes = setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Xóa tài khoản" }))
-  expect(await screen.findByText(/Bạn sắp xóa tài khoản/)).toBeTruthy()
-  fireEvent.click(screen.getByRole("button", { name: "Xác nhận xóa" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("delete", "/users/target", undefined))
-})
+it('confirms account deletion from the Edit actions menu', async () => {
+  const writes = setup();
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  fireEvent.click(
+    await screen.findByRole('menuitem', { name: 'Xóa tài khoản' })
+  );
+  expect(await screen.findByText(/Bạn sắp xóa tài khoản/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa' }));
+  await waitFor(() =>
+    expect(writes).toHaveBeenCalledWith('delete', '/users/target', undefined)
+  );
+});
 
+it('edits account access without silently resetting its password', async () => {
+  const writes = setup();
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  fireEvent.click(await screen.findByRole('menuitem', { name: 'Chỉnh sửa' }));
+  fireEvent.change(screen.getByLabelText('Trạng thái'), {
+    target: { value: 'suspended' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }));
+  await waitFor(() =>
+    expect(writes).toHaveBeenCalledWith('put', '/users/target', {
+      role: 'staff',
+      active: false,
+    })
+  );
+});
 
+it('keeps account actions while using the shared catalog controls', async () => {
+  setup();
+  await screen.findByText('target@example.com');
+  expect(screen.queryByRole('button', { name: 'Invite User' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Xem' })).toBeNull();
+  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(screen.queryByRole('combobox', { name: 'Users per page' })).toBeNull();
+  expect(
+    screen.getByRole('navigation', { name: 'Phân trang người dùng' })
+  ).toBeTruthy();
+  expect(
+    screen
+      .getByRole('region', { name: 'Quản lý người dùng' })
+      .classList.contains('dark')
+  ).toBe(false);
+});
 
+it('sorts by username only and provides a pointer cursor on its control', async () => {
+  api.defaults.adapter = async (config) => ({
+    config,
+    headers: new AxiosHeaders(),
+    status: 200,
+    statusText: '',
+    data: {
+      data: [
+        {
+          _id: 'zeta',
+          firstName: 'Alpha',
+          lastName: 'Tên',
+          email: 'zeta@example.com',
+          role: 'staff',
+          active: true,
+        },
+        {
+          _id: 'alpha',
+          firstName: 'Zeta',
+          lastName: 'Tên',
+          email: 'alpha@example.com',
+          role: 'admin',
+          active: true,
+        },
+      ].sort((a, b) =>
+        config.params.sortOrder === 'desc'
+          ? b.email.localeCompare(a.email)
+          : a.email.localeCompare(b.email)
+      ),
+      pagination: { total: 2, totalPages: 1 },
+    },
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  await screen.findByText('alpha@example.com');
+  const usernames = () =>
+    within(screen.getByRole('table'))
+      .getAllByRole('row')
+      .slice(1)
+      .map(
+        (row) =>
+          within(row).getAllByRole('cell')[0].querySelector('span.truncate')
+            ?.textContent
+      );
+  expect(usernames()).toEqual(['alpha', 'zeta']);
+  const sort = screen.getByRole('button', {
+    name: 'Sắp xếp theo tên đăng nhập',
+  });
+  expect(sort.classList.contains('cursor-pointer')).toBe(true);
+  expect(
+    within(screen.getByRole('columnheader', { name: 'Tên' })).queryByRole(
+      'button'
+    )
+  ).toBeNull();
+  expect(
+    within(screen.getByRole('columnheader', { name: 'Email' })).queryByRole(
+      'button'
+    )
+  ).toBeNull();
+  fireEvent.click(sort);
+  await waitFor(() => expect(usernames()).toEqual(['zeta', 'alpha']));
+  expect(sort.closest('th')?.getAttribute('aria-sort')).toBe('descending');
+});
 
-it("edits account access without silently resetting its password", async () => {
-  const writes = setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Chỉnh sửa" }))
-  fireEvent.change(screen.getByLabelText("Trạng thái"), { target: { value: "suspended" } })
-  fireEvent.click(screen.getByRole("button", { name: "Lưu thay đổi" }))
-  await waitFor(() => expect(writes).toHaveBeenCalledWith("put", "/users/target", { role: "staff", active: false }))
-})
-
-
-it("keeps account actions while using the shared catalog controls", async () => {
-  setup()
-  await screen.findByText("target@example.com")
-  expect(screen.queryByRole("button", { name: "Invite User" })).toBeNull()
-  expect(screen.queryByRole("button", { name: "Xem" })).toBeNull()
-  expect(screen.queryByRole("checkbox")).toBeNull()
-  expect(screen.queryByRole("combobox", { name: "Users per page" })).toBeNull()
-  expect(screen.getByRole("navigation", { name: "Phân trang người dùng" })).toBeTruthy()
-  expect(screen.getByRole("region", { name: "Quản lý người dùng" }).classList.contains("dark")).toBe(false)
-})
-
-it("sorts by username only and provides a pointer cursor on its control", async () => {
-  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-    data: [
-      { _id: "zeta", firstName: "Alpha", lastName: "Tên", email: "zeta@example.com", role: "staff", active: true },
-      { _id: "alpha", firstName: "Zeta", lastName: "Tên", email: "alpha@example.com", role: "admin", active: true },
-    ].sort((a, b) => config.params.sortOrder === "desc" ? b.email.localeCompare(a.email) : a.email.localeCompare(b.email)), pagination: { total: 2, totalPages: 1 },
-  } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  await screen.findByText("alpha@example.com")
-  const usernames = () => within(screen.getByRole("table")).getAllByRole("row").slice(1)
-    .map(row => within(row).getAllByRole("cell")[0].querySelector("span.truncate")?.textContent)
-  expect(usernames()).toEqual(["alpha", "zeta"])
-  const sort = screen.getByRole("button", { name: "Sắp xếp theo tên đăng nhập" })
-  expect(sort.classList.contains("cursor-pointer")).toBe(true)
-  expect(within(screen.getByRole("columnheader", { name: "Tên" })).queryByRole("button")).toBeNull()
-  expect(within(screen.getByRole("columnheader", { name: "Email" })).queryByRole("button")).toBeNull()
-  fireEvent.click(sort)
-  await waitFor(() => expect(usernames()).toEqual(["zeta", "alpha"]))
-  expect(sort.closest("th")?.getAttribute("aria-sort")).toBe("descending")
-})
-
-it("uses only active/suspended statuses and admin/staff roles, including temporary accounts", async () => {
-  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-    data: [{ _id: "temporary", firstName: "Temporary", lastName: "User", email: "temporary@example.com", role: "staff", active: true, mustChangePassword: true }],
-    pagination: { total: 1, totalPages: 1 },
-  } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  const row = (await screen.findByText("temporary@example.com")).closest("tr")!
-  expect(within(row).getByText("Đang hoạt động")).toBeTruthy()
-  expect(screen.queryByText("Invited")).toBeNull()
-  const status = screen.getByRole("combobox", { name: "Trạng thái tài khoản" })
-  expect(within(status).getByRole("option", { name: "Bị đình chỉ" })).toBeTruthy()
-  expect(within(status).queryByRole("option", { name: "Invited" })).toBeNull()
-  fireEvent.change(status, { target: { value: "all" } })
-  fireEvent.click(screen.getByRole("link", { name: "Thêm người dùng" }))
-  const role = await screen.findByRole("combobox", { name: "Vai trò" })
-  fireEvent.click(role)
-  expect((await screen.findAllByRole("option")).map(option => option.textContent)).toEqual(["Nhân viên", "Quản trị viên"])
-  expect(screen.queryByText("Manager")).toBeNull()
-  expect(screen.queryByText("Cashier")).toBeNull()
-})
+it('uses only active/suspended statuses and admin/staff roles, including temporary accounts', async () => {
+  api.defaults.adapter = async (config) => ({
+    config,
+    headers: new AxiosHeaders(),
+    status: 200,
+    statusText: '',
+    data: {
+      data: [
+        {
+          _id: 'temporary',
+          firstName: 'Temporary',
+          lastName: 'User',
+          email: 'temporary@example.com',
+          role: 'staff',
+          active: true,
+          mustChangePassword: true,
+        },
+      ],
+      pagination: { total: 1, totalPages: 1 },
+    },
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  const row = (await screen.findByText('temporary@example.com')).closest('tr')!;
+  expect(within(row).getByText('Đang hoạt động')).toBeTruthy();
+  expect(screen.queryByText('Invited')).toBeNull();
+  const status = screen.getByRole('combobox', { name: 'Trạng thái tài khoản' });
+  expect(
+    within(status).getByRole('option', { name: 'Bị đình chỉ' })
+  ).toBeTruthy();
+  expect(within(status).queryByRole('option', { name: 'Invited' })).toBeNull();
+  fireEvent.change(status, { target: { value: 'all' } });
+  fireEvent.click(screen.getByRole('link', { name: 'Thêm người dùng' }));
+  const role = await screen.findByRole('combobox', { name: 'Vai trò' });
+  fireEvent.click(role);
+  expect(
+    (await screen.findAllByRole('option')).map((option) => option.textContent)
+  ).toEqual(['Nhân viên', 'Quản trị viên']);
+  expect(screen.queryByText('Manager')).toBeNull();
+  expect(screen.queryByText('Cashier')).toBeNull();
+});
 
 it("opens the selected user's profile and closes it without writing account data", async () => {
-  const writes = setup()
-  const row = (await screen.findByText("target@example.com")).closest("tr")!
-  fireEvent.click(within(row).getAllByRole("cell")[1])
-  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })
-  expect(within(dialog).getByText("Tên đăng nhập")).toBeTruthy()
-  expect(within(dialog).getAllByText("target@example.com")).toHaveLength(2)
-  expect(within(dialog).getByText("Nhân viên")).toBeTruthy()
-  expect(within(dialog).getByText("Đang hoạt động")).toBeTruthy()
-  expect(within(dialog).queryByText(/Mật khẩu/i)).toBeNull()
-  fireEvent.click(within(dialog).getByRole("button", { name: "Đóng" }))
-  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-  expect(writes).not.toHaveBeenCalled()
-})
+  const writes = setup();
+  const row = (await screen.findByText('target@example.com')).closest('tr')!;
+  fireEvent.click(within(row).getAllByRole('cell')[1]);
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Hồ sơ người dùng',
+  });
+  expect(within(dialog).getByText('Tên đăng nhập')).toBeTruthy();
+  expect(within(dialog).getAllByText('target@example.com')).toHaveLength(2);
+  expect(within(dialog).getByText('Nhân viên')).toBeTruthy();
+  expect(within(dialog).getByText('Đang hoạt động')).toBeTruthy();
+  expect(within(dialog).queryByText(/Mật khẩu/i)).toBeNull();
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Đóng' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  expect(writes).not.toHaveBeenCalled();
+});
 
-it.each(["Enter", " "])("opens a focused user row with the %s key", async key => {
-  setup()
-  const row = (await screen.findByText("target@example.com")).closest("tr")!
-  row.focus()
-  fireEvent.keyDown(row, { key })
-  expect(await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })).toBeTruthy()
-})
-
-it("keeps the account action menu separate from the profile dialog", async () => {
-  setup()
-  await screen.findByText("target@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Chỉnh sửa tài khoản target@example.com" }))
-  expect(await screen.findByRole("menuitem", { name: "Chỉnh sửa" })).toBeTruthy()
-  expect(screen.queryByRole("dialog", { name: "Hồ sơ người dùng" })).toBeNull()
-  fireEvent.click(screen.getByRole("menuitem", { name: "Chỉnh sửa" }))
-  expect(await screen.findByRole("dialog", { name: "Chỉnh sửa tài khoản" })).toBeTruthy()
-  expect(screen.queryByRole("dialog", { name: "Hồ sơ người dùng" })).toBeNull()
-})
-
-it("shows the clicked account rather than the signed-in admin or a previous selection", async () => {
-  api.defaults.adapter = async config => ({ config, headers: new AxiosHeaders(), status: 200, statusText: "", data: {
-    data: [
-      { _id: "one", firstName: "First", lastName: "User", email: "one@example.com", role: "staff", active: true },
-      { _id: "two", firstName: "Second", lastName: "User", email: "two@example.com", personalEmail: "personal@example.com", phone: "0901234567", location: "Ho Chi Minh City", bio: "Second user's biography", role: "admin", active: false },
-    ], pagination: { total: 2, totalPages: 1 },
-  } })
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  fireEvent.click((await screen.findByText("one@example.com")).closest("tr")!)
-  fireEvent.click(within(await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })).getByRole("button", { name: "Đóng" }))
-  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
-  fireEvent.click(screen.getByText("two@example.com").closest("tr")!)
-  const dialog = await screen.findByRole("dialog", { name: "Hồ sơ người dùng" })
-  for (const text of ["personal@example.com", "0901234567", "Ho Chi Minh City", "Second user's biography", "Quản trị viên", "Bị đình chỉ"]) {
-    expect(within(dialog).getByText(text)).toBeTruthy()
+it.each(['Enter', ' '])(
+  'opens a focused user row with the %s key',
+  async (key) => {
+    setup();
+    const row = (await screen.findByText('target@example.com')).closest('tr')!;
+    row.focus();
+    fireEvent.keyDown(row, { key });
+    expect(
+      await screen.findByRole('dialog', { name: 'Hồ sơ người dùng' })
+    ).toBeTruthy();
   }
-  expect(within(dialog).queryByText("one@example.com")).toBeNull()
-  expect(within(dialog).queryByText("self@example.com")).toBeNull()
-})
+);
 
-it("keeps fixed page size and resets search and filters", async () => {
-  const requests: unknown[] = []
-  api.defaults.adapter = async config => {
-    requests.push(config.params)
-    return { config, headers: new AxiosHeaders(), status: 200, statusText: "OK", data: {
-      data: config.params.active === false ? [] : [{ _id: "target", firstName: "Jane", lastName: "Smith", email: "jane@example.com", role: "staff", active: true }],
-      pagination: { total: config.params.active === false ? 0 : 30, totalPages: Math.ceil(30 / Number(config.params.limit)) },
-    } }
+it('keeps the account action menu separate from the profile dialog', async () => {
+  setup();
+  await screen.findByText('target@example.com');
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Chỉnh sửa tài khoản target@example.com',
+    })
+  );
+  expect(
+    await screen.findByRole('menuitem', { name: 'Chỉnh sửa' })
+  ).toBeTruthy();
+  expect(screen.queryByRole('dialog', { name: 'Hồ sơ người dùng' })).toBeNull();
+  fireEvent.click(screen.getByRole('menuitem', { name: 'Chỉnh sửa' }));
+  expect(
+    await screen.findByRole('dialog', { name: 'Chỉnh sửa tài khoản' })
+  ).toBeTruthy();
+  expect(screen.queryByRole('dialog', { name: 'Hồ sơ người dùng' })).toBeNull();
+});
+
+it('shows the clicked account rather than the signed-in admin or a previous selection', async () => {
+  api.defaults.adapter = async (config) => ({
+    config,
+    headers: new AxiosHeaders(),
+    status: 200,
+    statusText: '',
+    data: {
+      data: [
+        {
+          _id: 'one',
+          firstName: 'First',
+          lastName: 'User',
+          email: 'one@example.com',
+          role: 'staff',
+          active: true,
+        },
+        {
+          _id: 'two',
+          firstName: 'Second',
+          lastName: 'User',
+          email: 'two@example.com',
+          personalEmail: 'personal@example.com',
+          phone: '0901234567',
+          location: 'Ho Chi Minh City',
+          bio: "Second user's biography",
+          role: 'admin',
+          active: false,
+        },
+      ],
+      pagination: { total: 2, totalPages: 1 },
+    },
+  });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  fireEvent.click((await screen.findByText('one@example.com')).closest('tr')!);
+  fireEvent.click(
+    within(
+      await screen.findByRole('dialog', { name: 'Hồ sơ người dùng' })
+    ).getByRole('button', { name: 'Đóng' })
+  );
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  fireEvent.click(screen.getByText('two@example.com').closest('tr')!);
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Hồ sơ người dùng',
+  });
+  for (const text of [
+    'personal@example.com',
+    '0901234567',
+    'Ho Chi Minh City',
+    "Second user's biography",
+    'Quản trị viên',
+    'Bị đình chỉ',
+  ]) {
+    expect(within(dialog).getByText(text)).toBeTruthy();
   }
-  render(<QueryClientProvider client={queryClient}><MemoryRouter><UserTestRoutes /></MemoryRouter></QueryClientProvider>)
-  await screen.findByText("jane@example.com")
-  fireEvent.click(screen.getByRole("button", { name: "Tiếp" }))
-  await waitFor(() => expect(requests).toContainEqual({ page: 2, limit: 10, sortBy: "username", sortOrder: "asc" }))
-  await waitFor(() => expect(screen.getByRole("button", { name: "Tiếp" }).hasAttribute("disabled")).toBe(false))
-  expect(screen.queryByLabelText("Users per page")).toBeNull()
-  fireEvent.change(screen.getByLabelText("Tìm tài khoản theo tên hoặc email"), { target: { value: "Jane" } })
-  await waitFor(() => expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", sortBy: "username", sortOrder: "asc" }))
-  fireEvent.change(screen.getByLabelText("Trạng thái tài khoản"), { target: { value: "suspended" } })
-  expect(await screen.findByText("Không có người dùng phù hợp với bộ lọc.")).toBeTruthy()
-  expect(requests).toContainEqual({ page: 1, limit: 10, search: "Jane", active: false, sortBy: "username", sortOrder: "asc" })
-  fireEvent.click(screen.getByRole("button", { name: "Đặt lại bộ lọc" }))
-  expect(await screen.findByText("jane@example.com")).toBeTruthy()
-  expect((screen.getByLabelText("Tìm tài khoản theo tên hoặc email") as HTMLInputElement).value).toBe("")
-  expect((screen.getByLabelText("Trạng thái tài khoản") as HTMLSelectElement).value).toBe("all")
-  expect(screen.getByText("Trang 1 / 3")).toBeTruthy()
-})
+  expect(within(dialog).queryByText('one@example.com')).toBeNull();
+  expect(within(dialog).queryByText('self@example.com')).toBeNull();
+});
+
+it('keeps fixed page size and resets search and filters', async () => {
+  const requests: unknown[] = [];
+  api.defaults.adapter = async (config) => {
+    requests.push(config.params);
+    return {
+      config,
+      headers: new AxiosHeaders(),
+      status: 200,
+      statusText: 'OK',
+      data: {
+        data:
+          config.params.active === false
+            ? []
+            : [
+                {
+                  _id: 'target',
+                  firstName: 'Jane',
+                  lastName: 'Smith',
+                  email: 'jane@example.com',
+                  role: 'staff',
+                  active: true,
+                },
+              ],
+        pagination: {
+          total: config.params.active === false ? 0 : 30,
+          totalPages: Math.ceil(30 / Number(config.params.limit)),
+        },
+      },
+    };
+  };
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <UserTestRoutes />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+  await screen.findByText('jane@example.com');
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  await waitFor(() =>
+    expect(requests).toContainEqual({
+      page: 2,
+      limit: 10,
+      sortBy: 'username',
+      sortOrder: 'asc',
+    })
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: 'Tiếp' }).hasAttribute('disabled')
+    ).toBe(false)
+  );
+  expect(screen.queryByLabelText('Users per page')).toBeNull();
+  fireEvent.change(screen.getByLabelText('Tìm tài khoản theo tên hoặc email'), {
+    target: { value: 'Jane' },
+  });
+  await waitFor(() =>
+    expect(requests).toContainEqual({
+      page: 1,
+      limit: 10,
+      search: 'Jane',
+      sortBy: 'username',
+      sortOrder: 'asc',
+    })
+  );
+  fireEvent.change(screen.getByLabelText('Trạng thái tài khoản'), {
+    target: { value: 'suspended' },
+  });
+  expect(
+    await screen.findByText('Không có người dùng phù hợp với bộ lọc.')
+  ).toBeTruthy();
+  expect(requests).toContainEqual({
+    page: 1,
+    limit: 10,
+    search: 'Jane',
+    active: false,
+    sortBy: 'username',
+    sortOrder: 'asc',
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Đặt lại bộ lọc' }));
+  expect(await screen.findByText('jane@example.com')).toBeTruthy();
+  expect(
+    (
+      screen.getByLabelText(
+        'Tìm tài khoản theo tên hoặc email'
+      ) as HTMLInputElement
+    ).value
+  ).toBe('');
+  expect(
+    (screen.getByLabelText('Trạng thái tài khoản') as HTMLSelectElement).value
+  ).toBe('all');
+  expect(screen.getByText('Trang 1 / 3')).toBeTruthy();
+});

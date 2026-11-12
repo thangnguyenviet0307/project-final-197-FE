@@ -77,8 +77,9 @@ function Editor({
         disabled={mutation.isPending}
       />
       <p className="text-muted-foreground text-sm">
-        {content.length.toLocaleString('vi-VN')}/{LONG_TEXT_MAX_LENGTH.toLocaleString('vi-VN')} ký tự, bao gồm định dạng. FAQ có thể trình bày
-        bằng tiêu đề câu hỏi và phần trả lời.
+        {content.length.toLocaleString('vi-VN')}/
+        {LONG_TEXT_MAX_LENGTH.toLocaleString('vi-VN')} ký tự, bao gồm định dạng.
+        FAQ có thể trình bày bằng tiêu đề câu hỏi và phần trả lời.
       </p>
       {error && <p role="alert">{error}</p>}
       {message && <p role="status">{message}</p>}

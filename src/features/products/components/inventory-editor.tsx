@@ -56,7 +56,10 @@ export function InventoryEditor({ product }: { product: Product }) {
         : ['Sản phẩm']
       ).map((label, index) => (
         <label key={label} className="grid gap-2 text-sm">
-          <span>Tồn kho {label}<RequiredMark /></span>
+          <span>
+            Tồn kho {label}
+            <RequiredMark />
+          </span>
           <input
             className="bg-background rounded-md border p-2"
             type="number"

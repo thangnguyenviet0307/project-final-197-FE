@@ -9,18 +9,26 @@ afterEach(() => {
 });
 
 it('keeps errors inline for queries that explicitly suppress the global toast', async () => {
-  await expect(queryClient.fetchQuery({
-    queryKey: ['ai', 'guest', 'conversations'],
-    queryFn: async () => { throw new Error('Cannot load chat'); },
-    meta: { suppressGlobalErrorToast: true },
-  })).rejects.toThrow('Cannot load chat');
+  await expect(
+    queryClient.fetchQuery({
+      queryKey: ['ai', 'guest', 'conversations'],
+      queryFn: async () => {
+        throw new Error('Cannot load chat');
+      },
+      meta: { suppressGlobalErrorToast: true },
+    })
+  ).rejects.toThrow('Cannot load chat');
   expect(toast.error).not.toHaveBeenCalled();
 });
 
 it('preserves global notifications for other queries', async () => {
-  await expect(queryClient.fetchQuery({
-    queryKey: ['products'],
-    queryFn: async () => { throw new Error('Cannot load products'); },
-  })).rejects.toThrow('Cannot load products');
+  await expect(
+    queryClient.fetchQuery({
+      queryKey: ['products'],
+      queryFn: async () => {
+        throw new Error('Cannot load products');
+      },
+    })
+  ).rejects.toThrow('Cannot load products');
   expect(toast.error).toHaveBeenCalledTimes(1);
 });

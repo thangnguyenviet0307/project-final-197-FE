@@ -40,7 +40,10 @@ export function ImageUploadField({
         JPG, PNG, WebP · Tối đa 5 MB. Ảnh được tải lên khi lưu biểu mẫu.
       </p>
       {guidance && (
-        <p id={`${id}-guidance`} className="text-muted-foreground text-sm leading-6">
+        <p
+          id={`${id}-guidance`}
+          className="text-muted-foreground text-sm leading-6"
+        >
           {guidance}
         </p>
       )}

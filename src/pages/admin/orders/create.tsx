@@ -109,7 +109,9 @@ export default function CreateOrderPage() {
           className="space-y-3 rounded-lg border p-4"
           disabled={mutation.isPending}
         >
-          <legend>Customer <RequiredMark /></legend>
+          <legend>
+            Customer <RequiredMark />
+          </legend>
           <Input
             aria-label="Search customers"
             placeholder="Search customers"
@@ -173,7 +175,9 @@ export default function CreateOrderPage() {
           className="space-y-3 rounded-lg border p-4"
           disabled={mutation.isPending}
         >
-          <legend>Products <RequiredMark /></legend>
+          <legend>
+            Products <RequiredMark />
+          </legend>
           <Input
             aria-label="Search products"
             placeholder="Search products"
@@ -266,7 +270,9 @@ export default function CreateOrderPage() {
           {items.map((item, index) => (
             <div className="flex flex-wrap items-center gap-2" key={index}>
               <span>{item.label}</span>
-              <span className="text-sm">Số lượng <RequiredMark /></span>
+              <span className="text-sm">
+                Số lượng <RequiredMark />
+              </span>
               <Input
                 placeholder="Nhập số lượng"
                 className="w-24"
@@ -311,7 +317,9 @@ export default function CreateOrderPage() {
         >
           {['street', 'city', 'state'].map((name) => (
             <label className="grid gap-2 text-sm capitalize" key={name}>
-              <span>{name} <RequiredMark /></span>
+              <span>
+                {name} <RequiredMark />
+              </span>
               <Input
                 placeholder={
                   name === 'street'

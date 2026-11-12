@@ -23,7 +23,10 @@ export function HomeCategoryLinks() {
                 to={`/shop?category=${encodeURIComponent(category.slug)}`}
                 className="flex h-16 min-w-0 items-center rounded-xl border border-gray-200 bg-white px-3 text-gray-800 hover:border-[#9acb74]"
               >
-                <CatalogOptionContent name={category.name} image={category.icon} />
+                <CatalogOptionContent
+                  name={category.name}
+                  image={category.icon}
+                />
               </Link>
             ))}
         </div>

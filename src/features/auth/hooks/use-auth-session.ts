@@ -9,9 +9,9 @@ export function useAuthSession() {
   const error = useAuthStore((state) => state.initializationError);
   const authenticated = useAuthStore((state) => state.isAuthenticated);
   const version = useAuthStore((state) => state.sessionVersion);
-  const restricted = useAuthStore((state) => Boolean(
-    state.user?.mustChangePassword || state.user?.onboardingRequired
-  ));
+  const restricted = useAuthStore((state) =>
+    Boolean(state.user?.mustChangePassword || state.user?.onboardingRequired)
+  );
   useEffect(() => {
     if (authenticated && !restricted && getAuthArea() === 'admin')
       return subscribeToLiveDataChanges();
@@ -31,7 +31,8 @@ export function useAuthSession() {
             saved?.version === 2 &&
             saved.state?.hasSession === current.hasSession &&
             saved.state?.sessionId === current.sessionId
-          ) return;
+          )
+            return;
         } catch {
           // Re-bootstrap on malformed or removed identity markers.
         }

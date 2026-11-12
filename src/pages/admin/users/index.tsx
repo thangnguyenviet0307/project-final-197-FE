@@ -52,7 +52,10 @@ import type { ManagedUser } from '@/features/users/types/users';
 import { getApiError } from '@/services/api';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUsers } from '@/features/users/hooks/use-users';
-import { useResetUserPassword, useReissueInitialPassword } from '@/features/users/hooks/use-reset-user-password';
+import {
+  useResetUserPassword,
+  useReissueInitialPassword,
+} from '@/features/users/hooks/use-reset-user-password';
 import { getTemporaryPassword } from '@/features/users/services/users.service';
 import { DeleteUserConfirmation } from '@/features/users/components/delete-user-confirmation';
 import { useUpdateUser } from '@/features/users/hooks/use-update-user';
@@ -152,7 +155,9 @@ function ResetPasswordDialog({
   const mutation = useResetUserPassword(user._id, { onSuccess: onClose });
   const initial = user.onboardingRequired && !user.personalEmailVerified;
   const reissue = useReissueInitialPassword(user._id, onClose);
-  const [initialPassword] = useState(() => initial ? getTemporaryPassword(user.role) : '');
+  const [initialPassword] = useState(() =>
+    initial ? getTemporaryPassword(user.role) : ''
+  );
   const pending = mutation.isPending || reissue.isPending;
   return (
     <Dialog
@@ -165,9 +170,11 @@ function ResetPasswordDialog({
         <DialogHeader>
           <DialogTitle>Đặt lại mật khẩu</DialogTitle>
           <DialogDescription>
-            {initial ? 'Cấp lại mật khẩu ban đầu cho tài khoản chưa hoàn tất. Quản trị viên cần chuyển mật khẩu này cho đúng nhân viên.'
-              : `Gửi mật khẩu ngẫu nhiên đến email cá nhân đã xác nhận của ${user.email}.`}
-            {' '}Người dùng phải đăng nhập và đổi mật khẩu trong 30 phút từ lúc kích hoạt.
+            {initial
+              ? 'Cấp lại mật khẩu ban đầu cho tài khoản chưa hoàn tất. Quản trị viên cần chuyển mật khẩu này cho đúng nhân viên.'
+              : `Gửi mật khẩu ngẫu nhiên đến email cá nhân đã xác nhận của ${user.email}.`}{' '}
+            Người dùng phải đăng nhập và đổi mật khẩu trong 30 phút từ lúc kích
+            hoạt.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -179,9 +186,19 @@ function ResetPasswordDialog({
           }}
         >
           <p className="text-sm">Email: {user.personalEmail || '—'}</p>
-          {initial && <Field><FieldLabel htmlFor="reissued-password">Mật khẩu cấp lại</FieldLabel>
-            <Input id="reissued-password" readOnly value={initialPassword} /></Field>}
-          {reissue.error && <p role="alert" className="text-destructive text-sm">{getApiError(reissue.error).message}</p>}
+          {initial && (
+            <Field>
+              <FieldLabel htmlFor="reissued-password">
+                Mật khẩu cấp lại
+              </FieldLabel>
+              <Input id="reissued-password" readOnly value={initialPassword} />
+            </Field>
+          )}
+          {reissue.error && (
+            <p role="alert" className="text-destructive text-sm">
+              {getApiError(reissue.error).message}
+            </p>
+          )}
           {mutation.error && (
             <p role="alert" className="text-destructive text-sm">
               {getApiError(mutation.error).message}
@@ -811,7 +828,9 @@ export default function UsersPage() {
             </DialogHeader>
             <form className="space-y-5" onSubmit={handleEditSubmit}>
               <Field>
-                <FieldLabel required htmlFor="edit-user-role">Vai trò</FieldLabel>
+                <FieldLabel required htmlFor="edit-user-role">
+                  Vai trò
+                </FieldLabel>
                 <select
                   id="edit-user-role"
                   value={editRole}
@@ -834,7 +853,9 @@ export default function UsersPage() {
                 </select>
               </Field>
               <Field>
-                <FieldLabel required htmlFor="edit-user-status">Trạng thái</FieldLabel>
+                <FieldLabel required htmlFor="edit-user-status">
+                  Trạng thái
+                </FieldLabel>
                 <select
                   id="edit-user-status"
                   value={editActive ? 'active' : 'suspended'}

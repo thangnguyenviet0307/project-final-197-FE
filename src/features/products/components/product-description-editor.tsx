@@ -72,8 +72,9 @@ export function ProductDescriptionEditor({
         }}
       />
       <p id="description-hint" className="text-muted-foreground mt-2 text-xs">
-        {value.length.toLocaleString('vi-VN')}/{PRODUCT_DESCRIPTION_MAX_LENGTH.toLocaleString('vi-VN')} ký tự, bao gồm định dạng. Hình ảnh được quản lý
-        riêng.
+        {value.length.toLocaleString('vi-VN')}/
+        {PRODUCT_DESCRIPTION_MAX_LENGTH.toLocaleString('vi-VN')} ký tự, bao gồm
+        định dạng. Hình ảnh được quản lý riêng.
       </p>
     </div>
   );

@@ -50,7 +50,11 @@ export function ProductDetailsInfo({ product }: { product: Product }) {
           <div key={label}>
             <dt className="text-muted-foreground">{label}</dt>
             <dd className="mt-1 font-medium break-words whitespace-pre-wrap">
-              {value === '' || value == null ? 'Chưa có thông tin' : <ProductPolicyText text={String(value)} />}
+              {value === '' || value == null ? (
+                'Chưa có thông tin'
+              ) : (
+                <ProductPolicyText text={String(value)} />
+              )}
             </dd>
           </div>
         ))}

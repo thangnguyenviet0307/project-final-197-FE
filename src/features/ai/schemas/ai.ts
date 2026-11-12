@@ -43,9 +43,12 @@ export const completedSchema = z.object({
     )
     .default([]),
 });
-export const cancelResultSchema = completedSchema.pick({
-  answer: true, sources: true,
-}).extend({
-  requestId: z.string(),
-  status: z.enum(['completed', 'cancelled', 'failed']),
-});
+export const cancelResultSchema = completedSchema
+  .pick({
+    answer: true,
+    sources: true,
+  })
+  .extend({
+    requestId: z.string(),
+    status: z.enum(['completed', 'cancelled', 'failed']),
+  });

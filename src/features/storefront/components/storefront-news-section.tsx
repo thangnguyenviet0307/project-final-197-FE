@@ -14,9 +14,7 @@ export function StorefrontNewsSection() {
       className="bg-[#f5f6f4] py-12 sm:py-16"
     >
       <div className="store-container">
-        <SectionHeading
-          title="Tin tức & Cẩm nang"
-        />
+        <SectionHeading title="Tin tức & Cẩm nang" />
 
         <Link
           to="/bai-viet"

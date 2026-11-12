@@ -110,7 +110,9 @@ export function OrderDatesDialog({
             </fieldset>
           ) : (
             <label className="grid gap-2 text-sm">
-              <span>Thời điểm hoàn tất <RequiredMark /></span>
+              <span>
+                Thời điểm hoàn tất <RequiredMark />
+              </span>
               <input
                 type="datetime-local"
                 aria-required="true"

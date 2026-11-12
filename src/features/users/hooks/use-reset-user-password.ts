@@ -1,5 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { resetUserPassword, reissueInitialPassword } from '@/features/users/services/users.service';
+import {
+  resetUserPassword,
+  reissueInitialPassword,
+} from '@/features/users/services/users.service';
 import type { MutationCallbacks } from '@/types/mutation';
 
 export function useResetUserPassword(

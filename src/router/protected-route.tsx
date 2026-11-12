@@ -33,7 +33,12 @@ export function ProtectedRoute({
   if (user.mustChangePassword && location.pathname !== passwordPath) {
     return <Navigate to={passwordPath} replace />;
   }
-  if (!storefront && !user.mustChangePassword && user.onboardingRequired && location.pathname !== '/auth/settings/user')
+  if (
+    !storefront &&
+    !user.mustChangePassword &&
+    user.onboardingRequired &&
+    location.pathname !== '/auth/settings/user'
+  )
     return <Navigate to="/auth/settings/user" replace />;
   return <Outlet />;
 }

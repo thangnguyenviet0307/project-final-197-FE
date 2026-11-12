@@ -70,7 +70,7 @@ export function WarrantyList({
                 onClick={() =>
                   onSelect(selectedId === item._id ? '' : item._id)
                 }
-                className={`block w-full rounded-xl border p-4 text-left transition ${admin ? 'hover:border-ring' : 'hover:border-green-500'} ${selectedId === item._id ? admin ? 'border-ring bg-accent text-accent-foreground' : 'border-green-600 bg-green-50/50' : 'bg-background'}`}
+                className={`block w-full rounded-xl border p-4 text-left transition ${admin ? 'hover:border-ring' : 'hover:border-green-500'} ${selectedId === item._id ? (admin ? 'border-ring bg-accent text-accent-foreground' : 'border-green-600 bg-green-50/50') : 'bg-background'}`}
               >
                 <span className="block text-sm font-semibold">
                   {item.productName}
@@ -80,10 +80,14 @@ export function WarrantyList({
                   {item.orderCode} · {supportDate(item.createdAt)}
                   {admin && ` · ${item.customerName ?? ''}`}
                 </span>
-                  <span className="text-muted-foreground mt-2 block text-xs">
-                    Người tiếp nhận: {item.handlerName || (item.handlerId ? 'Nhân viên cửa hàng' : 'Chưa có người tiếp nhận')}
-                    {admin && item.handlerId === userId && ' (Bạn)'}
-                  </span>
+                <span className="text-muted-foreground mt-2 block text-xs">
+                  Người tiếp nhận:{' '}
+                  {item.handlerName ||
+                    (item.handlerId
+                      ? 'Nhân viên cửa hàng'
+                      : 'Chưa có người tiếp nhận')}
+                  {admin && item.handlerId === userId && ' (Bạn)'}
+                </span>
                 <span
                   className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${(admin ? adminWarrantyStatusStyles : warrantyStatusStyles)[item.status]}`}
                 >
@@ -99,13 +103,13 @@ export function WarrantyList({
                 : 'Chưa có yêu cầu phù hợp.'}
             </p>
           )}
-            <ListPagination
-              label="Phân trang yêu cầu bảo hành"
-              page={page}
-              totalPages={Math.max(1, query.data.pagination.totalPages)}
-              disabled={query.isFetching}
-              onPageChange={setPage}
-            />
+          <ListPagination
+            label="Phân trang yêu cầu bảo hành"
+            page={page}
+            totalPages={Math.max(1, query.data.pagination.totalPages)}
+            disabled={query.isFetching}
+            onPageChange={setPage}
+          />
         </>
       )}
     </section>

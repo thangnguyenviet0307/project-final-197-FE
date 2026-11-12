@@ -52,7 +52,15 @@ export function ContentEditor({
   }, [id, label]);
   return (
     <div className="product-description-editor" aria-disabled={disabled}>
-      {requiredOnPublish && <p className="mb-2 text-sm">{label}<RequiredMark /> <span className="text-muted-foreground">Bắt buộc khi công bố; bản nháp có thể để trống.</span></p>}
+      {requiredOnPublish && (
+        <p className="mb-2 text-sm">
+          {label}
+          <RequiredMark />{' '}
+          <span className="text-muted-foreground">
+            Bắt buộc khi công bố; bản nháp có thể để trống.
+          </span>
+        </p>
+      )}
       <ReactQuill
         ref={editor}
         theme="snow"

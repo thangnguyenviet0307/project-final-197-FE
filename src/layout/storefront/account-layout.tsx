@@ -74,7 +74,10 @@ export function AccountLayout() {
               </p>
             </div>
 
-            <nav aria-label="Điều hướng tài khoản" className="flex gap-1 overflow-x-auto p-2 lg:block lg:p-3">
+            <nav
+              aria-label="Điều hướng tài khoản"
+              className="flex gap-1 overflow-x-auto p-2 lg:block lg:p-3"
+            >
               {accountMenus.map((item) => {
                 const Icon = item.icon;
 

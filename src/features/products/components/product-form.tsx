@@ -248,7 +248,8 @@ export function ProductForm({ product, save, pending }: ProductFormProps) {
                   );
                   return (
                     imagesPayload.variants?.findIndex(
-                      (item) => item._id === variant._id || item.sku === base?.sku
+                      (item) =>
+                        item._id === variant._id || item.sku === base?.sku
                     ) ?? -1
                   );
                 };

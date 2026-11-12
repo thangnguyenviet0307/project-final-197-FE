@@ -1,4 +1,7 @@
-import { POLICY_SECTION_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
+import {
+  POLICY_SECTION_MAX_LENGTH,
+  DESCRIPTION_MAX_LENGTH,
+} from '@/constants/text-limits';
 import { z } from 'zod';
 import { validateImageFile } from '@/utils/image-file';
 

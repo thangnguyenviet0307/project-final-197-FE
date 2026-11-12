@@ -111,7 +111,9 @@ export function OrderActions({
           {mode === 'status' && (
             <>
               <label className="grid gap-2 text-sm">
-                <span>Trạng thái mới <RequiredMark /></span>
+                <span>
+                  Trạng thái mới <RequiredMark />
+                </span>
                 <select
                   aria-required="true"
                   className="bg-background rounded-md border p-2"
@@ -133,8 +135,10 @@ export function OrderActions({
               </label>
               {next === 3 && (
                 <label className="grid gap-2 text-sm">
-          <span>Lý do hủy <RequiredMark /></span>
-          <textarea
+                  <span>
+                    Lý do hủy <RequiredMark />
+                  </span>
+                  <textarea
                     placeholder="Nhập lý do thay đổi trạng thái đơn hàng"
                     maxLength={1000}
                     className="bg-background rounded-md border p-2"

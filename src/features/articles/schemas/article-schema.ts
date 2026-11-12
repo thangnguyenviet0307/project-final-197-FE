@@ -1,4 +1,7 @@
-import { LONG_TEXT_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
+import {
+  LONG_TEXT_MAX_LENGTH,
+  DESCRIPTION_MAX_LENGTH,
+} from '@/constants/text-limits';
 import { z } from 'zod';
 const url = z
   .string()

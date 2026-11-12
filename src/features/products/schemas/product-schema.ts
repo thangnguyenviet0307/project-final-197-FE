@@ -147,8 +147,14 @@ export const productSchema = z
         }
       })
       .optional(),
-    warrantyInformation: optionalText('Thông tin bảo hành', DESCRIPTION_MAX_LENGTH),
-    shippingInformation: optionalText('Thông tin giao hàng', DESCRIPTION_MAX_LENGTH),
+    warrantyInformation: optionalText(
+      'Thông tin bảo hành',
+      DESCRIPTION_MAX_LENGTH
+    ),
+    shippingInformation: optionalText(
+      'Thông tin giao hàng',
+      DESCRIPTION_MAX_LENGTH
+    ),
     returnPolicy: optionalText('Chính sách đổi trả', DESCRIPTION_MAX_LENGTH),
     minimumOrderQuantity: stock('Số lượng đặt tối thiểu')
       .min(1, 'Số lượng đặt tối thiểu phải từ 1.')

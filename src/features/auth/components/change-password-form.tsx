@@ -27,7 +27,9 @@ export function ChangePasswordForm({
   storefront?: boolean;
 }) {
   const required = useAuthStore((state) => state.user?.mustChangePassword);
-  const deadline = useAuthStore((state) => state.user?.temporaryPasswordExpiresAt);
+  const deadline = useAuthStore(
+    (state) => state.user?.temporaryPasswordExpiresAt
+  );
   const form = useForm<Values>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -64,7 +66,13 @@ export function ChangePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {required && deadline && <p role="status" className="mb-4 text-sm">Bạn phải đổi mật khẩu trước {new Date(deadline).toLocaleString('vi-VN')}. Đăng nhập không gia hạn thời gian.</p>}
+          {required && deadline && (
+            <p role="status" className="mb-4 text-sm">
+              Bạn phải đổi mật khẩu trước{' '}
+              {new Date(deadline).toLocaleString('vi-VN')}. Đăng nhập không gia
+              hạn thời gian.
+            </p>
+          )}
           <form
             className="space-y-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}

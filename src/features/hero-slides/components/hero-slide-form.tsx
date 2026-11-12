@@ -78,7 +78,9 @@ export function HeroSlideForm({
         className="space-y-4 disabled:opacity-70"
       >
         <label className="grid gap-2 text-sm">
-          <span>Danh mục {(!slide || !!slide.category) && <RequiredMark />}</span>
+          <span>
+            Danh mục {(!slide || !!slide.category) && <RequiredMark />}
+          </span>
           <select
             required={!slide || !!slide.category}
             aria-invalid={!!categoryError}
@@ -116,7 +118,9 @@ export function HeroSlideForm({
           </p>
         )}
         <label className="grid gap-2 text-sm">
-          <span>Tiêu đề <RequiredMark /></span>
+          <span>
+            Tiêu đề <RequiredMark />
+          </span>
           <Textarea
             placeholder="Nhập tiêu đề banner"
             required
@@ -163,7 +167,9 @@ export function HeroSlideForm({
           </span>
         </label>
         <label className="grid gap-2 text-sm">
-          <span>Thứ tự <RequiredMark /></span>
+          <span>
+            Thứ tự <RequiredMark />
+          </span>
           <Input
             type="number"
             min={0}

@@ -14,7 +14,11 @@ export function useAdminPolicy() {
     queryFn: ({ signal }) => service.getAdminPolicy(signal),
   });
 }
-export function useEligibleWarrantyOrders(page: number, orderId?: string, enabled = true) {
+export function useEligibleWarrantyOrders(
+  page: number,
+  orderId?: string,
+  enabled = true
+) {
   return useQuery({
     queryKey: ['support', 'eligible-orders', page, orderId ?? ''],
     enabled,

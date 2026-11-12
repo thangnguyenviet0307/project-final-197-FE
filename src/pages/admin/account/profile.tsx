@@ -83,39 +83,45 @@ export default function UserProfilePage() {
     resetPhoto,
   } = useAvatarUpload();
   const form = useForm<ProfileValues>({
-    resolver: zodResolver(current?.onboardingRequired ? onboardingProfileSchema : profileSchema),
+    resolver: zodResolver(
+      current?.onboardingRequired ? onboardingProfileSchema : profileSchema
+    ),
     defaultValues: valuesFromUser(current),
   });
   const { reset } = form;
   const dirty = form.formState.isDirty;
   const bio = useWatch({ control: form.control, name: 'bio' }) ?? '';
-  const personalEmail = useWatch({ control: form.control, name: 'personalEmail' }) ?? '';
+  const personalEmail =
+    useWatch({ control: form.control, name: 'personalEmail' }) ?? '';
   useEffect(() => {
     if (profile.data && !dirty) reset(valuesFromUser(profile.data));
   }, [profile.data, reset, dirty]);
 
-  const mutation = useUpdateProfile({
-    onSuccess: (saved) => {
-      reset(valuesFromUser(saved));
-      clearPhotoChanges();
-      setIsEditing(saved.onboardingRequired === true || sendingEmail.current);
+  const mutation = useUpdateProfile(
+    {
+      onSuccess: (saved) => {
+        reset(valuesFromUser(saved));
+        clearPhotoChanges();
+        setIsEditing(saved.onboardingRequired === true || sendingEmail.current);
+      },
+      onError: (error) => {
+        const failure = getApiError(error);
+        form.setError('root', { message: failure.message });
+        failure.errors?.forEach(({ field, message }) => {
+          if (
+            field === 'firstName' ||
+            field === 'lastName' ||
+            field === 'personalEmail' ||
+            field === 'phone' ||
+            field === 'location' ||
+            field === 'bio'
+          )
+            form.setError(field, { message });
+        });
+      },
     },
-    onError: (error) => {
-      const failure = getApiError(error);
-      form.setError('root', { message: failure.message });
-      failure.errors?.forEach(({ field, message }) => {
-        if (
-          field === 'firstName' ||
-          field === 'lastName' ||
-          field === 'personalEmail' ||
-          field === 'phone' ||
-          field === 'location' ||
-          field === 'bio'
-        )
-          form.setError(field, { message });
-      });
-    },
-  }, () => !sendingEmail.current);
+    () => !sendingEmail.current
+  );
 
   const beginEditing = () => {
     reset(valuesFromUser(current));
@@ -136,7 +142,11 @@ export default function UserProfilePage() {
       description="Xem và quản lý thông tin tài khoản cá nhân."
     >
       <div className="space-y-6 px-4 lg:px-6">
-        {current?.onboardingRequired && <p role="status" className="rounded-lg border p-4 text-sm">Hoàn tất hồ sơ và xác nhận email cá nhân để sử dụng hệ thống.</p>}
+        {current?.onboardingRequired && (
+          <p role="status" className="rounded-lg border p-4 text-sm">
+            Hoàn tất hồ sơ và xác nhận email cá nhân để sử dụng hệ thống.
+          </p>
+        )}
         {profile.isPending ? (
           <Card>
             <CardContent>
@@ -177,7 +187,10 @@ export default function UserProfilePage() {
                   mutation.mutate({ profile: values, avatar, removeAvatar });
                 })}
               >
-                <fieldset disabled={mutation.isPending} className="space-y-6 [&_input]:caret-current [&_textarea]:caret-current">
+                <fieldset
+                  disabled={mutation.isPending}
+                  className="space-y-6 [&_input]:caret-current [&_textarea]:caret-current"
+                >
                   <section className="space-y-3">
                     <div>
                       <h3 className="text-sm font-medium">Ảnh hồ sơ</h3>
@@ -242,7 +255,10 @@ export default function UserProfilePage() {
                         data-invalid={!!form.formState.errors[name]}
                       >
                         <FieldLabel htmlFor={`profile-${name}`}>
-                          {label}{(['firstName', 'lastName', 'personalEmail'].includes(name)) && <RequiredMark />}
+                          {label}
+                          {['firstName', 'lastName', 'personalEmail'].includes(
+                            name
+                          ) && <RequiredMark />}
                         </FieldLabel>
                         <Input
                           placeholder={
@@ -256,21 +272,41 @@ export default function UserProfilePage() {
                           }
                           id={`profile-${name}`}
                           type={type}
-                          required={['firstName', 'lastName', 'personalEmail'].includes(name)}
+                          required={[
+                            'firstName',
+                            'lastName',
+                            'personalEmail',
+                          ].includes(name)}
                           aria-invalid={!!form.formState.errors[name]}
                           {...form.register(name)}
                         />
                         <FieldError errors={[form.formState.errors[name]]} />
-                        {name === 'personalEmail' && <PersonalEmailVerification
-                          email={personalEmail}
-                          verified={current?.personalEmailVerified && personalEmail.trim().toLowerCase() === current.personalEmail}
-                          beforeSend={async () => {
-                            if (!(await form.trigger())) throw new Error('Vui lòng kiểm tra các trường thông tin hồ sơ.');
-                            sendingEmail.current = true;
-                            try { await mutation.mutateAsync({ profile: form.getValues(), avatar, removeAvatar }); }
-                            finally { sendingEmail.current = false; }
-                          }}
-                        />}
+                        {name === 'personalEmail' && (
+                          <PersonalEmailVerification
+                            email={personalEmail}
+                            verified={
+                              current?.personalEmailVerified &&
+                              personalEmail.trim().toLowerCase() ===
+                                current.personalEmail
+                            }
+                            beforeSend={async () => {
+                              if (!(await form.trigger()))
+                                throw new Error(
+                                  'Vui lòng kiểm tra các trường thông tin hồ sơ.'
+                                );
+                              sendingEmail.current = true;
+                              try {
+                                await mutation.mutateAsync({
+                                  profile: form.getValues(),
+                                  avatar,
+                                  removeAvatar,
+                                });
+                              } finally {
+                                sendingEmail.current = false;
+                              }
+                            }}
+                          />
+                        )}
                       </Field>
                     ))}
                     <Field>

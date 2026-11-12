@@ -347,7 +347,12 @@ export function WarrantyDetailPanel({
       </p>
       <p className="mt-3 text-sm">
         <span className="text-muted-foreground">Người tiếp nhận: </span>
-        <span className="font-medium">{detail.handlerName || (detail.handlerId ? 'Nhân viên cửa hàng' : 'Chưa có người tiếp nhận')}</span>
+        <span className="font-medium">
+          {detail.handlerName ||
+            (detail.handlerId
+              ? 'Nhân viên cửa hàng'
+              : 'Chưa có người tiếp nhận')}
+        </span>
       </p>
       {admin && (
         <div className="bg-muted/30 mt-4 rounded-lg p-3 text-sm">

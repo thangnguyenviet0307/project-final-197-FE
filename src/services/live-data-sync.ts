@@ -8,20 +8,29 @@ export function subscribeToLiveDataChanges() {
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let delay = 1000;
-  const current = () => !controller.signal.aborted &&
+  const current = () =>
+    !controller.signal.aborted &&
     useAuthStore.getState().sessionVersion === version;
 
   const connect = async () => {
     try {
       let token = useAuthStore.getState().accessToken;
       if (!token || !current()) return;
-      const request = () => fetch(api.getUri({ url: '/data-sync/events' }), {
-        headers: { Authorization: `Bearer ${token}`, 'X-Login-Area': 'admin', Accept: 'text/event-stream' },
-        credentials: 'include',
-        signal: controller.signal,
-      });
+      const request = () =>
+        fetch(api.getUri({ url: '/data-sync/events' }), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-Login-Area': 'admin',
+            Accept: 'text/event-stream',
+          },
+          credentials: 'include',
+          signal: controller.signal,
+        });
       let response = await request();
-      if (!current()) { await response.body?.cancel(); return; }
+      if (!current()) {
+        await response.body?.cancel();
+        return;
+      }
       if (response.status === 401) {
         await response.body?.cancel();
         token = await refreshAccessToken();
@@ -33,7 +42,11 @@ export function subscribeToLiveDataChanges() {
         await response.body?.cancel();
         return;
       }
-      if (!response.ok || !response.headers.get('content-type')?.includes('text/event-stream') || !response.body) {
+      if (
+        !response.ok ||
+        !response.headers.get('content-type')?.includes('text/event-stream') ||
+        !response.body
+      ) {
         await response.body?.cancel();
         throw new Error('Data sync unavailable');
       }
@@ -66,7 +79,9 @@ export function subscribeToLiveDataChanges() {
       // Temporary disconnects never clear authentication or navigate the page.
     }
     if (current()) {
-      timer = setTimeout(() => { void connect(); }, delay);
+      timer = setTimeout(() => {
+        void connect();
+      }, delay);
       delay = Math.min(delay * 2, 30_000);
     }
   };

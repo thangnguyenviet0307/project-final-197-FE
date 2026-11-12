@@ -21,10 +21,18 @@ import type { ProductReviewInput } from '@/features/products/types/products';
 import { useAuthStore } from '@/stores/auth.store';
 import { getApiError } from '@/services/api';
 
-export function ProductReviews({ id, readOnly = false }: { id: string; readOnly?: boolean }) {
+export function ProductReviews({
+  id,
+  readOnly = false,
+}: {
+  id: string;
+  readOnly?: boolean;
+}) {
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const admin = useAuthStore((state) => !readOnly && isAdministrator(state.user?.role));
+  const admin = useAuthStore(
+    (state) => !readOnly && isAdministrator(state.user?.role)
+  );
   const { metrics, reviews, create, remove } = useProductReviews(id, page);
   const form = useForm<ProductReviewInput>({
     resolver: zodResolver(productReviewSchema),
@@ -156,7 +164,9 @@ export function ProductReviews({ id, readOnly = false }: { id: string; readOnly?
             className="grid gap-4 sm:grid-cols-2"
           >
             <Field>
-              <FieldLabel required htmlFor="reviewerName">Người đánh giá</FieldLabel>
+              <FieldLabel required htmlFor="reviewerName">
+                Người đánh giá
+              </FieldLabel>
               <Input
                 placeholder="Nhập tên người đánh giá"
                 id="reviewerName"
@@ -168,7 +178,9 @@ export function ProductReviews({ id, readOnly = false }: { id: string; readOnly?
               <FieldError errors={[form.formState.errors.reviewerName]} />
             </Field>
             <Field>
-              <FieldLabel required htmlFor="rating">Số sao (1–5)</FieldLabel>
+              <FieldLabel required htmlFor="rating">
+                Số sao (1–5)
+              </FieldLabel>
               <Input
                 placeholder="Nhập tên người đánh giá"
                 id="rating"

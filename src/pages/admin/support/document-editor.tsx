@@ -1,4 +1,7 @@
-import { POLICY_SECTION_MAX_LENGTH, LONG_TEXT_MAX_LENGTH } from '@/constants/text-limits';
+import {
+  POLICY_SECTION_MAX_LENGTH,
+  LONG_TEXT_MAX_LENGTH,
+} from '@/constants/text-limits';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
@@ -39,7 +42,11 @@ function Editor({
   const navigation = useUnsavedForm(
     content !== baseline.content || mutation.isPending
   );
-  const maxLength = ['warranty', 'privacy', 'shipping', 'returns'].includes(initial.key) ? POLICY_SECTION_MAX_LENGTH : LONG_TEXT_MAX_LENGTH;
+  const maxLength = ['warranty', 'privacy', 'shipping', 'returns'].includes(
+    initial.key
+  )
+    ? POLICY_SECTION_MAX_LENGTH
+    : LONG_TEXT_MAX_LENGTH;
   async function save(publish: boolean) {
     const parsed = saveInformationSchema.safeParse({
       content,
@@ -106,7 +113,8 @@ function Editor({
         />
       )}
       <p className="text-muted-foreground text-sm">
-        {content.length.toLocaleString('vi-VN')}/{maxLength.toLocaleString('vi-VN')} ký tự, bao gồm định dạng.
+        {content.length.toLocaleString('vi-VN')}/
+        {maxLength.toLocaleString('vi-VN')} ký tự, bao gồm định dạng.
       </p>
       {error && (
         <p role="alert" className="text-destructive">

@@ -24,7 +24,9 @@ function CategoryBranch({
     (item) => item.parent === category._id && !ancestors.includes(item._id)
   );
 
-  const content = <CatalogOptionContent name={category.name} image={category.icon} />;
+  const content = (
+    <CatalogOptionContent name={category.name} image={category.icon} />
+  );
 
   return (
     <li

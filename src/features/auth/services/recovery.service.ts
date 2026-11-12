@@ -6,11 +6,16 @@ export async function sendRecoveryOtp(email: string) {
   await authApi.post('/customer-auth/send-otp', { email }, storefront);
 }
 export async function verifyRecoveryOtp(input: { email: string; otp: string }) {
-  const { data } = await authApi.post<ApiResponse<{ resetToken: string; expiresIn: number }>>(
-    '/customer-auth/verify-otp', input, storefront);
+  const { data } = await authApi.post<
+    ApiResponse<{ resetToken: string; expiresIn: number }>
+  >('/customer-auth/verify-otp', input, storefront);
   return data.data;
 }
-export async function resetRecoveredPassword(input: { email: string; resetToken: string; newPassword: string }) {
+export async function resetRecoveredPassword(input: {
+  email: string;
+  resetToken: string;
+  newPassword: string;
+}) {
   await authApi.post('/customer-auth/reset-password', input, storefront);
 }
 export async function sendPersonalEmailOtp() {

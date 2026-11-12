@@ -9,7 +9,11 @@ import { formatPrice } from '@/features/products/types/products';
 import { useEligibleWarrantyOrders } from '@/features/support/hooks/use-support';
 
 export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
-  const eligible = useEligibleWarrantyOrders(1, order._id, order.orderStatus === 4);
+  const eligible = useEligibleWarrantyOrders(
+    1,
+    order._id,
+    order.orderStatus === 4
+  );
   const quantity = order.orderItems.reduce(
     (total, item) => total + item.quantity,
     0

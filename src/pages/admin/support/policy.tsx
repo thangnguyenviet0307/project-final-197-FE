@@ -125,9 +125,12 @@ function PolicyEditor({
         .map((section) => (
           <div key={section.key}>
             <label htmlFor={section.key} className="font-semibold">
-              {section.title}<RequiredMark />
+              {section.title}
+              <RequiredMark />
             </label>
-            <p className="text-muted-foreground text-xs">Bắt buộc khi công bố; có thể để trống khi lưu bản nháp.</p>
+            <p className="text-muted-foreground text-xs">
+              Bắt buộc khi công bố; có thể để trống khi lưu bản nháp.
+            </p>
             <p
               id={`${section.key}-hint`}
               className="text-muted-foreground my-2 text-sm"
@@ -144,7 +147,8 @@ function PolicyEditor({
               }}
             />
             <p className="text-muted-foreground text-right text-xs">
-              {content[section.key].length.toLocaleString('vi-VN')}/{POLICY_SECTION_MAX_LENGTH.toLocaleString('vi-VN')}
+              {content[section.key].length.toLocaleString('vi-VN')}/
+              {POLICY_SECTION_MAX_LENGTH.toLocaleString('vi-VN')}
             </p>
           </div>
         ))}

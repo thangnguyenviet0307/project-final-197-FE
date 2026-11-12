@@ -114,8 +114,8 @@ export function SmartSearch() {
             {result.data.scope === 'catalog'
               ? 'Kết quả sắp xếp trên toàn bộ danh mục phù hợp'
               : result.data.semantic
-              ? 'Kết quả kết hợp từ khóa và ngữ nghĩa'
-              : 'Kết quả theo từ khóa'}
+                ? 'Kết quả kết hợp từ khóa và ngữ nghĩa'
+                : 'Kết quả theo từ khóa'}
           </p>
           {!result.data.rows.length && <p>Chưa tìm thấy sản phẩm phù hợp.</p>}
           <AiProducts products={result.data.rows} />

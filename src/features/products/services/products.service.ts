@@ -33,8 +33,14 @@ export async function createProduct(input: ProductInput): Promise<Product> {
   const { data } = await api.post<ApiResponse<Product>>('/products', input);
   return data.data;
 }
-export async function getProductBySlug(slug: string, signal?: AbortSignal): Promise<Product> {
-  const { data } = await api.get<ApiResponse<Product>>(`/products/by-slug/${encodeURIComponent(slug)}`, { signal });
+export async function getProductBySlug(
+  slug: string,
+  signal?: AbortSignal
+): Promise<Product> {
+  const { data } = await api.get<ApiResponse<Product>>(
+    `/products/by-slug/${encodeURIComponent(slug)}`,
+    { signal }
+  );
   return data.data;
 }
 export async function updateProduct({

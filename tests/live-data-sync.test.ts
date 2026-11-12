@@ -15,27 +15,43 @@ beforeEach(() => {
   useAuthStore.setState({ accessToken: 'test-access', sessionVersion: 10 });
 });
 afterEach(() => {
-  stop?.(); stop = undefined;
-  vi.useRealTimers(); vi.unstubAllGlobals(); vi.clearAllMocks();
+  stop?.();
+  stop = undefined;
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
 });
-const streamResponse = (...chunks: string[]) => new Response(new ReadableStream({
-  start(controller) {
-    for (const chunk of chunks) controller.enqueue(new TextEncoder().encode(chunk));
-    controller.close();
-  },
-}), { headers: { 'Content-Type': 'text/event-stream' } });
+const streamResponse = (...chunks: string[]) =>
+  new Response(
+    new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks)
+          controller.enqueue(new TextEncoder().encode(chunk));
+        controller.close();
+      },
+    }),
+    { headers: { 'Content-Type': 'text/event-stream' } }
+  );
 
 it('handles fragmented signals, ignores heartbeats and reconnects without navigation or query polling', async () => {
-  const request = vi.fn(async () => streamResponse(': keepalive\n\n', 'data: cha', 'nged\r\n\r\n'));
+  const request = vi.fn(async () =>
+    streamResponse(': keepalive\n\n', 'data: cha', 'nged\r\n\r\n')
+  );
   vi.stubGlobal('fetch', request);
   stop = subscribeToLiveDataChanges();
   await vi.advanceTimersByTimeAsync(0);
   expect(notifyBusinessChange).toHaveBeenCalledTimes(1);
   expect(request).toHaveBeenCalledTimes(1);
-  expect(request.mock.calls[0]).toEqual(expect.arrayContaining([
-    'http://localhost:5000/api/v1/data-sync/events',
-    expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer test-access' }) }),
-  ]));
+  expect(request.mock.calls[0]).toEqual(
+    expect.arrayContaining([
+      'http://localhost:5000/api/v1/data-sync/events',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-access',
+        }),
+      }),
+    ])
+  );
   await vi.advanceTimersByTimeAsync(1000);
   expect(request).toHaveBeenCalledTimes(2);
   await vi.advanceTimersByTimeAsync(1999);
@@ -48,14 +64,17 @@ it('handles fragmented signals, ignores heartbeats and reconnects without naviga
 });
 
 it('renews expired access through the shared auth flow and sends no token in the URL', async () => {
-  const request = vi.fn()
+  const request = vi
+    .fn()
     .mockResolvedValueOnce(new Response(null, { status: 401 }))
     .mockResolvedValueOnce(streamResponse('data: changed\n\n'));
   vi.stubGlobal('fetch', request);
   stop = subscribeToLiveDataChanges();
   await vi.advanceTimersByTimeAsync(0);
   expect(refreshAccessToken).toHaveBeenCalledTimes(1);
-  expect(request.mock.calls[1]?.[1].headers.Authorization).toBe('Bearer renewed-access');
+  expect(request.mock.calls[1]?.[1].headers.Authorization).toBe(
+    'Bearer renewed-access'
+  );
   expect(request.mock.calls[1]?.[0]).not.toContain('renewed-access');
   expect(notifyBusinessChange).toHaveBeenCalledTimes(1);
 });

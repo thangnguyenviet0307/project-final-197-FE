@@ -48,12 +48,16 @@ export function ProductUploadField({
     if (!files.length || !select) return;
     const variant = /^variants\.(\d+)\./.exec(name);
     files.forEach((file, index) => {
-      const path = index === 0 ? name : variant
-        ? `variants.${variant[1]}.images` as FieldPath<ProductFormValues>
-        : null;
+      const path =
+        index === 0
+          ? name
+          : variant
+            ? (`variants.${variant[1]}.images` as FieldPath<ProductFormValues>)
+            : null;
       select(`${key}-${index}`, path, file);
     });
-    return () => files.forEach((_, index) => select(`${key}-${index}`, null, null));
+    return () =>
+      files.forEach((_, index) => select(`${key}-${index}`, null, null));
   }, [files, key, name, select]);
   const stored = form.watch(name);
   return (
@@ -75,10 +79,16 @@ export function ProductUploadField({
             setError('Chọn tối đa 5 ảnh mỗi lần.');
             return;
           }
-          if (selected.some((file) =>
-            !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
-            !file.size || file.size > 5 * 1024 * 1024
-          )) {
+          if (
+            selected.some(
+              (file) =>
+                !['image/jpeg', 'image/png', 'image/webp'].includes(
+                  file.type
+                ) ||
+                !file.size ||
+                file.size > 5 * 1024 * 1024
+            )
+          ) {
             setError('Chọn ảnh JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh.');
             return;
           }
@@ -103,15 +113,29 @@ export function ProductUploadField({
           className="text-muted-foreground min-w-0 flex-1 text-sm break-all"
           aria-live="polite"
         >
-          {files.length ? files.map((file) => file.name).join(', ') : 'Chưa chọn ảnh'}
+          {files.length
+            ? files.map((file) => file.name).join(', ')
+            : 'Chưa chọn ảnh'}
         </span>
       </div>
       <p className="text-muted-foreground text-xs">
-        Chọn tối đa 5 ảnh mỗi lần, JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh. Ảnh đầu tiên làm ảnh chính; các ảnh còn lại vào thư viện. Ảnh được tải lên khi lưu sản phẩm.
+        Chọn tối đa 5 ảnh mỗi lần, JPG, PNG hoặc WebP, tối đa 5 MB mỗi ảnh. Ảnh
+        đầu tiên làm ảnh chính; các ảnh còn lại vào thư viện. Ảnh được tải lên
+        khi lưu sản phẩm.
       </p>
       <div className="flex flex-wrap gap-2">
-        {(previews.length ? previews : typeof stored === 'string' && stored ? [stored] : []).map((src, index) => (
-          <ProductImage key={`${src}-${index}`} src={src} alt={`${label} ${index + 1}`} className="size-20 border" />
+        {(previews.length
+          ? previews
+          : typeof stored === 'string' && stored
+            ? [stored]
+            : []
+        ).map((src, index) => (
+          <ProductImage
+            key={`${src}-${index}`}
+            src={src}
+            alt={`${label} ${index + 1}`}
+            className="size-20 border"
+          />
         ))}
       </div>
       {error && (
