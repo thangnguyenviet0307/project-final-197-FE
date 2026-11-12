@@ -2,6 +2,8 @@
 
 Read [PROJECT_RULES.md](docs/PROJECT_RULES.md) before making changes. It records the implemented business rules and pnpm verification commands.
 
+- Use pnpm exclusively (`pnpm.cmd` in PowerShell). Corepack should select the version declared by `packageManager` in `package.json`.
+- If Windows pnpm reports a broken launcher under the pnpm store, inspect `Get-Command pnpm.cmd -All` and back up the affected shims first. When the selected shim is under `$env:APPDATA\npm`, repair that location with `corepack.cmd enable --install-directory (Join-Path $env:APPDATA 'npm') pnpm`. Verify `pnpm.cmd --version`, `pnpm.cmd typecheck` and `pnpm.cmd test:contracts`. Do not change the project's pinned version or patch generated store launchers to work around a machine-level shim problem.
 - Keep project Markdown documentation under this repository's `docs/`; retain every `AGENTS.md` in its original location and update relative links when moving documents.
 
 ## 1. Project Overview
