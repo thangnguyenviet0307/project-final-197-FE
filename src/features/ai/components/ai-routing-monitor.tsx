@@ -1,3 +1,4 @@
+import type { AiRoutingRun } from '../types/ai-routing';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -69,15 +70,35 @@ export function AiRoutingMonitor() {
           </TableHeader>
           <TableBody>
             {runs.map((run) => {
-              const current = run.attempts.at(-1);
+              const attempts = run.attempts.reduce<AiRoutingRun['attempts']>(
+                (groups, attempt) => {
+                  const previous = groups.at(-1);
+                  if (
+                    previous?.provider === attempt.provider &&
+                    previous.model === attempt.model
+                  )
+                    groups[groups.length - 1] = {
+                      ...attempt,
+                      startedAt: previous.startedAt,
+                    };
+                  else groups.push({ ...attempt });
+                  return groups;
+                },
+                []
+              );
+              const current = attempts.at(-1);
               return (
                 <TableRow key={run._id}>
                   <TableCell>
                     <p>{new Date(run.updatedAt).toLocaleString('vi-VN')}</p>
                     <p className="text-muted-foreground text-xs">
-                      {run.stage === 'answer'
-                        ? 'Soạn câu trả lời'
-                        : 'Phân tích nhu cầu'}
+                      {run.kind === 'activation'
+                        ? 'Kiểm tra kết nối AI'
+                        : run.kind === 'chat'
+                          ? 'Hỏi đáp mua sắm'
+                          : run.stage === 'answer'
+                            ? 'Soạn câu trả lời'
+                            : 'Phân tích nhu cầu'}
                     </p>
                   </TableCell>
                   <TableCell>
@@ -97,7 +118,7 @@ export function AiRoutingMonitor() {
                   </TableCell>
                   <TableCell>
                     <ol className="space-y-1">
-                      {run.attempts.map((attempt, index) => (
+                      {attempts.map((attempt, index) => (
                         <li key={index} className="text-xs">
                           {index + 1}. {attempt.provider} / {attempt.model} —{' '}
                           {labels[attempt.status]}

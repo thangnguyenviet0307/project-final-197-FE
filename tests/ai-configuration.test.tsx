@@ -6,6 +6,7 @@ import {
   fireEvent,
   waitFor,
   cleanup,
+  act,
 } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
@@ -356,4 +357,34 @@ it('shows administrative names and roles and labels automatic worker actions', a
   expect(await screen.findByText('Nguyễn Văn A (Super Admin)')).toBeTruthy();
   expect(screen.getByText('Hệ thống (Tự động)')).toBeTruthy();
   expect(screen.queryByText('old-id')).toBeNull();
+});
+
+it('submits only one activation when confirmation is clicked twice in the same render', async () => {
+  let resolve!: (value: AiSettingsData) => void;
+  const pending = new Promise<AiSettingsData>((done) => {
+    resolve = done;
+  });
+  const activate = vi
+    .spyOn(aiSettingsService, 'activate')
+    .mockReturnValue(pending);
+  mount();
+  fireEvent.click(await screen.findByRole('button', { name: 'Kích hoạt AI' }));
+  const confirm = screen.getByRole('button', { name: 'Xác nhận kích hoạt' });
+  act(() => {
+    confirm.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    confirm.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+  expect(activate).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    resolve({
+      ...data,
+      revision: 2,
+      settings: { ...data.settings, enabled: true },
+    });
+  });
+  await waitFor(() =>
+    expect(
+      screen.queryByRole('button', { name: 'Xác nhận kích hoạt' })
+    ).toBeNull()
+  );
 });

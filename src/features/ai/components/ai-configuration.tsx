@@ -1,7 +1,7 @@
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { AiSettingsHistory } from './ai-settings-history';
 import { toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AiEmbeddingVersions } from './ai-embedding-versions';
 import { aiSettingsService } from '../services/ai-settings.service';
@@ -51,6 +51,7 @@ export function AiConfiguration({
     (AiFeatureSettings & { revision: number }) | null
   >(null);
   const [busy, setBusy] = useState(false);
+  const activationInFlight = useRef(false);
   const notifySuccess = (text: string) => {
     toast.success(text);
   };
@@ -146,7 +147,9 @@ export function AiConfiguration({
                       activationRevision !== data.revision
                     }
                     onClick={async () => {
-                      if (busy || !canManage) return;
+                      if (busy || !canManage || activationInFlight.current)
+                        return;
+                      activationInFlight.current = true;
                       setBusy(true);
 
                       try {
@@ -161,6 +164,7 @@ export function AiConfiguration({
                       } catch (failure) {
                         notifyFailure(failure);
                       } finally {
+                        activationInFlight.current = false;
                         setBusy(false);
                         void client.invalidateQueries({
                           queryKey: ['ai', 'admin'],

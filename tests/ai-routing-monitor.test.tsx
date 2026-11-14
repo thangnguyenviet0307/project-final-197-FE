@@ -63,3 +63,46 @@ it('shows an empty state when no provider operations have run', async () => {
     await screen.findByText('Chưa có hoạt động model được ghi nhận.')
   ).toBeTruthy();
 });
+
+it('renders one activation row and one model timeline entry for its JSON and streaming phases', async () => {
+  vi.spyOn(aiRoutingService, 'read').mockResolvedValue({
+    sampledAt: '2026-11-15T00:00:02Z',
+    runs: [
+      {
+        _id: 'activation-one',
+        kind: 'activation',
+        stage: 'answer',
+        status: 'completed',
+        createdAt: '2026-11-15T00:00:00Z',
+        updatedAt: '2026-11-15T00:00:02Z',
+        attempts: [
+          {
+            phase: 'intent',
+            provider: 'gemini',
+            model: 'gemini-one',
+            status: 'completed',
+            startedAt: '2026-11-15T00:00:00Z',
+            finishedAt: '2026-11-15T00:00:01Z',
+          },
+          {
+            phase: 'answer',
+            provider: 'gemini',
+            model: 'gemini-one',
+            status: 'completed',
+            startedAt: '2026-11-15T00:00:01Z',
+            finishedAt: '2026-11-15T00:00:02Z',
+          },
+        ],
+      },
+    ],
+  });
+  render(
+    <QueryClientProvider client={client}>
+      <AiRoutingMonitor />
+    </QueryClientProvider>
+  );
+  expect(await screen.findByText('Kiểm tra kết nối AI')).toBeTruthy();
+  expect(screen.getAllByRole('row')).toHaveLength(2);
+  expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  expect(screen.getByText('Đang xử lý trong danh sách: 0')).toBeTruthy();
+});
