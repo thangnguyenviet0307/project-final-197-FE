@@ -1,7 +1,7 @@
 export interface EmbeddingVersion {
   _id: string;
   connectionId: string;
-  provider: 'gemini' | 'openai';
+  provider: 'gemini' | 'openai' | 'cloudflare' | 'openrouter';
   model: string;
   dimensions: number;
   indexName: string;
@@ -29,6 +29,12 @@ export interface EmbeddingVersionsData {
   activeId: string | null;
   versions: EmbeddingVersion[];
   collection: string;
+  supportedModels?: {
+    provider: 'gemini' | 'cloudflare' | 'openrouter';
+    model: string;
+    dimensions: number[];
+    available: boolean;
+  }[];
 }
 export interface EmbeddingVersionInput {
   engine?: 'exact' | 'atlas';

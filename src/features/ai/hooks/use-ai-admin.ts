@@ -1,3 +1,4 @@
+import { aiRoutingService } from '../services/ai-routing.service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { aiService } from '../services/ai.service';
 export function useAiAdmin() {
@@ -9,7 +10,16 @@ export function useAiAdmin() {
   });
   const reindex = useMutation({
     mutationFn: aiService.reindex,
+    meta: { successMessage: 'Đã xếp lịch đồng bộ kiến thức AI.' },
     onSuccess: () => client.invalidateQueries({ queryKey: ['ai', 'admin'] }),
   });
   return { status, reindex };
+}
+
+export function useAiRoutingMonitor() {
+  return useQuery({
+    queryKey: ['ai', 'admin', 'routing-monitor'],
+    queryFn: aiRoutingService.read,
+    refetchInterval: 3000,
+  });
 }

@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
@@ -28,6 +29,7 @@ const actions: Record<string, string> = {
   'connection.updated': 'Sửa kết nối',
   'connection.deleted': 'Xóa kết nối',
   'connection.tested': 'Kiểm tra kết nối',
+  'settings.activated': 'Kiểm tra kết nối và kích hoạt AI',
   'settings.updated': 'Cập nhật vận hành',
   'embedding.created': 'Tạo phiên bản embeddings',
   'embedding.activated': 'Chuyển phiên bản embeddings',
@@ -37,6 +39,12 @@ const actions: Record<string, string> = {
   'embedding.delete': 'Xóa phiên bản embeddings',
 };
 
+const roles: Record<string, string> = {
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  staff: 'Staff',
+  system: 'Tự động',
+};
 const pageSize = 10;
 export function AiSettingsHistory({
   data,
@@ -49,23 +57,25 @@ export function AiSettingsHistory({
   const [requestedPage, setPage] = useState(1);
   const [confirmation, setConfirmation] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const totalPages = Math.max(1, Math.ceil(data.audit.length / pageSize));
   const page = Math.min(requestedPage, totalPages);
   const rows = data.audit.slice((page - 1) * pageSize, page * pageSize);
   async function clear() {
-    if (!canManage || busy || confirmation === null) return;
+    if (
+      !canManage ||
+      busy ||
+      confirmation === null ||
+      confirmation !== data.revision
+    )
+      return;
     setBusy(true);
-    setError('');
-    setMessage('');
     try {
       const result = await aiSettingsService.clearAudit(confirmation);
       client.setQueryData(['ai', 'admin', 'settings'], result);
       setPage(1);
-      setMessage('Đã xóa lịch sử thay đổi cấu hình.');
+      toast.success('Đã xóa lịch sử thay đổi cấu hình.');
     } catch (failure) {
-      setError(getApiError(failure).message);
+      toast.error(getApiError(failure).message);
       // A stale confirmation must never clear newly appended audit entries.
       await client
         .invalidateQueries({
@@ -95,8 +105,6 @@ export function AiSettingsHistory({
             disabled={busy || !data.audit.length}
             onClick={() => {
               setConfirmation(data.revision);
-              setError('');
-              setMessage('');
             }}
           >
             <Trash2 aria-hidden="true" />
@@ -119,7 +127,7 @@ export function AiSettingsHistory({
               <Button
                 type="button"
                 variant="destructive"
-                disabled={busy}
+                disabled={busy || confirmation !== data.revision}
                 onClick={() => void clear()}
               >
                 {busy ? 'Đang xóa…' : 'Xác nhận xóa lịch sử'}
@@ -134,16 +142,6 @@ export function AiSettingsHistory({
               </Button>
             </div>
           </div>
-        )}
-        {error && (
-          <p role="alert" className="text-destructive mb-3 text-sm">
-            {error}
-          </p>
-        )}
-        {message && (
-          <p role="status" className="mb-3 text-sm">
-            {message}
-          </p>
         )}
         <Table aria-label="Lịch sử cấu hình AI">
           <TableHeader>
@@ -161,7 +159,10 @@ export function AiSettingsHistory({
                 </TableCell>
                 <TableCell>{actions[entry.action] ?? entry.action}</TableCell>
                 <TableCell className="font-mono text-xs break-all">
-                  {entry.actor}
+                  {entry.actorName ?? entry.actor}
+                  {entry.actorRole
+                    ? ` (${roles[entry.actorRole] ?? entry.actorRole})`
+                    : ''}
                 </TableCell>
               </TableRow>
             ))}

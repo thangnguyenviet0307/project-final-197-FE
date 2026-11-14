@@ -6,17 +6,18 @@ import {
   fireEvent,
   waitFor,
   cleanup,
-  within,
-  act,
 } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
 import { aiSettingsService } from '@/features/ai/services/ai-settings.service';
 import type { AiSettingsData } from '@/features/ai/types/ai-settings';
+import { useAuthStore } from '@/stores/auth.store';
+import { toast } from 'sonner';
 
 let data: AiSettingsData;
 let client: QueryClient;
 beforeEach(() => {
+  setRole('super_admin');
   data = {
     revision: 1,
     source: 'database',
@@ -28,8 +29,6 @@ beforeEach(() => {
       semanticEnabled: false,
       indexingEnabled: false,
       riskEnabled: false,
-      dailyCalls: 100,
-      activeConnectionId: null,
     },
     connections: [
       {
@@ -54,313 +53,307 @@ beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 });
 afterEach(() => {
+  useAuthStore.setState({ user: null });
   cleanup();
   client.clear();
   vi.restoreAllMocks();
 });
-function mount(canManage = true) {
+function setRole(role: 'admin' | 'staff' | 'super_admin') {
+  useAuthStore.setState({
+    user: {
+      id: 'operator',
+      name: 'Operator',
+      firstName: 'AI',
+      lastName: 'Operator',
+      email: 'operator@example.test',
+      role,
+      mustChangePassword: false,
+    },
+  });
+}
+it('Super Admin confirms clearing only configuration audit and returns to page one', async () => {
+  setRole('super_admin');
+  data.audit = Array.from({ length: 12 }, (_, i) => ({
+    at: '2026-11-14T00:00:00Z',
+    actor: `clear-actor-${i}`,
+    action: 'settings.updated',
+  }));
+  const clear = vi
+    .spyOn(aiSettingsService, 'clearAudit')
+    .mockImplementation(async () => {
+      data = { ...data, revision: 2, audit: [] };
+      return data;
+    });
+  mount();
+  await screen.findByText('clear-actor-0');
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  expect(screen.getByText('clear-actor-10')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Xóa lịch sử' }));
+  expect(clear).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa lịch sử' }));
+  await waitFor(() => expect(clear).toHaveBeenCalledWith(1));
+  expect(
+    await screen.findByText('Chưa có thay đổi cấu hình trên web.')
+  ).toBeTruthy();
+  expect(
+    screen.queryByRole('navigation', { name: 'Phân trang lịch sử cấu hình AI' })
+  ).toBeNull();
+});
+it('Admin cannot see the clear-audit action', async () => {
+  setRole('admin');
+  data.audit = [
+    { at: '2026-11-14T00:00:00Z', actor: 'admin', action: 'settings.updated' },
+  ];
+  mount();
+  await screen.findByText('Cập nhật vận hành');
+  expect(screen.queryByRole('button', { name: 'Xóa lịch sử' })).toBeNull();
+});
+it('only Super Admin can confirm a quota-consuming activation', async () => {
+  const successToast = vi.spyOn(toast, 'success');
+  setRole('super_admin');
+  const activate = vi
+    .spyOn(aiSettingsService, 'activate')
+    .mockImplementation(async () => {
+      data = {
+        ...data,
+        revision: 2,
+        settings: { ...data.settings, enabled: true },
+      };
+      return data;
+    });
+  mount();
+  fireEvent.click(await screen.findByRole('button', { name: 'Kích hoạt AI' }));
+  expect(activate).not.toHaveBeenCalled();
+  expect(
+    screen.getByRole('group', { name: 'Xác nhận kích hoạt AI' })
+  ).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận kích hoạt' }));
+  await waitFor(() => expect(activate).toHaveBeenCalledWith(1));
+  await waitFor(() =>
+    expect(successToast).toHaveBeenCalledWith(
+      'Kết nối AI đã được kiểm tra thành công và trợ lý đã được bật.'
+    )
+  );
+  expect(
+    screen.queryByText(
+      'Kết nối AI đã được kiểm tra thành công và trợ lý đã được bật.'
+    )
+  ).toBeNull();
+  expect(screen.getByRole('button', { name: 'Kết nối lại AI' })).toBeTruthy();
+});
+it('does not show the activation action to Admin and honors emergency stop', async () => {
+  setRole('admin');
+  const view = render(
+    <QueryClientProvider client={client}>
+      <AiConfiguration
+        canManage={useAuthStore.getState().user?.role === 'super_admin'}
+      />
+    </QueryClientProvider>
+  );
+  await screen.findByText('Vận hành AI');
+  expect(screen.queryByRole('button', { name: 'Kích hoạt AI' })).toBeNull();
+  view.unmount();
+  setRole('super_admin');
+  data.emergencyDisabled = true;
+  client.clear();
+  mount();
+  expect(
+    (
+      (await screen.findByRole('button', {
+        name: 'Kích hoạt AI',
+      })) as HTMLButtonElement
+    ).disabled
+  ).toBe(true);
+});
+function mount() {
   render(
     <QueryClientProvider client={client}>
-      <AiConfiguration canManage={canManage} />
+      <AiConfiguration
+        canManage={useAuthStore.getState().user?.role === 'super_admin'}
+      />
     </QueryClientProvider>
   );
 }
 
-it('viewers can read configuration but cannot submit operating changes', async () => {
-  const save = vi.spyOn(aiSettingsService, 'save');
-  mount(false);
-  const add = await screen.findByRole('button', { name: 'Thêm kết nối' });
-  expect((add.closest('fieldset') as HTMLFieldSetElement).disabled).toBe(true);
-  const submit = screen.getByRole('button', { name: 'Lưu vận hành' });
-  fireEvent.submit(submit.closest('form')!);
-  expect(save).not.toHaveBeenCalled();
-  expect(screen.getByText('Gemini chính')).toBeTruthy();
-});
-
-it('adds a model/key through the real service contract and clears the credential input after saving', async () => {
-  const save = vi
-    .spyOn(aiSettingsService, 'connection')
-    .mockImplementation(async () => ({ ...data, revision: 2 }));
+it('shows automatic routing without any credential editor or model selection', async () => {
+  data.routing = [
+    { provider: 'gemini', model: 'gemini-test', priority: 1, retryAt: null },
+    {
+      provider: 'groq',
+      model: 'llama-test',
+      priority: 2,
+      retryAt: '2026-11-14T12:00:00Z',
+    },
+  ];
   mount();
-  fireEvent.click(await screen.findByRole('button', { name: 'Thêm kết nối' }));
-  fireEvent.change(screen.getByLabelText('Tên kết nối'), {
-    target: { value: 'Dự phòng' },
-  });
-  fireEvent.change(screen.getByLabelText('API key'), {
-    target: { value: 'new-secret-gemini-key' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: 'Lưu kết nối' }));
-  await waitFor(() =>
-    expect(save).toHaveBeenCalledWith(
-      {
-        revision: 1,
-        name: 'Dự phòng',
-        provider: 'gemini',
-        model: 'gemini-3.1-flash-lite',
-        apiKey: 'new-secret-gemini-key',
-      },
-      undefined
-    )
-  );
-  await waitFor(() => expect(screen.queryByLabelText('API key')).toBeNull());
-  expect(document.body.textContent).not.toContain('new-secret-gemini-key');
-  expect(client.getMutationCache().getAll()).toHaveLength(0);
-});
-
-it('asks before consuming test quota, then allows activation only after success', async () => {
-  const test = vi.spyOn(aiSettingsService, 'test').mockResolvedValue({
-    ...data,
-    revision: 2,
-    connections: [{ ...data.connections[0]!, checkedOk: true }],
-  });
-  const save = vi
-    .spyOn(aiSettingsService, 'save')
-    .mockResolvedValue({ ...data, revision: 3 });
-  mount();
-  expect(await screen.findByText('••••1234')).toBeTruthy();
+  expect(await screen.findByText('Google Gemini')).toBeTruthy();
+  expect(screen.getByText('gemini-test')).toBeTruthy();
+  expect(screen.getByText('Groq')).toBeTruthy();
+  expect(screen.getByText('llama-test')).toBeTruthy();
+  expect(screen.getByText('Tự động chuyển mô hình AI')).toBeTruthy();
   expect(
-    (screen.getByRole('button', { name: 'Kích hoạt' }) as HTMLButtonElement)
-      .disabled
-  ).toBe(true);
-  fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }));
-  expect(test).not.toHaveBeenCalled();
-  expect(screen.getByText(/tối đa 2 lượt API/)).toBeTruthy();
-  fireEvent.click(screen.getByRole('button', { name: 'Chạy kiểm tra' }));
-  await waitFor(() =>
-    expect(test).toHaveBeenCalledWith(data.connections[0]!.id, 1)
-  );
-  await waitFor(() =>
-    expect(
-      (screen.getByRole('button', { name: 'Kích hoạt' }) as HTMLButtonElement)
-        .disabled
-    ).toBe(false)
-  );
-  fireEvent.click(screen.getByRole('button', { name: 'Kích hoạt' }));
-  await waitFor(() =>
-    expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        activeConnectionId: data.connections[0]!.id,
-        enabled: true,
-        revision: 2,
-      })
-    )
-  );
-});
-
-it('deletes keys only after inline confirmation and does not use browser popups', async () => {
-  const popup = vi.spyOn(window, 'confirm');
-  const remove = vi
-    .spyOn(aiSettingsService, 'remove')
-    .mockResolvedValue({ ...data, revision: 2, connections: [] });
-  mount();
-  fireEvent.click(await screen.findByRole('button', { name: 'Xóa' }));
-  expect(remove).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa' }));
-  await waitFor(() =>
-    expect(remove).toHaveBeenCalledWith(data.connections[0]!.id, 1)
-  );
-  expect(popup).not.toHaveBeenCalled();
-  expect(
-    await screen.findByText('Chưa có kết nối được lưu trên web.')
+    screen.getByRole('switch', { name: 'Tự động đồng bộ kiến thức' })
   ).toBeTruthy();
+  expect(screen.getByText('Tạm chờ')).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Thêm kết nối' })).toBeNull();
+  expect(screen.queryByLabelText('API key')).toBeNull();
+  expect(screen.queryByLabelText('Kết nối đang chọn')).toBeNull();
+  expect(document.body.textContent).not.toContain('?');
 });
-
-it('saves feature switches and daily limits to the backend', async () => {
+it('shows all four providers with honest missing configuration statuses', async () => {
+  data.routing = [
+    {
+      provider: 'gemini',
+      model: 'gemini-test',
+      priority: 1,
+      state: 'ready',
+      retryAt: null,
+    },
+    {
+      provider: 'groq',
+      model: 'llama-test',
+      priority: null,
+      state: 'missing_key',
+      retryAt: null,
+    },
+    {
+      provider: 'openrouter',
+      model: 'openrouter/free',
+      priority: null,
+      state: 'excluded',
+      retryAt: null,
+    },
+    {
+      provider: 'cloudflare',
+      model: '@cf/test',
+      priority: null,
+      state: 'missing_account',
+      retryAt: null,
+    },
+  ];
+  mount();
+  await screen.findByText('Google Gemini');
+  for (const name of ['Groq', 'OpenRouter', 'Cloudflare Workers AI'])
+    expect(screen.getByText(name)).toBeTruthy();
+  expect(screen.getByText('Chưa cấu hình khóa API')).toBeTruthy();
+  expect(screen.getByText('Thiếu mã tài khoản Cloudflare')).toBeTruthy();
+  expect(screen.getByText('Không nằm trong thứ tự ưu tiên')).toBeTruthy();
+});
+it('saves operating flags without selecting a connection or persisting keys', async () => {
+  const successToast = vi.spyOn(toast, 'success');
   const save = vi
     .spyOn(aiSettingsService, 'save')
     .mockResolvedValue({ ...data, revision: 2 });
   mount();
-  await screen.findByText('Điều khiển vận hành');
-  fireEvent.click(screen.getByRole('switch', { name: 'Theo dõi rủi ro' }));
-  fireEvent.change(screen.getByLabelText('Giới hạn lượt gọi / ngày UTC'), {
-    target: { value: '75' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: 'Lưu vận hành' }));
+  fireEvent.click(await screen.findByRole('switch', { name: 'Bật trợ lý AI' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu cấu hình' }));
   await waitFor(() =>
-    expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        riskEnabled: true,
-        dailyCalls: 75,
-        revision: 1,
-      })
+    expect(save).toHaveBeenCalledWith({
+      ...data.settings,
+      revision: 1,
+      enabled: true,
+    })
+  );
+  await waitFor(() =>
+    expect(successToast).toHaveBeenCalledExactlyOnceWith(
+      'Đã lưu cấu hình vận hành.'
     )
   );
+  expect(screen.queryByText('Đã lưu cấu hình vận hành.')).toBeNull();
+});
+it('shows one error toast when saving fails without an inline error banner', async () => {
+  const errorToast = vi.spyOn(toast, 'error');
+  vi.spyOn(aiSettingsService, 'save').mockRejectedValue(
+    new Error('Save failed')
+  );
+  mount();
+  fireEvent.click(await screen.findByRole('button', { name: 'Lưu cấu hình' }));
+  await waitFor(() => expect(errorToast).toHaveBeenCalledTimes(1));
+  expect(screen.queryByRole('alert')).toBeNull();
+});
+it('blocks enabling semantic search before activation without blocking chat enablement', async () => {
+  data.semanticReady = false;
+  mount();
+  const semantic = await screen.findByRole('switch', {
+    name: 'Tìm kiếm ngữ nghĩa',
+  });
+  expect(semantic.hasAttribute('data-disabled')).toBe(true);
+  expect(screen.getAllByRole('switch')[0].hasAttribute('data-disabled')).toBe(
+    false
+  );
+  expect(screen.getByText(/Bạn vẫn có thể bật trợ lý AI/)).toBeTruthy();
+});
+it('allows disabling a stale semantic setting even without a ready generation', async () => {
+  data.semanticReady = false;
+  data.settings.semanticEnabled = true;
+  mount();
+  const semantic = await screen.findByRole('switch', {
+    name: 'Tìm kiếm ngữ nghĩa',
+  });
+  expect(semantic.hasAttribute('data-disabled')).toBe(false);
+  fireEvent.click(semantic);
+  expect(semantic.hasAttribute('data-disabled')).toBe(true);
+});
+it('keeps configuration audit pagination independent of operating changes', async () => {
+  data.audit = Array.from({ length: 12 }, (_, i) => ({
+    at: '2026-11-14T00:00:00Z',
+    actor: `actor-${i}`,
+    action: 'settings.updated',
+  }));
+  mount();
+  await screen.findByText('actor-0');
+  expect(screen.queryByText('actor-10')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  expect(screen.getByText('actor-10')).toBeTruthy();
+  expect(screen.queryByText('actor-0')).toBeNull();
 });
 
-it('prevents writing credentials when the server wrapping key is missing', async () => {
-  data.encryptionReady = false;
-  mount();
-  expect(
-    await screen.findByText(/chưa có AI_CONFIG_ENCRYPTION_KEY/)
-  ).toBeTruthy();
-  expect(
-    (screen.getByRole('button', { name: 'Thêm kết nối' }) as HTMLButtonElement)
-      .disabled
-  ).toBe(true);
-});
-it('imports the existing environment connection without asking the browser to resend its key', async () => {
-  data.source = 'environment';
-  data.connections = [];
-  const initialize = vi
-    .spyOn(aiSettingsService, 'initialize')
-    .mockResolvedValue({ ...data, source: 'database', revision: 1 });
-  mount();
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'Nhập cấu hình hiện tại' })
-  );
-  await waitFor(() => expect(initialize).toHaveBeenCalledWith(1));
-  expect(await screen.findByText('Đã nhập cấu hình môi trường.')).toBeTruthy();
-});
-it('selects OpenAI with a fresh credential and provider-specific model suggestions', async () => {
-  data.providerModels = {
-    gemini: ['gemini-3.1-flash-lite'],
-    openai: ['gpt-4.1-mini'],
-    xai: ['grok-4.7'],
-  };
-  const save = vi
-    .spyOn(aiSettingsService, 'connection')
-    .mockResolvedValue({ ...data, revision: 2 });
-  mount();
-  fireEvent.click(await screen.findByRole('button', { name: 'Thêm kết nối' }));
-  fireEvent.change(screen.getByLabelText('Tên kết nối'), {
-    target: { value: 'GPT chính' },
-  });
-  fireEvent.change(screen.getByLabelText('API key'), {
-    target: { value: 'old-gemini-credential' },
-  });
-  fireEvent.change(screen.getByLabelText('Nhà cung cấp'), {
-    target: { value: 'openai' },
-  });
-  expect((screen.getByLabelText('API key') as HTMLInputElement).value).toBe('');
-  expect(
-    (screen.getByLabelText('Model trả lời') as HTMLInputElement).value
-  ).toBe('gpt-4.1-mini');
-  fireEvent.change(screen.getByLabelText('API key'), {
-    target: { value: 'new-openai-credential' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: 'Lưu kết nối' }));
-  await waitFor(() =>
-    expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        provider: 'openai',
-        model: 'gpt-4.1-mini',
-        apiKey: 'new-openai-credential',
-      }),
-      undefined
-    )
-  );
-});
-
-it.each([true, false])(
-  'paginates configuration history without disabling navigation for viewers (manage=%s)',
-  async (canManage) => {
-    data.audit = Array.from({ length: 25 }, (_, index) => ({
+it.each(['admin', 'staff'] as const)(
+  'keeps %s read-only while audit pagination remains usable',
+  async (role) => {
+    const save = vi.spyOn(aiSettingsService, 'save');
+    const activate = vi.spyOn(aiSettingsService, 'activate');
+    data.audit = Array.from({ length: 12 }, (_, i) => ({
+      at: '2026-11-14T00:00:00Z',
+      actor: `viewer-${i}`,
       action: 'settings.updated',
-      actor: `actor-${index}`,
-      at: new Date(2026, 0, 1, 0, 0, index).toISOString(),
     }));
-    mount(canManage);
-    const history = within(
-      await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
+    setRole(role);
+    mount();
+    await screen.findByText('viewer-0');
+    const submit = screen.getByRole('button', { name: 'Lưu cấu hình' });
+    expect((submit.closest('fieldset') as HTMLFieldSetElement).disabled).toBe(
+      true
     );
-    expect(history.getAllByRole('row')).toHaveLength(11);
-    expect(history.getByText('actor-0')).toBeTruthy();
-    const last = history.getByRole('button', {
-      name: 'Trang cuối',
-    }) as HTMLButtonElement;
-    expect(last.disabled).toBe(false);
-    expect(last.closest('fieldset')).toBeNull();
-    fireEvent.click(last);
-    expect(history.getByText('Trang 3 / 3')).toBeTruthy();
-    expect(history.getAllByRole('row')).toHaveLength(6);
-    expect(history.getByText('actor-24')).toBeTruthy();
-    expect(history.queryByText('actor-0')).toBeNull();
-    fireEvent.click(history.getByRole('button', { name: 'Trang đầu' }));
-    expect(history.getByText('actor-0')).toBeTruthy();
-    if (!canManage)
-      expect(history.queryByRole('button', { name: 'Xóa lịch sử' })).toBeNull();
+    fireEvent.submit(submit.closest('form')!);
+    expect(save).not.toHaveBeenCalled();
+    expect(activate).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Kích hoạt AI' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Xóa lịch sử' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+    expect(screen.getByText('viewer-10')).toBeTruthy();
   }
 );
 
-it('confirms clearing history and resets pagination after success without changing settings', async () => {
-  data.audit = Array.from({ length: 11 }, (_, index) => ({
-    action: 'settings.updated',
-    actor: `actor-${index}`,
-    at: new Date().toISOString(),
-  }));
-  const cleared = { ...data, revision: 2, audit: [] };
-  const clear = vi
-    .spyOn(aiSettingsService, 'clearAudit')
-    .mockResolvedValue(cleared);
-  mount();
-  const history = within(
-    await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
-  );
-  fireEvent.click(history.getByRole('button', { name: 'Trang cuối' }));
-  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
-  expect(clear).not.toHaveBeenCalled();
-  fireEvent.click(history.getByRole('button', { name: 'Hủy' }));
-  expect(clear).not.toHaveBeenCalled();
-  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
-  fireEvent.click(
-    history.getByRole('button', { name: 'Xác nhận xóa lịch sử' })
-  );
-  await waitFor(() => expect(clear).toHaveBeenCalledWith(1));
-  expect(
-    await history.findByText('Chưa có thay đổi cấu hình trên web.')
-  ).toBeTruthy();
-  expect(history.queryByRole('navigation')).toBeNull();
-  expect(
-    (history.getByRole('button', { name: 'Xóa lịch sử' }) as HTMLButtonElement)
-      .disabled
-  ).toBe(true);
-  expect(client.getQueryData(['ai', 'admin', 'settings'])).toMatchObject({
-    settings: data.settings,
-    connections: data.connections,
-    audit: [],
-  });
-});
-
-it('keeps the confirmed revision and retains new history after a stale deletion is rejected', async () => {
+it('shows administrative names and roles and labels automatic worker actions', async () => {
   data.audit = [
     {
+      at: '2026-11-15T00:00:00Z',
+      actor: 'old-id',
+      actorName: 'Nguyễn Văn A',
+      actorRole: 'super_admin',
       action: 'settings.updated',
-      actor: 'original',
-      at: new Date().toISOString(),
+    },
+    {
+      at: '2026-11-15T00:00:01Z',
+      actor: 'worker',
+      actorName: 'Hệ thống',
+      actorRole: 'system',
+      action: 'embedding.created',
     },
   ];
-  const clear = vi
-    .spyOn(aiSettingsService, 'clearAudit')
-    .mockRejectedValue(new Error('Configuration changed. Reload.'));
   mount();
-  const history = within(
-    await screen.findByRole('region', { name: 'Lịch sử thay đổi cấu hình' })
-  );
-  fireEvent.click(history.getByRole('button', { name: 'Xóa lịch sử' }));
-  data = {
-    ...data,
-    revision: 2,
-    audit: [
-      {
-        action: 'connection.tested',
-        actor: 'new-entry',
-        at: new Date().toISOString(),
-      },
-      ...data.audit,
-    ],
-  };
-  await act(async () => {
-    client.setQueryData(['ai', 'admin', 'settings'], data);
-  });
-  fireEvent.click(
-    history.getByRole('button', { name: 'Xác nhận xóa lịch sử' })
-  );
-  await waitFor(() => expect(clear).toHaveBeenCalledWith(1));
-  expect(await history.findByText('new-entry')).toBeTruthy();
-  await waitFor(() =>
-    expect(
-      history.queryByRole('group', { name: 'Xác nhận xóa lịch sử' })
-    ).toBeNull()
-  );
-  expect(history.getByRole('alert')).toBeTruthy();
+  expect(await screen.findByText('Nguyễn Văn A (Super Admin)')).toBeTruthy();
+  expect(screen.getByText('Hệ thống (Tự động)')).toBeTruthy();
+  expect(screen.queryByText('old-id')).toBeNull();
 });

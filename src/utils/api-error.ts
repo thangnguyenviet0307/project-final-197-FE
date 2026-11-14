@@ -4,6 +4,186 @@ import type { ApiError } from '@/types/api';
 
 const localizedMessages: Array<[RegExp, string]> = [
   [
+    new RegExp(
+      '^Embedding\\ model,\\ provider\\ and\\ dimensions\\ do\\ not\\ match$',
+      'i'
+    ),
+    'Model embedding, nhà cung cấp và số chiều vector không tương thích.',
+  ],
+  [
+    new RegExp(
+      '^Enable\\ the\\ AI\\ assistant\\ before\\ starting\\ synchronization$',
+      'i'
+    ),
+    'Vui lòng bật trợ lý AI trước khi bắt đầu đồng bộ kiến thức.',
+  ],
+  [
+    new RegExp(
+      '^Configure\\ the\\ selected\\ embedding\\ provider\\ on\\ the\\ server$',
+      'i'
+    ),
+    'Vui lòng cấu hình khóa API của nhà cung cấp embedding đã chọn trên máy chủ.',
+  ],
+  [
+    new RegExp(
+      '^Embedding\\ connection\\ and\\ model\\ provider\\ do\\ not\\ match$',
+      'i'
+    ),
+    'Kết nối embedding không thuộc nhà cung cấp của model đã chọn.',
+  ],
+  [
+    new RegExp(
+      '^Maximum\\ 20\\ embedding\\ versions\\.\\ Delete\\ unused\\ versions\\ first\\.$',
+      'i'
+    ),
+    'Chỉ được lưu tối đa 20 phiên bản embedding. Vui lòng xóa phiên bản không còn sử dụng trước.',
+  ],
+  [
+    new RegExp(
+      '^AI\\ configuration\\ changed\\.\\ Reload\\ before\\ saving\\.$',
+      'i'
+    ),
+    'Cấu hình AI đã thay đổi. Vui lòng tải lại trang trước khi lưu.',
+  ],
+  [
+    new RegExp(
+      '^A\\ supported\\ environment\\ embedding\\ connection\\ is\\ required$',
+      'i'
+    ),
+    'Chưa có kết nối embedding hợp lệ. Vui lòng kiểm tra model và khóa API của nhà cung cấp trên máy chủ.',
+  ],
+  [
+    new RegExp('^Embedding\\ version\\ is\\ not\\ ready$', 'i'),
+    'Phiên bản embedding chưa sẵn sàng để sử dụng.',
+  ],
+  [
+    new RegExp(
+      '^Vector\\ index\\ is\\ not\\ ready\\ or\\ has\\ an\\ incompatible\\ definition$',
+      'i'
+    ),
+    'Chỉ mục vector chưa sẵn sàng hoặc có cấu hình không tương thích.',
+  ],
+  [
+    new RegExp(
+      '^The\\ physical\\ vector\\ index\\ changed\\.\\ Rebuild\\ this\\ version\\ before\\ activation\\.$',
+      'i'
+    ),
+    'Chỉ mục vector đã thay đổi. Vui lòng tạo lại dữ liệu của phiên bản trước khi kích hoạt.',
+  ],
+  [
+    new RegExp('^Embedding\\ version\\ changed$', 'i'),
+    'Phiên bản embedding đã thay đổi. Vui lòng tải lại trang và thử lại.',
+  ],
+  [
+    new RegExp(
+      '^AI\\ configuration\\ changed\\.\\ Reload\\ before\\ switching\\.$',
+      'i'
+    ),
+    'Cấu hình AI đã thay đổi. Vui lòng tải lại trang trước khi chuyển phiên bản.',
+  ],
+  [
+    new RegExp(
+      '^Switch\\ away\\ from\\ the\\ active\\ embedding\\ version\\ first$',
+      'i'
+    ),
+    'Vui lòng ngừng sử dụng hoặc chuyển sang phiên bản khác trước khi thực hiện thao tác này.',
+  ],
+  [
+    new RegExp('^Embedding\\ version\\ not\\ found$', 'i'),
+    'Không tìm thấy phiên bản embedding.',
+  ],
+  [
+    new RegExp('^Only\\ terminal\\ versions\\ can\\ be\\ retried$', 'i'),
+    'Chỉ có thể thử lại phiên bản đã hoàn tất, thất bại hoặc bị hủy.',
+  ],
+  [
+    new RegExp('^This\\ version\\ is\\ not\\ running$', 'i'),
+    'Phiên bản này không có tác vụ đang chạy để hủy.',
+  ],
+  [
+    new RegExp(
+      '^Cancel\\ pending\\ work,\\ and\\ wait\\ five\\ minutes\\ after\\ deactivation\\ before\\ deletion$',
+      'i'
+    ),
+    'Hãy hủy tác vụ đang chờ và đợi ít nhất 5 phút sau khi ngừng sử dụng phiên bản trước khi xóa.',
+  ],
+  [
+    new RegExp(
+      '^Configure\\ AI\\ providers\\ in\\ the\\ server\\ environment\\ first$',
+      'i'
+    ),
+    'Vui lòng cấu hình nhà cung cấp và khóa API của AI trên máy chủ trước.',
+  ],
+  [
+    new RegExp(
+      '^Indexing\\ requires\\ an\\ environment\\ embedding\\ provider$',
+      'i'
+    ),
+    'Vui lòng cấu hình ít nhất một nhà cung cấp embedding trên máy chủ để đồng bộ kiến thức.',
+  ],
+  [
+    new RegExp(
+      '^Enable\\ AI\\ and\\ knowledge\\ indexing\\ before\\ synchronizing$',
+      'i'
+    ),
+    'Vui lòng bật trợ lý AI và tự động đồng bộ kiến thức trước khi yêu cầu đồng bộ.',
+  ],
+  [
+    new RegExp('^AI\\ configuration\\ database\\ is\\ unavailable$', 'i'),
+    'Hiện không thể kết nối cơ sở dữ liệu cấu hình AI. Vui lòng thử lại sau.',
+  ],
+  [
+    new RegExp('^Active\\ embedding\\ generation\\ is\\ unavailable$', 'i'),
+    'Không tìm thấy phiên bản embedding đang sử dụng hoặc phiên bản chưa sẵn sàng. Vui lòng kiểm tra trong phần Đồng bộ kiến thức.',
+  ],
+  [
+    new RegExp('^AI\\ identity\\ is\\ not\\ configured$', 'i'),
+    'Chưa cấu hình xác thực phiên AI trên máy chủ. Vui lòng liên hệ quản trị viên.',
+  ],
+  [
+    new RegExp('^Customer\\ session\\ required$', 'i'),
+    'Vui lòng đăng nhập tài khoản khách hàng để tiếp tục.',
+  ],
+  [
+    new RegExp('^Customer\\ session\\ expired$', 'i'),
+    'Phiên đăng nhập của khách hàng đã hết hạn. Vui lòng đăng nhập lại.',
+  ],
+  [
+    new RegExp('^Conversation\\ not\\ found$', 'i'),
+    'Không tìm thấy hội thoại.',
+  ],
+  [
+    new RegExp('^Request\\ ID\\ belongs\\ to\\ different\\ content$', 'i'),
+    'Mã yêu cầu đã được dùng cho nội dung khác.',
+  ],
+  [new RegExp('^Conversation\\ ended$', 'i'), 'Hội thoại đã kết thúc.'],
+  [
+    new RegExp('^Turn\\ changed;\\ reload\\ history$', 'i'),
+    'Lượt trả lời đã thay đổi. Vui lòng tải lại lịch sử hội thoại.',
+  ],
+  [
+    new RegExp(
+      '^AI\\ configuration\\ encryption\\ is\\ not\\ configured$',
+      'i'
+    ),
+    'Chưa cấu hình mã hóa thông tin kết nối AI trên máy chủ.',
+  ],
+  [
+    new RegExp('^AI\\ credential\\ could\\ not\\ be\\ decrypted$', 'i'),
+    'Không thể đọc thông tin xác thực AI đã lưu. Vui lòng kiểm tra cấu hình máy chủ.',
+  ],
+  [
+    new RegExp(
+      '^Embedding\\ model\\ and\\ dimensions\\ do\\ not\\ match$',
+      'i'
+    ),
+    'Model embedding và số chiều vector không tương thích.',
+  ],
+  [
+    new RegExp('^Cancellation\\ response\\ mismatch$', 'i'),
+    'Chưa xác nhận được việc dừng trả lời. Vui lòng tải lại lịch sử hội thoại để kiểm tra.',
+  ],
+  [
     /^Product price changed; refresh and review before ordering$/i,
     'Giá sản phẩm đã thay đổi. Vui lòng cập nhật giá và tồn kho để xem lại trước khi đặt hàng.',
   ],
@@ -208,6 +388,13 @@ function validationLabel(field: string, url = ''): string {
     logoUrl: 'Ảnh thương hiệu',
     role: 'Vai trò',
     expectedVersion: 'Phiên bản sản phẩm',
+    revision: 'Phiên bản cấu hình',
+    connectionId: 'Kết nối embedding',
+    generationId: 'Phiên bản embedding',
+    dimensions: 'Số chiều vector',
+    model: 'Model AI',
+    engine: 'Cách tìm kiếm ngữ nghĩa',
+    confirm: 'Xác nhận thao tác',
     isActive: 'Trạng thái',
     is_active: 'Trạng thái',
     active: 'Trạng thái',
@@ -255,6 +442,9 @@ function validationMessage(message: string, label: string): string {
     return `${label} phải là số nguyên.`;
   if (/^Invalid input: expected number\b/i.test(message))
     return `Vui lòng nhập số hợp lệ cho ${label.toLowerCase()}.`;
+  if (/^Invalid UUID$/i.test(message)) return `${label} không hợp lệ.`;
+  if (/^Unrecognized keys?:/i.test(message))
+    return 'Yêu cầu có trường thông tin không được hỗ trợ.';
   if (/^Invalid option:/i.test(message))
     return `Vui lòng chọn ${label.toLowerCase()} hợp lệ.`;
   if (/^Invalid (input|type|string)(:|$)/i.test(message))
@@ -356,7 +546,7 @@ export function getApiError(error: unknown): ApiError {
           message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
         };
       default:
-        return { statusCode: 0, message: error.message };
+        return { statusCode: 0, message: translateIssueMessage(error.message) };
     }
   }
 

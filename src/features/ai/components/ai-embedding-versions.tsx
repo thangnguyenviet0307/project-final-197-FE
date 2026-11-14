@@ -1,5 +1,6 @@
 import { LoadingSkeleton } from '@/components/loading-skeleton';
-import { useState } from 'react';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Database, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,10 +29,6 @@ import type {
   EmbeddingVersionsData,
 } from '../types/ai-embeddings';
 
-const models = {
-  gemini: ['gemini-embedding-001', 'gemini-embedding-2'],
-  openai: ['text-embedding-3-small', 'text-embedding-3-large'],
-};
 const labels = {
   queued: 'Đang chờ',
   building: 'Đang tạo embeddings',
@@ -48,9 +45,9 @@ const failureDescriptions: Record<string, string> = {
   AI_VECTOR_INDEX_PENDING:
     'Đang chờ index tạo xong hoặc dữ liệu được đưa vào index. Worker sẽ kiểm tra lại.',
   AI_VECTOR_INDEX_ERROR:
-    'Không tạo hoặc truy vấn được index. Kiểm tra Vector Search, quyền MongoDB và định nghĩa index bên dưới.',
+    'Không tạo hoặc truy vấn được index. Kiểm tra cấu hình tìm kiếm và quyền kết nối dữ liệu.',
   AI_USAGE_LIMIT:
-    'Đã đạt giới hạn gọi API của ứng dụng. Worker giữ tiến độ và tự tiếp tục vào ngày UTC tiếp theo.',
+    'Tác vụ bị tạm dừng bởi giới hạn cũ của ứng dụng. Worker sẽ tự tiếp tục ở lần kiểm tra kế tiếp khi AI và đồng bộ được bật.',
   AI_CREDIT_EXHAUSTED: 'Tài khoản nhà cung cấp không còn hạn mức khả dụng.',
   AI_RATE_LIMITED: 'Nhà cung cấp đang giới hạn yêu cầu. Hãy thử lại sau.',
 };
@@ -78,45 +75,69 @@ export function AiEmbeddingVersions({
     revision: number;
   } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   const data = query.data;
-  const eligible = connections.filter(
-    (connection) => connection.checkedOk && connection.provider !== 'xai'
+  const activeVersion = data?.versions.find(
+    (version) => version._id === data.activeId
   );
-  const selected = eligible.find(
-    (connection) => connection.id === draft?.connectionId
-  );
-  const provider = selected?.provider === 'openai' ? 'openai' : 'gemini';
+  const eligible = connections.filter((connection) => connection.checkedOk);
+  const options = data?.supportedModels ?? [];
+  const selected = options.find((item) => item.model === draft?.model);
+  const defaultOption = options.find((item) => item.available);
   async function execute(
     work: () => Promise<EmbeddingVersionsData>,
     text: string
   ) {
     if (busy || !canManage) return false;
     setBusy(true);
-    setError('');
-    setMessage('');
+
     try {
       const result = await work();
       client.setQueryData(['ai', 'admin', 'embeddings'], result);
       await client.invalidateQueries({ queryKey: ['ai', 'admin'] });
-      setMessage(text);
+      toast.success(text);
       return true;
     } catch (failure) {
-      setError(getApiError(failure).message);
+      const text = getApiError(failure).message;
+      toast.error(text);
+      if (getApiError(failure).statusCode === 409) {
+        setConfirm(null);
+        setDraft(null);
+        await client.invalidateQueries({ queryKey: ['ai', 'admin'] });
+      }
       return false;
     } finally {
       setBusy(false);
     }
   }
+  const workerNotice =
+    data &&
+    data.versions.some((version) =>
+      ['queued', 'building', 'verifying'].includes(version.state)
+    )
+      ? data.worker?.emergencyDisabled
+        ? 'Máy chủ đang bật AI_FORCE_DISABLED. Cần tắt chế độ dừng khẩn cấp để đồng bộ.'
+        : data.worker && !data.worker.running
+          ? 'Worker đồng bộ chưa chạy trên máy chủ này. Khởi động lại BE bằng pnpm dev hoặc pnpm start sau khi build.'
+          : data.worker &&
+              (!data.worker.enabled || !data.worker.indexingEnabled)
+            ? 'Chưa thể đồng bộ: hãy bật trợ lý AI và tự động đồng bộ kiến thức, rồi lưu cấu hình.'
+            : data.worker?.lastErrorCode
+              ? 'Tác vụ chưa xử lý được hàng đợi. Kiểm tra kết nối MongoDB và khóa API của nhà cung cấp embedding trên máy chủ.'
+              : 'Phiên bản đang chờ worker tạo và xác nhận embeddings. Tạo phiên bản chưa bật tìm kiếm ngữ nghĩa; khi Sẵn sàng, hãy chọn Dùng phiên bản này.'
+      : null;
+  useEffect(() => {
+    if (workerNotice)
+      toast.info(workerNotice, { id: 'ai-admin-worker-status' });
+    else toast.dismiss('ai-admin-worker-status');
+  }, [workerNotice]);
   return (
     <Card>
       <CardHeader className="flex flex-wrap items-start justify-between gap-3 sm:flex-row">
         <div className="space-y-1">
-          <CardTitle>Phiên bản embeddings & vector index</CardTitle>
+          <CardTitle>Đồng bộ kiến thức</CardTitle>
           <CardDescription>
-            Đổi nguồn embeddings độc lập với model chat. Chỉ chuyển sang phiên
-            bản đã xác nhận truy vấn được; giữ phiên bản cũ để quay lại.
+            Quản lý các phiên bản kiến thức dùng cho tìm kiếm ngữ nghĩa. Chỉ
+            kích hoạt phiên bản đã sẵn sàng; có thể quay lại phiên bản cũ.
           </CardDescription>
         </div>
         <Button
@@ -126,19 +147,20 @@ export function AiEmbeddingVersions({
             !canManage ||
             !encryptionReady ||
             !data ||
-            !eligible.length ||
+            !defaultOption ||
             data.versions.length >= 20
           }
           onClick={() => {
-            const connection = eligible[0]!;
+            const connection = eligible.find(
+              (item) => item.provider === defaultOption!.provider
+            )!;
             setDraft({
               revision: data!.revision,
               connectionId: connection.id,
-              model:
-                connection.provider === 'openai'
-                  ? models.openai[0]!
-                  : models.gemini[0]!,
-              dimensions: 1536,
+              model: defaultOption!.model,
+              dimensions: defaultOption!.dimensions.includes(1536)
+                ? 1536
+                : defaultOption!.dimensions[0]!,
               engine: 'exact',
               startSync: true,
             });
@@ -149,71 +171,33 @@ export function AiEmbeddingVersions({
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {data?.versions.some((version) =>
-          ['queued', 'building', 'verifying'].includes(version.state)
-        ) && (
-          <div role="status" className="rounded-lg border p-3 text-sm">
-            {data.worker?.emergencyDisabled
-              ? 'Máy chủ đang bật AI_FORCE_DISABLED. Cần tắt chế độ dừng khẩn cấp để đồng bộ.'
-              : data.worker && !data.worker.running
-                ? 'Worker đồng bộ chưa chạy trên máy chủ này. Khởi động lại BE bằng pnpm dev hoặc pnpm start sau khi build.'
-                : data.worker &&
-                    (!data.worker.enabled || !data.worker.indexingEnabled)
-                  ? 'Chưa thể đồng bộ: hãy bật trợ lý AI và đồng bộ kiến thức tự động, rồi Lưu vận hành.'
-                  : data.worker?.lastErrorCode
-                    ? 'Worker chưa xử lý được hàng đợi. Kiểm tra kết nối MongoDB và AI_CONFIG_ENCRYPTION_KEY đang dùng để giải mã các kết nối đã lưu.'
-                    : 'Phiên bản đang chờ worker tạo và xác nhận embeddings. Tạo phiên bản chưa bật tìm kiếm ngữ nghĩa; khi Sẵn sàng, hãy chọn Dùng phiên bản này.'}
-            {data.worker?.lastTickAt && (
-              <p className="text-muted-foreground mt-1 text-xs">
-                Worker kiểm tra gần nhất:{' '}
-                {new Date(data.worker.lastTickAt).toLocaleString('vi-VN')}
-              </p>
-            )}
-          </div>
-        )}
         {query.isPending && (
           <LoadingSkeleton
             label="Đang tải phiên bản embeddings…"
             variant="table"
           />
         )}
-        {query.isError && (
-          <p role="alert" className="text-destructive">
-            {getApiError(query.error).message}
-          </p>
-        )}
-        {message && (
-          <p role="status" className="rounded-lg border p-3 text-sm">
-            {message}
-          </p>
-        )}
-        {error && (
-          <p
-            role="alert"
-            className="text-destructive rounded-lg border p-3 text-sm"
-          >
-            {error}
-          </p>
-        )}
         <p className="text-muted-foreground text-sm">
           Chọn MongoDB thông thường cho cửa hàng nhỏ (tối đa 5.000 đoạn kiến
           thức), hoặc Atlas Vector Search cho dữ liệu lớn. Worker chạy khi bật
           AI và đồng bộ tự động; tác vụ sử dụng hạn mức embeddings và có thể
-          phát sinh phí dịch vụ. xAI chỉ dùng cho chat, không dùng làm nguồn
-          embeddings.
+          phát sinh phí dịch vụ. Embeddings sử dụng model đã chọn độc lập với
+          model chat.
         </p>
         {!eligible.length && (
           <p className="text-muted-foreground text-sm">
-            Hãy thêm và kiểm tra thành công một kết nối Gemini hoặc OpenAI
-            trước.
+            Hãy cấu hình khóa API của nhà cung cấp embedding trong .env của
+            backend trước.
           </p>
         )}
         <p className="text-muted-foreground text-sm">
-          Đồng bộ kiểm tra thay đổi mỗi 15 phút, chỉ gọi embeddings cho nội dung
-          mới hoặc đã sửa. Tối đa 25% hạn mức ngày dành cho đồng bộ (100
-          lượt/ngày tương ứng 25 lượt). Cần hạn mức ít nhất 4 lượt/ngày. Phiên
-          bản tự động dùng MongoDB cosine cũ được dọn khi đầy 20 phiên bản, sau
-          thời gian bảo vệ 5 phút; phiên bản tạo thủ công được giữ lại.
+          Đồng bộ kiểm tra thay đổi mỗi 15 phút, chỉ tạo phiên bản khi dữ liệu
+          thay đổi và chỉ gọi embeddings cho nội dung mới hoặc đã sửa. Website
+          không đặt hạn mức gọi API theo ngày; quota của nhà cung cấp vẫn áp
+          dụng cho cả chat và đồng bộ. Phiên bản tự động dùng MongoDB cosine cũ
+          được dọn khi đầy 20 phiên bản, sau thời gian bảo vệ 5 phút; phiên bản
+          tạo thủ công được giữ lại. Sau khi hủy, chọn Đồng bộ kiến thức để tiếp
+          tục cùng phiên bản.
         </p>
         {data && (
           <>
@@ -224,14 +208,14 @@ export function AiEmbeddingVersions({
               />
               <span>
                 {data.activeId
-                  ? `Phiên bản đang dùng: ${data.activeId}`
+                  ? `Phiên bản đang dùng: ${activeVersion?.model ?? 'Đang cập nhật thông tin'}`
                   : 'Đang dùng cấu hình embeddings môi trường / tìm kiếm từ khóa'}
               </span>
               {data.activeId && (
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={busy}
+                  disabled={busy || !canManage}
                   onClick={() =>
                     setConfirm({
                       action: 'legacy',
@@ -274,7 +258,7 @@ export function AiEmbeddingVersions({
                     id="embedding-engine"
                     className={field}
                     value={draft.engine ?? 'atlas'}
-                    disabled={busy}
+                    disabled={busy || !canManage}
                     onChange={(event) =>
                       setDraft({
                         ...draft,
@@ -293,7 +277,7 @@ export function AiEmbeddingVersions({
                     <input
                       type="checkbox"
                       checked={draft.startSync ?? false}
-                      disabled={busy}
+                      disabled={busy || !canManage}
                       onChange={(event) =>
                         setDraft({ ...draft, startSync: event.target.checked })
                       }
@@ -301,71 +285,59 @@ export function AiEmbeddingVersions({
                     Bật đồng bộ tự động sau khi tạo (cần bật trợ lý AI)
                   </label>
                 </div>
+                <p className="text-muted-foreground text-sm">
+                  Dữ liệu ngữ nghĩa dùng model embedding đã chọn, độc lập với
+                  model chat.
+                </p>
                 <div className="space-y-2">
-                  <Label htmlFor="embedding-connection">
-                    Kết nối embeddings
+                  <Label htmlFor="embedding-model">
+                    Nhà cung cấp / model embedding
                   </Label>
                   <select
-                    id="embedding-connection"
-                    required
+                    id="embedding-model"
                     className={field}
-                    value={draft.connectionId}
-                    disabled={busy}
+                    required
+                    disabled={busy || !canManage}
+                    value={draft.model}
                     onChange={(event) => {
+                      const option = options.find(
+                        (item) => item.model === event.target.value
+                      )!;
                       const connection = eligible.find(
-                        (item) => item.id === event.target.value
+                        (item) => item.provider === option.provider
                       )!;
                       setDraft({
                         ...draft,
+                        model: option.model,
                         connectionId: connection.id,
-                        model:
-                          connection.provider === 'openai'
-                            ? models.openai[0]!
-                            : models.gemini[0]!,
-                        dimensions: 1536,
+                        dimensions: option.dimensions.includes(draft.dimensions)
+                          ? draft.dimensions
+                          : option.dimensions[0]!,
                       });
                     }}
                   >
-                    {eligible.map((connection) => (
-                      <option key={connection.id} value={connection.id}>
-                        {connection.name}
+                    {options.map((item) => (
+                      <option
+                        key={`${item.provider}:${item.model}`}
+                        value={item.model}
+                        disabled={!item.available}
+                      >
+                        {item.provider} — {item.model}
+                        {item.available ? '' : ' (Chưa cấu hình)'}
                       </option>
                     ))}
                   </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="embedding-model">Model embeddings</Label>
-                  <select
-                    id="embedding-model"
-                    required
-                    className={field}
-                    disabled={busy}
-                    value={draft.model}
-                    onChange={(event) =>
-                      setDraft({
-                        ...draft,
-                        model: event.target.value,
-                        dimensions:
-                          event.target.value === 'text-embedding-3-small' &&
-                          draft.dimensions > 1536
-                            ? 1536
-                            : draft.dimensions,
-                      })
-                    }
-                  >
-                    {models[provider].map((model) => (
-                      <option key={model} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                  </select>
+                  <p className="text-muted-foreground text-xs">
+                    Mỗi phiên bản giữ riêng nhà cung cấp, model và số chiều.
+                    Thay đổi model cần tạo phiên bản mới.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="embedding-dimensions">Số chiều vector</Label>
                   <select
                     id="embedding-dimensions"
                     className={field}
-                    disabled={busy}
+                    disabled={busy || !canManage}
                     value={draft.dimensions}
                     onChange={(event) =>
                       setDraft({
@@ -374,16 +346,11 @@ export function AiEmbeddingVersions({
                       })
                     }
                   >
-                    {[768, 1536, 3072]
-                      .filter(
-                        (n) =>
-                          draft.model !== 'text-embedding-3-small' || n <= 1536
-                      )
-                      .map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
+                    {(selected?.dimensions ?? []).map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <p className="text-muted-foreground text-xs sm:col-span-3">
@@ -392,13 +359,13 @@ export function AiEmbeddingVersions({
                   phiên bản được lưu.
                 </p>
                 <div className="flex gap-2 sm:col-span-3">
-                  <Button type="submit" disabled={busy}>
+                  <Button type="submit" disabled={busy || !canManage}>
                     {busy ? 'Đang tạo…' : 'Xếp lịch đồng bộ phiên bản'}
                   </Button>
                   <Button
                     variant="outline"
                     type="button"
-                    disabled={busy}
+                    disabled={busy || !canManage}
                     onClick={() => setDraft(null)}
                   >
                     Hủy tạo phiên bản
@@ -425,7 +392,7 @@ export function AiEmbeddingVersions({
                 </p>
                 <div className="flex gap-2">
                   <Button
-                    disabled={busy}
+                    disabled={busy || !canManage}
                     variant={
                       confirm.action === 'delete' ? 'destructive' : 'default'
                     }
@@ -444,7 +411,14 @@ export function AiEmbeddingVersions({
                                 value.revision,
                                 value.action
                               ),
-                        'Đã cập nhật phiên bản embeddings.'
+                        {
+                          delete: 'Đã xóa phiên bản embedding.',
+                          cancel: 'Đã hủy đồng bộ phiên bản embedding.',
+                          retry:
+                            'Đã xếp lịch thử lại đồng bộ phiên bản embedding.',
+                          activate: 'Đã kích hoạt phiên bản embedding.',
+                          legacy: 'Đã ngừng sử dụng phiên bản embedding.',
+                        }[value.action]
                       );
                       if (ok) setConfirm(null);
                     }}
@@ -453,7 +427,7 @@ export function AiEmbeddingVersions({
                   </Button>
                   <Button
                     variant="outline"
-                    disabled={busy}
+                    disabled={busy || !canManage}
                     onClick={() => setConfirm(null)}
                   >
                     Hủy thao tác phiên bản
@@ -464,7 +438,7 @@ export function AiEmbeddingVersions({
             <Table aria-label="Phiên bản embeddings">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Phiên bản / Model</TableHead>
+                  <TableHead>Model embedding</TableHead>
                   <TableHead>Trạng thái</TableHead>
                   <TableHead>Đã xác nhận / Tổng đoạn</TableHead>
                   <TableHead>Thao tác</TableHead>
@@ -475,16 +449,7 @@ export function AiEmbeddingVersions({
                   <TableRow key={version._id}>
                     <TableCell>
                       <p className="max-w-64 font-medium break-all">
-                        {version.model} · {version.dimensions} chiều
-                      </p>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        Kết nối:{' '}
-                        {connections.find(
-                          (connection) => connection.id === version.connectionId
-                        )?.name ?? version.connectionId}
-                      </p>
-                      <p className="text-muted-foreground mt-1 font-mono text-xs">
-                        {version._id}
+                        {version.model}
                       </p>
                       <p className="text-muted-foreground mt-1 text-xs">
                         {new Date(version.createdAt).toLocaleString('vi-VN')}
@@ -495,21 +460,6 @@ export function AiEmbeddingVersions({
                           Đang sử dụng
                         </Badge>
                       )}
-                      <details className="mt-2 text-xs">
-                        <summary className="cursor-pointer">
-                          Thông tin vector index
-                        </summary>
-                        <p className="mt-2 break-all">
-                          {version.indexName.startsWith('ai_exact_')
-                            ? 'MongoDB cosine (tối đa 5.000 đoạn)'
-                            : 'Atlas Vector Search'}{' '}
-                          · Collection: {data.collection} · Index:{' '}
-                          {version.indexName}
-                        </p>
-                        <pre className="bg-muted mt-2 max-w-80 overflow-auto rounded p-2">
-                          {JSON.stringify(version.indexDefinition, null, 2)}
-                        </pre>
-                      </details>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -550,6 +500,13 @@ export function AiEmbeddingVersions({
                           size="sm"
                           disabled={
                             busy ||
+                            !canManage ||
+                            !options.some(
+                              (item) =>
+                                item.provider === version.provider &&
+                                item.model === version.model &&
+                                item.available
+                            ) ||
                             version.state !== 'ready' ||
                             data.activeId === version._id
                           }
@@ -570,7 +527,7 @@ export function AiEmbeddingVersions({
                             <Button
                               size="sm"
                               variant="outline"
-                              disabled={busy}
+                              disabled={busy || !canManage}
                               onClick={() =>
                                 setConfirm({
                                   action: 'cancel',
@@ -586,7 +543,17 @@ export function AiEmbeddingVersions({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                disabled={busy}
+                                disabled={
+                                  busy ||
+                                  !canManage ||
+                                  !options.some(
+                                    (item) =>
+                                      item.provider === version.provider &&
+                                      item.model === version.model &&
+                                      item.available
+                                  ) ||
+                                  !eligible.length
+                                }
                                 onClick={() =>
                                   setConfirm({
                                     action: 'retry',
@@ -600,7 +567,7 @@ export function AiEmbeddingVersions({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                disabled={busy}
+                                disabled={busy || !canManage}
                                 onClick={() =>
                                   setConfirm({
                                     action: 'delete',

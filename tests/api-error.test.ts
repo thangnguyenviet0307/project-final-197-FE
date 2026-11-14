@@ -193,3 +193,28 @@ it.each([
     expect(failure.message).toBe(message);
   }
 );
+
+it.each([
+  [
+    'Cancel pending work, and wait five minutes after deactivation before deletion',
+    'Hãy hủy tác vụ đang chờ và đợi ít nhất 5 phút sau khi ngừng sử dụng phiên bản trước khi xóa.',
+  ],
+  [
+    'Embedding version is not ready',
+    'Phiên bản embedding chưa sẵn sàng để sử dụng.',
+  ],
+  [
+    'AI configuration changed. Reload before saving.',
+    'Cấu hình AI đã thay đổi. Vui lòng tải lại trang trước khi lưu.',
+  ],
+])('localizes legacy AI notification: %s', (message, expected) => {
+  expect(
+    getApiError(apiError({ status: 409, message, url: '/ai/admin/embeddings' }))
+      .message
+  ).toBe(expected);
+});
+it('localizes uncertain chatbot cancellation feedback', () => {
+  expect(getApiError(new Error('Cancellation response mismatch')).message).toBe(
+    'Chưa xác nhận được việc dừng trả lời. Vui lòng tải lại lịch sử hội thoại để kiểm tra.'
+  );
+});
