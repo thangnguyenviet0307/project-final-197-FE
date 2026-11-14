@@ -1,7 +1,7 @@
 export interface AiConnection {
   id: string;
   name: string;
-  provider: 'gemini' | 'openai' | 'xai';
+  provider: 'gemini' | 'groq' | 'openrouter' | 'cloudflare';
   model: string;
   keyHint: string;
   checkedOk: boolean;
@@ -13,10 +13,17 @@ export interface AiFeatureSettings {
   semanticEnabled: boolean;
   indexingEnabled: boolean;
   riskEnabled: boolean;
-  dailyCalls: number;
-  activeConnectionId: string | null;
 }
 export interface AiSettingsData {
+  routing?: {
+    provider: string;
+    model: string;
+    priority: number | null;
+    state?: 'ready' | 'missing_key' | 'missing_account' | 'excluded';
+    retryAt: string | null;
+  }[];
+  credentialSource?: 'environment';
+  automaticRouting?: boolean;
   revision: number;
   source: 'environment' | 'database';
   encryptionReady: boolean;
@@ -24,17 +31,13 @@ export interface AiSettingsData {
   semanticReady?: boolean;
   activeEmbeddingGenerationId?: string | null;
   legacyEmbeddingConnectionId?: string | null;
-  providerModels?: Record<'gemini' | 'openai' | 'xai', string[]>;
+  providerModels?: Record<
+    'gemini' | 'groq' | 'openrouter' | 'cloudflare',
+    string[]
+  >;
   emergencyDisabled: boolean;
   settings: AiFeatureSettings;
   connections: AiConnection[];
   suggestedModels: string[];
   audit: { action: string; actor: string; at: string; connectionId?: string }[];
-}
-export interface AiConnectionInput {
-  revision: number;
-  name: string;
-  provider: 'gemini' | 'openai' | 'xai';
-  model: string;
-  apiKey?: string;
 }

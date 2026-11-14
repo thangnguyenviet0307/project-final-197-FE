@@ -61,7 +61,6 @@ export interface AiAdminStatus {
     model: string;
     embeddingModel: string;
     vectorIndex: string;
-    dailyCalls: number;
   };
   conversations: number;
   chunks: number;

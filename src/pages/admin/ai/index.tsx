@@ -1,4 +1,5 @@
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
+import { toast } from 'sonner';
 import {
   Activity,
   Database,
@@ -8,7 +9,6 @@ import {
 } from 'lucide-react';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { useAiAdmin } from '@/features/ai/hooks/use-ai-admin';
-import { getApiError } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -67,7 +67,11 @@ export default function AiAdminPage() {
             <Button
               variant="outline"
               disabled={status.isFetching}
-              onClick={() => void status.refetch()}
+              onClick={async () => {
+                const result = await status.refetch();
+                if (result.isSuccess)
+                  toast.success('Đã cập nhật trạng thái AI.');
+              }}
             >
               <RefreshCw
                 className={status.isFetching ? 'animate-spin' : ''}
@@ -88,25 +92,6 @@ export default function AiAdminPage() {
             </Button>
           </div>
         </div>
-        {reindex.isSuccess && (
-          <p
-            role="status"
-            className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
-          >
-            Đã xếp lịch đồng bộ. Tải lại để kiểm tra tiến độ.
-          </p>
-        )}
-        {(status.isError || reindex.isError) && (
-          <div
-            role="alert"
-            className="border-destructive/30 bg-destructive/5 text-destructive rounded-lg border p-4 text-sm"
-          >
-            {
-              getApiError(reindex.isError ? reindex.error : status.error)
-                .message
-            }
-          </div>
-        )}
         {status.isPending && (
           <div
             role="status"
@@ -198,11 +183,9 @@ export default function AiAdminPage() {
                       </dd>
                     </div>
                     <div className="flex flex-wrap justify-between gap-2">
-                      <dt className="text-muted-foreground">
-                        Giới hạn lượt gọi / ngày UTC
-                      </dt>
+                      <dt className="text-muted-foreground">Hạn mức dịch vụ</dt>
                       <dd className="font-medium tabular-nums">
-                        {number.format(data.config.dailyCalls)}
+                        Theo nhà cung cấp
                       </dd>
                     </div>
                   </dl>

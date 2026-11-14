@@ -9,6 +9,7 @@ export function useAiAdmin() {
   });
   const reindex = useMutation({
     mutationFn: aiService.reindex,
+    meta: { successMessage: 'Đã xếp lịch đồng bộ kiến thức AI.' },
     onSuccess: () => client.invalidateQueries({ queryKey: ['ai', 'admin'] }),
   });
   return { status, reindex };

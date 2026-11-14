@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Database, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,6 @@ import type {
 
 const models = {
   gemini: ['gemini-embedding-001', 'gemini-embedding-2'],
-  openai: ['text-embedding-3-small', 'text-embedding-3-large'],
 };
 const labels = {
   queued: 'Đang chờ',
@@ -75,45 +75,61 @@ export function AiEmbeddingVersions({
     revision: number;
   } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   const data = query.data;
   const eligible = connections.filter(
-    (connection) => connection.checkedOk && connection.provider !== 'xai'
+    (connection) => connection.checkedOk && connection.provider === 'gemini'
   );
-  const selected = eligible.find(
-    (connection) => connection.id === draft?.connectionId
-  );
-  const provider = selected?.provider === 'openai' ? 'openai' : 'gemini';
+  const provider = 'gemini';
   async function execute(
     work: () => Promise<EmbeddingVersionsData>,
     text: string
   ) {
     if (busy) return false;
     setBusy(true);
-    setError('');
-    setMessage('');
+
     try {
       const result = await work();
       client.setQueryData(['ai', 'admin', 'embeddings'], result);
       await client.invalidateQueries({ queryKey: ['ai', 'admin'] });
-      setMessage(text);
+      toast.success(text);
       return true;
     } catch (failure) {
-      setError(getApiError(failure).message);
+      const text = getApiError(failure).message;
+      toast.error(text);
       return false;
     } finally {
       setBusy(false);
     }
   }
+  const workerNotice =
+    data &&
+    data.versions.some((version) =>
+      ['queued', 'building', 'verifying'].includes(version.state)
+    )
+      ? data.worker?.emergencyDisabled
+        ? 'Máy chủ đang bật AI_FORCE_DISABLED. Cần tắt chế độ dừng khẩn cấp để đồng bộ.'
+        : data.worker && !data.worker.running
+          ? 'Worker đồng bộ chưa chạy trên máy chủ này. Khởi động lại BE bằng pnpm dev hoặc pnpm start sau khi build.'
+          : data.worker &&
+              (!data.worker.enabled || !data.worker.indexingEnabled)
+            ? 'Chưa thể đồng bộ: hãy bật trợ lý AI và tự động đồng bộ kiến thức, rồi lưu cấu hình.'
+            : data.worker?.lastErrorCode
+              ? 'Tác vụ chưa xử lý được hàng đợi. Kiểm tra kết nối MongoDB và khóa Gemini trên máy chủ.'
+              : 'Phiên bản đang chờ worker tạo và xác nhận embeddings. Tạo phiên bản chưa bật tìm kiếm ngữ nghĩa; khi Sẵn sàng, hãy chọn Dùng phiên bản này.'
+      : null;
+  useEffect(() => {
+    if (workerNotice)
+      toast.info(workerNotice, { id: 'ai-admin-worker-status' });
+    else toast.dismiss('ai-admin-worker-status');
+  }, [workerNotice]);
   return (
     <Card>
       <CardHeader className="flex flex-wrap items-start justify-between gap-3 sm:flex-row">
         <div className="space-y-1">
-          <CardTitle>Phiên bản embeddings & vector index</CardTitle>
+          <CardTitle>Đồng bộ kiến thức</CardTitle>
           <CardDescription>
-            Đổi nguồn embeddings độc lập với model chat. Chỉ chuyển sang phiên
-            bản đã xác nhận truy vấn được; giữ phiên bản cũ để quay lại.
+            Quản lý các phiên bản kiến thức dùng cho tìm kiếm ngữ nghĩa. Chỉ
+            kích hoạt phiên bản đã sẵn sàng; có thể quay lại phiên bản cũ.
           </CardDescription>
         </div>
         <Button
@@ -130,10 +146,7 @@ export function AiEmbeddingVersions({
             setDraft({
               revision: data!.revision,
               connectionId: connection.id,
-              model:
-                connection.provider === 'openai'
-                  ? models.openai[0]!
-                  : models.gemini[0]!,
+              model: models.gemini[0]!,
               dimensions: 1536,
               engine: 'exact',
               startSync: true,
@@ -145,47 +158,7 @@ export function AiEmbeddingVersions({
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {data?.versions.some((version) =>
-          ['queued', 'building', 'verifying'].includes(version.state)
-        ) && (
-          <div role="status" className="rounded-lg border p-3 text-sm">
-            {data.worker?.emergencyDisabled
-              ? 'Máy chủ đang bật AI_FORCE_DISABLED. Cần tắt chế độ dừng khẩn cấp để đồng bộ.'
-              : data.worker && !data.worker.running
-                ? 'Worker đồng bộ chưa chạy trên máy chủ này. Khởi động lại BE bằng pnpm dev hoặc pnpm start sau khi build.'
-                : data.worker &&
-                    (!data.worker.enabled || !data.worker.indexingEnabled)
-                  ? 'Chưa thể đồng bộ: hãy bật trợ lý AI và đồng bộ kiến thức tự động, rồi Lưu vận hành.'
-                  : data.worker?.lastErrorCode
-                    ? 'Worker chưa xử lý được hàng đợi. Kiểm tra kết nối MongoDB và AI_CONFIG_ENCRYPTION_KEY đang dùng để giải mã các kết nối đã lưu.'
-                    : 'Phiên bản đang chờ worker tạo và xác nhận embeddings. Tạo phiên bản chưa bật tìm kiếm ngữ nghĩa; khi Sẵn sàng, hãy chọn Dùng phiên bản này.'}
-            {data.worker?.lastTickAt && (
-              <p className="text-muted-foreground mt-1 text-xs">
-                Worker kiểm tra gần nhất:{' '}
-                {new Date(data.worker.lastTickAt).toLocaleString('vi-VN')}
-              </p>
-            )}
-          </div>
-        )}
         {query.isPending && <p role="status">Đang tải phiên bản embeddings…</p>}
-        {query.isError && (
-          <p role="alert" className="text-destructive">
-            {getApiError(query.error).message}
-          </p>
-        )}
-        {message && (
-          <p role="status" className="rounded-lg border p-3 text-sm">
-            {message}
-          </p>
-        )}
-        {error && (
-          <p
-            role="alert"
-            className="text-destructive rounded-lg border p-3 text-sm"
-          >
-            {error}
-          </p>
-        )}
         <p className="text-muted-foreground text-sm">
           Chọn MongoDB thông thường cho cửa hàng nhỏ (tối đa 5.000 đoạn kiến
           thức), hoặc Atlas Vector Search cho dữ liệu lớn. Worker chạy khi bật
@@ -195,16 +168,15 @@ export function AiEmbeddingVersions({
         </p>
         {!eligible.length && (
           <p className="text-muted-foreground text-sm">
-            Hãy thêm và kiểm tra thành công một kết nối Gemini hoặc OpenAI
-            trước.
+            Hãy cấu hình GEMINI_API_KEY trong .env của backend trước.
           </p>
         )}
         <p className="text-muted-foreground text-sm">
           Đồng bộ kiểm tra thay đổi mỗi 15 phút, chỉ gọi embeddings cho nội dung
-          mới hoặc đã sửa. Tối đa 25% hạn mức ngày dành cho đồng bộ (100
-          lượt/ngày tương ứng 25 lượt). Cần hạn mức ít nhất 4 lượt/ngày. Phiên
-          bản tự động dùng MongoDB cosine cũ được dọn khi đầy 20 phiên bản, sau
-          thời gian bảo vệ 5 phút; phiên bản tạo thủ công được giữ lại.
+          mới hoặc đã sửa. Website không đặt hạn mức gọi API theo ngày; quota
+          của nhà cung cấp vẫn áp dụng cho cả chat và đồng bộ. Phiên bản tự động
+          dùng MongoDB cosine cũ được dọn khi đầy 20 phiên bản, sau thời gian
+          bảo vệ 5 phút; phiên bản tạo thủ công được giữ lại.
         </p>
         {data && (
           <>
@@ -292,38 +264,10 @@ export function AiEmbeddingVersions({
                     Bật đồng bộ tự động sau khi tạo (cần bật trợ lý AI)
                   </label>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="embedding-connection">
-                    Kết nối embeddings
-                  </Label>
-                  <select
-                    id="embedding-connection"
-                    required
-                    className={field}
-                    value={draft.connectionId}
-                    disabled={busy}
-                    onChange={(event) => {
-                      const connection = eligible.find(
-                        (item) => item.id === event.target.value
-                      )!;
-                      setDraft({
-                        ...draft,
-                        connectionId: connection.id,
-                        model:
-                          connection.provider === 'openai'
-                            ? models.openai[0]!
-                            : models.gemini[0]!,
-                        dimensions: 1536,
-                      });
-                    }}
-                  >
-                    {eligible.map((connection) => (
-                      <option key={connection.id} value={connection.id}>
-                        {connection.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <p className="text-muted-foreground text-sm">
+                  Dữ liệu ngữ nghĩa được tạo bằng Gemini, độc lập với việc tự
+                  chuyển mô hình chat.
+                </p>
                 <div className="space-y-2">
                   <Label htmlFor="embedding-model">Model embeddings</Label>
                   <select

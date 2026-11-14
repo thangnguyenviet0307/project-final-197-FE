@@ -1,4 +1,5 @@
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
+import { toast } from 'sonner';
 import {
   render,
   screen,
@@ -20,9 +21,9 @@ beforeEach(() => {
     versions: [
       {
         _id: id,
-        connectionId: 'openai-id',
-        provider: 'openai',
-        model: 'text-embedding-3-small',
+        connectionId: 'gemini-id',
+        provider: 'gemini',
+        model: 'gemini-embedding-001',
         dimensions: 1536,
         indexName: 'ai_vectors_test',
         state: 'verifying',
@@ -49,10 +50,10 @@ function mount() {
         encryptionReady
         connections={[
           {
-            id: 'openai-id',
-            name: 'OpenAI embeddings',
-            provider: 'openai',
-            model: 'gpt-4.1-mini',
+            id: 'gemini-id',
+            name: 'Gemini (.env)',
+            provider: 'gemini',
+            model: 'gemini-3.1-flash-lite',
             keyHint: '1234',
             checkedOk: true,
           },
@@ -63,6 +64,7 @@ function mount() {
 }
 
 it('explains when queued embeddings have no running server worker', async () => {
+  const infoToast = vi.spyOn(toast, 'info');
   data.worker = {
     running: false,
     lastTickAt: null,
@@ -72,7 +74,13 @@ it('explains when queued embeddings have no running server worker', async () => 
     emergencyDisabled: false,
   };
   mount();
-  expect(await screen.findByText(/Worker đồng bộ chưa chạy/)).toBeTruthy();
+  await waitFor(() =>
+    expect(infoToast).toHaveBeenCalledWith(
+      expect.stringMatching(/Worker đồng bộ chưa chạy/),
+      { id: 'ai-admin-worker-status' }
+    )
+  );
+  expect(screen.queryByText(/Worker đồng bộ chưa chạy/)).toBeNull();
 });
 
 it('shows real progress and blocks activation until the index is verified', async () => {
@@ -88,6 +96,7 @@ it('shows real progress and blocks activation until the index is verified', asyn
   expect(screen.getByText('Đang xác nhận index')).toBeTruthy();
 });
 it('requires confirmation before switching back to a ready version', async () => {
+  const successToast = vi.spyOn(toast, 'success');
   data.versions[0]!.state = 'ready';
   const activate = vi
     .spyOn(aiEmbeddingsService, 'activate')
@@ -104,6 +113,7 @@ it('requires confirmation before switching back to a ready version', async () =>
   fireEvent.click(screen.getByRole('button', { name: 'Xác nhận phiên bản' }));
   await waitFor(() => expect(activate).toHaveBeenCalledWith(id, 3));
   expect(await screen.findByText('Đang sử dụng')).toBeTruthy();
+  expect(successToast).toHaveBeenCalledTimes(1);
 });
 it('creates a separate OpenAI embedding version without changing chat configuration', async () => {
   const create = vi
@@ -124,8 +134,8 @@ it('creates a separate OpenAI embedding version without changing chat configurat
   await waitFor(() =>
     expect(create).toHaveBeenCalledWith({
       revision: 3,
-      connectionId: 'openai-id',
-      model: 'text-embedding-3-small',
+      connectionId: 'gemini-id',
+      model: 'gemini-embedding-001',
       dimensions: 768,
       engine: 'exact',
       startSync: true,

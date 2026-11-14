@@ -1,12 +1,14 @@
-import { AiEmbeddingVersions } from './ai-embedding-versions';
-import { useState } from 'react';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, KeyRound } from 'lucide-react';
+import { AiEmbeddingVersions } from './ai-embedding-versions';
+import { aiSettingsService } from '../services/ai-settings.service';
+import type { AiFeatureSettings } from '../types/ai-settings';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardHeader,
@@ -17,672 +19,354 @@ import {
 import {
   Table,
   TableHeader,
-  TableBody,
   TableHead,
+  TableBody,
   TableCell,
   TableRow,
 } from '@/components/ui/table';
 import { getApiError } from '@/services/api';
-import { aiSettingsService } from '../services/ai-settings.service';
-import type {
-  AiConnection,
-  AiFeatureSettings,
-  AiSettingsData,
-} from '../types/ai-settings';
-
-const providerLabels = {
+import { useAuthStore } from '@/stores/auth.store';
+const providerLabels: Record<string, string> = {
   gemini: 'Google Gemini',
-  openai: 'OpenAI',
-  xai: 'xAI (Grok)',
+  groq: 'Groq',
+  openrouter: 'OpenRouter',
+  cloudflare: 'Cloudflare Workers AI',
 };
-type ConnectionDraft = {
-  provider: AiConnection['provider'];
-  id?: string;
-  revision: number;
-  name: string;
-  model: string;
-  apiKey: string;
-};
-const fieldClass =
-  'bg-background border-input h-9 w-full rounded-lg border px-3 text-sm';
-const actions: Record<string, string> = {
-  'settings.initialized': 'Nhập cấu hình môi trường',
+const auditLabels: Record<string, string> = {
+  'settings.updated': 'Cập nhật vận hành',
+  'settings.activated': 'Kiểm tra kết nối và kích hoạt AI',
+  'settings.initialized': 'Khởi tạo cấu hình',
+  'embedding.created': 'Tạo phiên bản kiến thức',
+  'embedding.activated': 'Kích hoạt phiên bản kiến thức',
+  'embedding.legacy': 'Ngừng dùng phiên bản kiến thức',
+  'embedding.retry': 'Thử lại đồng bộ',
+  'embedding.cancel': 'Hủy đồng bộ',
+  'embedding.delete': 'Xóa phiên bản kiến thức',
   'connection.created': 'Thêm kết nối',
-  'connection.updated': 'Sửa kết nối',
+  'connection.updated': 'Cập nhật kết nối',
   'connection.deleted': 'Xóa kết nối',
   'connection.tested': 'Kiểm tra kết nối',
-  'settings.updated': 'Cập nhật vận hành',
-  'embedding.created': 'Tạo phiên bản embeddings',
-  'embedding.activated': 'Chuyển phiên bản embeddings',
-  'embedding.legacy': 'Ngừng dùng phiên bản embeddings',
-  'embedding.retry': 'Thử lại phiên bản embeddings',
-  'embedding.cancel': 'Hủy đồng bộ embeddings',
-  'embedding.delete': 'Xóa phiên bản embeddings',
 };
-
 export function AiConfiguration() {
+  const isSuperAdmin = useAuthStore(
+    (state) => state.user?.role === 'super_admin'
+  );
   const client = useQueryClient();
   const query = useQuery({
     queryKey: ['ai', 'admin', 'settings'],
     queryFn: aiSettingsService.read,
     refetchInterval: 15000,
   });
-  const [form, setForm] = useState<ConnectionDraft | null>(null);
   const [draft, setDraft] = useState<
     (AiFeatureSettings & { revision: number }) | null
   >(null);
-  const [confirm, setConfirm] = useState<{
-    action: 'delete' | 'test';
-    connection: AiConnection;
-    revision: number;
-  } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const notifySuccess = (text: string) => {
+    toast.success(text);
+  };
+  const notifyFailure = (cause: unknown) => {
+    const text = getApiError(cause).message;
+    toast.error(text);
+  };
+
+  const [page, setPage] = useState(1);
+  const [activationRevision, setActivationRevision] = useState<number | null>(
+    null
+  );
+  const [clearAuditRevision, setClearAuditRevision] = useState<number | null>(
+    null
+  );
   const data = query.data;
-  // Credential writes bypass mutation caches so API keys are not retained in mutation variables.
-  async function execute(
-    action: () => Promise<AiSettingsData>,
-    success: string
-  ) {
-    if (busy) return false;
-    setBusy(true);
-    setError('');
-    setMessage('');
-    try {
-      const result = await action();
-      client.setQueryData(['ai', 'admin', 'settings'], result);
-      await client.invalidateQueries({
-        queryKey: ['ai', 'admin'],
-        exact: true,
+  const staleConfirmation =
+    !busy &&
+    !!data &&
+    [draft?.revision, activationRevision, clearAuditRevision].some(
+      (revision) => revision != null && revision !== data.revision
+    );
+  useEffect(() => {
+    if (data?.emergencyDisabled)
+      toast.warning('AI đang được tắt khẩn cấp trên máy chủ.', {
+        id: 'ai-admin-emergency',
       });
-      setMessage(success);
-      return true;
-    } catch (failure) {
-      setError(getApiError(failure).message);
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  }
-  if (query.isPending) return <p role="status">Đang tải cấu hình AI…</p>;
+    else toast.dismiss('ai-admin-emergency');
+  }, [data?.emergencyDisabled]);
+  useEffect(() => {
+    if (staleConfirmation)
+      toast.warning(
+        'Cấu hình AI đã thay đổi. Hãy hủy thay đổi hoặc xác nhận đang mở và thử lại.',
+        { id: 'ai-admin-stale-confirmation' }
+      );
+    else toast.dismiss('ai-admin-stale-confirmation');
+  }, [staleConfirmation]);
+  if (query.isPending)
+    return (
+      <div role="status" aria-label="Đang tải cấu hình AI">
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
   if (!data)
     return (
-      <div role="alert">
-        <p>{getApiError(query.error).message}</p>
-        <Button variant="outline" onClick={() => void query.refetch()}>
-          Tải lại cấu hình
-        </Button>
+      <div>
+        <Button onClick={() => void query.refetch()}>Tải lại cấu hình</Button>
       </div>
     );
   const current = draft ?? { ...data.settings, revision: data.revision };
-  const disabled = busy || !data.encryptionReady;
   const change = (values: Partial<AiFeatureSettings>) =>
     setDraft({ ...current, ...values });
+  const pages = Math.max(1, Math.ceil(data.audit.length / 10));
+  const activePage = Math.min(page, pages);
+  const semanticReady = data.semanticReady ?? data.vectorReady;
   return (
     <div className="space-y-6">
-      {message && (
-        <p role="status" className="rounded-lg border p-3 text-sm">
-          {message}
-        </p>
-      )}
-      {error && (
-        <p
-          role="alert"
-          className="text-destructive rounded-lg border p-3 text-sm"
-        >
-          {error}
-        </p>
-      )}
-      {!data.encryptionReady && (
-        <p
-          role="alert"
-          className="text-destructive rounded-lg border p-4 text-sm"
-        >
-          Máy chủ chưa có AI_CONFIG_ENCRYPTION_KEY hợp lệ. Cần cấu hình khóa mã
-          hóa trước khi lưu API key trên web.
-        </p>
-      )}
-      {data.emergencyDisabled && (
-        <p role="alert">
-          AI đang bị tắt khẩn cấp trên máy chủ. Các thay đổi trên web không thể
-          vượt qua công tắc này.
-        </p>
-      )}
-      <Card>
-        <CardHeader className="flex flex-wrap items-start justify-between gap-3 sm:flex-row">
-          <div className="space-y-1">
-            <CardTitle>Kết nối & model AI</CardTitle>
-            <CardDescription>
-              Gemini, OpenAI và xAI (Grok). API key được mã hóa và chỉ hiển thị
-              bốn ký tự cuối.
-            </CardDescription>
-          </div>
-          <Button
-            disabled={disabled}
-            onClick={() => {
-              setForm({
-                revision: data.revision,
-                name: '',
-                model: data.suggestedModels[0] ?? 'gemini-3.1-flash-lite',
-                provider: 'gemini',
-                apiKey: '',
-              });
-              setConfirm(null);
-            }}
-          >
-            <Plus aria-hidden="true" /> Thêm kết nối
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {data.source === 'environment' && (
-            <div className="space-y-3 rounded-lg border p-4">
+      {isSuperAdmin && (
+        <div className="space-y-3 rounded-xl border p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-1">
+              <p className="font-medium">Kích hoạt kết nối AI</p>
               <p className="text-muted-foreground text-sm">
-                Hiện dùng cấu hình môi trường. Nhập cấu hình hiện tại để quản lý
-                các công tắc trên web; API key cũ được mã hóa tự động, không cần
-                nhập lại. Bạn cũng có thể thêm kết nối mới ngay.
+                Kiểm tra dịch vụ và bật trợ lý. Dữ liệu tìm kiếm ngữ nghĩa được
+                kích hoạt riêng bên dưới.
               </p>
-              <Button
-                variant="outline"
-                disabled={disabled}
-                onClick={() => {
-                  void execute(
-                    () => aiSettingsService.initialize(data.revision),
-                    'Đã nhập cấu hình môi trường.'
-                  );
-                }}
-              >
-                Nhập cấu hình hiện tại
-              </Button>
+            </div>
+            <Button
+              disabled={busy || data.emergencyDisabled || !!draft}
+              onClick={() => setActivationRevision(data.revision)}
+            >
+              {busy && activationRevision !== null
+                ? 'Đang kiểm tra kết nối…'
+                : data.settings.enabled
+                  ? 'Kết nối lại AI'
+                  : 'Kích hoạt AI'}
+            </Button>
+          </div>
+          {draft && (
+            <p className="text-muted-foreground text-sm">
+              Hãy lưu hoặc hủy thay đổi đang chỉnh sửa trước khi kích hoạt.
+            </p>
+          )}
+          {activationRevision !== null && (
+            <div
+              role="group"
+              aria-label="Xác nhận kích hoạt AI"
+              className="bg-muted/40 space-y-3 rounded-lg border p-3"
+            >
+              <p className="text-sm">
+                Thao tác sẽ gọi dịch vụ AI để kiểm tra JSON và câu trả lời, sử
+                dụng hạn mức của nhà cung cấp. Hệ thống chỉ bật AI sau khi kiểm
+                tra thành công; không xóa thời gian chờ quota hoặc sửa API key.
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  disabled={
+                    busy ||
+                    data.emergencyDisabled ||
+                    activationRevision !== data.revision
+                  }
+                  onClick={async () => {
+                    if (busy) return;
+                    setBusy(true);
+
+                    try {
+                      const next =
+                        await aiSettingsService.activate(activationRevision);
+                      client.setQueryData(['ai', 'admin', 'settings'], next);
+                      setDraft(null);
+                      setActivationRevision(null);
+                      notifySuccess(
+                        'Kết nối AI đã được kiểm tra thành công và trợ lý đã được bật.'
+                      );
+                    } catch (failure) {
+                      notifyFailure(failure);
+                    } finally {
+                      setBusy(false);
+                      void client.invalidateQueries({
+                        queryKey: ['ai', 'admin'],
+                      });
+                    }
+                  }}
+                >
+                  {busy ? 'Đang kiểm tra…' : 'Xác nhận kích hoạt'}
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => setActivationRevision(null)}
+                >
+                  Hủy xác nhận
+                </Button>
+              </div>
             </div>
           )}
-          <Table aria-label="Kết nối AI">
+        </div>
+      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tự động chuyển mô hình AI</CardTitle>
+          <CardDescription>
+            Hệ thống tự chuyển sang mô hình tiếp theo khi hết hạn mức dịch vụ
+            hoặc gặp lỗi 429, trước khi bắt đầu hiển thị câu trả lời.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table aria-label="Trạng thái mô hình AI">
             <TableHeader>
               <TableRow>
-                <TableHead>Tên / Nhà cung cấp</TableHead>
-                <TableHead>Model</TableHead>
-                <TableHead>API key</TableHead>
-                <TableHead>Kiểm tra</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
+                <TableHead className="w-24">Ưu tiên</TableHead>
+                <TableHead>Nhà cung cấp / mô hình</TableHead>
+                <TableHead>Trạng thái</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.connections.map((connection) => (
-                <TableRow key={connection.id}>
+              {(data.routing ?? []).map((r) => (
+                <TableRow key={`${r.provider}:${r.model}`}>
+                  <TableCell>{r.priority ?? '—'}</TableCell>
                   <TableCell>
-                    <p className="font-medium">{connection.name}</p>
-                    <span className="text-muted-foreground text-xs">
-                      {providerLabels[connection.provider]}
+                    <span className="block font-medium">
+                      {providerLabels[r.provider] ?? r.provider}
                     </span>
-                    {data.settings.activeConnectionId === connection.id && (
-                      <Badge className="ml-2" variant="secondary">
-                        Đang chọn
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="break-all">
-                    {connection.model}
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-2 font-mono">
-                      <KeyRound className="size-3" aria-hidden="true" />
-                      ••••{connection.keyHint}
+                    <span className="text-muted-foreground block text-xs break-all">
+                      {r.model}
                     </span>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        connection.checkedOk
-                          ? 'secondary'
-                          : connection.checkedAt
-                            ? 'destructive'
-                            : 'outline'
+                        r.retryAt || (r.state && r.state !== 'ready')
+                          ? 'outline'
+                          : 'secondary'
                       }
                     >
-                      {connection.checkedOk
-                        ? 'Kết nối thành công'
-                        : connection.checkedAt
-                          ? 'Kiểm tra thất bại'
-                          : 'Chưa kiểm tra'}
+                      {r.state === 'missing_key'
+                        ? 'Chưa cấu hình khóa API'
+                        : r.state === 'missing_account'
+                          ? 'Thiếu mã tài khoản Cloudflare'
+                          : r.state === 'excluded'
+                            ? 'Không nằm trong thứ tự ưu tiên'
+                            : r.retryAt
+                              ? 'Tạm chờ'
+                              : 'Có thể sử dụng'}
                     </Badge>
-                    {connection.checkCode && !connection.checkedOk && (
+                    {r.retryAt && (
                       <p className="text-muted-foreground mt-1 text-xs">
-                        {connection.checkCode}
+                        Thử lại sau{' '}
+                        {new Date(r.retryAt).toLocaleString('vi-VN')}
                       </p>
                     )}
-                    {connection.checkedAt && (
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {new Date(connection.checkedAt).toLocaleString('vi-VN')}
-                      </p>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={disabled}
-                        onClick={() =>
-                          setConfirm({
-                            action: 'test',
-                            connection,
-                            revision: data.revision,
-                          })
-                        }
-                      >
-                        Kiểm tra
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={
-                          disabled ||
-                          !connection.checkedOk ||
-                          data.settings.activeConnectionId === connection.id
-                        }
-                        onClick={() => {
-                          void execute(
-                            () =>
-                              aiSettingsService.save({
-                                ...data.settings,
-                                revision: data.revision,
-                                activeConnectionId: connection.id,
-                                enabled: true,
-                              }),
-                            'Đã kích hoạt kết nối cho các yêu cầu mới.'
-                          );
-                        }}
-                      >
-                        Kích hoạt
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={
-                          disabled ||
-                          data.settings.activeConnectionId === connection.id
-                        }
-                        onClick={() => {
-                          setConfirm(null);
-                          setForm({
-                            id: connection.id,
-                            revision: data.revision,
-                            name: connection.name,
-                            model: connection.model,
-                            provider: connection.provider,
-                            apiKey: '',
-                          });
-                        }}
-                      >
-                        Sửa
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={
-                          disabled ||
-                          data.settings.activeConnectionId === connection.id
-                        }
-                        onClick={() =>
-                          setConfirm({
-                            action: 'delete',
-                            connection,
-                            revision: data.revision,
-                          })
-                        }
-                      >
-                        Xóa
-                      </Button>
-                    </div>
                   </TableCell>
                 </TableRow>
               ))}
-              {!data.connections.length && (
+              {!data.routing?.length && (
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-muted-foreground h-24 text-center"
-                  >
-                    Chưa có kết nối được lưu trên web.
+                  <TableCell colSpan={3}>
+                    Chưa có nhà cung cấp được cấu hình trên máy chủ.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          <p className="text-muted-foreground text-xs">
-            Muốn sửa hoặc xóa kết nối đang chọn, hãy chọn kết nối khác hoặc chọn
-            “Không dùng kết nối” rồi lưu phần vận hành bên dưới. Kiểm tra lại
-            sau khi thay model/API key.
+          <p className="text-muted-foreground mt-4 text-xs">
+            Khóa API được quản lý trên máy chủ. Mô hình dùng cấu hình mặc định
+            hoặc thiết lập riêng từ môi trường.
           </p>
-          {confirm && (
-            <div
-              role="group"
-              aria-label="Xác nhận thao tác kết nối"
-              className="space-y-3 rounded-lg border p-4"
-            >
-              <p>
-                {confirm.action === 'delete'
-                  ? `Xóa kết nối “${confirm.connection.name}” và API key đã lưu?`
-                  : `Kiểm tra “${confirm.connection.name}” sẽ gọi model thật để thử JSON và streaming, sử dụng tối đa 2 lượt API. Nhà cung cấp có thể tính phí theo tài khoản của bạn.`}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  disabled={busy}
-                  variant={
-                    confirm.action === 'delete' ? 'destructive' : 'default'
-                  }
-                  onClick={async () => {
-                    const target = confirm;
-                    const ok = await execute(
-                      () =>
-                        target.action === 'delete'
-                          ? aiSettingsService.remove(
-                              target.connection.id,
-                              target.revision
-                            )
-                          : aiSettingsService.test(
-                              target.connection.id,
-                              target.revision
-                            ),
-                      target.action === 'delete'
-                        ? 'Đã xóa kết nối.'
-                        : 'Đã kiểm tra. Xem kết quả trong danh sách kết nối.'
-                    );
-                    if (ok) setConfirm(null);
-                  }}
-                >
-                  {busy
-                    ? 'Đang xử lý…'
-                    : confirm.action === 'delete'
-                      ? 'Xác nhận xóa'
-                      : 'Chạy kiểm tra'}
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => setConfirm(null)}
-                >
-                  Hủy
-                </Button>
-              </div>
-            </div>
-          )}
-          {form && (
-            <form
-              className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
-              onSubmit={async (event) => {
-                event.preventDefault();
-                const submitted = form;
-                const ok = await execute(
-                  () =>
-                    aiSettingsService.connection(
-                      {
-                        revision: submitted.revision,
-                        name: submitted.name.trim(),
-                        provider: submitted.provider,
-                        model: submitted.model.trim(),
-                        ...(submitted.apiKey.trim()
-                          ? { apiKey: submitted.apiKey.trim() }
-                          : {}),
-                      },
-                      submitted.id
-                    ),
-                  'Đã lưu kết nối. Hãy kiểm tra trước khi kích hoạt.'
-                );
-                if (ok) setForm(null);
-              }}
-            >
-              <h3 className="font-semibold sm:col-span-2">
-                {form.id ? 'Chỉnh sửa kết nối' : 'Kết nối mới'}
-              </h3>
-              <div className="space-y-2">
-                <Label htmlFor="ai-connection-name">Tên kết nối</Label>
-                <Input
-                  id="ai-connection-name"
-                  required
-                  maxLength={80}
-                  value={form.name}
-                  disabled={busy}
-                  onChange={(event) =>
-                    setForm({ ...form, name: event.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ai-provider">Nhà cung cấp</Label>
-                <select
-                  id="ai-provider"
-                  className={fieldClass}
-                  disabled={busy}
-                  value={form.provider}
-                  onChange={(event) => {
-                    const provider = event.target
-                      .value as AiConnection['provider'];
-                    setForm({
-                      ...form,
-                      provider,
-                      apiKey: '',
-                      model:
-                        data.providerModels?.[provider]?.[0] ??
-                        (provider === 'gemini'
-                          ? (data.suggestedModels[0] ?? '')
-                          : ''),
-                    });
-                  }}
-                >
-                  {Object.entries(providerLabels).map(([id, label]) => (
-                    <option key={id} value={id}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-                <Label htmlFor="ai-connection-model">Model trả lời</Label>
-                <Input
-                  id="ai-connection-model"
-                  list="ai-model-options"
-                  required
-                  pattern={
-                    form.provider === 'gemini'
-                      ? 'gemini-[a-zA-Z0-9._-]+'
-                      : form.provider === 'openai'
-                        ? 'gpt-[a-zA-Z0-9._-]+'
-                        : 'grok-[a-zA-Z0-9._-]+'
-                  }
-                  maxLength={107}
-                  value={form.model}
-                  disabled={busy}
-                  onChange={(event) =>
-                    setForm({ ...form, model: event.target.value })
-                  }
-                />
-                <datalist id="ai-model-options">
-                  {(
-                    data.providerModels?.[form.provider] ??
-                    (form.provider === 'gemini' ? data.suggestedModels : [])
-                  ).map((model) => (
-                    <option key={model} value={model} />
-                  ))}
-                </datalist>
-                <p className="text-muted-foreground text-xs">
-                  Chọn gợi ý hoặc nhập mã model của nhà cung cấp có hỗ trợ JSON
-                  và streaming.
-                </p>
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="ai-connection-key">
-                  API key {form.id && '(để trống nếu giữ nguyên)'}
-                </Label>
-                <Input
-                  id="ai-connection-key"
-                  type="password"
-                  autoComplete="new-password"
-                  required={
-                    !form.id ||
-                    data.connections.find((item) => item.id === form.id)
-                      ?.provider !== form.provider
-                  }
-                  minLength={12}
-                  maxLength={1024}
-                  value={form.apiKey}
-                  disabled={busy}
-                  onChange={(event) =>
-                    setForm({ ...form, apiKey: event.target.value })
-                  }
-                />
-              </div>
-              <div className="flex gap-2 sm:col-span-2">
-                <Button type="submit" disabled={disabled}>
-                  {busy ? 'Đang lưu…' : 'Lưu kết nối'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => setForm(null)}
-                >
-                  Hủy chỉnh sửa
-                </Button>
-              </div>
-            </form>
-          )}
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Điều khiển vận hành</CardTitle>
+          <CardTitle>Vận hành AI</CardTitle>
           <CardDescription>
-            Áp dụng cho yêu cầu mới; tác vụ đang chạy giữ cấu hình ban đầu.
-            Phiên bản {data.revision}.
+            Bật các tính năng cần dùng. Hạn mức dịch vụ do nhà cung cấp quyết
+            định; website không đặt trần lượt gọi theo ngày.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form
-            className="space-y-5"
+            className="space-y-4"
             onSubmit={async (event) => {
               event.preventDefault();
-              if (
-                await execute(
-                  () => aiSettingsService.save(current),
-                  'Đã cập nhật cấu hình vận hành.'
-                )
-              )
+              if (busy) return;
+              setBusy(true);
+
+              try {
+                const next = await aiSettingsService.save(current);
+                client.setQueryData(['ai', 'admin', 'settings'], next);
                 setDraft(null);
+                await client.invalidateQueries({ queryKey: ['ai', 'admin'] });
+                notifySuccess('Đã lưu cấu hình vận hành.');
+              } catch (e) {
+                notifyFailure(e);
+              } finally {
+                setBusy(false);
+              }
             }}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="ai-active-connection">Kết nối đang dùng</Label>
-                <select
-                  id="ai-active-connection"
-                  className={fieldClass}
-                  disabled={disabled}
-                  value={current.activeConnectionId ?? ''}
-                  onChange={(event) =>
-                    change({
-                      activeConnectionId: event.target.value || null,
-                      ...(!event.target.value ? { enabled: false } : {}),
-                    })
-                  }
-                >
-                  <option value="">Không dùng kết nối</option>
-                  {data.connections.map((connection) => (
-                    <option key={connection.id} value={connection.id}>
-                      {connection.name} · {connection.model}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ai-daily-limit">
-                  Giới hạn lượt gọi / ngày UTC
-                </Label>
-                <Input
-                  id="ai-daily-limit"
-                  type="number"
-                  min={1}
-                  max={100000}
-                  required
-                  disabled={disabled}
-                  value={current.dailyCalls}
-                  onChange={(event) =>
-                    change({ dailyCalls: Number(event.target.value) })
-                  }
-                />
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2">
               {(
                 [
                   [
                     'enabled',
                     'Bật trợ lý AI',
-                    'Cho phép phân tích câu hỏi và trả lời.',
+                    'Cho phép khách trò chuyện với trợ lý mua sắm.',
                   ],
                   [
                     'semanticEnabled',
                     'Tìm kiếm ngữ nghĩa',
-                    'Tìm theo ý nghĩa bằng phiên bản embeddings đã kích hoạt.',
+                    'Tìm sản phẩm theo ý nghĩa từ dữ liệu kiến thức đã kích hoạt.',
                   ],
                   [
                     'indexingEnabled',
-                    'Đồng bộ kiến thức tự động',
-                    'Cho phép worker cập nhật embeddings định kỳ.',
+                    'Tự động đồng bộ kiến thức',
+                    'Cập nhật kiến thức khi sản phẩm và chính sách thay đổi.',
                   ],
                   [
                     'riskEnabled',
                     'Theo dõi rủi ro',
-                    'Ghi nhận tín hiệu đăng nhập và checkout theo quy tắc.',
+                    'Ghi nhận tín hiệu bất thường từ đăng nhập và đặt hàng.',
                   ],
                 ] as const
               ).map(([key, label, description]) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between gap-3 rounded-lg border p-4"
+                  className="flex items-start justify-between gap-4 rounded-lg border p-4"
                 >
-                  <div>
+                  <div className="space-y-1.5">
                     <Label htmlFor={`ai-feature-${key}`}>{label}</Label>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                    <p
+                      id={`ai-feature-${key}-description`}
+                      className="text-muted-foreground text-xs leading-relaxed"
+                    >
                       {description}
                     </p>
                   </div>
                   <Switch
                     id={`ai-feature-${key}`}
+                    aria-describedby={`ai-feature-${key}-description`}
                     checked={current[key]}
                     disabled={
-                      disabled ||
-                      (key === 'semanticEnabled'
-                        ? !(data.semanticReady ?? data.vectorReady)
-                        : key === 'indexingEnabled' && !data.vectorReady)
+                      busy ||
+                      (key === 'semanticEnabled' &&
+                        !semanticReady &&
+                        !current.semanticEnabled)
                     }
                     onCheckedChange={(checked) => change({ [key]: checked })}
                   />
                 </div>
               ))}
             </div>
-            {!data.vectorReady && (
-              <p className="text-muted-foreground text-sm">
-                Thiết lập lần đầu: kiểm tra kết nối Gemini/OpenAI ở trên, tạo
-                phiên bản embeddings bên dưới và chọn bật đồng bộ tự động. Khi
-                phiên bản sẵn sàng, chọn Dùng phiên bản này để bật tìm kiếm ngữ
-                nghĩa. Có thể dùng MongoDB thông thường mà không cần
-                AI_VECTOR_INDEX trong môi trường.
+            {!semanticReady && (
+              <p className="text-muted-foreground text-xs">
+                Tìm kiếm ngữ nghĩa cần một phiên bản kiến thức đã sẵn sàng và
+                được kích hoạt trong phần Đồng bộ kiến thức bên dưới. Bạn vẫn có
+                thể bật trợ lý AI và lưu cấu hình khi tắt Tìm kiếm ngữ nghĩa.
               </p>
             )}
-            {draft && draft.revision !== data.revision && (
-              <p role="alert">
-                Cấu hình đã được người khác thay đổi. Hủy thay đổi để tải phiên
-                bản mới trước khi lưu.
-              </p>
-            )}
+
             <div className="flex gap-2">
               <Button
                 type="submit"
-                disabled={
-                  disabled ||
-                  data.source === 'environment' ||
-                  (draft !== null && draft.revision !== data.revision)
-                }
+                disabled={busy || (!!draft && draft.revision !== data.revision)}
               >
-                {busy ? 'Đang lưu…' : 'Lưu vận hành'}
+                {busy ? 'Đang lưu…' : 'Lưu cấu hình'}
               </Button>
               {draft && (
                 <Button
@@ -700,16 +384,77 @@ export function AiConfiguration() {
       </Card>
       <AiEmbeddingVersions
         connections={data.connections}
-        encryptionReady={data.encryptionReady}
+        encryptionReady={true}
       />
       <Card>
         <CardHeader>
-          <CardTitle>Lịch sử thay đổi cấu hình</CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <CardTitle>Lịch sử thay đổi cấu hình</CardTitle>
+            {isSuperAdmin && (
+              <Button
+                variant="outline"
+                className="text-destructive"
+                disabled={busy || !data.audit.length}
+                onClick={() => setClearAuditRevision(data.revision)}
+              >
+                Xóa lịch sử cấu hình
+              </Button>
+            )}
+          </div>
           <CardDescription>
-            Tối đa 100 thay đổi gần đây, không ghi giá trị API key.
+            Lưu 100 thay đổi gần nhất, hiển thị 10 mục mỗi trang.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {isSuperAdmin && clearAuditRevision !== null && (
+            <div
+              role="group"
+              aria-label="Xác nhận xóa lịch sử cấu hình"
+              className="mb-4 space-y-3 rounded-lg border p-4"
+            >
+              <p className="text-sm">
+                Xóa toàn bộ lịch sử thay đổi cấu hình AI? Thao tác không thể
+                hoàn tác. Cấu hình vận hành, khóa API, dữ liệu kiến thức và lịch
+                sử trò chuyện vẫn được giữ nguyên.
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="destructive"
+                  disabled={busy || clearAuditRevision !== data.revision}
+                  onClick={async () => {
+                    if (busy) return;
+                    setBusy(true);
+
+                    try {
+                      const next =
+                        await aiSettingsService.clearAudit(clearAuditRevision);
+                      client.setQueryData(['ai', 'admin', 'settings'], next);
+                      setClearAuditRevision(null);
+                      setPage(1);
+                      notifySuccess('Đã xóa lịch sử cấu hình AI.');
+                    } catch (failure) {
+                      notifyFailure(failure);
+                    } finally {
+                      setBusy(false);
+                      void client.invalidateQueries({
+                        queryKey: ['ai', 'admin'],
+                      });
+                    }
+                  }}
+                >
+                  {busy ? 'Đang xóa…' : 'Xác nhận xóa lịch sử'}
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => setClearAuditRevision(null)}
+                >
+                  Hủy xóa lịch sử
+                </Button>
+              </div>
+            </div>
+          )}
           <Table aria-label="Lịch sử cấu hình AI">
             <TableHeader>
               <TableRow>
@@ -719,29 +464,48 @@ export function AiConfiguration() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.audit.map((entry, index) => (
-                <TableRow key={`${entry.at}-${index}`}>
-                  <TableCell className="whitespace-nowrap">
-                    {new Date(entry.at).toLocaleString('vi-VN')}
-                  </TableCell>
-                  <TableCell>{actions[entry.action] ?? entry.action}</TableCell>
-                  <TableCell className="font-mono text-xs break-all">
-                    {entry.actor}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {data.audit
+                .slice((activePage - 1) * 10, activePage * 10)
+                .map((e, i) => (
+                  <TableRow key={`${e.at}:${i}`}>
+                    <TableCell>
+                      {new Date(e.at).toLocaleString('vi-VN')}
+                    </TableCell>
+                    <TableCell>{auditLabels[e.action] ?? e.action}</TableCell>
+                    <TableCell>{e.actor}</TableCell>
+                  </TableRow>
+                ))}
               {!data.audit.length && (
                 <TableRow>
                   <TableCell
                     colSpan={3}
-                    className="text-muted-foreground h-20 text-center"
+                    className="text-muted-foreground py-8 text-center"
                   >
-                    Chưa có thay đổi cấu hình trên web.
+                    Chưa có thay đổi cấu hình.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              disabled={activePage <= 1}
+              onClick={() => setPage(activePage - 1)}
+            >
+              Trước
+            </Button>
+            <span>
+              Trang {activePage}/{pages}
+            </span>
+            <Button
+              variant="outline"
+              disabled={activePage >= pages}
+              onClick={() => setPage(activePage + 1)}
+            >
+              Sau
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
