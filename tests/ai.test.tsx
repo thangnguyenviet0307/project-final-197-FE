@@ -222,6 +222,8 @@ it('uses Socket.IO events and clears the draft only after acceptance', async () 
     expect.objectContaining({
       auth: { ticket: 'ephemeral-ticket', accessToken: null },
       reconnection: false,
+      transports: ['websocket', 'polling'],
+      tryAllTransports: true,
       path: '/api/v1/ai/socket',
     })
   );
@@ -301,6 +303,38 @@ function openAndSend(text: string) {
   });
   fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
 }
+it.each([false, true])(
+  'distinguishes network failure from expired socket authentication (%s)',
+  async (expired) => {
+    const { socket, handlers } = socketFixture(false);
+    vi.spyOn(aiService, 'create').mockResolvedValue({ id });
+    vi.spyOn(aiService, 'ticket').mockResolvedValue('ticket');
+    mount();
+    openAndSend('Giữ lại câu hỏi');
+    await waitFor(() => expect(socket.connect).toHaveBeenCalled());
+    await act(async () => {
+      handlers.get('connect_error')?.(
+        Object.assign(
+          new Error('connect failed'),
+          expired ? { data: { code: 'AI_SOCKET_SESSION_EXPIRED' } } : {}
+        )
+      );
+    });
+    await screen.findByText(
+      expired
+        ? 'Phiên kết nối trợ lý đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.'
+        : 'Không kết nối được máy chủ trợ lý. Vui lòng kiểm tra kết nối mạng và thử lại.'
+    );
+    expect(socket.emit).not.toHaveBeenCalled();
+    expect(
+      (screen.getByLabelText('Câu hỏi cho trợ lý') as HTMLTextAreaElement).value
+    ).toBe('Giữ lại câu hỏi');
+    expect(
+      (screen.getByRole('button', { name: 'Gửi' }) as HTMLButtonElement)
+        .disabled
+    ).toBe(false);
+  }
+);
 it.each(['create', 'ticket'] as const)(
   'stops during %s preparation and preserves the draft without a later socket',
   async (phase) => {

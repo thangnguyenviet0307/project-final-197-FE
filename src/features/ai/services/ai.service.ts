@@ -1,4 +1,5 @@
 import { api } from '@/services/api';
+import { resolveAiSocketEndpoint } from './socket-endpoint';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth.store';
 import { cancelResultSchema } from '../schemas/ai';
@@ -159,9 +160,9 @@ export const aiService = {
   },
 };
 export function socketEndpoint() {
-  const url = new URL(
-    (api.defaults.baseURL || '/api/v1').replace(/\/$/, '') + '/ai/socket',
+  return resolveAiSocketEndpoint(
+    import.meta.env.VITE_AI_SOCKET_URL,
+    api.defaults.baseURL || '/api/v1',
     window.location.origin
   );
-  return { origin: url.origin, path: url.pathname };
 }

@@ -9,6 +9,10 @@
   ],
   "headers": [
     {
+      "source": "/api/v1/ai/:path*",
+      "headers": [{ "key": "Cache-Control", "value": "private, no-store" }]
+    },
+    {
       "source": "/api/v1/auth/:path*",
       "headers": [{ "key": "Cache-Control", "value": "private, no-store" }]
     },

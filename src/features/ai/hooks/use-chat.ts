@@ -174,7 +174,13 @@ export function useChat(open: boolean) {
       const endpoint = socketEndpoint();
       const connection = io(endpoint.origin, {
         path: endpoint.path,
-        transports: ['websocket'],
+        // Production goes directly to Render and prefers WebSocket. A local
+        // same-origin HTTP proxy starts with polling; either can fall back.
+        transports:
+          endpoint.origin !== window.location.origin
+            ? ['websocket', 'polling']
+            : ['polling', 'websocket'],
+        tryAllTransports: true,
         autoConnect: false,
         reconnection: false,
         forceNew: true,
@@ -312,15 +318,20 @@ export function useChat(open: boolean) {
       ])
         connection.on(name, onEvent);
       connection.on('disconnect', finish);
-      connection.on('connect_error', () => {
-        finished = true;
-        connection.disconnect();
-        finish();
-        if (current())
-          setError(
-            'Không thể kết nối trợ lý hoặc phiên đã hết hạn. Vui lòng thử lại.'
-          );
-      });
+      connection.on(
+        'connect_error',
+        (cause: Error & { data?: { code?: string } }) => {
+          finished = true;
+          connection.disconnect();
+          finish();
+          if (current())
+            setError(
+              cause.data?.code === 'AI_SOCKET_SESSION_EXPIRED'
+                ? 'Phiên kết nối trợ lý đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.'
+                : 'Không kết nối được máy chủ trợ lý. Vui lòng kiểm tra kết nối mạng và thử lại.'
+            );
+        }
+      );
       connection.connect();
     } catch (cause) {
       if (current()) {
