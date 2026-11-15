@@ -36,20 +36,27 @@ The creation form requires a selected embedding model and sends it explicitly. M
 
 Periodic refresh creates a successor only when knowledge changes; equivalent pending builds cannot be duplicated. Cancelling a successor suspends automatic recreation for that parent. Use the knowledge synchronization action to retry the same cancelled version explicitly.
 
-## Per-version embedding selection and routing monitor (2026-11-15)
+## Per-version embedding selection (2026-11-15)
 
 This supersedes the automatic-only embedding form above. Creation now selects a provider/model from the backend-supported catalog; changing model resets connection and constrains dimensions. Gemini, Cloudflare and free OpenRouter models are supported when their environment credentials are configured. Each existing version retains its vector space. Switching the chatbot model never implicitly switches embedding data.
 
-The AI page polls the protected routing monitor every three seconds, displaying thirty recent intent/answer operations, current/final models and per-attempt quota transitions. Monitoring is administration-only, metadata-only and retained for 24 hours. Storefront typing/stream events do not expose model identities or switching. Already-emitted answer text is retained rather than mixed across models.
-
-Configuration audit displays the resolved administrator name followed by current role; worker operations display Hệ thống (Tự động). Management remains Super Admin-only while Admin/Staff may view the monitor and audit.
+Configuration audit displays the resolved administrator name followed by current role; worker operations display Hệ thống (Tự động). Management remains Super Admin-only while Admin/Staff may view AI configuration and audit.
 
 ## Vietnamese notifications (2026-11-15)
 
 AI HTTP errors and rate-limit feedback use Vietnamese. The frontend error utility also translates legacy English AI messages so independently deployed backend versions do not expose untranslated toasts. Embedding deletion distinguishes a still-pending job from the existing five-minute deactivation waiting period; authorization, status codes and data-protection rules are unchanged.
 
-## One monitoring row per logical operation (2026-11-15)
-
-Activation/reconnection shares one monitoring operation across its required structured JSON and streaming probes. Chat intent extraction and answer generation likewise share one operation per request; concurrent customers remain isolated. Kind distinguishes activation, chat and standalone provider operations. Attempts retain their phase and all real provider transitions; the administration groups consecutive uses of the same model in its timeline. No timestamp-based deduplication merges different customers. Legacy rows lack an operation correlation and remain unchanged until their existing 24-hour expiration.
+## Activation concurrency protection (2026-11-15)
 
 An immediate browser guard blocks repeated confirmation clicks. A cross-instance MongoDB lease in ai_activation_leases serializes activation attempts, expires after 90 seconds (beyond the 70-second HTTP deadline), and is released conditionally by its owner. A rejected duplicate performs no provider calls. The existing revision check prevents replaying a completed activation against stale settings. Existing provider quota/cooldown, chat history and partial-stream behavior remain unchanged.
+
+
+## Removed chatbot model monitor (2026-11-15)
+
+The administrative model-monitor card, polling hook, API, run model and per-call tracing have been removed. Chat provider fallback, quota cooldowns, activation concurrency protection, audit, embedding versions and customer conversations remain. No application code reads or writes the former monitoring collection. Existing database records are not dropped by this source change; an already-created MongoDB TTL index may expire historical records normally.
+
+## Embedding recommendations and paginated records (2026-11-15)
+
+The embedding picker labels recommended multilingual options: Gemini embedding-2 (default 1536 dimensions), Cloudflare BGE-M3 (1024) and OpenRouter Nemotron 3.5 Embed 8B free (4096). Old models remain selectable for compatibility. Availability depends on backend environment credentials; free usage remains subject to the provider's account plan and limits. Embedding selection is independent of chat routing. A version's model stays pinned for indexing and retrieval.
+
+Embedding versions use the shared `ListPagination` at 10 rows per page; the active model label resolves against the full version list. The failure, provider-usage and risk sections independently request server-side pages of 10 records, with stable sort and refresh. They reuse `ListPagination`, `Button`, `Trash2` and the shared `AlertDialog` confirmation, and Sonner notifications. Only Super Admin sees deletion controls; backend authorization also enforces this restriction. Each confirmation carries the selected record's timestamp or usage count, so concurrent changes return 409 and require a fresh confirmation. Failure removal preserves customer conversation history. Usage removal affects only statistical totals, not abuse protection or provider quota state.

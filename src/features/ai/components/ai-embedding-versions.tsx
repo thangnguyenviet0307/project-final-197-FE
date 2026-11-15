@@ -1,3 +1,4 @@
+import { ListPagination } from '@/components/list-pagination';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -76,13 +77,18 @@ export function AiEmbeddingVersions({
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const data = query.data;
+  const [requestedPage, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil((data?.versions.length ?? 0) / 10));
+  const page = Math.min(requestedPage, totalPages);
   const activeVersion = data?.versions.find(
     (version) => version._id === data.activeId
   );
   const eligible = connections.filter((connection) => connection.checkedOk);
   const options = data?.supportedModels ?? [];
   const selected = options.find((item) => item.model === draft?.model);
-  const defaultOption = options.find((item) => item.available);
+  const defaultOption =
+    options.find((item) => item.available && item.recommended) ??
+    options.find((item) => item.available);
   async function execute(
     work: () => Promise<EmbeddingVersionsData>,
     text: string
@@ -287,7 +293,11 @@ export function AiEmbeddingVersions({
                 </div>
                 <p className="text-muted-foreground text-sm">
                   Dữ liệu ngữ nghĩa dùng model embedding đã chọn, độc lập với
-                  model chat.
+                  model chat. Khuyến nghị: Gemini Embedding 2, Cloudflare BGE-M3
+                  và OpenRouter Nemotron 3.5 Embed 8B. Gemini cần dự án Free
+                  Tier; Cloudflare miễn phí trong hạn mức Workers AI; OpenRouter
+                  dùng model có hậu tố :free. Groq chưa cung cấp model embedding
+                  phù hợp.
                 </p>
                 <div className="space-y-2">
                   <Label htmlFor="embedding-model">
@@ -323,6 +333,7 @@ export function AiEmbeddingVersions({
                         disabled={!item.available}
                       >
                         {item.provider} — {item.model}
+                        {item.recommended ? ' (Khuyến nghị)' : ''}
                         {item.available ? '' : ' (Chưa cấu hình)'}
                       </option>
                     ))}
@@ -445,145 +456,147 @@ export function AiEmbeddingVersions({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.versions.map((version) => (
-                  <TableRow key={version._id}>
-                    <TableCell>
-                      <p className="max-w-64 font-medium break-all">
-                        {version.model}
-                      </p>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {new Date(version.createdAt).toLocaleString('vi-VN')}
-                        {version.autoActivate ? ' · Đồng bộ định kỳ' : ''}
-                      </p>
-                      {data.activeId === version._id && (
-                        <Badge className="mt-2" variant="secondary">
-                          Đang sử dụng
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          version.state === 'failed'
-                            ? 'destructive'
-                            : 'secondary'
-                        }
-                      >
-                        {labels[version.state]}
-                      </Badge>
-                      {version.failureCode && (
-                        <p className="text-muted-foreground mt-2 text-xs">
-                          {failureDescriptions[version.failureCode] ??
-                            'Chưa thể hoàn tất tác vụ. Kiểm tra cấu hình và thử lại.'}{' '}
-                          ({version.failureCode})
+                {data.versions
+                  .slice((page - 1) * 10, page * 10)
+                  .map((version) => (
+                    <TableRow key={version._id}>
+                      <TableCell>
+                        <p className="max-w-64 font-medium break-all">
+                          {version.model}
                         </p>
-                      )}
-                      {version.failureCode &&
-                        version.nextRunAt &&
-                        ['queued', 'building', 'verifying'].includes(
-                          version.state
-                        ) && (
-                          <p className="text-muted-foreground mt-2 text-xs">
-                            Tự kiểm tra lại:{' '}
-                            {new Date(version.nextRunAt).toLocaleString(
-                              'vi-VN'
-                            )}
-                          </p>
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {new Date(version.createdAt).toLocaleString('vi-VN')}
+                          {version.autoActivate ? ' · Đồng bộ định kỳ' : ''}
+                        </p>
+                        {data.activeId === version._id && (
+                          <Badge className="mt-2" variant="secondary">
+                            Đang sử dụng
+                          </Badge>
                         )}
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {version.verified} / {version.chunks}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          size="sm"
-                          disabled={
-                            busy ||
-                            !canManage ||
-                            !options.some(
-                              (item) =>
-                                item.provider === version.provider &&
-                                item.model === version.model &&
-                                item.available
-                            ) ||
-                            version.state !== 'ready' ||
-                            data.activeId === version._id
-                          }
-                          onClick={() =>
-                            setConfirm({
-                              action: 'activate',
-                              id: version._id,
-                              revision: data.revision,
-                            })
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            version.state === 'failed'
+                              ? 'destructive'
+                              : 'secondary'
                           }
                         >
-                          Dùng phiên bản này
-                        </Button>
-                        {data.activeId !== version._id &&
-                          (['queued', 'building', 'verifying'].includes(
+                          {labels[version.state]}
+                        </Badge>
+                        {version.failureCode && (
+                          <p className="text-muted-foreground mt-2 text-xs">
+                            {failureDescriptions[version.failureCode] ??
+                              'Chưa thể hoàn tất tác vụ. Kiểm tra cấu hình và thử lại.'}{' '}
+                            ({version.failureCode})
+                          </p>
+                        )}
+                        {version.failureCode &&
+                          version.nextRunAt &&
+                          ['queued', 'building', 'verifying'].includes(
                             version.state
-                          ) ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={busy || !canManage}
-                              onClick={() =>
-                                setConfirm({
-                                  action: 'cancel',
-                                  id: version._id,
-                                  revision: data.revision,
-                                })
-                              }
-                            >
-                              Hủy đồng bộ
-                            </Button>
-                          ) : (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={
-                                  busy ||
-                                  !canManage ||
-                                  !options.some(
-                                    (item) =>
-                                      item.provider === version.provider &&
-                                      item.model === version.model &&
-                                      item.available
-                                  ) ||
-                                  !eligible.length
-                                }
-                                onClick={() =>
-                                  setConfirm({
-                                    action: 'retry',
-                                    id: version._id,
-                                    revision: data.revision,
-                                  })
-                                }
-                              >
-                                Thử lại / xác nhận
-                              </Button>
+                          ) && (
+                            <p className="text-muted-foreground mt-2 text-xs">
+                              Tự kiểm tra lại:{' '}
+                              {new Date(version.nextRunAt).toLocaleString(
+                                'vi-VN'
+                              )}
+                            </p>
+                          )}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {version.verified} / {version.chunks}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            disabled={
+                              busy ||
+                              !canManage ||
+                              !options.some(
+                                (item) =>
+                                  item.provider === version.provider &&
+                                  item.model === version.model &&
+                                  item.available
+                              ) ||
+                              version.state !== 'ready' ||
+                              data.activeId === version._id
+                            }
+                            onClick={() =>
+                              setConfirm({
+                                action: 'activate',
+                                id: version._id,
+                                revision: data.revision,
+                              })
+                            }
+                          >
+                            Dùng phiên bản này
+                          </Button>
+                          {data.activeId !== version._id &&
+                            (['queued', 'building', 'verifying'].includes(
+                              version.state
+                            ) ? (
                               <Button
                                 size="sm"
                                 variant="outline"
                                 disabled={busy || !canManage}
                                 onClick={() =>
                                   setConfirm({
-                                    action: 'delete',
+                                    action: 'cancel',
                                     id: version._id,
                                     revision: data.revision,
                                   })
                                 }
                               >
-                                Xóa phiên bản
+                                Hủy đồng bộ
                               </Button>
-                            </>
-                          ))}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                            ) : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={
+                                    busy ||
+                                    !canManage ||
+                                    !options.some(
+                                      (item) =>
+                                        item.provider === version.provider &&
+                                        item.model === version.model &&
+                                        item.available
+                                    ) ||
+                                    !eligible.length
+                                  }
+                                  onClick={() =>
+                                    setConfirm({
+                                      action: 'retry',
+                                      id: version._id,
+                                      revision: data.revision,
+                                    })
+                                  }
+                                >
+                                  Thử lại / xác nhận
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={busy || !canManage}
+                                  onClick={() =>
+                                    setConfirm({
+                                      action: 'delete',
+                                      id: version._id,
+                                      revision: data.revision,
+                                    })
+                                  }
+                                >
+                                  Xóa phiên bản
+                                </Button>
+                              </>
+                            ))}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 {!data.versions.length && (
                   <TableRow>
                     <TableCell
@@ -596,6 +609,13 @@ export function AiEmbeddingVersions({
                 )}
               </TableBody>
             </Table>
+            <ListPagination
+              label="Phân trang phiên bản embeddings"
+              page={page}
+              totalPages={totalPages}
+              disabled={busy}
+              onPageChange={setPage}
+            />
           </>
         )}
       </CardContent>

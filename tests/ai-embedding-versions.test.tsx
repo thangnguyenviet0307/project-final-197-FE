@@ -78,6 +78,42 @@ function mount() {
   );
 }
 
+it('paginates versions while retaining the active model name outside the displayed page', async () => {
+  const original = data.versions[0]!;
+  data.versions = Array.from({ length: 12 }, (_, index) => ({
+    ...original,
+    _id: `version-${index}`,
+    model: `embedding-${index}`,
+  }));
+  data.activeId = 'version-11';
+  mount();
+  await screen.findByText('Trang 1 / 2');
+  expect(screen.getByText('Phiên bản đang dùng: embedding-11')).toBeTruthy();
+  expect(screen.queryByText('embedding-10')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }));
+  await screen.findByText('Trang 2 / 2');
+  expect(screen.getByText('embedding-10')).toBeTruthy();
+  expect(screen.queryByText('embedding-0')).toBeNull();
+});
+
+it('defaults new versions to the recommended available embedding model', async () => {
+  data.supportedModels![1]!.recommended = true;
+  mount();
+  await screen.findByText('Trang 1 / 1');
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Tạo phiên bản embeddings' })
+  );
+  await waitFor(() =>
+    expect(
+      (
+        screen.getByLabelText(
+          'Nhà cung cấp / model embedding'
+        ) as HTMLSelectElement
+      ).value
+    ).toBe('gemini-embedding-2')
+  );
+});
+
 it('explains when queued embeddings have no running server worker', async () => {
   const infoToast = vi.spyOn(toast, 'info');
   data.worker = {

@@ -34,6 +34,7 @@ export interface EmbeddingVersionsData {
     model: string;
     dimensions: number[];
     available: boolean;
+    recommended?: boolean;
   }[];
 }
 export interface EmbeddingVersionInput {

@@ -1,4 +1,4 @@
-import { AiRoutingMonitor } from '@/features/ai/components/ai-routing-monitor';
+import { AiAdminRecordsSection } from '@/features/ai/components/ai-admin-records';
 import { useAuthStore } from '@/stores/auth.store';
 import { AiConfiguration } from '@/features/ai/components/ai-configuration';
 import { toast } from 'sonner';
@@ -21,14 +21,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 
 const number = new Intl.NumberFormat('vi-VN');
 function dateTime(value?: string) {
@@ -114,7 +106,6 @@ export default function AiAdminPage() {
             ))}
           </div>
         )}
-        <AiRoutingMonitor />
         <AiConfiguration canManage={canManage} />
         {data && (
           <>
@@ -257,156 +248,9 @@ export default function AiAdminPage() {
                 </CardContent>
               </Card>
             </div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Lỗi trả lời gần đây</CardTitle>
-                <CardDescription>
-                  Các lượt trả lời thất bại để kiểm tra nguyên nhân và hỗ trợ
-                  vận hành.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table aria-label="Lỗi trả lời gần đây">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Thời gian</TableHead>
-                      <TableHead>Mã lỗi</TableHead>
-                      <TableHead>Giai đoạn</TableHead>
-                      <TableHead>Thông báo</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.failures?.length ? (
-                      data.failures.map((failure) => (
-                        <TableRow key={failure.requestId}>
-                          <TableCell className="whitespace-nowrap">
-                            {dateTime(failure.updatedAt)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="destructive">
-                              {failure.error.code}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{failure.error.stage}</TableCell>
-                          <TableCell className="min-w-64 whitespace-normal">
-                            {failure.error.message}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="text-muted-foreground h-24 text-center"
-                        >
-                          Chưa ghi nhận lỗi trả lời.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Lượt gọi nhà cung cấp</CardTitle>
-                <CardDescription>
-                  Số lượt gọi API ghi nhận theo ngày UTC, gồm cả các lần gọi
-                  thất bại.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table aria-label="Lượt gọi nhà cung cấp">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ngày (UTC)</TableHead>
-                      <TableHead className="text-right">Số lượt gọi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.usage.length ? (
-                      [...data.usage]
-                        .sort(
-                          (a, b) =>
-                            Number(b._id.split(':').at(-1)) -
-                            Number(a._id.split(':').at(-1))
-                        )
-                        .map((usage) => (
-                          <TableRow key={usage._id}>
-                            <TableCell>
-                              {new Date(
-                                Number(usage._id.split(':').at(-1)) * 86400000
-                              ).toLocaleDateString('vi-VN', {
-                                timeZone: 'UTC',
-                              })}
-                            </TableCell>
-                            <TableCell className="text-right font-medium tabular-nums">
-                              {number.format(usage.count)}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={2}
-                          className="text-muted-foreground h-24 text-center"
-                        >
-                          Chưa có dữ liệu lượt gọi.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Cảnh báo rủi ro theo quy tắc</CardTitle>
-                <CardDescription>
-                  Các tín hiệu cần xem xét; hệ thống không tự kết luận gian lận
-                  hoặc khóa tài khoản.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table aria-label="Cảnh báo rủi ro">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Thời gian</TableHead>
-                      <TableHead>Sự kiện</TableHead>
-                      <TableHead>Lý do</TableHead>
-                      <TableHead className="text-right">Điểm</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.risks.length ? (
-                      data.risks.map((risk) => (
-                        <TableRow key={risk._id}>
-                          <TableCell className="whitespace-nowrap">
-                            {dateTime(risk.createdAt)}
-                          </TableCell>
-                          <TableCell>{risk.event}</TableCell>
-                          <TableCell className="min-w-56 whitespace-normal">
-                            {risk.reason}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Badge variant="outline">{risk.score}</Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="text-muted-foreground h-24 text-center"
-                        >
-                          Chưa có cảnh báo.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <AiAdminRecordsSection kind="failures" canManage={canManage} />
+            <AiAdminRecordsSection kind="usage" canManage={canManage} />
+            <AiAdminRecordsSection kind="risks" canManage={canManage} />
           </>
         )}
       </div>
