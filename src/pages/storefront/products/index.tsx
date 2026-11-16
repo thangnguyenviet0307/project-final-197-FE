@@ -8,7 +8,6 @@ import {
   catalogOptionGrid,
 } from '@/features/storefront/components/catalog-filter-option';
 import { memo, useEffect, useState, type SubmitEvent } from 'react';
-import { SmartSearch } from '@/features/ai/components/smart-search';
 import './catalog-filters.css';
 import {
   Filter,
@@ -519,7 +518,6 @@ export default function StorefrontProductsPage() {
   return (
     <div className="store-catalog min-h-[60vh] bg-white text-gray-950">
       <div className="store-container space-y-6 py-8">
-        <SmartSearch />
         <nav aria-label="Breadcrumb" className="text-sm text-gray-500">
           <Link className="transition-colors hover:text-[#4d9210]" to="/">
             Trang chủ
