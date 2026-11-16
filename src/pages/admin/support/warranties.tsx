@@ -2,7 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { WarrantyList } from '@/features/support/components/warranty-list';
 import { WarrantyDetailPanel } from '@/features/support/components/warranty-detail';
-import { warrantyIdSchema } from '@/features/support/schemas/support-schema';
+import { warrantyNavigationKeySchema } from '@/features/support/schemas/support-schema';
 
 export default function AdminWarrantiesPage() {
   const [params, setParams] = useSearchParams();
@@ -36,7 +36,7 @@ export default function AdminWarrantiesPage() {
           }
         />
         {selected ? (
-          warrantyIdSchema.safeParse(selected).success ? (
+          warrantyNavigationKeySchema.safeParse(selected).success ? (
             <WarrantyDetailPanel
               key={selected}
               id={selected}

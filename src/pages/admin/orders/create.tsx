@@ -51,7 +51,7 @@ export default function CreateOrderPage() {
   });
   const mutation = useMutation({
     mutationFn: async (input: AdminOrderInput) => {
-      const { data } = await api.post<{ data: { _id: string } }>(
+      const { data } = await api.post<{ data: { _id: string; slug?: string } }>(
         '/orders',
         input
       );
@@ -64,7 +64,7 @@ export default function CreateOrderPage() {
         client.invalidateQueries({ queryKey: ['orders'] }),
         client.invalidateQueries({ queryKey: ['products'] }),
       ]);
-      navigate(`/auth/orders/${order._id}`);
+      navigate(`/auth/orders/${order.slug || order._id}`);
     },
   });
   return (

@@ -1,10 +1,11 @@
+import { orderNavigationKeySchema } from '@/features/support/schemas/support-schema';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { WarrantyCreateForm } from '@/features/support/components/warranty-create-form';
 import { WarrantyList } from '@/features/support/components/warranty-list';
 import { WarrantyDetailPanel } from '@/features/support/components/warranty-detail';
-import { warrantyIdSchema } from '@/features/support/schemas/support-schema';
+import { warrantyNavigationKeySchema } from '@/features/support/schemas/support-schema';
 
 export default function CustomerWarrantyPage() {
   const [params, setParams] = useSearchParams();
@@ -15,7 +16,7 @@ export default function CustomerWarrantyPage() {
   const item = params.get('item') ?? '';
   const hasTarget = params.has('order') || params.has('item');
   const validTarget =
-    warrantyIdSchema.safeParse(orderId).success &&
+    orderNavigationKeySchema.safeParse(orderId).success &&
     /^\d{1,4}$/.test(item) &&
     Number(item) <= 9999;
   function closeDetail() {
@@ -113,7 +114,7 @@ export default function CustomerWarrantyPage() {
       <WarrantyList admin={false} selectedId={selected} onSelect={select} />
       {!creating &&
         selected &&
-        (warrantyIdSchema.safeParse(selected).success ? (
+        (warrantyNavigationKeySchema.safeParse(selected).success ? (
           <WarrantyDetailPanel
             key={selected}
             id={selected}

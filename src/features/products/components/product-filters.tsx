@@ -33,10 +33,12 @@ export function ProductFilters({
     const next = Object.fromEntries(
       Object.entries(draft).map(([key, value]) => [key, value.trim()])
     ) as unknown as ProductFiltersValue;
+    next.category = categories.data?.find((item) => item._id === next.category)?.slug ?? next.category;
+    next.brand = brands.data?.find((item) => item._id === next.brand)?.slug ?? next.brand;
     if (JSON.stringify(next) === initialKey) return;
     const timer = window.setTimeout(() => onChange(next), 350);
     return () => window.clearTimeout(timer);
-  }, [draft, initialKey, onChange]);
+  }, [draft, initialKey, onChange, categories.data, brands.data]);
   return (
     <section
       aria-label="Bộ lọc sản phẩm"
@@ -80,13 +82,13 @@ export function ProductFilters({
             >
               <option value="">Tất cả {label.toLowerCase()}</option>
               {draft[name] &&
-                !query.data?.some((item) => item._id === draft[name]) && (
+                !query.data?.some((item) => (item.slug || item._id) === draft[name]) && (
                   <option value={draft[name]}>
                     Đã chọn {label.toLowerCase()}
                   </option>
                 )}
               {query.data?.map((item) => (
-                <option key={item._id} value={item._id}>
+                <option key={item._id} value={item.slug || item._id}>
                   {item.name}
                 </option>
               ))}

@@ -117,8 +117,10 @@ export default function AdminProductsPage() {
     page,
     limit,
     search: filters.search || undefined,
-    category: filters.category || undefined,
-    brand: filters.brand || undefined,
+    category: undefined,
+    brand: undefined,
+    ...(/^[a-f\d]{24}$/i.test(filters.category) ? { category: filters.category } : { categorySlug: filters.category || undefined }),
+    ...(/^[a-f\d]{24}$/i.test(filters.brand) ? { brand: filters.brand } : { brandSlug: filters.brand || undefined }),
     stockStatus,
   });
   useValidListPage(page, query);
@@ -477,7 +479,7 @@ export default function AdminProductsPage() {
                                         aria-label={`Edit ${product.product_name}`}
                                         render={
                                           <Link
-                                            to={`/auth/products/${product._id}/edit`}
+                                            to={`/auth/products/${product.slug}/edit`}
                                             state={linkState}
                                           />
                                         }

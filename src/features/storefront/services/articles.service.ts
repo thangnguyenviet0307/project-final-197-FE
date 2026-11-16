@@ -14,6 +14,7 @@ export async function listPublicArticles(
   options: {
     page?: number;
     categoryId?: string;
+    categorySlug?: string;
     search?: string;
     featured?: boolean;
     sort?: 'newest' | 'popular';
@@ -29,6 +30,7 @@ export async function listPublicArticles(
       page: options.page ?? 1,
       limit,
       categoryId: options.categoryId,
+      categorySlug: options.categorySlug,
       search: options.search,
       isFeatured: options.featured ? true : undefined,
       sort: options.featured ? 'display' : (options.sort ?? 'newest'),

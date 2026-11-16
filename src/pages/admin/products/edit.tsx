@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { ProductForm } from '@/features/products/components/product-form';
 import { ProductQueryState } from '@/features/products/components/product-query-state';
@@ -15,9 +15,13 @@ import { ProductReviews } from '@/features/products/components/product-reviews';
 import { ProductNewsEditor } from '@/features/products/components/product-news-editor';
 export default function ProductEditPage() {
   const { id = '' } = useParams();
-  const query = useProduct(id);
+  const query = useProduct(id, true);
+  const location = useLocation();
   const mutation = useUpdateProduct();
   const returnTo = useProductListLocation();
+  if (query.data?.slug && id !== query.data.slug) {
+    return <Navigate replace to={`/auth/products/${query.data.slug}/edit${location.search}`} state={location.state} />;
+  }
   return (
     <BaseLayout title="Chỉnh sửa sản phẩm">
       <div className="space-y-4 px-4 lg:px-6">
@@ -35,7 +39,7 @@ export default function ProductEditPage() {
         </div>
         {!query.data ? (
           <ProductQueryState
-            invalid={!/^[a-f\d]{24}$/i.test(id)}
+            invalid={!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(id) || id.length > 255}
             error={query.error}
             retry={query.refetch}
           />
@@ -62,7 +66,7 @@ export default function ProductEditPage() {
               pending={mutation.isPending}
               save={async (input, original) => {
                 if (input.variants !== undefined || input.stock !== undefined) {
-                  const latest = await getProduct(id);
+                  const latest = await getProduct(original._id);
                   if (
                     JSON.stringify(latest.variants ?? []) !==
                       JSON.stringify(original.variants ?? []) ||
@@ -76,7 +80,7 @@ export default function ProductEditPage() {
                   }
                 }
                 return mutation.mutateAsync({
-                  id,
+                  id: original._id,
                   input: {
                     ...input,
                     ...(input.variants !== undefined ||
@@ -89,8 +93,8 @@ export default function ProductEditPage() {
             />
             <ProductGallery product={query.data} />
             <InventoryEditor key={`inventory-${id}`} product={query.data} />
-            <ProductReviews key={`reviews-${id}`} id={id} />
-            <ProductNewsEditor key={`news-${id}`} id={id} />
+            <ProductReviews key={`reviews-${id}`} id={query.data._id} />
+            <ProductNewsEditor key={`news-${id}`} id={query.data._id} />
           </>
         )}
       </div>

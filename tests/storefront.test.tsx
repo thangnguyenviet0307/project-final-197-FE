@@ -252,7 +252,7 @@ it('groups category labels and policies inside the overview, without duplicated 
   const original = state.product;
   state.product = {
     ...original,
-    category: { _id: 'd'.repeat(24), name: 'Tai nghe' },
+    category: { _id: 'd'.repeat(24), name: 'Tai nghe', slug: 'tai-nghe' },
     tags: ['Bluetooth'],
     shippingInformation: 'Giao trong 3 ngày',
     variants: original.variants?.map((variant) => ({
@@ -285,7 +285,7 @@ it('groups category labels and policies inside the overview, without duplicated 
       within(breadcrumb)
         .getByRole('link', { name: 'Tai nghe' })
         .getAttribute('href')
-    ).toBe(`/shop?category=${'d'.repeat(24)}`);
+    ).toBe('/shop?c=tai-nghe');
     expect(
       within(breadcrumb)
         .getByText('Ceramic Chicken')
@@ -295,7 +295,7 @@ it('groups category labels and policies inside the overview, without duplicated 
       within(categories)
         .getByRole('link', { name: 'Tai nghe' })
         .getAttribute('href')
-    ).toBe(`/shop?category=${'d'.repeat(24)}`);
+    ).toBe('/shop?c=tai-nghe');
     const overview = screen.getByRole('region', { name: 'Tổng quan sản phẩm' });
     expect(
       within(overview).getByRole('navigation', { name: 'Danh mục sản phẩm' })

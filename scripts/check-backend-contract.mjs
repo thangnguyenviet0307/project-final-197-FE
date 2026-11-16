@@ -21,6 +21,7 @@ const allowed = new Set([
   'config/text-limits.ts',
   'config/product-limits.ts',
   'validations/shared/common.validation.ts',
+  'validations/shared/resource-slug.validation.ts',
   'validations/customers/customers.validation.ts',
   'validations/users/users.validation.ts',
   'validations/brands/brands.validation.ts',

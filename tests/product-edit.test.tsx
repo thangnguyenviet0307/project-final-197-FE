@@ -78,6 +78,8 @@ function setup(latest: Product) {
     if (config.method === 'put') {
       writes(JSON.parse(config.data));
       data = original;
+    } else if (config.url === '/products/by-slug/custom-case') {
+      data = original;
     } else if (config.url === `/products/${id}`) {
       reads++;
       data = reads === 1 ? original : latest;
@@ -220,7 +222,7 @@ it('preserves unsaved form values through a failed background refetch and a succ
   };
   await act(async () => {
     await queryClient.invalidateQueries({
-      queryKey: ['products', 'detail', id],
+      queryKey: ['products', 'detail', original.slug],
     });
   });
   expect(await screen.findByRole('alert')).toHaveProperty(

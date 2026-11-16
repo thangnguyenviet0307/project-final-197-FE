@@ -31,7 +31,7 @@ export function useOrder(id: string) {
   return useQuery({
     queryKey: orderKeys.detail(id),
     queryFn: ({ signal }) => getOrder(id, signal),
-    enabled: /^[a-f\d]{24}$/i.test(id),
+    enabled: /^(?:[a-f\d]{24}|don-hang-[a-z0-9]{1,19})$/i.test(id),
   });
 }
 export function useStartOrder() {

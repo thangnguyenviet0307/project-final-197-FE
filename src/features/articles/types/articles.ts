@@ -17,6 +17,7 @@ export interface PostCategory {
   __v: number;
 }
 export interface ArticleQuery {
+  categorySlug?: string;
   page: number;
   limit: number;
   search?: string;

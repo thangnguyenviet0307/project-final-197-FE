@@ -19,6 +19,7 @@ export interface OrderItem {
   discount: number;
 }
 export interface Order {
+  slug?: string;
   deliveryAddress?: {
     province: string;
     district: string;

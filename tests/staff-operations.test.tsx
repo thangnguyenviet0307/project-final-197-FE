@@ -227,7 +227,7 @@ it('staff can add customers and inspect history without edit, delete or export c
   await screen.findByText('jane@example.com');
   expect(
     screen.getByRole('link', { name: 'Lịch sử đơn hàng' }).getAttribute('href')
-  ).toBe(`/auth/orders?customerId=${customerId}`);
+  ).toBe(`/auth/orders?customer=${customerId}`);
   expect(screen.queryByRole('button', { name: /Delete Jane/ })).toBeNull();
   expect(screen.queryByRole('button', { name: /Edit/ })).toBeNull();
   expect(screen.queryByRole('button', { name: /Export/ })).toBeNull();

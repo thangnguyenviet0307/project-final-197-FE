@@ -69,11 +69,11 @@ export function WarrantyList({
               <button
                 key={item._id}
                 type="button"
-                aria-pressed={selectedId === item._id}
+                aria-pressed={(selectedId === item._id || selectedId === item.slug)}
                 onClick={() =>
-                  onSelect(selectedId === item._id ? '' : item._id)
+                  onSelect((selectedId === item._id || selectedId === item.slug) ? '' : item.slug || item._id)
                 }
-                className={`block w-full rounded-xl border p-4 text-left transition ${admin ? 'hover:border-ring' : 'hover:border-green-500'} ${selectedId === item._id ? (admin ? 'border-ring bg-accent text-accent-foreground' : 'border-green-600 bg-green-50/50') : 'bg-background'}`}
+                className={`block w-full rounded-xl border p-4 text-left transition ${admin ? 'hover:border-ring' : 'hover:border-green-500'} ${(selectedId === item._id || selectedId === item.slug) ? (admin ? 'border-ring bg-accent text-accent-foreground' : 'border-green-600 bg-green-50/50') : 'bg-background'}`}
               >
                 <span className="block text-sm font-semibold">
                   {item.productName}

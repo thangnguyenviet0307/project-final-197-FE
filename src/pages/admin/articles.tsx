@@ -1,5 +1,5 @@
 import { LoadingSkeleton } from '@/components/loading-skeleton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,7 @@ export default function AdminArticlesPage() {
     type: type === 'news' || type === 'blog' ? type : undefined,
     status:
       status && status in statuses ? (status as ArticleStatus) : undefined,
+    categorySlug: params.get('category') || undefined,
     categoryId: /^[a-fA-F0-9]{24}$/.test(params.get('categoryId') ?? '')
       ? params.get('categoryId')!
       : undefined,
@@ -56,6 +57,15 @@ export default function AdminArticlesPage() {
   });
   useValidListPage(page, query);
   const categories = usePostCategories();
+  useEffect(() => {
+    const legacy = categories.data?.find((item) => item._id === params.get('categoryId'));
+    if (legacy) {
+      const next = new URLSearchParams(params);
+      next.delete('categoryId');
+      if (!next.has('category')) next.set('category', legacy.slug);
+      setParams(next, { replace: true });
+    }
+  }, [categories.data, params, setParams]);
   const mutations = useArticleMutations();
   const [editing, setEditing] = useState<AdminArticle | 'new' | null>(null);
   const [deleting, setDeleting] = useState<AdminArticle | null>(null);
@@ -67,6 +77,7 @@ export default function AdminArticlesPage() {
   function filter(key: string, value: string) {
     setParams((previous) => {
       const next = new URLSearchParams(previous);
+      if (key === 'category') next.delete('categoryId');
       if (value) next.set(key, value);
       else next.delete(key);
       next.delete('page');
@@ -151,12 +162,12 @@ export default function AdminArticlesPage() {
           <select
             aria-label="Lọc danh mục bài"
             className="bg-background rounded-md border p-2"
-            value={params.get('categoryId') ?? ''}
-            onChange={(e) => filter('categoryId', e.target.value)}
+            value={params.get('category') ?? params.get('categoryId') ?? ''}
+            onChange={(e) => filter('category', e.target.value)}
           >
             <option value="">Tất cả danh mục</option>
             {categories.data?.map((item) => (
-              <option key={item._id} value={item._id}>
+              <option key={item._id} value={item.slug}>
                 {item.name}
               </option>
             ))}

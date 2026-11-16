@@ -1,5 +1,5 @@
 import { OrderNoteEditor } from '@/features/orders/components/order-note-editor';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +41,9 @@ export default function OrderDetailPage() {
       ? candidate
       : '/auth/orders';
   const order = query.data;
+  if (order?.slug && id !== order.slug) {
+    return <Navigate replace to={`/auth/orders/${order.slug}${location.search}`} state={location.state} />;
+  }
   const customer = order ? orderCustomer(order) : null;
   return (
     <BaseLayout title="Chi tiết đơn hàng">
@@ -54,7 +57,7 @@ export default function OrderDetailPage() {
         </Button>
         {!order ? (
           <OrderQueryState
-            invalid={!/^[a-f\d]{24}$/i.test(id)}
+            invalid={!/^(?:[a-f\d]{24}|don-hang-[a-z0-9]{1,19})$/i.test(id)}
             error={query.error}
             retry={query.refetch}
           />

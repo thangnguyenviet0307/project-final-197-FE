@@ -20,6 +20,7 @@ export interface AdminPolicy {
 export type WarrantyStatus =
   'submitted' | 'reviewing' | 'repairing' | 'resolved' | 'rejected';
 export interface WarrantySummary {
+  slug?: string;
   _id: string;
   orderId?: string;
   orderCode: string;
@@ -46,6 +47,7 @@ export interface WarrantyDetail extends WarrantySummary {
   }[];
 }
 export interface EligibleOrder {
+  slug?: string;
   _id: string;
   orderCode: string;
   orderDate: string;

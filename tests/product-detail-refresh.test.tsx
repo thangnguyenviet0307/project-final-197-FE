@@ -13,6 +13,7 @@ vi.mock('@/features/products/hooks/use-product', () => ({
       _id: 'a'.repeat(24),
       __v: 1,
       product_name: 'Test product',
+      slug: 'test-product',
       category: null,
       brand: null,
       stock: 50,
@@ -58,7 +59,7 @@ it('keeps details read-only through background updates and links to separate inv
   });
   const page = () => (
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={['/auth/products/' + 'a'.repeat(24)]}>
+      <MemoryRouter initialEntries={['/auth/products/test-product']}>
         <Routes>
           <Route path="/auth/products/:id" element={<ProductDetailPage />} />
         </Routes>
@@ -68,7 +69,7 @@ it('keeps details read-only through background updates and links to separate inv
   const view = render(page());
   expect(
     screen.getByRole('link', { name: 'Cập nhật tồn kho' }).getAttribute('href')
-  ).toBe('/auth/products/' + 'a'.repeat(24) + '/inventory');
+  ).toBe('/auth/products/test-product/inventory');
   for (let i = 0; i < 5; i++) {
     for (const fetching of [true, false]) {
       state.fetching = fetching;

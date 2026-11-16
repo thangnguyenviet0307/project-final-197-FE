@@ -165,7 +165,7 @@ function RecentOrders() {
                 <TableRow key={order._id}>
                   <TableCell>
                     <Link
-                      to={`/auth/orders/${order._id}`}
+                      to={`/auth/orders/${order.slug || order._id}`}
                       className="text-primary font-medium underline-offset-4 hover:underline"
                     >
                       {order.orderCode ?? order._id}

@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { useEffect, useState } from 'react';
 import { RequiredMark } from '@/components/required-mark';
@@ -305,6 +306,14 @@ export function WarrantyDetailPanel({
   onClose?: () => void;
 }) {
   const query = useWarranty(admin, id);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (query.data?.slug && query.data.slug !== id && params.get('request') === id) {
+      const next = new URLSearchParams(params);
+      next.set('request', query.data.slug);
+      setParams(next, { replace: true });
+    }
+  }, [query.data?.slug, id, params, setParams]);
   const [session, setSession] = useState(0);
   const [message, setMessage] = useState('');
   async function reload() {

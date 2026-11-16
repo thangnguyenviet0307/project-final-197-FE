@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { BaseLayout } from '@/layout/admin/base-layout';
 import { Button } from '@/components/ui/button';
@@ -57,16 +58,24 @@ export default function AdminOrdersPage() {
     (!from || validOrderDate(from)) &&
     (!to || validOrderDate(to)) &&
     (!from || !to || from <= to);
-  const customerId = params.get('customerId') ?? '';
+  const customerId = params.get('customer') ?? params.get('customerId') ?? '';
   const customer = useQuery({
     queryKey: ['customers', 'detail', customerId],
     queryFn: () => customersService.getCustomerById(customerId),
-    enabled: /^[a-f\d]{24}$/i.test(customerId),
+    enabled: /^(?:[a-f\d]{24}|khach-hang-[a-z0-9]{1,19})$/i.test(customerId),
   });
+  useEffect(() => {
+    if (customer.data?.data.slug && (params.has('customerId') || params.get('customer') !== customer.data.data.slug)) {
+      const next = new URLSearchParams(params);
+      next.delete('customerId');
+      next.set('customer', customer.data.data.slug);
+      setParams(next, { replace: true });
+    }
+  }, [customer.data?.data.slug, params, setParams]);
   const query = useOrders({
     page,
     limit,
-    ...(/^[a-f\d]{24}$/i.test(customerId) ? { customerId } : {}),
+    ...(customerId ? { customerId } : {}),
     ...(search ? { search } : {}),
     ...(isOrderStatus(status) ? { orderStatus: status } : {}),
     ...(validRange && from ? { dateFrom: orderDateBoundary(from) } : {}),
@@ -211,7 +220,7 @@ export default function AdminOrdersPage() {
                           <TableCell className="font-mono text-xs">
                             <Link
                               className="hover:underline"
-                              to={`/auth/orders/${order._id}`}
+                              to={`/auth/orders/${order.slug || order._id}`}
                               state={{
                                 returnTo: location.pathname + location.search,
                               }}
@@ -249,7 +258,7 @@ export default function AdminOrdersPage() {
                                 role="link"
                                 render={
                                   <Link
-                                    to={`/auth/orders/${order._id}`}
+                                    to={`/auth/orders/${order.slug || order._id}`}
                                     state={{
                                       returnTo:
                                         location.pathname + location.search,

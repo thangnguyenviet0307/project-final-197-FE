@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
 import { ArrowUpRight, ChevronRight, Search } from 'lucide-react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
@@ -22,19 +23,32 @@ export default function StorefrontArticlesPage() {
   const requested = Number(params.get('page'));
   const page = Number.isSafeInteger(requested) && requested > 0 ? requested : 1;
   const search = params.get('search') ?? '';
-  const rawCategory = params.get('categoryId') ?? '';
+  const categorySlug = params.get('category') ?? '';
+  const rawCategory = categorySlug ? '' : params.get('categoryId') ?? '';
   const categoryId = /^[a-f\d]{24}$/i.test(rawCategory) ? rawCategory : '';
   const categories = usePublicArticleCategories();
-  const category = categories.data?.find((item) => item._id === categoryId);
-  const query = useArticleCatalog(type, page, search, categoryId);
+  const category = categories.data?.find((item) => categorySlug ? item.slug === categorySlug : item._id === categoryId);
+  const query = useArticleCatalog(type, page, search, categoryId, categorySlug);
+  useEffect(() => {
+    if (categorySlug && params.has('categoryId')) {
+      const next = new URLSearchParams(params);
+      next.delete('categoryId');
+      setParams(next, { replace: true });
+    } else if (!categorySlug && categoryId && category?.slug) {
+      const next = new URLSearchParams(params);
+      next.delete('categoryId');
+      next.set('category', category.slug);
+      setParams(next, { replace: true });
+    }
+  }, [categorySlug, categoryId, category?.slug, params, setParams]);
   useValidListPage(page, query);
   const title =
     category?.name ??
     (type === 'news' ? 'Tin tức mới nhất' : 'Góc chia sẻ & Blog');
-  const categoryLink = (id: string) => {
+  const categoryLink = (slug: string) => {
     const next = new URLSearchParams({ type });
     if (search) next.set('search', search);
-    if (id) next.set('categoryId', id);
+    if (slug) next.set('category', slug);
     return `/bai-viet?${next}`;
   };
   return (
@@ -86,7 +100,7 @@ export default function StorefrontArticlesPage() {
               ).trim();
               setParams({
                 type,
-                ...(categoryId ? { categoryId } : {}),
+                ...(categorySlug || category?.slug ? { category: categorySlug || category!.slug } : categoryId ? { categoryId } : {}),
                 ...(value ? { search: value } : {}),
               });
             }}
@@ -118,17 +132,17 @@ export default function StorefrontArticlesPage() {
         <nav aria-label="Danh mục bài viết" className="flex flex-wrap gap-2">
           <Link
             to={categoryLink('')}
-            aria-current={!categoryId ? 'page' : undefined}
-            className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${!categoryId ? 'border-[#4d9210] bg-[#edf5e5] text-[#4d9210]' : 'border-gray-200 bg-white text-gray-600 hover:border-[#4d9210]'}`}
+            aria-current={!(categorySlug || categoryId) ? 'page' : undefined}
+            className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${!(categorySlug || categoryId) ? 'border-[#4d9210] bg-[#edf5e5] text-[#4d9210]' : 'border-gray-200 bg-white text-gray-600 hover:border-[#4d9210]'}`}
           >
             Tất cả
           </Link>
           {categories.data?.map((item) => (
             <Link
               key={item._id}
-              to={categoryLink(item._id)}
-              aria-current={categoryId === item._id ? 'page' : undefined}
-              className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${categoryId === item._id ? 'border-[#4d9210] bg-[#edf5e5] text-[#4d9210]' : 'border-gray-200 bg-white text-gray-600 hover:border-[#4d9210]'}`}
+              to={categoryLink(item.slug)}
+              aria-current={category?._id === item._id ? 'page' : undefined}
+              className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${category?._id === item._id ? 'border-[#4d9210] bg-[#edf5e5] text-[#4d9210]' : 'border-gray-200 bg-white text-gray-600 hover:border-[#4d9210]'}`}
             >
               {item.name}
             </Link>

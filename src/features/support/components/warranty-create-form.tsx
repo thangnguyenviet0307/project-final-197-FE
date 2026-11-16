@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { validateImageFile } from '@/utils/image-file';
 import { ImageFilePicker } from '@/components/image-file-picker';
 import { RequiredMark } from '@/components/required-mark';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ListPagination } from '@/components/list-pagination';
 import {
@@ -36,8 +36,16 @@ export function WarrantyCreateForm({
     label: string;
   } | null>(null);
   const initialOrder = eligibleOrders.find(
-    (order) => order._id === initialOrderId
+    (order) => (order._id === initialOrderId || order.slug === initialOrderId)
   );
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (initialOrder?.slug && params.get('order') === initialOrderId && initialOrder.slug !== initialOrderId) {
+      const next = new URLSearchParams(params);
+      next.set('order', initialOrder.slug);
+      setParams(next, { replace: true });
+    }
+  }, [initialOrder?.slug, initialOrderId, params, setParams]);
   const initialItem = initialOrder?.items.find(
     (item) => item.itemIndex === initialItemIndex
   );
@@ -60,6 +68,7 @@ export function WarrantyCreateForm({
   const mutation = mutations.create;
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const [uploaded, setUploaded] = useState<number[]>([]);
+  const [createdSlug, setCreatedSlug] = useState('');
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const busy =
@@ -97,10 +106,13 @@ export function WarrantyCreateForm({
     setCanEdit(false);
     setSubmitting(true);
     let requestId = createdId;
+    let requestSlug = createdSlug;
     try {
       if (!requestId) {
         const result = await mutation.mutateAsync(parsed.data);
         requestId = result._id;
+        requestSlug = result.slug || '';
+        setCreatedSlug(requestSlug);
         setCreatedId(requestId);
       }
       for (let index = 0; index < images.length; index++) {
@@ -117,7 +129,7 @@ export function WarrantyCreateForm({
       setDescription('');
       setSelection(null);
       navigation.allowSavedNavigation();
-      onCreated(requestId);
+      onCreated(requestSlug || requestId);
     } catch (failure) {
       const apiError = getApiError(failure);
       setError(
@@ -378,7 +390,7 @@ export function WarrantyCreateForm({
               onClick={() =>
                 navigation.confirmDiscard(() => {
                   navigation.allowSavedNavigation();
-                  onCreated(createdId);
+                  onCreated(createdSlug || createdId);
                 })
               }
             >

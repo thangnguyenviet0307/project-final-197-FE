@@ -48,7 +48,7 @@ export function useWarranty(admin: boolean, id: string) {
   return useQuery({
     queryKey: ['support', 'request', admin ? 'admin' : 'customer', id],
     queryFn: ({ signal }) => service.getWarranty(admin, id, signal),
-    enabled: /^[a-fA-F0-9]{24}$/.test(id),
+    enabled: /^(?:[a-fA-F0-9]{24}|bao-hanh-[a-z0-9]{1,19})$/.test(id),
   });
 }
 export function useSupportMutations() {

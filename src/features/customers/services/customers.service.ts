@@ -9,6 +9,7 @@ import type {
 } from '@/features/customers/types/customers';
 
 interface BackendCustomer {
+  slug?: string;
   _id: string;
   firstName: string;
   displayName?: string;
@@ -42,6 +43,7 @@ type CustomersListResponse = ApiResult<BackendCustomer[]> & {
 function mapCustomer(customer: BackendCustomer): ICustomer {
   return {
     _id: customer._id,
+    slug: customer.slug,
     first_name: customer.firstName,
     displayName: customer.displayName,
     customerType: customer.customerType,

@@ -264,7 +264,7 @@ it('loads managed categories and independent sidebar rankings while preserving f
   await waitFor(() =>
     expect(
       calls.filter((call) => call.params?.limit === 9).at(-1)?.params
-    ).toMatchObject({ categoryId, page: 1, search: 'cáp' })
+    ).toMatchObject({ categorySlug: 'meo-su-dung', page: 1, search: 'cáp' })
   );
   fireEvent.click(screen.getByRole('link', { name: 'Tất cả' }));
   await waitFor(() =>
@@ -272,4 +272,18 @@ it('loads managed categories and independent sidebar rankings while preserving f
       new URLSearchParams(router.state.location.search).has('categoryId')
     ).toBe(false)
   );
+});
+
+it('replaces legacy category IDs with the stored slug while preserving URL state', async () => {
+  withSidebar = true;
+  const router = setup(`/bai-viet?type=news&categoryId=${categoryId}&search=cap&page=2&extra=keep`);
+  await waitFor(() => {
+    const params = new URLSearchParams(router.state.location.search);
+    expect(params.get('category')).toBe('meo-su-dung');
+    expect(params.has('categoryId')).toBe(false);
+    expect(params.get('search')).toBe('cap');
+    expect(params.get('extra')).toBe('keep');
+    expect(params.get('page')).toBe('2');
+  });
+  await waitFor(() => expect(calls.filter((call) => call.params?.limit === 9).at(-1)?.params).toMatchObject({ categorySlug: 'meo-su-dung', page: 2 }));
 });

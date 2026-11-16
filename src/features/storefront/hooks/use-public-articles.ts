@@ -31,15 +31,17 @@ export function useArticleCatalog(
   type: ArticleType,
   page: number,
   search: string,
-  categoryId: string
+  categoryId: string,
+  categorySlug = ''
 ) {
   return useQuery({
-    queryKey: ['articles', 'public', 'catalog', type, page, search, categoryId],
+    queryKey: ['articles', 'public', 'catalog', type, page, search, categoryId, categorySlug],
     queryFn: ({ signal }) =>
       listPublicArticles(type, 9, signal, {
         page,
         search: search || undefined,
         categoryId: categoryId || undefined,
+        categorySlug: categorySlug || undefined,
       }),
   });
 }

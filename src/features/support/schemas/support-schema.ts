@@ -34,6 +34,8 @@ export const savePolicySchema = z
       ),
     { message: 'Vui lòng điền đủ các mục trước khi công bố chính sách.' }
   );
+export const warrantyNavigationKeySchema = z.string().regex(/^(?:[a-fA-F0-9]{24}|bao-hanh-[a-z0-9]{1,19})$/);
+export const orderNavigationKeySchema = z.string().regex(/^(?:[a-fA-F0-9]{24}|don-hang-[a-z0-9]{1,19})$/);
 export const warrantyIdSchema = z.string().regex(/^[a-fA-F0-9]{24}$/);
 export const warrantyStatuses = [
   'submitted',

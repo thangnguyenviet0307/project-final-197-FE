@@ -72,7 +72,7 @@ export function CustomerOrderCard({ order }: { order: CustomerOrder }) {
                 </p>
                 {canCreateWarranty && (
                   <Link
-                    to={`/account/warranty?new=1&order=${encodeURIComponent(order._id)}&item=${index}`}
+                    to={`/account/warranty?new=1&order=${encodeURIComponent(order.slug || order._id)}&item=${index}`}
                     className="mt-3 inline-flex min-h-9 items-center rounded-lg border border-green-600 px-3 text-xs font-semibold text-green-700 hover:bg-green-50"
                   >
                     Yêu cầu bảo hành

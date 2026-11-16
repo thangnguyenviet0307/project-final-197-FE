@@ -65,7 +65,7 @@ export default function ProductDetailPage() {
               variant="outline"
               render={
                 <Link
-                  to={`/auth/products/${product._id}/inventory`}
+                  to={`/auth/products/${product.slug}/inventory`}
                   state={{ returnTo }}
                 />
               }
@@ -79,7 +79,7 @@ export default function ProductDetailPage() {
               role="link"
               render={
                 <Link
-                  to={`/auth/products/${product._id}/edit`}
+                  to={`/auth/products/${product.slug}/edit`}
                   state={{ returnTo }}
                 />
               }

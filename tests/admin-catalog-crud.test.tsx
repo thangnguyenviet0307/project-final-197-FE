@@ -331,7 +331,7 @@ it('displays a guest CRM contact and links its administrative order history', as
   const link = screen
     .getAllByRole('link')
     .find((item) => item.getAttribute('href')?.includes(customer._id));
-  expect(link?.getAttribute('href')).toContain(`customerId=${customer._id}`);
+  expect(link?.getAttribute('href')).toContain(`customer=${customer._id}`);
   fireEvent.click(screen.getByRole('button', { name: 'Xem Guest Buyer' }));
   expect(await screen.findByText(/chưa xác minh danh tính/)).toBeTruthy();
 });

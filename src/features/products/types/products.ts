@@ -2,6 +2,7 @@ export type ProductFlag =
   'on_sale' | 'is_best_seller' | 'is_new' | 'is_hot' | 'is_home';
 export type AttributeValue = string | number | boolean | null;
 export interface CatalogReference {
+  slug?: string;
   _id: string;
   name: string;
   isActive?: boolean;
@@ -105,6 +106,8 @@ export type UpdateProductInput = Partial<ProductInput> & {
   expectedVersion?: number;
 };
 export interface ProductsQuery {
+  categorySlug?: string;
+  brandSlug?: string;
   on_sale?: boolean;
   is_best_seller?: boolean;
   is_new?: boolean;

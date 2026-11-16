@@ -1,6 +1,7 @@
 import type { ShippingAddressValues } from '@/features/profile/schemas/customer-account-schema';
 
 export interface ICustomer {
+  slug?: string;
   _id: string;
   first_name: string;
   last_name: string;

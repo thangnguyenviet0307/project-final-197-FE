@@ -330,7 +330,7 @@ export function CustomerTable({
                     <div className="flex items-center gap-2">
                       <Link
                         className="text-sm underline"
-                        to={`/auth/orders?customerId=${customer._id}`}
+                        to={`/auth/orders?customer=${customer.slug || customer._id}`}
                       >
                         Lịch sử đơn hàng
                       </Link>
