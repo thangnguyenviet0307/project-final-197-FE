@@ -31,7 +31,6 @@ export interface ArticlesResult {
 }
 export interface CategoryInput {
   name: string;
-  slug: string;
   description: string;
   isActive: boolean;
 }

@@ -1,3 +1,4 @@
+import { Quill } from 'react-quill-new';
 import {
   act,
   fireEvent,
@@ -86,8 +87,10 @@ it('confirms dirty editor closure, keeps the draft and protects the next editor 
 it('blocks navigation and unload only while the article is dirty', async () => {
   const router = setup();
   fireEvent.click(screen.getByRole('button', { name: 'Thêm bài viết' }));
-  fireEvent.change(screen.getByLabelText('Nội dung'), {
-    target: { value: 'Nội dung chưa lưu' },
+  const editor = screen.getByRole('textbox', { name: 'Nội dung' });
+  act(() => {
+    const quill = Quill.find(editor.closest('.ql-container')!) as unknown as { setText: (text: string, source: string) => void };
+    quill.setText('Nội dung chưa lưu', 'user');
   });
   const unload = new Event('beforeunload', { cancelable: true });
   window.dispatchEvent(unload);
@@ -99,7 +102,7 @@ it('blocks navigation and unload only while the article is dirty', async () => {
     await screen.findByRole('button', { name: 'Tiếp tục chỉnh sửa' })
   );
   expect(router.state.location.pathname).toBe('/auth/articles');
-  expect((screen.getByLabelText('Nội dung') as HTMLTextAreaElement).value).toBe(
+  expect(screen.getByRole('textbox', { name: 'Nội dung' }).textContent).toBe(
     'Nội dung chưa lưu'
   );
   await act(async () => {

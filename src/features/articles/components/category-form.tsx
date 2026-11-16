@@ -24,7 +24,6 @@ export function PostCategoryForm({
 }) {
   const [initial] = useState(() => ({
     name: category?.name ?? '',
-    slug: category?.slug ?? '',
     description: category?.description ?? '',
     isActive: category?.isActive ?? true,
   }));
@@ -67,18 +66,6 @@ export function PostCategoryForm({
             maxLength={80}
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          <span>
-            Slug danh mục <RequiredMark />
-          </span>
-          <Input
-            required
-            maxLength={255}
-            placeholder="vi-du-phu-kien"
-            value={draft.slug}
-            onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
           />
         </label>
         <label className="grid gap-1">

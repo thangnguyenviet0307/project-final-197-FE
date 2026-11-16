@@ -1,6 +1,9 @@
+import { ImageUploadField } from '@/components/image-upload-field';
+import { useSelectedImage } from '@/hooks/use-selected-image';
+import { uploadEditorImage } from '@/services/editor-image.service';
 import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
-import { useState, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { useCategories } from '@/features/categories/hooks/use-categories';
 import { heroSlideSchema } from '@/features/hero-slides/schemas/hero-slide-schema';
 import type {
@@ -23,6 +26,11 @@ export function HeroSlideForm({
   save: (input: HeroSlideInput) => Promise<unknown>;
   reload: () => Promise<void>;
 }) {
+  const image = useSelectedImage();
+  const upload = useRef<AbortController | null>(null);
+  useEffect(() => () => upload.current?.abort(), []);
+  const [saving, setSaving] = useState(false);
+  const busy = pending || saving;
   const categories = useCategories();
   const choices = (categories.data ?? []).filter(
     (item) => item.isActive && !item.isDeleted
@@ -43,7 +51,7 @@ export function HeroSlideForm({
   const [conflict, setConflict] = useState(false);
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    if (conflict || pending) return;
+    if (conflict || busy || image.error) return;
     const schema =
       slide && !slide.category && !draft.category
         ? heroSlideSchema.omit({ category: true })
@@ -58,15 +66,29 @@ export function HeroSlideForm({
       return;
     }
     try {
+      setSaving(true);
       setError('');
       setCategoryError('');
+      if (image.selected) {
+        const controller = new AbortController();
+        upload.current = controller;
+        const uploaded = await uploadEditorImage(image.selected.file, controller.signal, 'hero');
+        if (controller.signal.aborted) return;
+        result.data.imageUrl = uploaded.url;
+        setDraft((previous) => ({ ...previous, imageUrl: uploaded.url }));
+        image.select(null);
+      }
       await save({ ...result.data, category: draft.category });
     } catch (failure) {
+      if (upload.current?.signal.aborted) return;
       const apiError = getApiError(failure);
       if (apiError.code === 'CATEGORY_UNAVAILABLE')
         setCategoryError(apiError.message);
       else setError(apiError.message);
       setConflict(apiError.code === 'VERSION_CONFLICT' && !!slide);
+    } finally {
+      upload.current = null;
+      setSaving(false);
     }
   }
   const unavailable =
@@ -74,7 +96,7 @@ export function HeroSlideForm({
   return (
     <form onSubmit={submit} className="space-y-4">
       <fieldset
-        disabled={pending || categories.isPending || categories.isError}
+        disabled={busy || categories.isPending || categories.isError}
         className="space-y-4 disabled:opacity-70"
       >
         <label className="grid gap-2 text-sm">
@@ -149,24 +171,16 @@ export function HeroSlideForm({
             }
           />
         </label>
-        <label className="grid gap-2 text-sm">
-          URL ảnh nền
-          <Input
-            placeholder="https://example.com/banner.jpg"
-            type="url"
-            maxLength={2048}
-            value={draft.imageUrl}
-            onChange={(event) =>
-              setDraft((previous) => ({
-                ...previous,
-                imageUrl: event.target.value,
-              }))
-            }
-          />
-          <span className="text-muted-foreground text-xs">
-            Để trống để dùng ảnh danh mục; nếu không có ảnh sẽ dùng nền tối.
-          </span>
-        </label>
+        <ImageUploadField
+          id="hero-background"
+          label="Ảnh nền"
+          selected={image.selected}
+          existingUrl={draft.imageUrl}
+          error={image.error}
+          disabled={busy}
+          onSelect={image.select}
+          guidance="Để trống để dùng ảnh danh mục."
+        />
         <label className="grid gap-2 text-sm">
           <span>
             Thứ tự <RequiredMark />
@@ -226,7 +240,7 @@ export function HeroSlideForm({
         <Button
           type="button"
           variant="outline"
-          disabled={pending}
+          disabled={busy}
           onClick={async () => {
             try {
               await reload();
@@ -241,7 +255,7 @@ export function HeroSlideForm({
       <Button
         type="submit"
         disabled={
-          pending || conflict || categories.isPending || categories.isError
+          busy || !!image.error || conflict || categories.isPending || categories.isError
         }
       >
         {pending ? 'Đang lưu…' : 'Lưu slide'}

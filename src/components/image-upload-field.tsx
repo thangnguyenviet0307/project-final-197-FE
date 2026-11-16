@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CatalogImage } from '@/components/catalog-image';
 import type { SelectedImage } from '@/hooks/use-selected-image';
@@ -21,21 +23,45 @@ export function ImageUploadField({
   guidance?: string;
   onSelect: (file: File | null) => void;
 }) {
+  const input = useRef<HTMLInputElement>(null);
   return (
     <div className="space-y-3">
-      <label htmlFor={id} className="text-sm font-medium">
+      <span className="text-sm font-medium">
         {label}
-      </label>
+      </span>
       <input
         key={selected?.url ?? 'empty'}
         id={id}
+        aria-label={label}
+        ref={input}
         type="file"
+        hidden
         accept="image/jpeg,image/png,image/webp"
         aria-describedby={guidance ? `${id}-guidance` : undefined}
         disabled={disabled}
-        onChange={(event) => onSelect(event.target.files?.[0] ?? null)}
-        className="file:bg-muted block w-full min-w-0 text-sm file:mr-3 file:rounded-lg file:border file:px-3 file:py-2"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = '';
+          if (file) onSelect(file);
+        }}
       />
+      <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border p-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="cursor-pointer"
+          disabled={disabled}
+          aria-label={`Chọn ${label.toLowerCase()}`}
+          aria-describedby={`${id}-selection`}
+          onClick={() => input.current?.click()}
+        >
+          <Upload aria-hidden="true" />
+          Chọn ảnh
+        </Button>
+        <span id={`${id}-selection`} className="text-muted-foreground min-w-0 flex-1 text-sm break-all" aria-live="polite">
+          {selected?.file.name ?? 'Chưa chọn ảnh'}
+        </span>
+      </div>
       <p className="text-muted-foreground text-xs">
         JPG, PNG, WebP · Tối đa 5 MB. Ảnh được tải lên khi lưu biểu mẫu.
       </p>
@@ -65,9 +91,6 @@ export function ImageUploadField({
           </div>
           {selected && (
             <>
-              <p className="min-w-0 flex-1 text-sm break-all">
-                {selected.file.name}
-              </p>
               <Button
                 type="button"
                 variant="outline"

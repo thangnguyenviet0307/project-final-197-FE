@@ -165,7 +165,7 @@ export function RichTextEditor({
       image: 'Chèn hình ảnh',
       clean: 'Xóa định dạng',
       align: 'Căn lề',
-      header: 'Tiêu đề',
+      header: 'Kiểu tiêu đề',
       size: 'Cỡ chữ',
       list: 'Danh sách',
       indent: 'Thụt lề',

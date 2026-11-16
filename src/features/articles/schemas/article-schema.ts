@@ -12,11 +12,6 @@ const url = z
 export const articleInputSchema = z
   .object({
     title: z.string().trim().min(3).max(200),
-    slug: z
-      .string()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-      .max(255)
-      .optional(),
     type: z.enum(['news', 'blog']),
     category: z.string().trim().max(80),
     categoryId: z
@@ -64,12 +59,6 @@ export const articleInputSchema = z
 export type ArticleInput = z.infer<typeof articleInputSchema>;
 export const categoryInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
-  slug: z
-    .string()
-    .trim()
-    .min(1)
-    .max(255)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   description: z.string().trim().max(DESCRIPTION_MAX_LENGTH),
   isActive: z.boolean(),
 });

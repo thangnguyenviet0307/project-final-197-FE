@@ -1,6 +1,6 @@
 import { LoadingImage } from '@/components/loading-image';
 import { LoadingSkeleton } from '@/components/loading-skeleton';
-import { normalizeTextSpacing } from '@/utils/text-spacing';
+import { ContentBody } from '@/features/support/components/content';
 import { ArrowLeft, CalendarDays, Newspaper } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useRecordArticleView } from '@/features/storefront/hooks/use-record-article-view';
@@ -125,8 +125,8 @@ export default function StorefrontArticleDetailPage() {
             className="mt-8 aspect-[16/9] w-full rounded-lg object-cover"
           />
         )}
-        <div className="mt-8 text-base leading-8 break-words whitespace-pre-wrap text-gray-800">
-          {normalizeTextSpacing(post.content)}
+        <div className="mt-8 text-base leading-8 break-words text-gray-800">
+          <ContentBody value={post.content} />
         </div>
         {post.tags.length > 0 && (
           <ul aria-label="Thẻ bài viết" className="mt-8 flex flex-wrap gap-2">

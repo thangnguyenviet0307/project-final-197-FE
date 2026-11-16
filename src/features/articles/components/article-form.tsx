@@ -1,10 +1,11 @@
-import { normalizeTextSpacing } from '@/utils/text-spacing';
-import {
-  LONG_TEXT_MAX_LENGTH,
-  DESCRIPTION_MAX_LENGTH,
-} from '@/constants/text-limits';
+import { ContentBody } from '@/features/support/components/content';
+import { RichTextEditor } from '@/components/rich-text-editor';
+import { ImageUploadField } from '@/components/image-upload-field';
+import { useSelectedImage } from '@/hooks/use-selected-image';
+import { uploadEditorImage } from '@/services/editor-image.service';
+import { DESCRIPTION_MAX_LENGTH } from '@/constants/text-limits';
 import { RequiredMark } from '@/components/required-mark';
-import { useEffect, useState, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,7 +36,6 @@ export function ArticleForm({
 }) {
   const [initial] = useState(() => ({
     title: article?.title ?? '',
-    slug: article?.slug ?? '',
     type: article?.type ?? 'news',
     category: article?.category ?? '',
     categoryId: article?.categoryId ?? '',
@@ -58,8 +58,13 @@ export function ArticleForm({
     seoTitle: article?.seo.title ?? '',
     seoDescription: article?.seo.description ?? '',
   }));
+  const image = useSelectedImage();
+  const upload = useRef<AbortController | null>(null);
+  useEffect(() => () => upload.current?.abort(), []);
+  const [saving, setSaving] = useState(false);
+  const busy = pending || saving;
   const [draft, setDraft] = useState(initial);
-  const dirty = Object.keys(initial).some(
+  const dirty = !!image.selected || Object.keys(initial).some(
     (key) =>
       draft[key as keyof typeof draft] !== initial[key as keyof typeof initial]
   );
@@ -74,7 +79,6 @@ export function ArticleForm({
   function input(values: typeof draft) {
     return {
       title: values.title,
-      slug: values.slug.trim() || undefined,
       type: values.type,
       categoryId: values.categoryId || undefined,
       category: values.category,
@@ -99,7 +103,8 @@ export function ArticleForm({
   }
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    if (pending || conflict) return;
+    if (busy || conflict || image.error) return;
+    setSaving(true);
     try {
       const parsed = articleInputSchema.safeParse(input(draft));
       if (!parsed.success) {
@@ -120,6 +125,15 @@ export function ArticleForm({
         setError('Thời gian lên lịch phải ở tương lai.');
         return;
       }
+      if (image.selected) {
+        const controller = new AbortController();
+        upload.current = controller;
+        const uploaded = await uploadEditorImage(image.selected.file, controller.signal, 'articles');
+        if (controller.signal.aborted) return;
+        parsed.data.imageUrl = uploaded.url;
+        patch({ imageUrl: uploaded.url });
+        image.select(null);
+      }
       const baseline = input(initial);
       const changed = Object.fromEntries(
         Object.entries(parsed.data).filter(
@@ -135,14 +149,18 @@ export function ArticleForm({
       setError('');
       await save(article ? changed : parsed.data);
     } catch (failure) {
+      if (upload.current?.signal.aborted) return;
       const result = getApiError(failure);
       setError(result.message);
       setConflict(result.code === 'VERSION_CONFLICT');
+    } finally {
+      upload.current = null;
+      setSaving(false);
     }
   }
   return (
     <form onSubmit={submit} className="space-y-4">
-      <fieldset disabled={pending} className="grid gap-4 sm:grid-cols-2">
+      <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-1 sm:col-span-2">
           <span>
             Tiêu đề <RequiredMark />
@@ -197,15 +215,6 @@ export function ArticleForm({
           </select>
         </label>
         <label className="grid gap-1">
-          Slug
-          <Input
-            maxLength={255}
-            value={draft.slug}
-            onChange={(e) => patch({ slug: e.target.value })}
-            placeholder="Tự tạo khi thêm mới"
-          />
-        </label>
-        <label className="grid gap-1">
           <span>
             Tác giả <RequiredMark />
           </span>
@@ -229,33 +238,26 @@ export function ArticleForm({
             onChange={(e) => patch({ excerpt: e.target.value })}
           />
         </label>
-        <label className="grid gap-1 sm:col-span-2">
-          <span>
-            Nội dung <RequiredMark />
-          </span>
-          <Textarea
-            placeholder="Nhập nội dung bài viết"
-            aria-label="Nội dung"
-            required
-            rows={12}
-            maxLength={LONG_TEXT_MAX_LENGTH}
+        <div className="grid gap-1 sm:col-span-2">
+          <span>Nội dung <RequiredMark /></span>
+          <RichTextEditor
             value={draft.content}
-            onChange={(e) => patch({ content: e.target.value })}
+            onChange={(content) => patch({ content })}
+            disabled={busy}
+            label="Nội dung"
           />
-          <span className="text-muted-foreground text-xs">
-            Nội dung hiển thị dạng văn bản, giữ xuống dòng.
-          </span>
-        </label>
-        <label className="grid gap-1 sm:col-span-2">
-          URL ảnh bìa
-          <Input
-            placeholder="https://example.com/anh-bai-viet.jpg"
-            type="url"
-            maxLength={2048}
-            value={draft.imageUrl}
-            onChange={(e) => patch({ imageUrl: e.target.value })}
+        </div>
+        <div className="sm:col-span-2">
+          <ImageUploadField
+            id="article-cover"
+            label="Ảnh bìa"
+            selected={image.selected}
+            existingUrl={draft.imageUrl}
+            error={image.error}
+            disabled={busy}
+            onSelect={image.select}
           />
-        </label>
+        </div>
         <label className="grid gap-1">
           <span>
             Trạng thái <RequiredMark />
@@ -348,9 +350,7 @@ export function ArticleForm({
         >
           <h2 className="text-xl font-bold">{draft.title}</h2>
           <p>{draft.excerpt}</p>
-          <div className="break-words whitespace-pre-wrap">
-            {normalizeTextSpacing(draft.content)}
-          </div>
+          <ContentBody value={draft.content} />
         </article>
       )}
       {error && (
@@ -371,7 +371,7 @@ export function ArticleForm({
           Tải lại dữ liệu (bỏ thay đổi)
         </Button>
       )}
-      <Button type="submit" disabled={pending || conflict}>
+      <Button type="submit" disabled={busy || conflict || !!image.error}>
         {pending ? 'Đang lưu…' : 'Lưu bài viết'}
       </Button>
     </form>

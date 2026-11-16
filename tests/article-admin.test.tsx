@@ -1,11 +1,14 @@
+import { uploadEditorImage } from '@/services/editor-image.service';
+import { Quill } from 'react-quill-new';
 import { expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { ArticleForm } from '@/features/articles/components/article-form';
 import type {
   AdminArticle,
   PostCategory,
 } from '@/features/articles/types/articles';
+vi.mock('@/services/editor-image.service', () => ({ uploadEditorImage: vi.fn() }));
 const categories: PostCategory[] = [
   {
     _id: 'b'.repeat(24),
@@ -56,8 +59,10 @@ it('creates selected homepage news with category, order and safe preview', async
   fireEvent.change(screen.getByLabelText('Tóm tắt'), {
     target: { value: 'Tóm tắt mới' },
   });
-  fireEvent.change(screen.getByLabelText('Nội dung'), {
-    target: { value: '<script>alert(1)</script>' },
+  const editor = screen.getByRole('textbox', { name: 'Nội dung' });
+  act(() => {
+    const quill = Quill.find(editor.closest('.ql-container')!) as unknown as { setText: (text: string, source: string) => void };
+    quill.setText('Safe content', 'user');
   });
   fireEvent.click(screen.getByLabelText(/Chọn hiển thị trên trang chủ/));
   fireEvent.change(screen.getByLabelText('Thứ tự trên trang chủ'), {
@@ -158,4 +163,32 @@ it('rejects scheduling in the past without sending a request', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Lưu bài viết' }));
   expect(await screen.findByRole('alert')).toBeTruthy();
   expect(save).not.toHaveBeenCalled();
+});
+
+it('uploads a selected cover on save and retains it after an upload failure', async () => {
+  const save = vi.fn(async () => {});
+  const OriginalURL = URL;
+  vi.stubGlobal('URL', class extends OriginalURL {
+    static createObjectURL() { return 'blob:cover-preview'; }
+    static revokeObjectURL() {}
+  });
+  const upload = vi.mocked(uploadEditorImage)
+    .mockRejectedValueOnce(new Error('Upload failed'))
+    .mockResolvedValueOnce({ url: 'https://example.com/cover.png', publicId: 'articles/cover' });
+  try {
+    render(<ArticleForm article={article} categories={categories} pending={false} save={save} reload={vi.fn()} />);
+    const file = new File(['image'], 'cover.png', { type: 'image/png' });
+    fireEvent.change(screen.getByLabelText('\u1ea2nh b\u00eca'), { target: { files: [file] } });
+    expect(upload).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'L\u01b0u b\u00e0i vi\u1ebft' }));
+    await screen.findByRole('alert');
+    expect(save).not.toHaveBeenCalled();
+    expect(screen.getByText('cover.png')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'L\u01b0u b\u00e0i vi\u1ebft' }));
+    await waitFor(() => expect(save).toHaveBeenCalledWith({ imageUrl: 'https://example.com/cover.png' }));
+    expect(upload).toHaveBeenLastCalledWith(file, expect.any(AbortSignal), 'articles');
+  } finally {
+    vi.unstubAllGlobals();
+    upload.mockReset();
+  }
 });

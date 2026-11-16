@@ -154,7 +154,7 @@ it('renders safe article detail content', () => {
   );
   expect(screen.getByRole('heading', { name: 'Bài viết mẫu' })).toBeTruthy();
   expect(detail.container.querySelector('script')).toBeNull();
-  expect(screen.getByText(/<script>alert\(1\)<\/script>/)).toBeTruthy();
+  expect(screen.queryByText(/<script>alert\(1\)<\/script>/)).toBeNull();
 });
 
 it('keeps repeated article tags consistent through data refreshes without duplicate keys', () => {
@@ -199,7 +199,7 @@ it('keeps repeated article tags consistent through data refreshes without duplic
   }
 });
 
-it('wraps pasted article text at normal spaces while retaining line breaks and literal HTML', () => {
+it('normalizes rich article spacing and removes unsafe HTML', () => {
   const previous = state.article.content;
   state.article.content =
     'Chính\u00a0sách\u00a0cửa\u00a0hàng\n<script>literal</script>';
@@ -214,9 +214,9 @@ it('wraps pasted article text at normal spaces while retaining line breaks and l
         </Routes>
       </MemoryRouter>
     );
-    const body = view.container.querySelector('.whitespace-pre-wrap');
+    const body = view.container.querySelector('.product-description-content');
     expect(body?.textContent).toBe(
-      'Chính sách cửa hàng\n<script>literal</script>'
+      'Chính sách cửa hàng\n'
     );
     expect(body?.querySelector('script')).toBeNull();
   } finally {
