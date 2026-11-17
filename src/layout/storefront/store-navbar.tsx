@@ -29,7 +29,7 @@ export function StoreNavbar() {
           </div>
 
           {/* DESKTOP LINKS */}
-          <div className="hidden h-14 min-w-0 flex-1 grid-cols-[1fr_1px_1fr_1px_1fr_1px_1fr] items-center lg:grid">
+          <div className="hidden h-14 min-w-0 flex-1 grid-cols-[1fr_1px_1fr_1px_1fr_1px_1fr_1px_1fr] items-center lg:grid">
             <NavLink
               to="/"
               end
@@ -71,6 +71,16 @@ export function StoreNavbar() {
               }
             >
               LIÊN HỆ
+            </NavLink>
+            <span aria-hidden="true" className="h-4 w-px bg-white/40" />
+
+            <NavLink
+              to="/chinh-sach-cua-hang"
+              className={({ isActive }) =>
+                `flex h-full min-w-0 items-center justify-center px-2 text-center text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-white ${isActive ? 'text-black' : 'text-white/90 hover:text-black'}`
+              }
+            >
+              CHÍNH SÁCH CỬA HÀNG
             </NavLink>
           </div>
 
@@ -147,6 +157,16 @@ export function StoreNavbar() {
                 }
               >
                 LIÊN HỆ
+              </NavLink>
+
+              <NavLink
+                to="/chinh-sach-cua-hang"
+                onClick={closeMobileMenu}
+                className={({ isActive }) =>
+                  `block rounded-md px-4 py-3 text-center text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-white ${isActive ? 'text-black' : 'text-white/90 hover:bg-white/15'}`
+                }
+              >
+                CHÍNH SÁCH CỬA HÀNG
               </NavLink>
             </div>
           </div>

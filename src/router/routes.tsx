@@ -28,6 +28,10 @@ export const routes: RouteObject[] = [
         lazy: page(() => import('@/pages/storefront/support/document')),
       })),
       {
+        path: '/chinh-sach-cua-hang',
+        lazy: page(() => import('@/pages/storefront/support/policy-index')),
+      },
+      {
         path: '/',
         lazy: page(() => import('@/pages/storefront/home/index')),
       },

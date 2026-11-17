@@ -28,7 +28,7 @@ export function StoreInformationLayout({
             Trang chủ
           </Link>
           <span>/</span>
-          <Link to="/chinh-sach-bao-hanh" className="hover:underline">
+          <Link to="/chinh-sach-cua-hang" className="hover:underline">
             Chính sách cửa hàng
           </Link>
           <span>/</span>
